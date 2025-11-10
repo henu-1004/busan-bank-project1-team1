@@ -1,0 +1,48 @@
+name: GCP VM 배포 (API 및 AP 서버)
+
+on:
+  push:
+    branches:
+      - main # 'main' 브랜치에 푸시될 때만 실행됩니다.
+
+permissions:
+  contents: 'read'
+  id-token: 'write' # !! WIF 인증에 필수 !!
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 코드 체크아웃
+      uses: actions/checkout@v4
+
+    # 1. WIF로 GCP에 인증
+    - name: GCP에 인증
+      id: auth
+      uses: 'google-github-actions/auth@v2'
+      with:
+        workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
+        service_account: ${{ secrets.GCP_SA_EMAIL }}
+
+    # 2. gcloud CLI 설정
+    - name: gcloud CLI 설정
+      uses: 'google-github-actions/setup-gcloud@v2'
+      with:
+        project_id: ${{ secrets.GCP_PROJECT_ID }}
+
+    # 3. bnk-api-server (프론트엔드) 배포
+    - name: bnk-api-server 배포
+      run: |
+        gcloud beta compute ssh bnk-api-server \
+          --project=${{ secrets.GCP_PROJECT_ID }} \
+          --zone=asia-northeast3-a \
+          --command="sudo /opt/scripts/deploy-api.sh"
+
+    # 4. bnk-ap-server (백엔드) 배포
+    - name: bnk-ap-server 배포
+      run: |
+        gcloud beta compute ssh bnk-ap-server \
+          --project=${{ secrets.GCP_PROJECT_ID }} \
+          --zone=asia-northeast3-a \
+          --command="sudo /opt/scripts/deploy-ap.sh"
