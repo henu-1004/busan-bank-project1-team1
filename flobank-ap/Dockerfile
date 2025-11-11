@@ -18,8 +18,8 @@ RUN ./gradlew build -x test
 # 6. 소스 코드는 더 이상 필요 없으니 삭제 (선택 사항이지만 권장)
 # RUN rm -rf src
 
-# 7. 빌드된 JAR 파일을 app.jar로 복사
-RUN mv build/libs/*.jar app.jar
+# 7. 실행가능한 JAR 파일만 app.jar로 복사
+RUN find build/libs -name "*.jar" ! -name "*-plain.jar" -exec cp {} app.jar \;
 
 # 8. 이 Docker 이미지가 실행될 때 실행할 명령어
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]
