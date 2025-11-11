@@ -38,7 +38,7 @@ jobs:
     # 3. bnk-api-server (프론트엔드) 배포
     - name: bnk-api-server 배포
       run: |
-        gcloud beta compute ssh bnk-api-server \
+        gcloud beta compute ssh mjgemini987@bnk-api-server \
           --project=${{ secrets.GCP_PROJECT_ID }} \
           --zone=asia-northeast3-a \
           --command="bash /opt/scripts/deploy-api.sh"
@@ -46,7 +46,7 @@ jobs:
     # 4. bnk-ap-server (백엔드) 배포
     - name: bnk-ap-server 배포
       run: |
-        gcloud beta compute ssh bnk-ap-server \
+        gcloud beta compute ssh mjgemini987@bnk-api-server \
           --project=${{ secrets.GCP_PROJECT_ID }} \
           --zone=asia-northeast3-a \
           --command="bash /opt/scripts/deploy-ap.sh"
