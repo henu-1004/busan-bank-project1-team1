@@ -34,4 +34,24 @@ public class ApResponseDTO {
      * 응답 타임스탬프 (로깅용)
      */
     private LocalDateTime responseTimestamp;
+
+    public static ApResponseDTO ok() {
+        return new ApResponseDTO("OK", null, null, LocalDateTime.now());
+    }
+
+    public static ApResponseDTO ok(JsonNode data) {
+        return new ApResponseDTO("OK", null, data, LocalDateTime.now());
+    }
+
+    public static ApResponseDTO ok(String message, JsonNode data) {
+        return new ApResponseDTO("OK", message, data, LocalDateTime.now());
+    }
+
+    public static ApResponseDTO fail(String message) {
+        return new ApResponseDTO("FAIL", message, null, LocalDateTime.now());
+    }
+
+    public boolean isSuccess() {
+        return "OK".equalsIgnoreCase(status);
+    }
 }

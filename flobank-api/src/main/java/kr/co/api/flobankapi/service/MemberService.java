@@ -1,17 +1,25 @@
 package kr.co.api.flobankapi.service;
 
+import kr.co.api.flobankapi.dto.ApRequestDTO;
 import kr.co.api.flobankapi.dto.ApResponseDTO;
 import kr.co.api.flobankapi.dto.MemberDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 // import org.springframework.security.crypto.password.PasswordEncoder; // [제거]
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+
+import java.time.LocalDate;
+import java.util.Map;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor // ApRequestService만 주입됩니다.
 public class MemberService {
 
+    private static final String API_MEMBER_REGISTER   = "MEMBER_REGISTER";
+    private static final String API_MEMBER_CHECK_ID   = "MEMBER_CHECK_ID";
+    private static final String API_MEMBER_CHECK_EMAIL= "MEMBER_CHECK_EMAIL";
     // AP 서버 공용 통신 모듈
     private final ApRequestService apRequestService;
 
@@ -22,10 +30,70 @@ public class MemberService {
 
         log.info("[회원가입 요청] DTO 전송: {}", memberDTO.getCustId());
 
-        // 2. [공통 모듈 호출] "MEMBER_REGISTER"라는 요청 코드로 AP 서버에 전송
-        ApResponseDTO response = apRequestService.execute("MEMBER_REGISTER", memberDTO);
+        ApResponseDTO invalid = validateForRegister(memberDTO);if (invalid != null) return invalid;
 
-        // 3. AP 서버의 응답을 컨트롤러로 그대로 반환
-        return response;
+        try {
+
+            return apRequestService.execute(API_MEMBER_REGISTER, memberDTO, ApResponseDTO.class);
+
+        } catch (Exception e) {
+            return ApResponseDTO.fail("AP 통신 오류: " + e.getMessage());
+        }
+    }
+
+    public ApResponseDTO checkId(String custId) {
+        if (!StringUtils.hasText(custId)) {
+            return ApResponseDTO.fail("아이디를 입력하세요.");
+        }
+        try {
+            Map<String, Object> payload = Map.of("custId", custId);
+            return apRequestService.execute(API_MEMBER_CHECK_ID, payload, ApResponseDTO.class);
+
+        } catch (Exception e) {
+            return ApResponseDTO.fail("AP 통신 오류: " + e.getMessage());
+        }
+    }
+
+    public ApResponseDTO checkEmail(String custEmail) {
+        if (!StringUtils.hasText(custEmail)) {
+            return ApResponseDTO.fail("이메일을 입력하세요.");
+        }
+        try {
+            Map<String, Object> payload = Map.of("custEmail", custEmail);
+            return apRequestService.execute(API_MEMBER_CHECK_EMAIL, payload, ApResponseDTO.class);
+
+        } catch (Exception e) {
+            return ApResponseDTO.fail("AP 통신 오류: " + e.getMessage());
+        }
+    }
+
+    private ApResponseDTO validateForRegister(MemberDTO d) {
+        if (!StringUtils.hasText(d.getCustId()))
+            return ApResponseDTO.fail("아이디를 입력하세요.");
+
+        if (!StringUtils.hasText(d.getCustPw()))
+            return ApResponseDTO.fail("비밀번호를 입력하세요.");
+
+        if (d.getCustPw().length() < 4 || d.getCustPw().length() > 16)
+            return ApResponseDTO.fail("비밀번호는 8~16자여야 합니다.");
+
+        if (!StringUtils.hasText(d.getCustName()))
+            return ApResponseDTO.fail("이름을 입력하세요.");
+
+        if (d.getCustBirth() == null)
+            return ApResponseDTO.fail("생년월일을 입력하세요.");
+
+        if (!StringUtils.hasText(d.getCustGen()))
+            return ApResponseDTO.fail("성별을 선택하세요.");
+
+        if (!StringUtils.hasText(d.getCustEmail()))
+            return ApResponseDTO.fail("이메일을 입력하세요.");
+
+        if (!StringUtils.hasText(d.getCustHp()))
+            return ApResponseDTO.fail("휴대폰 번호를 입력하세요.");
+
+        // 필요 시 휴대폰/이메일 포맷, 약관동의 등의 추가 검증을 여기에.
+
+        return null; // 검증 통과
     }
 }

@@ -28,11 +28,12 @@ public class ApRequestService {
     /**
      * AP 서버로 요청을 보내고 표준 응답(ApResponseDTO)을 받습니다.
      *
-     * @param requestCode AP 서버의 RequestRouterService가 사용할 요청 코드 (예: "MEMBER_REGISTER")
-     * @param payload     AP 서버로 보낼 실제 데이터 객체 (예: MemberDTO, ExchangeDTO 등)
+     * @param requestCode        AP 서버의 RequestRouterService가 사용할 요청 코드 (예: "MEMBER_REGISTER")
+     * @param payload            AP 서버로 보낼 실제 데이터 객체 (예: MemberDTO, ExchangeDTO 등)
+     * @param apResponseDTOClass
      * @return AP 서버로부터 받은 표준 응답(ApResponseDTO)
      */
-    public ApResponseDTO execute(String requestCode, Object payload) {
+    public ApResponseDTO execute(String requestCode, Object payload, Class<ApResponseDTO> apResponseDTOClass) {
 
         String jsonRequest = "";
         try {
