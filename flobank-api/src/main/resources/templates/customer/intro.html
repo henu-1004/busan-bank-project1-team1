@@ -4,9 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>FLOBANK 소개</title>
-  <link rel="stylesheet" href="/static/css/customer.css" />
-  <link rel="stylesheet" href="/static/css/header.css">
-  <link rel="stylesheet" href="/static/css/footer.css">
+    <link rel="stylesheet" th:href="@{/css/customer.css}">
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+    <link rel="stylesheet" th:href="@{/css/footer.css}">
 
   <link
     rel="stylesheet"
@@ -15,84 +15,13 @@
   />
 </head>
 <body>
-
-  <!-- 상단 헤더 -->
-  <header>
-    <div class="top-bar">
-      <ul></ul>
-      <div class="right-menu">
-        <a href="/member/login.html">로그인</a>
-        <a href="#">회원가입</a>
-        <a href="#">Language ▾</a>
-      </div>
-    </div>
-
-    <!--  메인 네비게이션 (하나만 유지) -->
-    <div class="main-nav">
-      <div class="logo">
-        <img src="/static/images/logo.png" alt="FLOBANK 로고">
-      </div>
-
-      <ul class="nav-menu">
-        <li class="menu-item" data-menu="1">외화예금</li>
-        <li class="menu-item" data-menu="2">외화송금</li>
-        <li class="menu-item" data-menu="3">환전</li>
-        <li class="menu-item" data-menu="4">환율</li>
-        <li class="menu-item" data-menu="5">고객센터</li>
-      </ul>
-
-      <div class="nav-icons">
-        <a href="#"><i class="fa-solid fa-comment-dots"></i></a>
-        <a href="#" class="search-trigger" aria-haspopup="dialog" aria-controls="searchModal"><i class="fa-solid fa-magnifying-glass"></i></a>
-      </div>
-    </div>
-
-    <!-- ✅ Mega Dropdown -->
-    <div class="mega-menu">
-      <div class="menu-group" data-menu="1">
-        <a href="/deposit/list.html">외화예금상품</a>
-        <a href="/deposit/info.html">외화예금안내</a>
-      </div>
-      <div class="menu-group" data-menu="2">
-        <a href="/remit/en_transfer_1.html">외화 송금하기</a>
-        <a href="/remit/info.html">외화 송금 안내</a>
-      </div>
-      <div class="menu-group" data-menu="3">
-        <a href="/exchange/step1.html">환전하기</a>
-        <a href="/exchange/info1.html">환전 가능 통화</a>
-        <a href="/exchange/info2.html">환전안내</a>
-        <a href="#">환전 계산기</a>
-      </div>
-      <div class="menu-group" data-menu="4">
-        <a href="/rate/rate_info.html">환율 조회</a>
-      </div>
-      <div class="menu-group" data-menu="5">
-        <a href="/customer/intro.html">FLOBANK 소개</a>
-        <a href="/customer/qna_list.html">질문과 답변(Q&A)</a>
-        <a href="/customer/faq_list.html">자주 묻는 질문(FAQ)</a>
-        <a href="/customer/event_list.html">이벤트</a>
-        <a href="/customer/notice_list.html">공지사항</a>
-      </div>
-    </div>
-  </header>
-
-
+<div th:replace="~{/_template/_header.html}"></div>
 <!-- =====================
        Main
 ====================== -->
 <main class="customer-container">
 
-  <!-- 사이드바 -->
-  <aside class="customer-sidebar">
-    <h3 class="customer-title">고객센터</h3>
-    <ul class="customer-category">
-      <li><a href="#" class="active">FLOBANK 소개</a></li>
-      <li><a href="#">질문과 답변(Q&A)</a></li>
-      <li><a href="#">자주 묻는 질문(FAQ)</a></li>
-      <li><a href="#">이벤트</a></li>
-      <li><a href="#">공지사항</a></li>
-    </ul>
-  </aside>
+    <div th:replace="~{/customer/_side}"></div>
 
   <!-- 본문 -->
   <section class="customer-content">
@@ -169,111 +98,6 @@
   </section>
 </main>
 
-
-
-
-<!-- 푸터 -->
-<footer class="footer">
-  <div class="footer-top">
-    <div class="footer-links">
-      <a href="#">개인정보처리방침</a> ·
-      <a href="#">경영공시</a> ·
-      <a href="#">고객정보취급방침</a> ·
-      <a href="#">보호금융상품등록부</a> ·
-      <a href="#">상품공시실</a> ·
-      <a href="#">전자민원접수</a> ·
-      <a href="#">전자금융이용자보호수칙</a> ·
-      <a href="#">전자금융사기피해금환급제도</a>
-    </div>
-    <p class="footer-location">위치기반서비스 이용약관</p>
-  </div>
-
-  <div class="footer-middle">
-    <p class="footer-call">
-      고객상담 <strong>1588-6200, 1544-6200</strong> &nbsp; | &nbsp;
-      해외 <strong>82-2-1588-6200</strong>
-    </p>
-    <p class="footer-copy">COPYRIGHT ⓒ 2025 FLOBANK ALL RIGHTS RESERVED.</p>
-  </div>
-
-  <div class="footer-bottom">
-    <div class="footer-left">
-      <a href="https://www.webwatch.or.kr/Situation/WA_Situation.html?MenuCD=110" target="_blank">
-        <img src="/static/images/web.png" alt="웹 접근성 인증" class="footer-cert">
-      </a>
-      <div class="footer-sns">
-        <a href="#"><i class="fa-brands fa-instagram"></i></a>
-        <a href="#"><i class="fa-brands fa-facebook"></i></a>
-        <a href="#"><i class="fa-brands fa-youtube"></i></a>
-      </div>
-    </div>
-
-    
-
-    </div>
-  </div>
-</footer>
-
-    <!-- ✅ 수정된 검색 Top Sheet -->
-    <div
-      class="search-top-sheet"
-      id="searchModal"
-      role="dialog"
-      aria-modal="true"
-      aria-hidden="true"
-    >
-      <div class="search-top-sheet__panel" role="document">
-        <div class="search-top-sheet__header">
-          <form class="search-top-sheet__form" role="search">
-            <label for="globalSearch" class="sr-only">검색어 입력</label>
-            <input
-              type="text"
-              id="globalSearch"
-              placeholder="검색어를 입력하세요."
-              autocomplete="off"
-            />
-            <button
-              type="submit"
-              class="search-top-sheet__submit"
-              aria-label="검색"
-            >
-              <i class="fa-solid fa-magnifying-glass"></i>
-            </button>
-          </form>
-
-          <button type="button" class="search-top-sheet__close" aria-label="닫기">
-            <i class="fa-solid fa-xmark"></i>
-          </button>
-        </div>
-
-        <div class="search-top-sheet__content">
-          <div class="search-section">
-            <h3>최근 검색어</h3>
-            <ul class="search-list">
-              <li class="empty">최근 검색 내역이 없습니다.</li>
-            </ul>
-          </div>
-          <div class="search-section">
-            <h3>인기 검색어</h3>
-            <ol class="search-list rank">
-              <li>환율우대</li>
-              <li>여행자보험</li>
-              <li>OTP</li>
-              <li>환율 계산기</li>
-              <li>외화예금</li>
-              <li>모바일뱅킹</li>
-              <li>자동이체</li>
-              <li>주거래</li>
-              <li>카드교체</li>
-              <li>무료주차</li>
-            </ol>
-          </div>
-        </div>
-
-
-
-
-
-<script src="/static/js/index.js"></script>
+<div th:replace="~{/_template/_footer.html}"></div>
 </body>
 </html>

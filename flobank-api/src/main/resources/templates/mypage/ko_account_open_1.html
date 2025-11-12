@@ -1,429 +1,252 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>원화 계좌개설1</title>
-  <link rel="stylesheet" href="/static/css/mypage.css"> <!-- 각 카테고리별 css 입력-->
-  <link rel="stylesheet" href="/static/css/header.css">
-  <link rel="stylesheet" href="/static/css/footer.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>원화 계좌개설1</title>
+
+    <link rel="stylesheet" th:href="@{/css/mypage.css}"> <link rel="stylesheet" th:href="@{/css/header.css}">
+    <link rel="stylesheet" th:href="@{/css/footer.css}">
 
     <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-    crossorigin="anonymous"
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+            crossorigin="anonymous"
     />
 
 </head>
 <body>
-
-  <!-- 상단 헤더 -->
-  <header>
-    <div class="top-bar">
-      <ul></ul>
-      <div class="right-menu">
-        <a href="/member/login.html">로그인</a>
-        <a href="#">회원가입</a>
-        <a href="#">Language ▾</a>
-      </div>
-    </div>
-
-    <!--  메인 네비게이션 (하나만 유지) -->
-    <div class="main-nav">
-      <div class="logo">
-        <img src="/static/images/logo.png" alt="FLOBANK 로고">
-      </div>
-
-      <ul class="nav-menu">
-        <li class="menu-item" data-menu="1">외화예금</li>
-        <li class="menu-item" data-menu="2">외화송금</li>
-        <li class="menu-item" data-menu="3">환전</li>
-        <li class="menu-item" data-menu="4">환율</li>
-        <li class="menu-item" data-menu="5">고객센터</li>
-      </ul>
-
-      <div class="nav-icons">
-        <a href="#"><i class="fa-solid fa-comment-dots"></i></a>
-        <a href="#" class="search-trigger" aria-haspopup="dialog" aria-controls="searchModal"><i class="fa-solid fa-magnifying-glass"></i></a>
-      </div>
-    </div>
-
-    <!-- ✅ Mega Dropdown -->
-    <div class="mega-menu">
-      <div class="menu-group" data-menu="1">
-        <a href="/deposit/list.html">외화예금상품</a>
-        <a href="/deposit/info.html">외화예금안내</a>
-      </div>
-      <div class="menu-group" data-menu="2">
-        <a href="/remit/en_transfer_1.html">외화 송금하기</a>
-        <a href="/remit/info.html">외화 송금 안내</a>
-      </div>
-      <div class="menu-group" data-menu="3">
-        <a href="/exchange/step1.html">환전하기</a>
-        <a href="/exchange/info1.html">환전 가능 통화</a>
-        <a href="/exchange/info2.html">환전안내</a>
-        <a href="#">환전 계산기</a>
-      </div>
-      <div class="menu-group" data-menu="4">
-        <a href="/rate/rate_info.html">환율 조회</a>
-      </div>
-      <div class="menu-group" data-menu="5">
-        <a href="/customer/intro.html">FLOBANK 소개</a>
-        <a href="/customer/qna_list.html">질문과 답변(Q&A)</a>
-        <a href="/customer/faq_list.html">자주 묻는 질문(FAQ)</a>
-        <a href="/customer/event_list.html">이벤트</a>
-        <a href="/customer/notice_list.html">공지사항</a>
-      </div>
-    </div>
-  </header>
-
-
+<div th:replace="~{/_template/_header.html}"></div>
 
 <main class="terms-container">
-  <h2>입출금 통장 개설 약관 동의</h2>
-  <p class="terms-desc">통장 개설을 위해 아래 약관을 확인하시고 동의해주세요.</p>
+    <h2>입출금 통장 개설 약관 동의</h2>
+    <p class="terms-desc">통장 개설을 위해 아래 약관을 확인하시고 동의해주세요.</p>
 
-  <!-- 1️⃣ 전자금융 약관 동의 -->
-  <section class="terms-group">
-    <h3 class="group-title">전자금융 약관 동의</h3>
+    <section class="terms-group">
+        <h3 class="group-title">전자금융 약관 동의</h3>
 
-    <!-- 전자금융이용약관 -->
-    <div class="terms-box">
-      <h4 class="terms-title">전자금융이용약관</h4>
-      <div class="terms-content">
-        <p>
-          제1조 (목적)<br>
-          본 약관은 OO은행과 고객 간 전자금융거래에 관한 기본적인 권리, 의무 및 책임사항을 규정합니다.<br><br>
-          제2조 (정의)<br>
-          "전자금융거래"라 함은 고객이 전자적 장치를 통하여 은행의 금융서비스를 이용하는 거래를 말합니다.<br><br>
-          제3조 (적용범위)<br>
-          본 약관은 전자금융거래를 이용하는 고객에게 적용됩니다.<br><br>
-          제4조 (이용시간 및 중단)<br>
-          은행은 시스템 점검 등의 사유로 전자금융거래 이용을 일시 중단할 수 있습니다.
-        </p>
-      </div>
-      <div class="terms-check">
+        <div class="terms-box">
+            <h4 class="terms-title">전자금융이용약관</h4>
+            <div class="terms-content">
+                <p>
+                    제1조 (목적)<br>
+                    본 약관은 OO은행과 고객 간 전자금융거래에 관한 기본적인 권리, 의무 및 책임사항을 규정합니다.<br><br>
+                    제2조 (정의)<br>
+                    "전자금융거래"라 함은 고객이 전자적 장치를 통하여 은행의 금융서비스를 이용하는 거래를 말합니다.<br><br>
+                    제3조 (적용범위)<br>
+                    본 약관은 전자금융거래를 이용하는 고객에게 적용됩니다.<br><br>
+                    제4조 (이용시간 및 중단)<br>
+                    은행은 시스템 점검 등의 사유로 전자금융거래 이용을 일시 중단할 수 있습니다.
+                </p>
+            </div>
+            <div class="terms-check">
+                <label class="custom-check">
+                    <input type="checkbox" class="term-check">
+                    <span class="checkmark"></span>
+                    위 약관에 동의합니다.
+                </label>
+            </div>
+        </div>
+
+        <div class="terms-box">
+            <h4 class="terms-title">전자금융서비스 이용약관</h4>
+            <div class="terms-content">
+                <p>
+                    제1조 (목적)<br>
+                    본 약관은 OO은행이 제공하는 전자금융서비스의 이용조건 및 절차 등에 관한 사항을 정함을 목적으로 합니다.<br><br>
+                    제2조 (서비스 종류)<br>
+                    인터넷뱅킹, 모바일뱅킹, 텔레뱅킹, 자동화기기 거래 등으로 구성됩니다.<br><br>
+                    제3조 (이용시간)<br>
+                    은행은 서비스별 이용시간을 정하여 홈페이지에 게시합니다.<br><br>
+                    제4조 (이용자의 의무)<br>
+                    이용자는 접근매체를 제3자에게 대여하거나 누설하여서는 아니됩니다.
+                </p>
+            </div>
+            <div class="terms-check">
+                <label class="custom-check">
+                    <input type="checkbox" class="term-check">
+                    <span class="checkmark"></span>
+                    위 약관에 동의합니다.
+                </label>
+            </div>
+        </div>
+
+        <div class="terms-box">
+            <h4 class="terms-title">개인(신용)정보 수집·이용 동의서 (전자금융)</h4>
+            <div class="terms-content">
+                <p>
+                    수집항목: 성명, 연락처, 계좌번호, 로그인정보 등<br>
+                    이용목적: 본인확인, 거래이력 관리, 고객서비스 제공<br>
+                    보유기간: 관계법령에 의한 보존기간까지<br><br>
+                    고객은 개인정보 보호법에 따라 언제든 동의를 철회할 수 있습니다.
+                </p>
+            </div>
+            <div class="terms-check">
+                <label class="custom-check">
+                    <input type="checkbox" class="term-check">
+                    <span class="checkmark"></span>
+                    위 약관에 동의합니다.
+                </label>
+            </div>
+        </div>
+
+        <div class="terms-box">
+            <h4 class="terms-title">스타뱅킹서비스 이용 및 상품가입 동의</h4>
+            <div class="terms-content">
+                <p>
+                    제1조 (목적)<br>
+                    본 약관은 OO은행의 스타뱅킹 서비스 이용에 관한 기본사항을 규정합니다.<br><br>
+                    제2조 (서비스 이용)<br>
+                    이용자는 본인의 인증을 통해 스타뱅킹 서비스를 이용할 수 있습니다.<br><br>
+                    제3조 (이용자의 의무)<br>
+                    이용자는 비밀번호와 접근수단을 안전하게 관리해야 합니다.
+                </p>
+            </div>
+            <div class="terms-check">
+                <label class="custom-check">
+                    <input type="checkbox" class="term-check">
+                    <span class="checkmark"></span>
+                    위 약관에 동의합니다.
+                </label>
+            </div>
+        </div>
+    </section>
+
+    <section class="terms-group">
+        <h3 class="group-title">상품 약관 동의</h3>
+
+        <div class="terms-box">
+            <h4 class="terms-title">예금거래기본약관</h4>
+            <div class="terms-content">
+                <p>
+                    본 약관은 예금거래에 관한 기본적인 사항을 정함을 목적으로 합니다.<br><br>
+                    제2조 (예금계약의 성립)<br>
+                    고객의 신청과 은행의 승낙으로 예금계약이 성립됩니다.
+                </p>
+            </div>
+            <div class="terms-check">
+                <label class="custom-check">
+                    <input type="checkbox" class="term-check">
+                    <span class="checkmark"></span>
+                    위 약관에 동의합니다.
+                </label>
+            </div>
+        </div>
+
+        <div class="terms-box">
+            <h4 class="terms-title">입출금이자자유로움 약관</h4>
+            <div class="terms-content">
+                <p>
+                    본 상품은 자유로운 입출금이 가능한 보통예금 상품입니다.<br>
+                    이자는 일정기간의 평균잔액에 따라 계산되며, 약정일에 지급됩니다.
+                </p>
+            </div>
+            <div class="terms-check">
+                <label class="custom-check">
+                    <input type="checkbox" class="term-check">
+                    <span class="checkmark"></span>
+                    위 약관에 동의합니다.
+                </label>
+            </div>
+        </div>
+
+        <div class="terms-box">
+            <h4 class="terms-title">입출금통장 상품설명서</h4>
+            <div class="terms-content">
+                <p>
+                    상품명: 입출금통장<br>
+                    거래한도, 이자율, 수수료 및 기타 서비스에 대한 상세 내용은 상품설명서에서 확인하실 수 있습니다.
+                </p>
+            </div>
+            <div class="terms-check">
+                <label class="custom-check">
+                    <input type="checkbox" class="term-check">
+                    <span class="checkmark"></span>
+                    위 약관에 동의합니다.
+                </label>
+            </div>
+        </div>
+
+        <div class="terms-box">
+            <h4 class="terms-title">개인(신용)정보 수집·이용 동의서 (상품서비스)</h4>
+            <div class="terms-content">
+                <p>
+                    고객의 신용정보는 상품 서비스 제공 목적 외로 사용되지 않습니다.<br>
+                    수집항목, 이용목적, 보유기간은 관련 법령에 따라 관리됩니다.
+                </p>
+            </div>
+            <div class="terms-check">
+                <label class="custom-check">
+                    <input type="checkbox" class="term-check">
+                    <span class="checkmark"></span>
+                    위 약관에 동의합니다.
+                </label>
+            </div>
+        </div>
+    </section>
+
+    <section class="terms-group">
+        <h3 class="group-title">확인 및 안내사항</h3>
+
+        <div class="terms-box">
+            <h4 class="terms-title">예금주 본인확인 (스타뱅킹)</h4>
+            <div class="terms-content"><p>고객 본인의 명의와 실명확인을 위해 본인 인증 절차를 수행해야 합니다.</p></div>
+            <div class="terms-check">
+                <label class="custom-check"><input type="checkbox" class="term-check"><span class="checkmark"></span> 위 약관에 동의합니다.</label>
+            </div>
+        </div>
+
+        <div class="terms-box">
+            <h4 class="terms-title">통장·현금카드 비대면 개설 동의</h4>
+            <div class="terms-content"><p>비대면 개설 시 본인 인증 및 고객정보 보호를 위한 절차가 적용됩니다.</p></div>
+            <div class="terms-check">
+                <label class="custom-check"><input type="checkbox" class="term-check"><span class="checkmark"></span> 위 약관에 동의합니다.</label>
+            </div>
+        </div>
+
+        <div class="terms-box">
+            <h4 class="terms-title">거래 목적 및 자금 원천 확인</h4>
+            <div class="terms-content"><p>자금세탁방지법에 따라 거래 목적 및 자금 출처 확인이 필요합니다.</p></div>
+            <div class="terms-check">
+                <label class="custom-check"><input type="checkbox" class="term-check"><span class="checkmark"></span> 위 약관에 동의합니다.</label>
+            </div>
+        </div>
+    </section>
+
+    <section class="terms-group">
+        <h3 class="group-title">금융상품의 중요사항 안내</h3>
+
+        <div class="terms-box">
+            <h4 class="terms-title">우선 설명사항 [필수]</h4>
+            <div class="terms-content"><p>본 상품은 예금자보호법에 따라 보호되며, 예금보험공사가 보호합니다.</p></div>
+            <div class="terms-check">
+                <label class="custom-check"><input type="checkbox" class="term-check"><span class="checkmark"></span> 위 약관에 동의합니다.</label>
+            </div>
+        </div>
+
+        <div class="terms-box">
+            <h4 class="terms-title">예금상품 및 연계·제휴 서비스 [필수]</h4>
+            <div class="terms-content"><p>예금상품의 금리, 수수료, 부가서비스 등은 은행의 정책에 따라 변동될 수 있습니다.</p></div>
+            <div class="terms-check">
+                <label class="custom-check"><input type="checkbox" class="term-check"><span class="checkmark"></span> 위 약관에 동의합니다.</label>
+            </div>
+        </div>
+    </section>
+
+    <div class="terms-all">
         <label class="custom-check">
-          <input type="checkbox" class="term-check">
-          <span class="checkmark"></span>
-          위 약관에 동의합니다.
+            <input type="checkbox" id="agreeAll">
+            <span class="checkmark"></span>
+            <strong> 모든 약관에 동의합니다.</strong>
         </label>
-      </div>
     </div>
 
-    <!-- 전자금융서비스 이용약관 -->
-    <div class="terms-box">
-      <h4 class="terms-title">전자금융서비스 이용약관</h4>
-      <div class="terms-content">
-        <p>
-          제1조 (목적)<br>
-          본 약관은 OO은행이 제공하는 전자금융서비스의 이용조건 및 절차 등에 관한 사항을 정함을 목적으로 합니다.<br><br>
-          제2조 (서비스 종류)<br>
-          인터넷뱅킹, 모바일뱅킹, 텔레뱅킹, 자동화기기 거래 등으로 구성됩니다.<br><br>
-          제3조 (이용시간)<br>
-          은행은 서비스별 이용시간을 정하여 홈페이지에 게시합니다.<br><br>
-          제4조 (이용자의 의무)<br>
-          이용자는 접근매체를 제3자에게 대여하거나 누설하여서는 아니됩니다.
-        </p>
-      </div>
-      <div class="terms-check">
-        <label class="custom-check">
-          <input type="checkbox" class="term-check">
-          <span class="checkmark"></span>
-          위 약관에 동의합니다.
-        </label>
-      </div>
+    <div class="terms-actions">
+        <a th:href="@{/mypage/ko_account_open_2}" class="btn-next">다음</a>
     </div>
-
-    <!-- 개인(신용)정보 수집·이용 동의서(전자금융) -->
-    <div class="terms-box">
-      <h4 class="terms-title">개인(신용)정보 수집·이용 동의서 (전자금융)</h4>
-      <div class="terms-content">
-        <p>
-          수집항목: 성명, 연락처, 계좌번호, 로그인정보 등<br>
-          이용목적: 본인확인, 거래이력 관리, 고객서비스 제공<br>
-          보유기간: 관계법령에 의한 보존기간까지<br><br>
-          고객은 개인정보 보호법에 따라 언제든 동의를 철회할 수 있습니다.
-        </p>
-      </div>
-      <div class="terms-check">
-        <label class="custom-check">
-          <input type="checkbox" class="term-check">
-          <span class="checkmark"></span>
-          위 약관에 동의합니다.
-        </label>
-      </div>
-    </div>
-
-    <!-- 스타뱅킹서비스 이용 및 상품가입 동의 -->
-    <div class="terms-box">
-      <h4 class="terms-title">스타뱅킹서비스 이용 및 상품가입 동의</h4>
-      <div class="terms-content">
-        <p>
-          제1조 (목적)<br>
-          본 약관은 OO은행의 스타뱅킹 서비스 이용에 관한 기본사항을 규정합니다.<br><br>
-          제2조 (서비스 이용)<br>
-          이용자는 본인의 인증을 통해 스타뱅킹 서비스를 이용할 수 있습니다.<br><br>
-          제3조 (이용자의 의무)<br>
-          이용자는 비밀번호와 접근수단을 안전하게 관리해야 합니다.
-        </p>
-      </div>
-      <div class="terms-check">
-        <label class="custom-check">
-          <input type="checkbox" class="term-check">
-          <span class="checkmark"></span>
-          위 약관에 동의합니다.
-        </label>
-      </div>
-    </div>
-  </section>
-
-  <!-- 2️⃣ 상품 약관 동의 -->
-  <section class="terms-group">
-    <h3 class="group-title">상품 약관 동의</h3>
-
-    <div class="terms-box">
-      <h4 class="terms-title">예금거래기본약관</h4>
-      <div class="terms-content">
-        <p>
-          본 약관은 예금거래에 관한 기본적인 사항을 정함을 목적으로 합니다.<br><br>
-          제2조 (예금계약의 성립)<br>
-          고객의 신청과 은행의 승낙으로 예금계약이 성립됩니다.
-        </p>
-      </div>
-      <div class="terms-check">
-        <label class="custom-check">
-          <input type="checkbox" class="term-check">
-          <span class="checkmark"></span>
-          위 약관에 동의합니다.
-        </label>
-      </div>
-    </div>
-
-    <div class="terms-box">
-      <h4 class="terms-title">입출금이자자유로움 약관</h4>
-      <div class="terms-content">
-        <p>
-          본 상품은 자유로운 입출금이 가능한 보통예금 상품입니다.<br>
-          이자는 일정기간의 평균잔액에 따라 계산되며, 약정일에 지급됩니다.
-        </p>
-      </div>
-      <div class="terms-check">
-        <label class="custom-check">
-          <input type="checkbox" class="term-check">
-          <span class="checkmark"></span>
-          위 약관에 동의합니다.
-        </label>
-      </div>
-    </div>
-
-    <div class="terms-box">
-      <h4 class="terms-title">입출금통장 상품설명서</h4>
-      <div class="terms-content">
-        <p>
-          상품명: 입출금통장<br>
-          거래한도, 이자율, 수수료 및 기타 서비스에 대한 상세 내용은 상품설명서에서 확인하실 수 있습니다.
-        </p>
-      </div>
-      <div class="terms-check">
-        <label class="custom-check">
-          <input type="checkbox" class="term-check">
-          <span class="checkmark"></span>
-          위 약관에 동의합니다.
-        </label>
-      </div>
-    </div>
-
-    <div class="terms-box">
-      <h4 class="terms-title">개인(신용)정보 수집·이용 동의서 (상품서비스)</h4>
-      <div class="terms-content">
-        <p>
-          고객의 신용정보는 상품 서비스 제공 목적 외로 사용되지 않습니다.<br>
-          수집항목, 이용목적, 보유기간은 관련 법령에 따라 관리됩니다.
-        </p>
-      </div>
-      <div class="terms-check">
-        <label class="custom-check">
-          <input type="checkbox" class="term-check">
-          <span class="checkmark"></span>
-          위 약관에 동의합니다.
-        </label>
-      </div>
-    </div>
-  </section>
-
-  <!-- 3️⃣ 확인 및 안내사항 -->
-  <section class="terms-group">
-    <h3 class="group-title">확인 및 안내사항</h3>
-
-    <div class="terms-box">
-      <h4 class="terms-title">예금주 본인확인 (스타뱅킹)</h4>
-      <div class="terms-content"><p>고객 본인의 명의와 실명확인을 위해 본인 인증 절차를 수행해야 합니다.</p></div>
-      <div class="terms-check">
-        <label class="custom-check"><input type="checkbox" class="term-check"><span class="checkmark"></span> 위 약관에 동의합니다.</label>
-      </div>
-    </div>
-
-    <div class="terms-box">
-      <h4 class="terms-title">통장·현금카드 비대면 개설 동의</h4>
-      <div class="terms-content"><p>비대면 개설 시 본인 인증 및 고객정보 보호를 위한 절차가 적용됩니다.</p></div>
-      <div class="terms-check">
-        <label class="custom-check"><input type="checkbox" class="term-check"><span class="checkmark"></span> 위 약관에 동의합니다.</label>
-      </div>
-    </div>
-
-    <div class="terms-box">
-      <h4 class="terms-title">거래 목적 및 자금 원천 확인</h4>
-      <div class="terms-content"><p>자금세탁방지법에 따라 거래 목적 및 자금 출처 확인이 필요합니다.</p></div>
-      <div class="terms-check">
-        <label class="custom-check"><input type="checkbox" class="term-check"><span class="checkmark"></span> 위 약관에 동의합니다.</label>
-      </div>
-    </div>
-  </section>
-
-  <!-- 4️⃣ 금융상품의 중요사항 안내 -->
-  <section class="terms-group">
-    <h3 class="group-title">금융상품의 중요사항 안내</h3>
-
-    <div class="terms-box">
-      <h4 class="terms-title">우선 설명사항 [필수]</h4>
-      <div class="terms-content"><p>본 상품은 예금자보호법에 따라 보호되며, 예금보험공사가 보호합니다.</p></div>
-      <div class="terms-check">
-        <label class="custom-check"><input type="checkbox" class="term-check"><span class="checkmark"></span> 위 약관에 동의합니다.</label>
-      </div>
-    </div>
-
-    <div class="terms-box">
-      <h4 class="terms-title">예금상품 및 연계·제휴 서비스 [필수]</h4>
-      <div class="terms-content"><p>예금상품의 금리, 수수료, 부가서비스 등은 은행의 정책에 따라 변동될 수 있습니다.</p></div>
-      <div class="terms-check">
-        <label class="custom-check"><input type="checkbox" class="term-check"><span class="checkmark"></span> 위 약관에 동의합니다.</label>
-      </div>
-    </div>
-  </section>
-
-  <!-- 전체 동의 -->
-  <div class="terms-all">
-    <label class="custom-check">
-      <input type="checkbox" id="agreeAll">
-      <span class="checkmark"></span>
-      <strong> 모든 약관에 동의합니다.</strong>
-    </label>
-  </div>
-
-  <div class="terms-actions">
-  <a href="/mypage/ko_account_open_2.html" class="btn-next">다음</a>
-</div>
 </main>
-
-
-
-
-<!-- 푸터 -->
-<footer class="footer">
-  <div class="footer-top">
-    <div class="footer-links">
-      <a href="#">개인정보처리방침</a> ·
-      <a href="#">경영공시</a> ·
-      <a href="#">고객정보취급방침</a> ·
-      <a href="#">보호금융상품등록부</a> ·
-      <a href="#">상품공시실</a> ·
-      <a href="#">전자민원접수</a> ·
-      <a href="#">전자금융이용자보호수칙</a> ·
-      <a href="#">전자금융사기피해금환급제도</a>
-    </div>
-    <p class="footer-location">위치기반서비스 이용약관</p>
-  </div>
-
-  <div class="footer-middle">
-    <p class="footer-call">
-      고객상담 <strong>1588-6200, 1544-6200</strong> &nbsp; | &nbsp;
-      해외 <strong>82-2-1588-6200</strong>
-    </p>
-    <p class="footer-copy">COPYRIGHT ⓒ 2025 FLOBANK ALL RIGHTS RESERVED.</p>
-  </div>
-
-  <div class="footer-bottom">
-    <div class="footer-left">
-      <a href="https://www.webwatch.or.kr/Situation/WA_Situation.html?MenuCD=110" target="_blank">
-        <img src="/static/images/web.png" alt="웹 접근성 인증" class="footer-cert">
-      </a>
-      <div class="footer-sns">
-        <a href="#"><i class="fa-brands fa-instagram"></i></a>
-        <a href="#"><i class="fa-brands fa-facebook"></i></a>
-        <a href="#"><i class="fa-brands fa-youtube"></i></a>
-      </div>
-    </div>
-
-    
-
-    </div>
-  </div>
-</footer>
-
-    <!-- ✅ 수정된 검색 Top Sheet -->
-    <div
-      class="search-top-sheet"
-      id="searchModal"
-      role="dialog"
-      aria-modal="true"
-      aria-hidden="true"
-    >
-      <div class="search-top-sheet__panel" role="document">
-        <div class="search-top-sheet__header">
-          <form class="search-top-sheet__form" role="search">
-            <label for="globalSearch" class="sr-only">검색어 입력</label>
-            <input
-              type="text"
-              id="globalSearch"
-              placeholder="검색어를 입력하세요."
-              autocomplete="off"
-            />
-            <button
-              type="submit"
-              class="search-top-sheet__submit"
-              aria-label="검색"
-            >
-              <i class="fa-solid fa-magnifying-glass"></i>
-            </button>
-          </form>
-
-          <button type="button" class="search-top-sheet__close" aria-label="닫기">
-            <i class="fa-solid fa-xmark"></i>
-          </button>
-        </div>
-
-        <div class="search-top-sheet__content">
-          <div class="search-section">
-            <h3>최근 검색어</h3>
-            <ul class="search-list">
-              <li class="empty">최근 검색 내역이 없습니다.</li>
-            </ul>
-          </div>
-          <div class="search-section">
-            <h3>인기 검색어</h3>
-            <ol class="search-list rank">
-              <li>환율우대</li>
-              <li>여행자보험</li>
-              <li>OTP</li>
-              <li>환율 계산기</li>
-              <li>외화예금</li>
-              <li>모바일뱅킹</li>
-              <li>자동이체</li>
-              <li>주거래</li>
-              <li>카드교체</li>
-              <li>무료주차</li>
-            </ol>
-          </div>
-        </div>
-      </div>
-    </div>
-
-
-
-<script src ="/static/js/index.js"></script>
-<script src ="/static/js/mypage.js"></script>
+<div th:replace="~{/_template/_footer.html}"></div>
+<script th:src="@{/js/mypage.js}"></script>
 
 </body>
 </html>
-

@@ -6,8 +6,25 @@ spring:
     application:
         name: flobank_api
 
+    # ✅ 1. DB 접속 정보
+    datasource:
+      url: jdbc:oracle:thin:@(description=(retry_count=20)(retry_delay=3)(address=(protocol=tcps)(port=1522)(host=adb.ap-chuncheon-1.oraclecloud.com))(connect_data=(service_name=g9ab35e902b30b6_flobank_low.adb.oraclecloud.com))(security=(ssl_server_dn_match=yes)))
+      username: ADMIN
+      password: Flobank1234!!
+      driver-class-name: oracle.jdbc.OracleDriver
+
 # 접속해야 할 flobank_ap (AP 서버) 정보
 flobank:
   ap:
     host: 34.22.80.47
     port: 9090 # AP 서버와 약속한 TCP 포트
+
+# ✅ 2. MyBatis 설정
+mybatis:
+  # SQL 쿼리가 작성될 XML 매퍼 파일의 위치를 지정
+  mapper-locations: classpath:mappers/**/*.xml
+  # DB의 snake_case 컬럼(ex: exchange_rate)을
+  # Java의 camelCase 프로퍼티(ex: exchangeRate)로 자동 매핑
+  configuration:
+    map-underscore-to-camel-case: true
+

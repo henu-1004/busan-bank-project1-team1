@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>외화 예금 상품 view</title>
-  <link rel="stylesheet" href="/static/css/deposit.css">
-  <link rel="stylesheet" href="/static/css/header.css">
-  <link rel="stylesheet" href="/static/css/footer.css">
+    <link rel="stylesheet" th:href="@{/css/deposit.css}">
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+    <link rel="stylesheet" th:href="@{/css/footer.css}">
 
     <link
     rel="stylesheet"
@@ -16,88 +16,11 @@
 
 </head>
 <body>
-
-<!-- 상단 헤더 -->
-  <header>
-    <div class="top-bar">
-      <ul></ul>
-      <div class="right-menu">
-        <a href="/member/login.html">로그인</a>
-        <a href="#">회원가입</a>
-        <div class="language-dropdown">
-        <a href="#" class="language-toggle">Language ▾</a>
-        <ul class="language-menu">
-          <li data-lang="ko">한국어(Korean)</li>
-          <li data-lang="en">영어(English)</li>
-          <li data-lang="ja">일본어(日本語)</li>
-          <li data-lang="zh">중국어(中文)</li>
-        </ul>
-      </div>
-      </div>
-    </div>
-
-    <!--  메인 네비게이션 (하나만 유지) -->
-    <div class="main-nav">
-      <div class="logo">
-        <img src="/static/images/logo.png" alt="FLOBANK 로고">
-      </div>
-
-      <ul class="nav-menu">
-        <li class="menu-item" data-menu="1">외화예금</li>
-        <li class="menu-item" data-menu="2">외화송금</li>
-        <li class="menu-item" data-menu="3">환전</li>
-        <li class="menu-item" data-menu="4">환율</li>
-        <li class="menu-item" data-menu="5">고객센터</li>
-      </ul>
-
-      <div class="nav-icons">
-        <a href="#"><i class="fa-solid fa-comment-dots"></i></a>
-        <a href="#" class="search-trigger" aria-haspopup="dialog" aria-controls="searchModal"><i class="fa-solid fa-magnifying-glass"></i></a>
-      </div>
-    </div>
-
-    <!-- ✅ Mega Dropdown -->
-    <div class="mega-menu">
-      <div class="menu-group" data-menu="1">
-        <a href="/deposit/list.html">외화예금상품</a>
-        <a href="/deposit/info.html">외화예금안내</a>
-      </div>
-      <div class="menu-group" data-menu="2">
-        <a href="/remit/en_transfer_1.html">외화 송금하기</a>
-        <a href="/remit/info.html">외화 송금 안내</a>
-      </div>
-      <div class="menu-group" data-menu="3">
-        <a href="/exchange/step1.html">환전하기</a>
-        <a href="/exchange/info1.html">환전 가능 통화</a>
-        <a href="/exchange/info2.html">환전안내</a>
-      </div>
-      <div class="menu-group" data-menu="4">
-        <a href="/rate/rate_info.html">환율 조회</a>
-        <a href="/rate/rate_calc.html">환전 계산기</a>
-      </div>
-      <div class="menu-group" data-menu="5">
-        <a href="/customer/intro.html">FLOBANK 소개</a>
-        <a href="/customer/qna_list.html">질문과 답변(Q&A)</a>
-        <a href="/customer/faq_list.html">자주 묻는 질문(FAQ)</a>
-        <a href="/customer/event_list.html">이벤트</a>
-        <a href="/customer/notice_list.html">공지사항</a>
-      </div>
-    </div>
-  </header>
-
-
-
+<div th:replace="~{/_template/_header.html}"></div>
  <!-- ✅ 메인 콘텐츠 -->
 <main class="view-main">
 
-    <!-- 왼쪽 카테고리 -->
-    <aside class="list-sidebar">
-      <h3 class="list-title">외화예금</h3>
-      <ul class="list-category">
-        <li class="active"><a href="#">외화예금상품</a></li>
-        <li><a href="#">외화예금안내</a></li>
-      </ul>
-    </aside>
+    <div th:replace="~{/_side.html}"></div>
 
     <section class="view-container">
 
@@ -430,80 +353,8 @@
     </section>
   </main>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<!-- 푸터 -->
-<footer class="footer">
-  <div class="footer-top">
-    <div class="footer-links">
-      <a href="#">개인정보처리방침</a> ·
-      <a href="#">경영공시</a> ·
-      <a href="#">고객정보취급방침</a> ·
-      <a href="#">보호금융상품등록부</a> ·
-      <a href="#">상품공시실</a> ·
-      <a href="#">전자민원접수</a> ·
-      <a href="#">전자금융이용자보호수칙</a> ·
-      <a href="#">전자금융사기피해금환급제도</a>
-    </div>
-    <p class="footer-location">위치기반서비스 이용약관</p>
-  </div>
-
-  <div class="footer-middle">
-    <p class="footer-call">
-      고객상담 <strong>1588-6200, 1544-6200</strong> &nbsp; | &nbsp;
-      해외 <strong>82-2-1588-6200</strong>
-    </p>
-    <p class="footer-copy">COPYRIGHT ⓒ 2025 FLOBANK ALL RIGHTS RESERVED.</p>
-  </div>
-
-  <div class="footer-bottom">
-    <div class="footer-left">
-      <a href="https://www.webwatch.or.kr/Situation/WA_Situation.html?MenuCD=110" target="_blank">
-        <img src="/static/images/web.png" alt="웹 접근성 인증" class="footer-cert">
-      </a>
-      <div class="footer-sns">
-        <a href="#"><i class="fa-brands fa-instagram"></i></a>
-        <a href="#"><i class="fa-brands fa-facebook"></i></a>
-        <a href="#"><i class="fa-brands fa-youtube"></i></a>
-      </div>
-    </div>
-
-    
-
-    </div>
-  </div>
-</footer>
-
+<div th:replace="~{/_template/_footer.html}"></div>
 <script src ="/static/js/deposit.js"></script>
-<script src ="/static/js/index.js"></script>
 
 
 </body>

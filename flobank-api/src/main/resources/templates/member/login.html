@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>로그인</title>
-  <link rel="stylesheet" href="/static/css/member.css">
-  <link rel="stylesheet" href="/static/css/header.css">
-  <link rel="stylesheet" href="/static/css/footer.css">
+    <link rel="stylesheet" th:href="@{/css/member.css}">
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+    <link rel="stylesheet" th:href="@{/css/footer.css}">
 
   
 
@@ -18,67 +18,7 @@
 
 </head>
 <body>
-
-  <!-- 상단 헤더 -->
-  <header>
-    <div class="top-bar">
-      <ul></ul>
-      <div class="right-menu">
-        <a href="/member/login.html">로그인</a>
-        <a href="#">회원가입</a>
-        <a href="#">Language ▾</a>
-      </div>
-    </div>
-
-    <!--  메인 네비게이션 (하나만 유지) -->
-    <div class="main-nav">
-      <div class="logo">
-        <img src="/static/images/logo.png" alt="FLOBANK 로고">
-      </div>
-
-      <ul class="nav-menu">
-        <li class="menu-item" data-menu="1">외화예금</li>
-        <li class="menu-item" data-menu="2">외화송금</li>
-        <li class="menu-item" data-menu="3">환전</li>
-        <li class="menu-item" data-menu="4">환율</li>
-        <li class="menu-item" data-menu="5">고객센터</li>
-      </ul>
-
-      <div class="nav-icons">
-        <a href="#"><i class="fa-solid fa-comment-dots"></i></a>
-        <a href="#" class="search-trigger" aria-haspopup="dialog" aria-controls="searchModal"><i class="fa-solid fa-magnifying-glass"></i></a>
-      </div>
-    </div>
-
-    <!-- ✅ Mega Dropdown -->
-    <div class="mega-menu">
-      <div class="menu-group" data-menu="1">
-        <a href="/deposit/list.html">외화예금상품</a>
-        <a href="/deposit/info.html">외화예금안내</a>
-      </div>
-      <div class="menu-group" data-menu="2">
-        <a href="/remit/en_transfer_1.html">외화 송금하기</a>
-        <a href="/remit/info.html">외화 송금 안내</a>
-      </div>
-      <div class="menu-group" data-menu="3">
-        <a href="/exchange/step1.html">환전하기</a>
-        <a href="/exchange/info1.html">환전 가능 통화</a>
-        <a href="/exchange/info2.html">환전안내</a>
-        <a href="#">환전 계산기</a>
-      </div>
-      <div class="menu-group" data-menu="4">
-        <a href="/rate/rate_info.html">환율 조회</a>
-      </div>
-      <div class="menu-group" data-menu="5">
-        <a href="/customer/intro.html">FLOBANK 소개</a>
-        <a href="/customer/qna_list.html">질문과 답변(Q&A)</a>
-        <a href="/customer/faq_list.html">자주 묻는 질문(FAQ)</a>
-        <a href="/customer/event_list.html">이벤트</a>
-        <a href="/customer/notice_list.html">공지사항</a>
-      </div>
-    </div>
-  </header>
-
+<div th:replace="~{/_template/_header.html}"></div>
 
 <main class="login-section">
   <div class="login-header">

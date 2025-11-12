@@ -37,6 +37,8 @@ dependencies {
 
     // DTO <-> JSON 문자열 변환
     implementation 'com.fasterxml.jackson.core:jackson-databind'
+    implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.5'
+    testImplementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter-test:3.0.5'
 
     // 유틸리티
     compileOnly 'org.projectlombok:lombok'
@@ -46,6 +48,7 @@ dependencies {
     // 테스트
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.integration:spring-integration-test'
+    runtimeOnly 'com.oracle.database.jdbc:ojdbc11'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 

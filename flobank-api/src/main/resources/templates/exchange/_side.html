@@ -1,0 +1,19 @@
+<!-- 왼쪽 사이드 -->
+<aside class="exchange-sidebar">
+    <h3 class="exchange-title">환전</h3>
+    <ul class="exchange-category">
+        <li>
+            <a href="#">환전안내</a>
+            <ul class="exchange-subcategory">
+                <li th:class="${activeItem == 'info1'} ? 'active' : ''"><a th:href="@{/exchange/info1}">환전 가능 통화</a></li>
+                <li th:class="${activeItem == 'info2'} ? 'active' : ''"><a th:href="@{/exchange/info2}">환전 가능 금액</a></li>
+                <li th:class="${activeItem == 'info3'} ? 'active' : ''"><a th:href="@{/exchange/info3}">환전 요령</a></li>
+            </ul>
+        </li>
+
+        <li th:class="${activeItem == 'benefit'} ? 'active' : ''">
+            <a th:href="@{/exchange/benefit}">환율 우대</a></li>
+        <li><a th:href="@{/exchange/step1}">환전하기</a></li>
+
+    </ul>
+</aside>

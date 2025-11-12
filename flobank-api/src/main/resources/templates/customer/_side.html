@@ -1,0 +1,13 @@
+<!-- 🔹 사이드바 -->
+<aside class="customer-sidebar">
+    <h3 class="customer-title">고객센터</h3>
+
+    <ul class="customer-category">
+        <li><a th:href="@{/customer/intro}" th:class="${activeItem == 'intro'} ? 'active' : ''">FLOBANK 소개</a></li>
+        <li><a th:href="@{/customer/qna_list}" th:class="${activeItem == 'qna'} ? 'active' : ''">질문과 답변(Q&A)</a></li>
+        <li><a th:href="@{/customer/faq_list}" th:class="${activeItem == 'faq'} ? 'active' : ''">자주 묻는 질문(FAQ)</a></li>
+        <li><a th:href="@{/customer/event_list}" th:class="${activeItem == 'event'} ? 'active' : ''">이벤트</a></li>
+        <li><a th:href="@{/customer/notice_list}" th:class="${activeItem == 'notice'} ? 'active' : ''">공지사항</a></li>
+    </ul>
+
+</aside>
