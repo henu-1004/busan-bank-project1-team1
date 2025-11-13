@@ -1,4 +1,4 @@
-// 오늘 날짜 yyyy-MM-dd 구하기
+// 오늘 날짜 yyyy-MM-dd
 function getToday() {
     const today = new Date();
     const y = today.getFullYear();
@@ -7,11 +7,53 @@ function getToday() {
     return `${y}-${m}-${d}`;
 }
 
+// yyyy-MM-dd 형식 변환
+function formatDate(date) {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+}
+
+// API 조회 날짜 계산 로직
+function getApiDate() {
+    const now = new Date();
+    const day = now.getDay();  // 0=일, 6=토
+    const hour = now.getHours();
+    let target = new Date(now);
+
+    // ★ 토요일 → 금요일
+    if (day === 6) {
+        target.setDate(target.getDate() - 1);
+        return formatDate(target);
+    }
+
+    // ★ 일요일 → 금요일
+    if (day === 0) {
+        target.setDate(target.getDate() - 2);
+        return formatDate(target);
+    }
+
+    // ★ 월요일 오전 11시 이전 → 금요일
+    if (day === 1 && hour < 11) {
+        target.setDate(target.getDate() - 3);
+        return formatDate(target);
+    }
+
+    // ★ 화~금 오전 11시 이전 → 전날
+    if (day >= 2 && day <= 5 && hour < 11) {
+        target.setDate(target.getDate() - 1);
+        return formatDate(target);
+    }
+
+    // ★ 그 외(평일 11시 이후) → 오늘
+    return formatDate(target);
+}
+
 let exchangeRates = [];
 
 // 통화 환율값 추출
 function getRate(currency, type) {
-
     const cur = exchangeRates.find(c =>
         c.cur_unit === currency || c.cur_unit.startsWith(currency)
     );
@@ -64,22 +106,19 @@ function calculate() {
     document.querySelector(".unit").innerText = to;
 }
 
-// 초기 로딩
+// 페이지 로딩 시
 document.addEventListener("DOMContentLoaded", async () => {
-    const today = getToday();
+    const apiDate = getApiDate();
 
-    // 🔹 화면 상단에 날짜 표시: yyyy-MM-dd → yyyy.MM.dd
-    const displayDate = today.replace(/-/g, ".");
+    const displayDate = apiDate.replace(/-/g, ".");
     const dateTextEl = document.getElementById("rate-date-text");
     if (dateTextEl) {
         dateTextEl.innerText = `${displayDate} 기준 환율입니다.`;
     }
 
-    // 🔹 환율 요청
-    const res = await fetch(`/flobank/rate/data?date=${today}`);
+    const res = await fetch(`/flobank/rate/data?date=${apiDate}`);
     exchangeRates = await res.json();
 
-    // 🔹 초기 계산
     calculate();
 });
 

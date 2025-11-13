@@ -61,3 +61,33 @@ document.querySelector(".rateinfo-btn-search").addEventListener("click", functio
     const date = document.querySelector("#rateinfo-date").value;
     loadRate(date);
 });
+
+
+async function loadRate(date) {
+    const msgBox = document.querySelector("#rateinfo-message");
+
+    try {
+        const res = await fetch(`/flobank/rate/data?date=${date}`);
+        const data = await res.json();
+
+        // 데이터 없음(비영업일 or 11시 이전)
+        if (!data || data.length === 0 || data[0].result !== 1) {
+
+            // 테이블 비우기
+            document.querySelector(".rateinfo-table tbody").innerHTML = "";
+
+            // 안내 메시지 띄우기
+            msgBox.innerHTML = "※ 선택한 날짜의 환율 정보가 존재하지 않습니다. (비영업일 또는 아직 고시되지 않은 경우)";
+            return;
+        }
+
+        // 데이터 있음 → 메시지 제거 + 테이블 렌더링
+        msgBox.innerHTML = "";
+        renderRateTable(data);
+
+    } catch (err) {
+        console.error(err);
+
+        msgBox.innerHTML = "※ 환율 정보를 불러오는 중 오류가 발생했습니다.";
+    }
+}
