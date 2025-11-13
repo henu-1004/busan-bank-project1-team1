@@ -23,50 +23,45 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes; // 2. Red
 @RequiredArgsConstructor
 public class MemberController {
 
-    private final MemberService memberService;
     private final CustInfoService custInfoService;
     private final JwtTokenProvider jwtTokenProvider;
 
     // 3. registerPage 메소드가 에러 메시지를 받을 수 있도록 수정
     @GetMapping("/register")
-    public String registerPage(Model model, @ModelAttribute("errorMessage") String errorMessage) {
-        if (!model.containsAttribute("memberDTO")) {
-            model.addAttribute("memberDTO", new MemberDTO());
-        }
-        // FlashAttribute로 전달된 에러 메시지가 있으면 모델에 추가
-        if (errorMessage != null && !errorMessage.isEmpty()) {
-            model.addAttribute("errorMessage", errorMessage);
-        }
+    public String registerPage(Model model) {
+
+        model.addAttribute("custInfoDTO", new CustInfoDTO());
+
         return "member/register"; // templates/member/register.html
     }
 
-    /**
-     * 회원가입 처리 (POST)
-     * th:object="${memberDTO}"로 보낸 폼 데이터를 @ModelAttribute MemberDTO memberDTO로 받습니다.
+    /*
+      회원가입 처리 (POST)
+      th:object="${memberDTO}"로 보낸 폼 데이터를 @ModelAttribute MemberDTO memberDTO로 받습니다.
      */
     // 4. registerProcess 메소드가 응답을 처리하도록 수정
     @PostMapping("/register")
-    public String registerProcess(@ModelAttribute MemberDTO memberDTO, RedirectAttributes redirectAttributes) {
+    public String registerProcess(@ModelAttribute CustInfoDTO custInfoDTO) {
 
-        // 1. DTO가 폼 데이터를 제대로 받았는지 로그로 확인
-        log.info("[회원가입 시도] : {}", memberDTO.toString());
-
-        // 2. MemberService를 호출하여 응답을 받음
-        ApResponseDTO response = memberService.register(memberDTO);
-
-        // 3. 응답 상태에 따라 분기
-        if ("SUCCESS".equals(response.getStatus())) {
-            // 3-1. 성공 시 완료 페이지로
+        if(custInfoDTO != null){
+            custInfoService.register(custInfoDTO);
             return "redirect:/member/complete";
-        } else {
-            // 3-2. 실패 시 회원가입 폼으로 다시 보내고 에러 메시지 전달
-            log.warn("[회원가입 실패] Message: {}", response.getMessage());
-            // RedirectAttributes에 에러 메시지를 담아 전달 (1회성)
-            redirectAttributes.addFlashAttribute("errorMessage", response.getMessage());
-            redirectAttributes.addFlashAttribute("memberDTO", memberDTO); // 사용자가 입력했던 값 유지
-            return "redirect:/member/register"; // 다시 회원가입 폼으로
+        }else {
+            log.error("custInfoDTO가 널 {} ", custInfoDTO);
+            return "member/register";
         }
+
     }
+
+    /*
+        회원가입 - 아이디 유효성 검사
+     */
+    @PostMapping("/checkId")
+    @ResponseBody
+    public Boolean checkId(@RequestParam("custId") String custId) {
+        return custInfoService.checkId(custId);
+    }
+
 
     // 5. /member/complete GET 매핑 추가
     @GetMapping("/complete")

@@ -1,12 +1,17 @@
 package kr.co.api.flobankapi.service;
 
+import kr.co.api.flobankapi.dto.ApResponseDTO;
 import kr.co.api.flobankapi.dto.CustInfoDTO;
 import kr.co.api.flobankapi.jwt.JwtTokenProvider;
 import kr.co.api.flobankapi.mapper.MemberMapper;
+import kr.co.api.flobankapi.util.AesUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -15,6 +20,39 @@ public class CustInfoService {
     private final PasswordEncoder passwordEncoder; // SecurityConfig에서 등록한 빈
     private final JwtTokenProvider jwtTokenProvider;
     private final MemberMapper memberMapper;
+
+    /*
+      회원가입 처리
+     */
+    public void register(CustInfoDTO custInfoDTO) {
+
+        log.info("[회원가입 요청] DTO 전송: {}", custInfoDTO.getCustId());
+
+        // 비밀번호 암호화 => 단방향
+        String endPw = passwordEncoder.encode(custInfoDTO.getCustPw());
+        custInfoDTO.setCustPw(endPw);
+
+        // 주민번호, 전화번호 암호화 (encrypt : 암호화, decrypt : 복호화)
+        String aesJumin = AesUtil.encrypt(custInfoDTO.getCustJumin());
+        String aesHp = AesUtil.encrypt(custInfoDTO.getCustHp());
+
+        custInfoDTO.setCustJumin(aesJumin);
+        custInfoDTO.setCustHp(aesHp);
+
+        memberMapper.registerCustInfo(custInfoDTO);
+    }
+
+    /*
+        회원가입 - 아이디 유효성 검사
+     */
+    public Boolean checkId(String custId) {
+        CustInfoDTO dto = memberMapper.findByIdCustInfo(custId);
+        if(dto != null){
+            return true; // 아이디 이미 존재
+        }else {
+            return false; // 아이디 없음
+        }
+    }
 
     /*
     로그인 처리
@@ -29,7 +67,7 @@ public class CustInfoService {
         }
 
         // matches(평문, 암호문) 메서드 사용
-        if(passwordEncoder.matches(rawPassword, custInfoDTO.getCustPw())){ // 있으면 비밀번호 확인
+        if(!passwordEncoder.matches(rawPassword, custInfoDTO.getCustPw())){ // 있으면 비밀번호 확인
 
             log.warn("로그인 실패: 비밀번호 불일치 - {}", custId);
             return null; // 컨트롤러에서 로그인 실패 처리

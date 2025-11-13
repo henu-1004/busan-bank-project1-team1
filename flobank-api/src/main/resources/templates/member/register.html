@@ -20,61 +20,46 @@
     <h2>회원가입</h2>
     <p class="join-desc">고객님의 정보를 정확히 입력해주세요.</p>
 
-    <div th:if="${errorMessage}" class="error" th:text="${errorMessage}"></div>
+    <form th:action="@{/member/register}" method="post" th:object="${custInfoDTO}" class="join-form">
 
-    <form th:action="@{/member/register}" method="post" th:object="${memberDTO}" class="join-form">
-
-        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-
-        <!-- 아이디 -->
         <div class="form-group">
-            <label for="custId">아이디</label>
+            <label for="reg-custId">아이디</label>
             <div class="input-inline">
-                <input type="text" id="custId" th:field="*{custId}" placeholder="아이디를 입력하세요" required>
+                <input type="text" id="reg-custId" th:field="*{custId}" placeholder="아이디를 입력하세요" required>
                 <button type="button" class="register-btn">중복확인</button>
             </div>
         </div>
 
-        <!-- 비밀번호 -->
         <div class="form-group">
             <label for="custPw">비밀번호</label>
-            <input type="password" id="custPw" th:field="*{custPw}"
-                   placeholder="영문, 숫자, 특수문자 포함 8~16자" required>
+            <input type="password" id="custPw" th:field="*{custPw}" placeholder="영문, 숫자, 특수문자 포함 8~16자" required>
         </div>
 
-        <!-- 비밀번호 확인 (DTO에 없으므로 바인딩 없이 name만; 서버 검증은 선택) -->
         <div class="form-group">
             <label for="custPwConfirm">비밀번호 확인</label>
-            <input type="password" id="custPwConfirm" name="custPwConfirm"
-                   placeholder="비밀번호를 다시 입력하세요" required>
+            <input type="password" id="custPwConfirm" name="custPwConfirm" placeholder="비밀번호를 다시 입력하세요" required>
         </div>
 
-        <!-- 이름 -->
         <div class="form-group">
             <label for="custName">이름</label>
             <input type="text" id="custName" th:field="*{custName}" placeholder="이름을 입력하세요" required>
         </div>
 
-        <!-- 영문 이름 -->
         <div class="form-group">
             <label for="custEngName">영문 이름</label>
             <input type="text" id="custEngName" th:field="*{custEngName}" placeholder="영문 이름을 입력하세요">
         </div>
 
-        <!-- 주민등록번호: DTO는 custJumin 하나 → 입력칸도 하나 -->
         <div class="form-group">
             <label for="custJumin">주민등록번호</label>
-            <input type="password" id="custJumin" th:field="*{custJumin}" maxlength="13"
-                   placeholder="YYMMDD + 7자리">
+            <input type="password" id="custJumin" th:field="*{custJumin}" maxlength="13" placeholder="- 없이 숫자만 입력">
         </div>
 
-        <!-- 생년월일 -->
         <div class="form-group">
             <label for="custBirth">생년월일</label>
-            <input type="date" id="custBirth" th:field="*{custBirth}">
+            <input type="date" id="custBirth" th:field="*{custBirthDt}">
         </div>
 
-        <!-- 성별 -->
         <div class="form-group">
             <label>성별</label>
             <div class="gender-group">
@@ -83,7 +68,6 @@
             </div>
         </div>
 
-        <!-- 이메일 -->
         <div class="form-group">
             <label for="custEmail">이메일</label>
             <div class="input-inline">
@@ -92,29 +76,26 @@
             </div>
         </div>
 
-        <!-- 휴대폰 -->
         <div class="form-group">
             <label for="custHp">휴대폰 번호</label>
             <div class="input-inline">
-                <input type="tel" id="custHp" th:field="*{custHp}" placeholder="010-1234-5678">
+                <input type="tel" id="custHp" th:field="*{custHp}" placeholder="010-1234-5678 (-없이 입력)">
                 <button type="button" class="register-btn">인증번호 전송</button>
             </div>
         </div>
 
-        <!-- 주소 -->
         <div class="form-group">
             <label>주소</label>
             <div class="address-group">
                 <div class="input-inline">
-                    <input type="text" id="custZip" th:field="*{custZip}" placeholder="우편번호" readonly>
+                    <input type="text" th:field="*{custZip}" placeholder="우편번호" readonly>
                     <button type="button" class="register-btn">우편번호 검색</button>
                 </div>
-                <input type="text" id="custAddr1" th:field="*{custAddr1}" placeholder="기본주소">
-                <input type="text" id="custAddr2" th:field="*{custAddr2}" placeholder="상세주소">
+                <input type="text" th:field="*{custAddr1}" placeholder="기본주소">
+                <input type="text" th:field="*{custAddr2}" placeholder="상세주소">
             </div>
         </div>
 
-        <!-- 제출 -->
         <div class="form-actions">
             <button type="submit" class="btn-join">가입하기</button>
         </div>
@@ -122,6 +103,7 @@
 </main>
 
 <div th:replace="~{_template/_footer.html}"></div>
+<script th:src="@{/js/member.js}"></script>
 
 </body>
 </html>
