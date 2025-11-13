@@ -515,3 +515,20 @@
   background-color: #f2f4ff;
   color: #2C5DE5;
 }
+
+
+.rateinfo-api-info {
+    font-size: 14px;
+    color: #888;
+    margin-top: -10px;
+    margin-bottom: 15px;
+    text-align: center;      /* 가운데 정렬 */
+}
+
+.rate-date-text {
+    margin-top: -10px;
+    margin-bottom: 20px;
+    color: #555;
+    font-size: 12px;
+    text-align: right;
+}

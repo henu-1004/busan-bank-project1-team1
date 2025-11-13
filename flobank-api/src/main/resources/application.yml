@@ -28,3 +28,10 @@ mybatis:
   configuration:
     map-underscore-to-camel-case: true
 
+
+
+eximbank:
+  api:
+    base-url: "https://oapi.koreaexim.go.kr/site/program/financial/exchangeJSON"
+    auth-key: "LNyeb6x2OFLu289XSY1tokxFueROPpxI"   # API Key
+
