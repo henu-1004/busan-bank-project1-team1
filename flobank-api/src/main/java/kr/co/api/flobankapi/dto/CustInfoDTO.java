@@ -6,19 +6,19 @@ import lombok.Data;
 public class CustInfoDTO {
     private String custCode;
     private String custId;
-    private String custPw;
+    private String custPw;      // 단방향 암호화
     private String custName;
-    private String custJumin;
+    private String custJumin;   // 양방향 암호화
     private String custEmail;
-    private String custHp;
+    private String custHp;      // 양방향 암호화
     private String custBirthDt;
     private String custGen;
     private String custEngName;
     private String custRegDt;
-    private String custStatus;
+    private Integer custStatus;
     private String custZip;
     private String custAddr1;
     private String custAddr2;
-    private String custSecurityLevel; // 보안 등급
+    private Integer custSecurityLevel; // 보안 등급
     private String custLasLoginDt;
 }

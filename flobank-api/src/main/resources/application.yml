@@ -13,11 +13,13 @@ spring:
       password: Flobank1234!!
       driver-class-name: oracle.jdbc.OracleDriver
 
-# 접속해야 할 flobank_ap (AP 서버) 정보
+
 flobank:
-  ap:
+  ap: # 접속해야 할 flobank_ap (AP 서버) 정보
     host: 34.22.80.47
     port: 9090 # AP 서버와 약속한 TCP 포트
+  aes:
+    secret: "01234567890123456789012345678901"
 
 # ✅ 2. MyBatis 설정
 mybatis:
