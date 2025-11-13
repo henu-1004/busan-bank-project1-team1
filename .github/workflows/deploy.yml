@@ -64,7 +64,7 @@ jobs:
         gcloud beta compute ssh bnk-api-server \
           --project=${{ secrets.GCP_PROJECT_ID }} \
           --zone=asia-northeast3-a \
-          --command="sudo rm -rf /opt/flobank-api/app.jar && sudo mv /tmp/app.jar /opt/flobank-api/app.jar && cd /opt/flobank-api && sudo docker-compose up -d --build"
+          --command="sudo rm -rf /opt/flobank-api/app.jar && sudo mv /tmp/app.jar /opt/flobank-api/app.jar && cd /opt/flobank-api && sudo docker-compose up -d --build --force-recreate"
 
     # --- 3. bnk-ap-server (flobank-ap) 배포 ---
 
@@ -97,4 +97,4 @@ jobs:
         gcloud beta compute ssh bnk-ap-server \
           --project=${{ secrets.GCP_PROJECT_ID }} \
           --zone=asia-northeast3-a \
-          --command="sudo rm -rf /opt/flobank-ap/app.jar && sudo mv /tmp/app.jar /opt/flobank-ap/app.jar && cd /opt/flobank-ap && sudo docker-compose up -d --build"
+          --command="sudo rm -rf /opt/flobank-ap/app.jar && sudo mv /tmp/app.jar /opt/flobank-ap/app.jar && cd /opt/flobank-ap && sudo docker-compose up -d --build --force-recreate"
