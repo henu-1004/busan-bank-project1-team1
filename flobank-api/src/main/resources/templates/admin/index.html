@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>관리자 메인</title>
-    <link rel="stylesheet" href="/static/css/admin.css" />
+      <link rel="stylesheet" th:href="@{/css/admin.css}">
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
@@ -19,10 +19,14 @@
         </div>
         <nav>
           <ul>
-            <li><a class="active" href="/admin/index.html"><i class="fa-solid fa-gauge"></i>대시보드</a></li>
-            <li><a href="/admin/member.html"><i class="fa-solid fa-gear"></i>고객센터</a></li>
-            <li><a href="/admin/products.html"><i class="fa-solid fa-coins"></i>외화예금</a></li>
-            <li><a href="/admin/exchange.html"><i class="fa-solid fa-hand-holding-dollar"></i>환전</a></li>
+            <li><a th:href="@{/admin/index}" th:classappend="${activeItem=='dashboard'} ? 'active'">
+                <i class="fa-solid fa-gauge"></i>대시보드</a></li>
+            <li><a th:href="@{/admin/member}" th:classappend="${activeItem=='member'} ? 'active'">
+                <i class="fa-solid fa-gear"></i>고객센터</a></li>
+            <li><a th:href="@{/admin/products}" th:classappend="${activeItem=='products'} ? 'active'">
+                <i class="fa-solid fa-coins"></i>외화예금</a></li>
+            <li><a th:href="@{/admin/exchange}" th:classappend="${activeItem=='exchange'} ? 'active'">
+                <i class="fa-solid fa-hand-holding-dollar"></i>환전</a></li>
           </ul>
         </nav>
        
@@ -53,7 +57,7 @@
             <article class="admin-stat-card admin-graph-card">
               <h3>오늘 방문자 수<span>(2025.11.10 14:16:13 기준)</span></h3>
               <div class="admin-graph-box">
-                <img src="/static/images/ex.png" alt="오늘 방문자 수 그래프" />
+                  <img th:src="@{/images/ex.png}" alt="오늘 방문자 수 그래프">
               </div>
             </article>
 
@@ -61,7 +65,7 @@
             <article class="admin-stat-card admin-graph-card">
               <h3>오늘 거래 건수 <span>(입출금·환전·송금·예금가입 | 2025.11.10 14:16:13 기준)</span></h3>
               <div class="admin-graph-box">
-                <img src="/static/images/ex.png" alt="오늘 거래 건수 그래프" />
+                  <img th:src="@{/images/ex.png}" alt="오늘 거래 건수 그래프">
               </div>
             </article>
           </div>
@@ -78,7 +82,7 @@
             <article class="admin-stat-card-3 admin-graph-card">
               <h3>월별 가입자수 <span>(2025.11.10 14:16:13 기준)</span></h3>
               <div class="admin-graph-box-3">
-                <img src="/static/images/ex.png" alt="월별 가입자수 그래프" />
+                  <img th:src="@{/images/ex.png}" alt="월별 가입자수 그래프">
               </div>
             </article>
 
@@ -86,7 +90,7 @@
             <article class="admin-stat-card-3 admin-graph-card">
               <h3>주별 가입자수 <span>(2025.11.10 14:16:13 기준)</span></h3>
               <div class="admin-graph-box-3">
-                <img src="/static/images/ex.png" alt="주별 가입자수 그래프" />
+                  <img th:src="@{/images/ex.png}" alt="주별 가입자수 그래프">
               </div>
             </article>
 
@@ -94,7 +98,7 @@
             <article class="admin-stat-card-3 admin-graph-card">
               <h3>일별 가입자수 <span>(2025.11.10 14:16:13 기준)</span></h3>
               <div class="admin-graph-box-3">
-                <img src="/static/images/ex.png" alt="일별 가입자수 그래프" />
+                  <img th:src="@{/images/ex.png}" alt="일별 가입자수 그래프">
               </div>
             </article>
           </div>
@@ -109,14 +113,14 @@
           <article class="admin-stat-card admin-graph-card">
             <h3>연령대별 분포 <span>(2025.11.10 14:16:13 기준)</span></h3>
             <div class="admin-graph-box">
-              <img src="/static/images/ex.png" alt="연령대별 분포 그래프" />
+                <img th:src="@{/images/ex.png}" alt="연령대별 분포 그래프">
             </div>
           </article>
 
           <article class="admin-stat-card admin-graph-card">
             <h3>성별 분포 <span>(2025.11.10 14:16:13 기준)</span></h3>
             <div class="admin-graph-box">
-              <img src="/static/images/ex.png" alt="성별 분포 그래프" />
+                <img th:src="@{/images/ex.png}" alt="성별 분포 그래프">
             </div>
           </article>
         </div>

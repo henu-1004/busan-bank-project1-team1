@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>환전 관리</title>
-    <link rel="stylesheet" href="/static/css/admin.css" />
+      <link rel="stylesheet" th:href="@{/css/admin.css}">
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
@@ -21,10 +21,10 @@
         </div>
         <nav>
           <ul>
-            <li><a href="/admin/index.html"><i class="fa-solid fa-gauge"></i>대시보드</a></li>
-            <li><a href="/admin/member.html"><i class="fa-solid fa-gear"></i>고객센터</a></li>
-            <li><a href="/admin/products.html"><i class="fa-solid fa-coins"></i>외화예금</a></li>
-            <li><a class="active" href="/admin/exchange.html"><i class="fa-solid fa-hand-holding-dollar"></i>환전</a></li>
+              <li><a th:href="@{/admin/index}"><i class="fa-solid fa-gauge"></i>대시보드</a></li>
+              <li><a th:href="@{/admin/member}"><i class="fa-solid fa-gear"></i>고객센터</a></li>
+              <li><a th:href="@{/admin/products}"><i class="fa-solid fa-coins"></i>외화예금</a></li>
+              <li><a th:href="@{/admin/exchange}"><i class="fa-solid fa-hand-holding-dollar"></i>환전</a></li>
           </ul>
         </nav>
       </aside>
@@ -53,7 +53,7 @@
             일자별 통화 환전금액 <span>(2025.11.11 17:18:20 기준)</span>
           </h3>
           <div class="admin-exchange-graph-box">
-            <img src="/static/images/ex.png" alt="환전 사용자 수 그래프" />
+              <img th:src="@{/images/ex.png}" alt="환전 사용자 수 그래프" />
           </div>
         </article>
 
@@ -62,7 +62,7 @@
             일자별 환전액 <span>(2025.11.11 17:18:20 기준)</span>
           </h3>
           <div class="admin-exchange-graph-box">
-            <img src="/static/images/ex.png" alt="환전 연령대별 그래프" />
+              <img th:src="@{/images/ex.png}" alt="환전 연령대별 그래프" />
           </div>
         </article>
       </section>
@@ -199,8 +199,9 @@
 
       
 
-    </div>
+
   </main>
+    </div>
 
   </body>
 </html>
