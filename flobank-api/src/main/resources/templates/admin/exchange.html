@@ -1,206 +1,149 @@
 <!DOCTYPE html>
-<html lang="ko">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>환전 관리</title>
-    <link rel="stylesheet" href="/static/css/admin.css" />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-      crossorigin="anonymous"
-    />
-  </head>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<th:block th:replace="~{admin/admin_template :: admin_template('환전 관리','환전 관리', ~{::content})}">
+    <th:block th:fragment="content">
 
-  <body>
-    <div class="admin-layout">
-      <!-- 사이드바 -->
-      <aside class="sidebar">
-        <div class="logo">
-          <span>FLOWBANK ADMIN</span>
-        </div>
-        <nav>
-          <ul>
-            <li><a href="/admin/index.html"><i class="fa-solid fa-gauge"></i>대시보드</a></li>
-            <li><a href="/admin/member.html"><i class="fa-solid fa-gear"></i>고객센터</a></li>
-            <li><a href="/admin/products.html"><i class="fa-solid fa-coins"></i>외화예금</a></li>
-            <li><a class="active" href="/admin/exchange.html"><i class="fa-solid fa-hand-holding-dollar"></i>환전</a></li>
-          </ul>
-        </nav>
-      </aside>
 
-      <!-- 메인 -->
-      <main class="main-panel">
-        <!-- 상단 헤더 -->
-        <header class="admin-header">
-          <div>
-            <h1 class="page-title">환전 관리</h1>
-          </div>
-          <div class="user-info">
-            <div class="profile">
-              <div class="profile-info">
-                <strong>홍길동 관리자</strong>
-              </div>
+            <!-- 환전 통계 영역 -->
+        <section class="admin-exchange-stats-row">
+            <article class="admin-exchange-card admin-exchange-graph-card">
+                <h3>일자별 통화 환전금액 <span>(2025.11.11 17:18:20 기준)</span></h3>
+                <div class="admin-exchange-graph-box">
+                    <img th:src="@{/images/ex.png}" alt="환전 사용자 수 그래프" />
+                </div>
+            </article>
+
+            <article class="admin-exchange-card admin-exchange-graph-card">
+                <h3>일자별 환전액 <span>(2025.11.11 17:18:20 기준)</span></h3>
+                <div class="admin-exchange-graph-box">
+                    <img th:src="@{/images/ex.png}" alt="환전 연령대별 그래프" />
+                </div>
+            </article>
+        </section>
+
+        <!-- 환전 이력 섹션 -->
+        <section class="admin-exchange-section">
+            <h2 class="admin-exchange-section-title">환전 이력</h2>
+
+            <!-- 검색 -->
+            <div class="admin-exchange-search">
+                <select id="exchangeSearchType">
+                    <option value="customer">고객번호</option>
+                    <option value="exchange">환전번호</option>
+                </select>
+                <input type="text" id="exchangeSearchInput" placeholder="검색어를 입력하세요" />
+                <button id="exchangeSearchBtn">검색</button>
             </div>
-          </div>
-        </header>
-    
 
-      <!-- 환전 통계 영역 -->
-      <section class="admin-exchange-stats-row">
-        <article class="admin-exchange-card admin-exchange-graph-card">
-          <h3>
-            일자별 통화 환전금액 <span>(2025.11.11 17:18:20 기준)</span>
-          </h3>
-          <div class="admin-exchange-graph-box">
-            <img src="/static/images/ex.png" alt="환전 사용자 수 그래프" />
-          </div>
-        </article>
+            <!-- 테이블 -->
+            <div class="admin-exchange-table-container">
+                <table class="admin-exchange-table">
+                    <thead>
+                    <tr>
+                        <th>고객번호</th>
+                        <th>환전번호</th>
+                        <th>환전 전 통화</th>
+                        <th>환전 후 통화</th>
+                        <th>적용환율</th>
+                        <th>환전 신청일시</th>
+                    </tr>
+                    </thead>
+                    <tbody id="exchangeTableBody">
+                    <tr>
+                        <td>10001</td>
+                        <td>EX20251111001</td>
+                        <td>KRW</td>
+                        <td>USD</td>
+                        <td>1,470.59</td>
+                        <td>2025-11-11 09:13:22</td>
+                    </tr>
+                    <tr>
+                        <td>10002</td>
+                        <td>EX20251111002</td>
+                        <td>KRW</td>
+                        <td>JPY</td>
+                        <td>9.62</td>
+                        <td>2025-11-11 10:20:05</td>
+                    </tr>
+                    <tr>
+                        <td>10003</td>
+                        <td>EX20251111003</td>
+                        <td>KRW</td>
+                        <td>EUR</td>
+                        <td>1,600.12</td>
+                        <td>2025-11-11 12:45:10</td>
+                    </tr>
+                    <tr>
+                        <td>10004</td>
+                        <td>EX20251111004</td>
+                        <td>KRW</td>
+                        <td>CNY</td>
+                        <td>203.14</td>
+                        <td>2025-11-11 14:10:33</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
 
-        <article class="admin-exchange-card admin-exchange-graph-card">
-          <h3>
-            일자별 환전액 <span>(2025.11.11 17:18:20 기준)</span>
-          </h3>
-          <div class="admin-exchange-graph-box">
-            <img src="/static/images/ex.png" alt="환전 연령대별 그래프" />
-          </div>
-        </article>
-      </section>
+            <!-- 페이지네이션 -->
+            <div class="pagination">
+                <button class="page-btn" disabled>«</button>
+                <button class="page-btn active">1</button>
+                <button class="page-btn">2</button>
+                <button class="page-btn">3</button>
+                <button class="page-btn">4</button>
+                <button class="page-btn">5</button>
+                <button class="page-btn">»</button>
+            </div>
+        </section>
 
-    <!-- 환전 이력 섹션 -->
-<section class="admin-exchange-section">
-  <h2 class="admin-exchange-section-title">환전 이력</h2>
-
-  <!-- 🔍 검색 영역 -->
-  <div class="admin-exchange-search">
-    <select id="exchangeSearchType">
-      <option value="customer">고객번호</option>
-      <option value="exchange">환전번호</option>
-    </select>
-    <input type="text" id="exchangeSearchInput" placeholder="검색어를 입력하세요" />
-    <button id="exchangeSearchBtn">검색</button>
-  </div>
-
-  <!-- 📊 테이블 -->
-  <div class="admin-exchange-table-container">
-    <table class="admin-exchange-table">
-      <thead>
-        <tr>
-          <th>고객번호</th>
-          <th>환전번호</th>
-          <th>환전 전 통화</th>
-          <th>환전 후 통화</th>
-          <th>적용환율</th>
-          <th>환전 신청일시</th>
-        </tr>
-      </thead>
-      <tbody id="exchangeTableBody">
-        <tr>
-          <td>10001</td>
-          <td>EX20251111001</td>
-          <td>KRW</td>
-          <td>USD</td>
-          <td>1,470.59</td>
-          <td>2025-11-11 09:13:22</td>
-        </tr>
-        <tr>
-          <td>10002</td>
-          <td>EX20251111002</td>
-          <td>KRW</td>
-          <td>JPY</td>
-          <td>9.62</td>
-          <td>2025-11-11 10:20:05</td>
-        </tr>
-        <tr>
-          <td>10003</td>
-          <td>EX20251111003</td>
-          <td>KRW</td>
-          <td>EUR</td>
-          <td>1,600.12</td>
-          <td>2025-11-11 12:45:10</td>
-        </tr>
-        <tr>
-          <td>10004</td>
-          <td>EX20251111004</td>
-          <td>KRW</td>
-          <td>CNY</td>
-          <td>203.14</td>
-          <td>2025-11-11 14:10:33</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <!-- 📄 페이지네이션 -->
-    <div class="pagination">
-    <button class="page-btn" disabled>«</button>
-    <button class="page-btn active">1</button>
-    <button class="page-btn">2</button>
-    <button class="page-btn">3</button>
-    <button class="page-btn">4</button>
-    <button class="page-btn">5</button>
-    <button class="page-btn">»</button>
-  </div>
-  </section>
-
-      <!-- 환전 수수료 쿠폰 발급 현황 -->
-      <section class="admin-exchange-section">
-        <h2 class="admin-exchange-section-title">환전 수수료 쿠폰 발급 현황</h2>
-        <div class="admin-exchange-table-container">
-          <table class="admin-exchange-table">
-            <thead>
-              <tr>
-                <th>고객번호</th>
-                <th>쿠폰번호</th>
-                <th>발급일자</th>
-                <th>쿠폰명</th>
-                <th>상태</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>10001</td>
-                <td>CPN2025110101</td>
-                <td>2025-11-01</td>
-                <td>수수료 5% 할인 쿠폰</td>
-                <td class="admin-exchange-status-unused">미사용</td>
-              </tr>
-              <tr>
-                <td>10002</td>
-                <td>CPN2025110102</td>
-                <td>2025-11-02</td>
-                <td>수수료 10% 할인 쿠폰</td>
-                <td class="admin-exchange-status-used">사용완료</td>
-              </tr>
-              <tr>
-                <td>10003</td>
-                <td>CPN2025110103</td>
-                <td>2025-11-03</td>
-                <td>수수료 20% 할인 쿠폰</td>
-                <td class="admin-exchange-status-unused">미사용</td>
-              </tr>
-              <tr>
-                <td>10004</td>
-                <td>CPN2025110104</td>
-                <td>2025-11-04</td>
-                <td>수수료 5% 할인 쿠폰</td>
-                <td class="admin-exchange-status-used">사용완료</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-
-
-
-
-
-
-      
-
-    </div>
-  </main>
-
-  </body>
+        <!-- 환전 수수료 쿠폰 발급 현황 -->
+        <section class="admin-exchange-section">
+            <h2 class="admin-exchange-section-title">환전 수수료 쿠폰 발급 현황</h2>
+            <div class="admin-exchange-table-container">
+                <table class="admin-exchange-table">
+                    <thead>
+                    <tr>
+                        <th>고객번호</th>
+                        <th>쿠폰번호</th>
+                        <th>발급일자</th>
+                        <th>쿠폰명</th>
+                        <th>상태</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>10001</td>
+                        <td>CPN2025110101</td>
+                        <td>2025-11-01</td>
+                        <td>수수료 5% 할인 쿠폰</td>
+                        <td class="admin-exchange-status-unused">미사용</td>
+                    </tr>
+                    <tr>
+                        <td>10002</td>
+                        <td>CPN2025110102</td>
+                        <td>2025-11-02</td>
+                        <td>수수료 10% 할인 쿠폰</td>
+                        <td class="admin-exchange-status-used">사용완료</td>
+                    </tr>
+                    <tr>
+                        <td>10003</td>
+                        <td>CPN2025110103</td>
+                        <td>2025-11-03</td>
+                        <td>수수료 20% 할인 쿠폰</td>
+                        <td class="admin-exchange-status-unused">미사용</td>
+                    </tr>
+                    <tr>
+                        <td>10004</td>
+                        <td>CPN2025110104</td>
+                        <td>2025-11-04</td>
+                        <td>수수료 5% 할인 쿠폰</td>
+                        <td class="admin-exchange-status-used">사용완료</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </th:block>
+</th:block>
 </html>

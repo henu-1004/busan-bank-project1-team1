@@ -1,207 +1,164 @@
 <!DOCTYPE html>
-<html lang="ko">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>고객센터 관리</title>
-    <link rel="stylesheet" href="/static/css/admin.css" />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-      crossorigin="anonymous"
-    />
-  </head>
+<html xmlns:th="http://www.thymeleaf.org" lang="k1o"
+      th:replace="~{admin/admin_template :: admin_template('고객센터 관리','환경설정',~{::body})}">
+<body>
 
-  <body>
-    <div class="admin-layout">
-      <!-- 사이드바 -->
-      <aside class="sidebar">
-        <div class="logo">
-          <span>FLOWBANK ADMIN</span>
-        </div>
-        <nav>
-          <ul>
-            <li><a href="/admin/index.html"><i class="fa-solid fa-gauge"></i>대시보드</a></li>
-            <li><a class="active" href="/admin/member.html"><i class="fa-solid fa-gear"></i>고객센터</a></li>
-            <li><a href="/admin/products.html"><i class="fa-solid fa-coins"></i>외화예금</a></li>
-            <li><a href="/admin/exchange.html"><i class="fa-solid fa-hand-holding-dollar"></i>환전</a></li>
-          </ul>
-        </nav>
-      </aside>
+<section class="admin-content">
 
-      <!-- 메인 -->
-      <main class="main-panel">
-        <!-- 상단 헤더 -->
-        <header class="admin-header">
-          <div>
-            <h1 class="page-title">환경설정</h1>
-          </div>
-          <div class="user-info">
-            <div class="profile">
-              <div class="profile-info">
-                <strong>홍길동 관리자</strong>
-              </div>
-            </div>
-          </div>
-        </header>
-
-        <!-- 본문 시작 -->
-        <section class="admin-content">
-
-          <!-- 게시판 관리 -->
-          <section class="board-admin">
-            <!-- 글 등록 -->
-            <section id="board-register" class="board-section">
-              <div class="board-header">
+    <!-- 게시판 관리 -->
+    <section class="board-admin">
+        <!-- 글 등록 -->
+        <section id="board-register" class="board-section">
+            <div class="board-header">
                 <h2>글 등록</h2>
-              </div>
+            </div>
 
-              <div class="board-row">
+            <div class="board-row">
                 <div class="board-control">
-                  <label for="board-title">제목</label>
-                  <input id="board-title" type="text" placeholder="제목을 입력하세요." />
+                    <label for="board-title">제목</label>
+                    <input id="board-title" type="text" placeholder="제목을 입력하세요." />
                 </div>
 
                 <div class="board-control">
-                  <label for="board-type">유형</label>
-                  <select id="board-type">
-                    <option value="notice">공지사항</option>
-                    <option value="event">이벤트</option>
-                  </select>
+                    <label for="board-type">유형</label>
+                    <select id="board-type">
+                        <option value="notice">공지사항</option>
+                        <option value="event">이벤트</option>
+                    </select>
                 </div>
-              </div>
+            </div>
 
-              <div class="board-control">
+            <div class="board-control">
                 <label for="board-content">내용</label>
                 <textarea id="board-content" rows="6" placeholder="내용을 입력하세요."></textarea>
-              </div>
-
-              <button class="board-btn-primary">등록</button>
-            </section>
-
-            <!-- 글 목록 -->
-            <section id="board-list" class="board-section">
-              <div class="board-header">
-                <h2>글 목록</h2>
-              </div>
-
-              <div class="board-table-wrapper">
-                <table class="board-table">
-                  <thead>
-                    <tr>
-                      <th>번호</th>
-                      <th>유형</th>
-                      <th>제목</th>
-                      <th>작성일</th>
-                      <th>관리</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>1</td>
-                      <td>공지사항</td>
-                      <td>3월 정기 점검 안내</td>
-                      <td>2025-03-10</td>
-                      <td>
-                        <button class="board-btn-edit"><i class="fa-solid fa-pen"></i> 수정</button>
-                        <button class="board-btn-delete"><i class="fa-solid fa-trash"></i> 삭제</button>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </section>
-          </section>
-
-          <!-- FAQ 관리 -->
-          <section class="faq-admin">
-            <!-- 등록 -->
-            <section id="faq-register" class="faq-section">
-              <div class="faq-header">
-                <h2>FAQ 등록</h2>
-              </div>
-
-              <div class="faq-row">
-                <div class="faq-control">
-                  <label for="faq-category">카테고리</label>
-                  <select id="faq-category">
-                    <option>환율</option>
-                    <option>환전</option>
-                    <option>외화예금</option>
-                    <option>환전 수수료</option>
-                  </select>
-                </div>
-
-                <div class="faq-control">
-                  <label for="faq-question">질문</label>
-                  <input id="faq-question" type="text" placeholder="질문을 입력하세요.">
-                </div>
-              </div>
-
-              <div class="faq-control">
-                <label for="faq-answer">답변</label>
-                <textarea id="faq-answer" rows="5" placeholder="답변을 입력하세요."></textarea>
-              </div>
-
-              <button class="faq-btn-primary">등록</button>
-            </section>
-
-            <!-- 목록 -->
-            <section id="faq-list" class="faq-section">
-              <div class="faq-header">
-                <h2>FAQ 목록</h2>
-              </div>
-
-              <div class="faq-table-wrapper">
-                <table class="faq-table">
-                  <thead>
-                    <tr>
-                      <th>번호</th>
-                      <th>카테고리</th>
-                      <th>질문</th>
-                      <th>답변</th>
-                      <th>관리</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>1</td>
-                      <td>환율</td>
-                      <td>환율은 어떻게 결정되나요?</td>
-                      <td class="faq-answer">
-                        환율은 외환시장의 수요와 공급에 따라 결정됩니다. 경제지표, 금리, 국제정세 등 다양한 요인이 영향을 줍니다.
-                      </td>
-                      <td>
-                        <button class="faq-btn-edit"><i class="fa-solid fa-pen"></i> 수정</button>
-                        <button class="faq-btn-delete"><i class="fa-solid fa-trash"></i> 삭제</button>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </section>
-          </section>
-
-          <!-- Q&A 관리 -->
-          <section class="qna-admin">
-            <div class="qna-header">
-              <h2>Q&A 목록</h2>
-
-              <div class="qna-filter">
-                <label for="qna-status-filter">상태</label>
-                <select id="qna-status-filter">
-                  <option value="all">전체</option>
-                  <option value="pending">답변 대기중</option>
-                  <option value="ai-draft">AI 초안 완료</option>
-                  <option value="complete">답변 완료</option>
-                </select>
-              </div>
             </div>
 
-            <div class="qna-table-wrapper">
-              <table class="qna-table">
+            <button class="board-btn-primary">등록</button>
+        </section>
+
+        <!-- 글 목록 -->
+        <section id="board-list" class="board-section">
+            <div class="board-header">
+                <h2>글 목록</h2>
+            </div>
+
+            <div class="board-table-wrapper">
+                <table class="board-table">
+                    <thead>
+                    <tr>
+                        <th>번호</th>
+                        <th>유형</th>
+                        <th>제목</th>
+                        <th>작성일</th>
+                        <th>관리</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>공지사항</td>
+                        <td>3월 정기 점검 안내</td>
+                        <td>2025-03-10</td>
+                        <td>
+                            <button class="board-btn-edit"><i class="fa-solid fa-pen"></i> 수정</button>
+                            <button class="board-btn-delete"><i class="fa-solid fa-trash"></i> 삭제</button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </section>
+
+    <!-- FAQ 관리 -->
+    <section class="faq-admin">
+        <!-- 등록 -->
+        <section id="faq-register" class="faq-section">
+            <div class="faq-header">
+                <h2>FAQ 등록</h2>
+            </div>
+
+            <div class="faq-row">
+                <div class="faq-control">
+                    <label for="faq-category">카테고리</label>
+                    <select id="faq-category">
+                        <option>환율</option>
+                        <option>환전</option>
+                        <option>외화예금</option>
+                        <option>환전 수수료</option>
+                    </select>
+                </div>
+
+                <div class="faq-control">
+                    <label for="faq-question">질문</label>
+                    <input id="faq-question" type="text" placeholder="질문을 입력하세요.">
+                </div>
+            </div>
+
+            <div class="faq-control">
+                <label for="faq-answer">답변</label>
+                <textarea id="faq-answer" rows="5" placeholder="답변을 입력하세요."></textarea>
+            </div>
+
+            <button class="faq-btn-primary">등록</button>
+        </section>
+
+        <!-- 목록 -->
+        <section id="faq-list" class="faq-section">
+            <div class="faq-header">
+                <h2>FAQ 목록</h2>
+            </div>
+
+            <div class="faq-table-wrapper">
+                <table class="faq-table">
+                    <thead>
+                    <tr>
+                        <th>번호</th>
+                        <th>카테고리</th>
+                        <th>질문</th>
+                        <th>답변</th>
+                        <th>관리</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>환율</td>
+                        <td>환율은 어떻게 결정되나요?</td>
+                        <td class="faq-answer">
+                            환율은 외환시장의 수요와 공급에 따라 결정됩니다. 경제지표, 금리, 국제정세 등 다양한 요인이 영향을 줍니다.
+                        </td>
+                        <td>
+                            <button class="faq-btn-edit"><i class="fa-solid fa-pen"></i> 수정</button>
+                            <button class="faq-btn-delete"><i class="fa-solid fa-trash"></i> 삭제</button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </section>
+
+    <!-- Q&A 관리 -->
+    <section class="qna-admin">
+        <div class="qna-header">
+            <h2>Q&A 목록</h2>
+
+            <div class="qna-filter">
+                <label for="qna-status-filter">상태</label>
+                <select id="qna-status-filter">
+                    <option value="all">전체</option>
+                    <option value="pending">답변 대기중</option>
+                    <option value="ai-draft">AI 초안 완료</option>
+                    <option value="complete">답변 완료</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="qna-table-wrapper">
+            <table class="qna-table">
                 <thead>
-                  <tr>
+                <tr>
                     <th>번호</th>
                     <th>카테고리</th>
                     <th>질문</th>
@@ -209,10 +166,10 @@
                     <th>등록일</th>
                     <th>상태</th>
                     <th>관리</th>
-                  </tr>
+                </tr>
                 </thead>
                 <tbody>
-                  <tr data-status="pending">
+                <tr data-status="pending">
                     <td>1</td>
                     <td>외화송금</td>
                     <td>해외송금 수수료는 얼마인가요?</td>
@@ -220,9 +177,9 @@
                     <td>2025-11-10</td>
                     <td><span class="qna-status pending">답변 대기중</span></td>
                     <td><button class="qna-btn-ai">AI 초안 생성</button></td>
-                  </tr>
+                </tr>
 
-                  <tr data-status="ai-draft">
+                <tr data-status="ai-draft">
                     <td>2</td>
                     <td>환전</td>
                     <td>환전 가능한 통화는 어떤 것이 있나요?</td>
@@ -230,9 +187,9 @@
                     <td>2025-11-09</td>
                     <td><span class="qna-status ai-draft">AI 초안 완료</span></td>
                     <td><button class="qna-btn-approve">검토</button></td>
-                  </tr>
+                </tr>
 
-                  <tr data-status="complete">
+                <tr data-status="complete">
                     <td>3</td>
                     <td>외화예금</td>
                     <td>외화예금 금리는 어떻게 되나요?</td>
@@ -240,37 +197,35 @@
                     <td>2025-11-08</td>
                     <td><span class="qna-status complete">답변 완료</span></td>
                     <td><button class="qna-btn-view">보기</button></td>
-                  </tr>
+                </tr>
                 </tbody>
-              </table>
-            </div>
-          </section>
+            </table>
+        </div>
+    </section>
 
-          <!-- Q&A 모달 -->
-          <div class="qna-modal" id="qnaModal">
-            <div class="qna-modal-content">
-              <span class="qna-modal-close">&times;</span>
-              <h2 class="qna-modal-title">AI 초안 검토 및 승인</h2>
-              <div class="qna-modal-body">
+    <!-- Q&A 모달 -->
+    <div class="qna-modal" id="qnaModal">
+        <div class="qna-modal-content">
+            <span class="qna-modal-close">&times;</span>
+            <h2 class="qna-modal-title">AI 초안 검토 및 승인</h2>
+            <div class="qna-modal-body">
                 <div class="qna-modal-question">
-                  <h3>질문</h3>
-                  <p id="modal-question-text"></p>
-                  <div class="qna-modal-line"></div>
-                  <h3>AI 초안 답변</h3>
-                  <textarea id="modal-ai-answer" class="qna-ai-draft-box" rows="6"></textarea>
+                    <h3>질문</h3>
+                    <p id="modal-question-text"></p>
+                    <div class="qna-modal-line"></div>
+                    <h3>AI 초안 답변</h3>
+                    <textarea id="modal-ai-answer" class="qna-ai-draft-box" rows="6"></textarea>
                 </div>
-              </div>
-              <div class="qna-modal-footer">
+            </div>
+            <div class="qna-modal-footer">
                 <button class="qna-btn-cancel">취소</button>
                 <button class="qna-btn-primary" id="approveBtn">승인</button>
-              </div>
             </div>
-          </div>
-        </section>
-        <!-- admin-content 끝 -->
-      </main>
+        </div>
     </div>
+</section>
 
-    <script src="/static/js/admin_setting.js"></script>
-  </body>
+<script th:src="@{/js/admin_setting.js}"></script>
+
+</body>
 </html>
