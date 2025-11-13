@@ -1,0 +1,43 @@
+package kr.co.api.flobankapi.config;
+
+import kr.co.api.flobankapi.jwt.JwtAuthenticationFilter;
+import kr.co.api.flobankapi.jwt.JwtTokenProvider;
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+@Configuration
+@EnableWebSecurity
+@RequiredArgsConstructor
+public class SecurityConfig {
+
+    private final JwtTokenProvider jwtTokenProvider;
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+                .csrf(csrf -> csrf.disable()) // JWT 사용 시 CSRF 비활성화 가능 (쿠키 사용 시엔 켜는 게 좋지만, 지금은 복잡도 줄이기 위해 끔)
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 세션 안 씀
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/", "/member/login", "/member/register", "/css/**", "/js/**", "/images/**").permitAll()
+                        .requestMatchers("/mypage/**").authenticated() // 마이페이지는 로그인 필요
+                        .anyRequest().permitAll() // 일단 나머지는 다 허용 (개발 편의상)
+                )
+                // 우리가 만든 필터를 UsernamePasswordAuthenticationFilter 앞에 끼워넣기
+                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
+
+        return http.build();
+    }
+}

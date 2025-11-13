@@ -6,3 +6,5 @@ services:
       # application.yml의 웹 포트 8080을 외부에 8080으로 노출
       - "8080:8080"
     restart: always
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}

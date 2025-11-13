@@ -1,156 +1,93 @@
 <!DOCTYPE html>
-<html lang="ko">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>관리자 메인</title>
-      <link rel="stylesheet" th:href="@{/css/admin.css}">
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-      crossorigin="anonymous"
-    />
-  </head>
-  <body>
-    <div class="admin-layout">
-      <aside class="sidebar">
-        <div class="logo">
-          <span>FLOWBANK ADMIN</span>
-        </div>
-        <nav>
-          <ul>
-            <li><a th:href="@{/admin/index}" th:classappend="${activeItem=='dashboard'} ? 'active'">
-                <i class="fa-solid fa-gauge"></i>대시보드</a></li>
-            <li><a th:href="@{/admin/member}" th:classappend="${activeItem=='member'} ? 'active'">
-                <i class="fa-solid fa-gear"></i>고객센터</a></li>
-            <li><a th:href="@{/admin/products}" th:classappend="${activeItem=='products'} ? 'active'">
-                <i class="fa-solid fa-coins"></i>외화예금</a></li>
-            <li><a th:href="@{/admin/exchange}" th:classappend="${activeItem=='exchange'} ? 'active'">
-                <i class="fa-solid fa-hand-holding-dollar"></i>환전</a></li>
-          </ul>
-        </nav>
-       
-      </aside>
-
-      <main class="main-panel">
-        <header class="admin-header">
-          <div>
-            <h1 class="page-title">대시보드</h1>
-          </div>
-            <div class="user-info">
-              <div class="profile">
-                <div class="profile-info">
-                  <strong>홍길동 관리자</strong>
-                </div>
-              </div>
-            </div>
-        </header>
-
-        <!-- 1행: 방문·거래 통계 섹션 -->
-        <section class="section">
-          <div class="section-header">
+<html xmlns:th="http://www.thymeleaf.org" lang="ko"
+      th:replace="~{admin/admin_template :: admin_template('관리자 메인','대시보드',~{::body})}">
+<th:block th:fragment="content">
+    <body>
+    <!-- 1행: 방문·거래 통계 섹션 -->
+    <section class="section">
+        <div class="section-header">
             <h2>오늘 주요 통계</h2>
-          </div>
+        </div>
 
-          <div class="admin-stats-row">
+        <div class="admin-stats-row">
             <!-- 오늘 방문자 수 -->
             <article class="admin-stat-card admin-graph-card">
-              <h3>오늘 방문자 수<span>(2025.11.10 14:16:13 기준)</span></h3>
-              <div class="admin-graph-box">
-                  <img th:src="@{/images/ex.png}" alt="오늘 방문자 수 그래프">
-              </div>
+                <h3>오늘 방문자 수<span>(2025.11.10 14:16:13 기준)</span></h3>
+                <div class="admin-graph-box">
+                    <img th:src="@{/images/ex.png}" alt="오늘 방문자 수 그래프" />
+                </div>
             </article>
 
             <!-- 오늘 거래 건수 -->
             <article class="admin-stat-card admin-graph-card">
-              <h3>오늘 거래 건수 <span>(입출금·환전·송금·예금가입 | 2025.11.10 14:16:13 기준)</span></h3>
-              <div class="admin-graph-box">
-                  <img th:src="@{/images/ex.png}" alt="오늘 거래 건수 그래프">
-              </div>
+                <h3>오늘 거래 건수
+                    <span>(입출금·환전·송금·예금가입 | 2025.11.10 14:16:13 기준)</span>
+                </h3>
+                <div class="admin-graph-box">
+                    <img th:src="@{/images/ex.png}" alt="오늘 거래 건수 그래프" />
+                </div>
             </article>
-          </div>
-        </section>
+        </div>
+    </section>
 
-        <!-- 4행: 가입자수 추이 -->
-        <section class="section">
-          <div class="section-header">
+    <!-- 4행: 가입자수 추이 -->
+    <section class="section">
+        <div class="section-header">
             <h2>가입자수 추이</h2>
-          </div>
+        </div>
 
-          <div class="admin-stats-row-3">
+        <div class="admin-stats-row-3">
             <!-- 월별 -->
             <article class="admin-stat-card-3 admin-graph-card">
-              <h3>월별 가입자수 <span>(2025.11.10 14:16:13 기준)</span></h3>
-              <div class="admin-graph-box-3">
-                  <img th:src="@{/images/ex.png}" alt="월별 가입자수 그래프">
-              </div>
+                <h3>월별 가입자수 <span>(2025.11.10 14:16:13 기준)</span></h3>
+                <div class="admin-graph-box-3">
+                    <img th:src="@{/images/ex.png}" alt="월별 가입자수 그래프" />
+                </div>
             </article>
 
             <!-- 주별 -->
             <article class="admin-stat-card-3 admin-graph-card">
-              <h3>주별 가입자수 <span>(2025.11.10 14:16:13 기준)</span></h3>
-              <div class="admin-graph-box-3">
-                  <img th:src="@{/images/ex.png}" alt="주별 가입자수 그래프">
-              </div>
+                <h3>주별 가입자수 <span>(2025.11.10 14:16:13 기준)</span></h3>
+                <div class="admin-graph-box-3">
+                    <img th:src="@{/images/ex.png}" alt="주별 가입자수 그래프" />
+                </div>
             </article>
 
             <!-- 일별 -->
             <article class="admin-stat-card-3 admin-graph-card">
-              <h3>일별 가입자수 <span>(2025.11.10 14:16:13 기준)</span></h3>
-              <div class="admin-graph-box-3">
-                  <img th:src="@{/images/ex.png}" alt="일별 가입자수 그래프">
-              </div>
+                <h3>일별 가입자수 <span>(2025.11.10 14:16:13 기준)</span></h3>
+                <div class="admin-graph-box-3">
+                    <img th:src="@{/images/ex.png}" alt="일별 가입자수 그래프" />
+                </div>
             </article>
-          </div>
-        </section>
-
-
-
-
-
-        <!-- 2행 -->
-        <div class="admin-stats-row">
-          <article class="admin-stat-card admin-graph-card">
-            <h3>연령대별 분포 <span>(2025.11.10 14:16:13 기준)</span></h3>
-            <div class="admin-graph-box">
-                <img th:src="@{/images/ex.png}" alt="연령대별 분포 그래프">
-            </div>
-          </article>
-
-          <article class="admin-stat-card admin-graph-card">
-            <h3>성별 분포 <span>(2025.11.10 14:16:13 기준)</span></h3>
-            <div class="admin-graph-box">
-                <img th:src="@{/images/ex.png}" alt="성별 분포 그래프">
-            </div>
-          </article>
         </div>
+    </section>
 
-      
+    <!-- 2행: 연령·성별 분포 -->
+    <section class="section">
+        <div class="admin-stats-row">
+            <article class="admin-stat-card admin-graph-card">
+                <h3>연령대별 분포 <span>(2025.11.10 14:16:13 기준)</span></h3>
+                <div class="admin-graph-box">
+                    <img th:src="@{/images/ex.png}" alt="연령대별 분포 그래프" />
+                </div>
+            </article>
 
+            <article class="admin-stat-card admin-graph-card">
+                <h3>성별 분포 <span>(2025.11.10 14:16:13 기준)</span></h3>
+                <div class="admin-graph-box">
+                    <img th:src="@{/images/ex.png}" alt="성별 분포 그래프" />
+                </div>
+            </article>
+        </div>
+    </section>
 
-
-        
-      </section>
-
-
-      <script>
+    <script>
         document.querySelectorAll('.admin-keyword-box span').forEach(el => {
-          const randomSize = Math.floor(Math.random() * 14) + 14; // 14~28px
-          el.style.fontSize = randomSize + 'px';
+            const randomSize = Math.floor(Math.random() * 14) + 14; // 14~28px
+            el.style.fontSize = randomSize + 'px';
         });
-      </script>
-
-
-      </main>
-  </body>
+    </script>
+    </body>
+</th:block>
 </html>
-
-
-
-
-
-
-
-
-
-

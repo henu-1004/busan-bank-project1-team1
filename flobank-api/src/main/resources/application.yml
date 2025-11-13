@@ -28,3 +28,14 @@ mybatis:
   configuration:
     map-underscore-to-camel-case: true
 
+jwt:
+  secret: "v3rySecr3tKeyF0rFl0BankApiProjectMustBeLongerThan256Bits!!" # 256비트 이상 길이 필수
+
+eximbank:
+  api:
+    base-url: "https://oapi.koreaexim.go.kr/site/program/financial/exchangeJSON"
+    auth-key: "LNyeb6x2OFLu289XSY1tokxFueROPpxI"   # API Key
+
+openai:
+  api-key: ${OPENAI_API_KEY}
+  base-url: "https://api.openai.com/v1"

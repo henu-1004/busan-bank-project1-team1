@@ -8,8 +8,6 @@
     <link rel="stylesheet" th:href="@{/css/header.css}">
     <link rel="stylesheet" th:href="@{/css/footer.css}">
 
-  
-
     <link
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
@@ -18,7 +16,7 @@
 
 </head>
 <body>
-<div th:replace="~{/_template/_header.html}"></div>
+<div th:replace="~{_template/_header.html}"></div>
 
 <main class="login-section">
   <div class="login-header">
@@ -39,13 +37,15 @@
    
     <!-- ID 로그인 -->
     <div class="login-box id-login">
-      <input type="text" placeholder="이용자 ID">
-      <input type="password" placeholder="비밀번호">
-      <button class="btn-sub">ID 로그인</button>
+        <form th:action="@{/member/login}" method="post">
+          <input type="text" name="userid" placeholder="이용자 ID">
+          <input type="password" name="password" placeholder="비밀번호">
+          <button class="btn-sub" type="submit">ID 로그인</button>
+        </form>
       <div class="login-links">
-        <a href="/member/find_id.html">아이디 찾기</a> |
-        <a href="/member/find_pw.html">비밀번호 찾기</a> |
-        <a href="/member/register.html">회원가입</a>
+          <a th:href="@{/member/find_id}">아이디 찾기</a> |
+          <a th:href="@{/member/find_pw}">비밀번호 찾기</a> |
+          <a th:href="@{/member/register}">회원가입</a>
       </div>
     </div>
   </div>
@@ -75,126 +75,7 @@
   </div>
 </main>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- <!-- 푸터 -->
-<footer class="footer">
-  <div class="footer-top">
-    <div class="footer-links">
-      <a href="#">개인정보처리방침</a> ·
-      <a href="#">경영공시</a> ·
-      <a href="#">고객정보취급방침</a> ·
-      <a href="#">보호금융상품등록부</a> ·
-      <a href="#">상품공시실</a> ·
-      <a href="#">전자민원접수</a> ·
-      <a href="#">전자금융이용자보호수칙</a> ·
-      <a href="#">전자금융사기피해금환급제도</a>
-    </div>
-    <p class="footer-location">위치기반서비스 이용약관</p>
-  </div>
-
-  <div class="footer-middle">
-    <p class="footer-call">
-      고객상담 <strong>1588-6200, 1544-6200</strong> &nbsp; | &nbsp;
-      해외 <strong>82-2-1588-6200</strong>
-    </p>
-    <p class="footer-copy">COPYRIGHT ⓒ 2025 FLOBANK ALL RIGHTS RESERVED.</p>
-  </div>
-
-  <div class="footer-bottom">
-    <div class="footer-left">
-      <a href="https://www.webwatch.or.kr/Situation/WA_Situation.html?MenuCD=110" target="_blank">
-        <img src="/static/images/web.png" alt="웹 접근성 인증" class="footer-cert">
-      </a>
-      <div class="footer-sns">
-        <a href="#"><i class="fa-brands fa-instagram"></i></a>
-        <a href="#"><i class="fa-brands fa-facebook"></i></a>
-        <a href="#"><i class="fa-brands fa-youtube"></i></a>
-      </div>
-    </div>
-
-    
-
-    </div>
-  </div>
-</footer>
-
-    <!-- ✅ 수정된 검색 Top Sheet -->
-    <div
-      class="search-top-sheet"
-      id="searchModal"
-      role="dialog"
-      aria-modal="true"
-      aria-hidden="true"
-    >
-      <div class="search-top-sheet__panel" role="document">
-        <div class="search-top-sheet__header">
-          <form class="search-top-sheet__form" role="search">
-            <label for="globalSearch" class="sr-only">검색어 입력</label>
-            <input
-              type="text"
-              id="globalSearch"
-              placeholder="검색어를 입력하세요."
-              autocomplete="off"
-            />
-            <button
-              type="submit"
-              class="search-top-sheet__submit"
-              aria-label="검색"
-            >
-              <i class="fa-solid fa-magnifying-glass"></i>
-            </button>
-          </form>
-
-          <button type="button" class="search-top-sheet__close" aria-label="닫기">
-            <i class="fa-solid fa-xmark"></i>
-          </button>
-        </div>
-
-        <div class="search-top-sheet__content">
-          <div class="search-section">
-            <h3>최근 검색어</h3>
-            <ul class="search-list">
-              <li class="empty">최근 검색 내역이 없습니다.</li>
-            </ul>
-          </div>
-          <div class="search-section">
-            <h3>인기 검색어</h3>
-            <ol class="search-list rank">
-              <li>환율우대</li>
-              <li>여행자보험</li>
-              <li>OTP</li>
-              <li>환율 계산기</li>
-              <li>외화예금</li>
-              <li>모바일뱅킹</li>
-              <li>자동이체</li>
-              <li>주거래</li>
-              <li>카드교체</li>
-              <li>무료주차</li>
-            </ol>
-          </div>
-        </div>
-
-
-
-
-<script src ="/static/js/index.js"></script>
-
+<div th:replace="~{_template/_footer.html}"></div>
 </body>
 </html>
 

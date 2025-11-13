@@ -15,13 +15,13 @@
   />
 </head>
 <body>
-<div th:replace="~{/_template/_header.html}"></div>
+<div th:replace="~{_template/_header.html}"></div>
 <!-- =====================
        Main
 ====================== -->
 <main class="customer-container">
 
-    <div th:replace="~{/customer/_side}"></div>
+    <div th:replace="~{customer/_side.html}"></div>
 
   <!-- 본문 -->
   <section class="customer-content">
@@ -98,6 +98,6 @@
   </section>
 </main>
 
-<div th:replace="~{/_template/_footer.html}"></div>
+<div th:replace="~{_template/_footer.html}"></div>
 </body>
 </html>
