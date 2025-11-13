@@ -46,7 +46,14 @@ jobs:
     # Dockerfile이 app.jar를 찾으므로, 이름을 바꿔서 /opt/flobank-api/ 위치에 복사합니다.
     - name: bnk-api-server (flobank-api)에 JAR 파일 복사
       run: |
-        gcloud beta compute scp flobank-api/build/libs/flobank-api-*.jar \
+        JAR_FILE=$(find flobank-api/build/libs -name "*.jar" ! -name "*-plain.jar")
+        
+        if [ -z "$JAR_FILE" ]; then
+          echo "ERROR: 실행 가능한 JAR 파일을 flobank-api/build/libs 에서 찾을 수 없습니다."
+          exit 1
+        fi
+        
+        gcloud beta compute scp "$JAR_FILE" \
           bnk-api-server:/tmp/app.jar \
           --project=${{ secrets.GCP_PROJECT_ID }} \
           --zone=asia-northeast3-a
@@ -72,7 +79,14 @@ jobs:
     # Dockerfile이 app.jar를 찾으므로, 이름을 바꿔서 /opt/flobank-ap/ 위치에 복사합니다.
     - name: bnk-ap-server (flobank-ap)에 JAR 파일 복사
       run: |
-        gcloud beta compute scp flobank-ap/build/libs/flobank-ap-*.jar \
+        JAR_FILE=$(find flobank-ap/build/libs -name "*.jar" ! -name "*-plain.jar")
+        
+        if [ -z "$JAR_FILE" ]; then
+          echo "ERROR: 실행 가능한 JAR 파일을 flobank-ap/build/libs 에서 찾을 수 없습니다."
+          exit 1
+        fi
+        
+        gcloud beta compute scp "$JAR_FILE" \
           bnk-ap-server:/tmp/app.jar \
           --project=${{ secrets.GCP_PROJECT_ID }} \
           --zone=asia-northeast3-a
