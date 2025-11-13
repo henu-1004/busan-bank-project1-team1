@@ -4,7 +4,7 @@ services:
     container_name: flobank-ap-container # 컨테이너 이름
     ports:
       # application.yml의 TCP 포트 9090을 외부에 9090으로 노출
-      - "9090:9090" 
+      - "9090:9090"
       # application.yml의 관리용 웹 포트 8081을 외부에 8081로 노출
       - "8081:8081"
     restart: always # VM이 재시작되어도 자동으로 컨테이너 실행
