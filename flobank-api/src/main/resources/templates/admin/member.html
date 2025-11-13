@@ -58,7 +58,7 @@
 
 
                   <!-- 등록 모드일 때만 보이는 form -->
-                  <form th:if="${!editMode}" th:action="@{/admin/board/register}" method="post">
+                  <form th:if="${editMode}" th:action="@{/admin/board/register}" method="post">
 
                       <div class="board-row">
                           <div class="board-control">

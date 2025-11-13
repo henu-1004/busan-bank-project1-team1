@@ -39,3 +39,12 @@ eximbank:
 openai:
   api-key: ${OPENAI_API_KEY}
   base-url: "https://api.openai.com/v1"
+
+
+
+
+#############################################
+  # 지울예정
+terms:
+  base-dir : C:/Users/GGG/Desktop/workspace
+#############################################
