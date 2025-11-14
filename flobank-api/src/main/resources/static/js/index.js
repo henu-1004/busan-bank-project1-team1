@@ -1,3 +1,17 @@
+// 로그인 필요 공통 이벤트 함수 (전역)
+window.goKoAccountOpenMain = function () {
+    const hasLoginFlag = document.cookie
+        .split(";")
+        .map(v => v.trim())
+        .some(v => v.startsWith("loginYn=Y"));
+
+    if (!hasLoginFlag) {
+        alert("로그인 후 이용 부탁드립니다.");
+        return;
+    }
+    window.location.href = "/flobank/mypage/account_open_main";
+};
+
 document.addEventListener("DOMContentLoaded", () => {
   /** ============================
    * ✅ 1. 네비게이션 & Mega 메뉴
