@@ -6,7 +6,8 @@
 <mapper namespace="kr.co.api.flobankapi.mapper.admin.ProductMapper">
 
     <insert id="insertProduct" parameterType="kr.co.api.flobankapi.dto.ProductDTO">
-        INSERT INTO TB_DPST_PROD_INFO (
+
+        INSERT INTO TB_DPST_PROD_INFO(
         dpst_name,
         dpst_info,
         dpst_type,
@@ -36,21 +37,25 @@
         #{dpstStatus},
         #{dpstDescript},
         #{dpstPeriodType},
-        #{dpstMinAge},
-        #{dpstMaxAge},
+        #{dpstMinAge, jdbcType=INTEGER},
+        #{dpstMaxAge, jdbcType=INTEGER},
         #{dpstAutoRenewYn},
         #{dpstAddPayYn},
         #{dpstAddPayMax},
         #{dpstPartWdrwYn},
         SYSDATE
         )
-
-        <selectKey keyProperty="dpstId" resultType="string" order="AFTER">
-            SELECT MAX(dpst_id)
-            FROM TB_DPST_PROD_INFO
-        </selectKey>
-
     </insert>
+
+    <select id="getRecentDpstId" resultType="string">
+        SELECT dpst_id
+        FROM (
+        SELECT dpst_id
+        FROM TB_DPST_PROD_INFO
+        ORDER BY dpst_reg_dt DESC
+        )
+        WHERE ROWNUM = 1
+    </select>
 
 
     <insert id="insertProductLimits" parameterType="java.util.List">
@@ -64,8 +69,8 @@
             SELECT
             #{item.lmtDpstId},
             #{item.lmtCurrency},
-            #{item.lmtMinAmt},
-            #{item.lmtMaxAmt}
+            #{item.lmtMinAmt, jdbcType=NUMERIC},
+            #{item.lmtMaxAmt, jdbcType=NUMERIC}
             FROM dual
         </foreach>
     </insert>

@@ -30,9 +30,9 @@ public class ProductController {
             ProductDTO dto,
             @RequestParam(value = "dpstCurrency", required = false) String[] currencies,
             @RequestParam("ageLimit") String ageLimit,
-            @RequestParam(value = "lmtCurrency", required = false) String[] lmtCurrency,
-            @RequestParam(value = "lmtMinAmt", required = false) Integer[] lmtMinAmt,
-            @RequestParam(value = "lmtMaxAmt", required = false) Integer[] lmtMaxAmt
+            @RequestParam(value="lmtCurrency", required = false) String[] lmtCurrency,
+            @RequestParam(value="lmtMinAmt", required = false) Integer[] lmtMinAmt,
+            @RequestParam(value="lmtMaxAmt", required = false) Integer[] lmtMaxAmt
     ) {
 
         // --- 통화 처리 ---

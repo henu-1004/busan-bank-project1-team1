@@ -8,7 +8,7 @@ spring:
 
     # ✅ 1. DB 접속 정보
     datasource:
-      url: jdbc:oracle:thin:@//34.22.80.47:1521/XEPDB1
+      url: jdbc:oracle:thin:@34.22.80.47:1521/XEPDB1
       username: flobank
       password: 1234
       driver-class-name: oracle.jdbc.OracleDriver

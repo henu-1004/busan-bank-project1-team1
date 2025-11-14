@@ -18,22 +18,20 @@ public class ProductService {
     @Transactional
     public void insertProduct(ProductDTO dto, List<ProductLimitDTO> limits) {
 
-        // 1) 상품 기본정보 INSERT
+        // 1) 상품 기본정보 INSERT (dpst_id는 트리거가 생성)
         productMapper.insertProduct(dto);
 
-        // 2) 트리거 + selectKey 로 자동 들어옴
-        String dpstId = dto.getDpstId();
+        // 2) 생성된 dpst_id 조회
+        String dpstId = productMapper.getRecentDpstId ();
 
-        // 3) 통화별 최소/최대 INSERT
-        if (limits != null && !limits.isEmpty()) {
-
-            // 각 통화별 limit에 dpst_id 세팅
-            for (ProductLimitDTO limit : limits) {
-                limit.setLmtDpstId(dpstId);
-            }
-
-            // mapper 호출
-            productMapper.insertProductLimits(limits);
+        // 3) Limit 리스트에 dpst_id 주입
+        for (ProductLimitDTO limit : limits) {
+            limit.setLmtDpstId(dpstId);
         }
+
+        // 4) 통화별 한 번에 INSERT
+        productMapper.insertProductLimits(limits);
     }
+
+
 }

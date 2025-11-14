@@ -10,13 +10,12 @@ import java.util.List;
 @Mapper
 public interface ProductMapper {
 
-
-    // 상품 등록
+    // 상품 정보 INSERT
     int insertProduct(ProductDTO dto);
+
+    // 통화별 최소/최대 INSERT
     int insertProductLimits(List<ProductLimitDTO> limits);
 
-//    int updateProduct(ProductDTO dto);          // 정보 수정
-//    int updateProductStatus(String dpstId, int status); // 상태 변경
-//    int approveProduct(String dpstId);          // 최종 승인
-
+    // ★ 트리거가 생성한 가장 최근 상품 ID 조회 (필수)
+    String getRecentDpstId();
 }
