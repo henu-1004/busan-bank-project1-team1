@@ -76,18 +76,44 @@
 
 <section class="briefing-section">
     <div class="briefing-container">
+
+        <!-- 브리핑 모드 탭 -->
+        <div class="briefing-tabs">
+            <a th:href="@{/?mode=oneday}"
+               th:class="${briefingMode} == 'oneday' ? 'active' : ''">
+                오늘의 브리핑
+            </a>
+
+            <a th:href="@{/?mode=recent5}"
+               th:class="${briefingMode} == 'recent5' ? 'active' : ''">
+                최근 5일 브리핑
+            </a>
+        </div>
+
         <div class="briefing-box">
-            <h3>오늘의 브리핑 <span>(2025.11.12)</span></h3>
+
+            <!-- 동적 제목 + 날짜 -->
+            <h3>
+                <span th:text="${briefingTitle}">오늘의 브리핑</span>
+                <span th:text="'(' + briefingDateText + ')'"></span>
+            </h3>
+
+            <!-- 브리핑 내용 -->
             <ul class="briefing-list">
-                <li>미국 증시, 인플레이션 둔화 기대에 상승 마감</li>
-                <li>연준, 금리 동결 시사로 달러 약세 전환</li>
-                <li>10월 CPI 전년 대비 3.0% 상승, 물가 안정세 지속</li>
-                <li>기술주 중심의 나S스닥 1.2% 상승 기록</li>
-                <li>유가 소폭 하락, 에너지 관련주 혼조세</li>
+                <li th:each="line : ${briefingLines}"
+                    th:text="${line}">
+                </li>
+
+                <!-- 브리핑이 없는 경우 -->
+                <li th:if="${briefingLines == null}">
+                    아직 생성된 브리핑이 없습니다.
+                </li>
             </ul>
+
         </div>
     </div>
 </section>
+
 
 <section class="board-section">
     <div class="board-container">
