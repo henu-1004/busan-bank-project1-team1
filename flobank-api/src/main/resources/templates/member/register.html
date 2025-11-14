@@ -26,7 +26,7 @@
             <label for="reg-custId">아이디</label>
             <div class="input-inline">
                 <input type="text" id="reg-custId" th:field="*{custId}" placeholder="아이디를 입력하세요" required>
-                <button type="button" class="register-btn">중복확인</button>
+                <button type="button" class="register-btn" id="id-check-btn">중복확인</button>
             </div>
         </div>
 
@@ -79,8 +79,10 @@
         <div class="form-group">
             <label for="custHp">휴대폰 번호</label>
             <div class="input-inline">
-                <input type="tel" id="custHp" th:field="*{custHp}" placeholder="010-1234-5678 (-없이 입력)">
-                <button type="button" class="register-btn">인증번호 전송</button>
+                <input type="text" id="custHp" th:field="*{custHp}" placeholder="010-1234-5678 (-없이 입력)">
+                <button type="button" class="register-btn" id="btnSendCode">인증번호 전송</button>
+                <input type="text" id="verifyCodeInput" placeholder="인증번호 입력" style="width:100px; display:none;">
+                <button type="button" id="btnVerifyCode" class="register-btn" style="display:none;">확인</button>
             </div>
         </div>
 
@@ -89,7 +91,7 @@
             <div class="address-group">
                 <div class="input-inline">
                     <input type="text" th:field="*{custZip}" placeholder="우편번호" readonly>
-                    <button type="button" class="register-btn">우편번호 검색</button>
+                    <button type="button" class="register-btn" id="zip-btn">우편번호 검색</button>
                 </div>
                 <input type="text" th:field="*{custAddr1}" placeholder="기본주소">
                 <input type="text" th:field="*{custAddr2}" placeholder="상세주소">
@@ -103,6 +105,8 @@
 </main>
 
 <div th:replace="~{_template/_footer.html}"></div>
+<!--주소입력 라이브러리 추가-->
+<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 <script th:src="@{/js/member.js}"></script>
 
 </body>

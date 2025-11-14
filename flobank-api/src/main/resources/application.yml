@@ -13,6 +13,21 @@ spring:
       password: Flobank1234!!
       driver-class-name: oracle.jdbc.OracleDriver
 
+    mail:
+      host: smtp.gmail.com
+      port: 587
+      username: alswnstl23@gmail.com
+      password: nkel ifue pjnh hzyj
+      properties:
+        mail:
+          smtp:
+            auth: true
+            timeout: 5000
+            starttls:
+              enable: true
+            ssl:
+              trust: smtp.gmail.com
+
 
 flobank:
   ap: # 접속해야 할 flobank_ap (AP 서버) 정보
@@ -42,7 +57,11 @@ openai:
   api-key: ${OPENAI_API_KEY}
   base-url: "https://api.openai.com/v1"
 
-
+#휴대폰 인증
+solapi:
+  apiKey: NCSGTLVVAFB7GAHV
+  apiSecret: N7V7FAHACZ8KWKNQPQFUCGSDSWWL4K5E
+  phoneNumber: 01021098237
 
 
 #############################################

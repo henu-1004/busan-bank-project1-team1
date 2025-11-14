@@ -64,6 +64,13 @@ dependencies {
 
     // 타임리프용 시큐리티 확장 라이브러리 (화면 처리용)
     implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
+
+    // 솔라피 라이브러리
+    implementation 'com.solapi:sdk:1.0.3'
+
+    // 메일 인증 관련
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-mail', version: '3.3.3'
+    implementation group: 'org.modelmapper', name: 'modelmapper', version: '3.2.1'
 }
 
 tasks.named('test') {
