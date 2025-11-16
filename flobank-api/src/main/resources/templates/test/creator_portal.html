@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>플로뱅크 크리에이터 허브</title>
+    <link rel="stylesheet" th:href="@{/css/index.css}">
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+    <link rel="stylesheet" th:href="@{/css/footer.css}">
+
+    <link rel="stylesheet" th:href="@{/css/test/creator_suite.css}">
+</head>
+<body>
+<div th:replace="~{_template/_header.html}"></div>
+
+<main class="page-wrapper">
+    <div class="container">
+        <section class="hero">
+            <h1 class="page-title">Creator Growth Banking Studio</h1>
+            <p class="page-description">
+                글로벌 팔로워를 기반으로 성장하는 크리에이터를 위해 외환예금과 적금 상품을 맞춤 추천합니다.
+                실시간 팔로워 증가 추이와 추천 통계를 확인하고, 우대금리 로드맵으로 한 발 빠르게 리워드를 확보해 보세요.
+            </p>
+            <div class="hero-actions">
+                <span class="badge">#페일블루 #CreatorBanking</span>
+                <a class="link-button" th:href="@{/test/followers}">팔로워 인사이트 보기</a>
+                <a class="link-button" th:href="@{/test/events}">이벤트 플랜 둘러보기</a>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">오늘의 추천 상품</h2>
+                    <p class="section-subtitle">외화 수익부터 단기 적립까지, 채널별 수익 패턴을 반영한 세 가지 플랜</p>
+                </div>
+                <div class="section-actions">
+                    <span class="tag">Creator 전용 금리</span>
+                    <a class="link-button" th:href="@{/deposit/list}">상품 전체 보기</a>
+                </div>
+            </div>
+            <div class="card-grid">
+                <article class="card">
+                    <h3>글로벌 팔로워 외화예금</h3>
+                    <p>유튜브 광고수익과 후원금을 다국적 통화로 모으고, 환율 알림으로 수익 타이밍을 잡으세요.</p>
+                    <strong>기본금리 3.6% + 추천우대 0.5%</strong>
+                    <div class="tag-row">
+                        <span class="tag">자동 환전</span>
+                        <span class="tag">수수료 면제</span>
+                    </div>
+                    <a class="link-button" th:href="@{/deposit/view(id=global_fx)}">상품 상세보기</a>
+                </article>
+                <article class="card">
+                    <h3>Creator 성장 적금</h3>
+                    <p>협찬 · 라이브 수익을 목표 달성 시 자동 적립하고, 캠페인 실적에 따라 금리가 단계적으로 상승합니다.</p>
+                    <strong>기본금리 3.2% + 실적우대 0.6%</strong>
+                    <div class="tag-row">
+                        <span class="tag">목표 관리</span>
+                        <span class="tag">수익 리포트</span>
+                    </div>
+                    <a class="link-button" th:href="@{/deposit/view(id=growth_savings)}">상품 상세보기</a>
+                </article>
+                <article class="card">
+                    <h3>콘텐츠 크루 비상금통장</h3>
+                    <p>단기 제작비와 협업 비용을 바로 사용할 수 있는 유동성 계좌. 멤버 추천 시 수수료 절감 혜택이 제공됩니다.</p>
+                    <strong>기본금리 2.4% + 크루추천 0.4%</strong>
+                    <div class="tag-row">
+                        <span class="tag">실시간 이체</span>
+                        <span class="tag">지출 캘린더</span>
+                    </div>
+                    <a class="link-button" th:href="@{/deposit/view(id=content_flex)}">상품 상세보기</a>
+                </article>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">팔로워 증가 추이 & 추천 현황</h2>
+                    <p class="section-subtitle">채널별 최근 6주 누적 추이와 금월 추천 성과를 실시간으로 확인하세요.</p>
+                </div>
+                <div class="section-actions">
+                    <span class="tag">실시간 연동</span>
+                    <a class="link-button" th:href="@{/test/followers}">팔로워 대시보드 열기</a>
+                </div>
+            </div>
+            <div class="metric-grid">
+                <div class="metric-card">
+                    <span class="metric-label">YouTube 팔로워 6주 증가</span>
+                    <span class="metric-value">+68,420명</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-label">Instagram 팔로워 6주 증가</span>
+                    <span class="metric-value">+42,180명</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-label">TikTok 팔로워 6주 증가</span>
+                    <span class="metric-value">+35,260명</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-label">금월 추천받은 횟수</span>
+                    <span class="metric-value">74회</span>
+                </div>
+            </div>
+            <div class="line-chart" role="img" aria-label="최근 6주 채널별 팔로워 증가 추이">
+                <svg viewBox="0 0 320 160">
+                    <g class="chart-axis">
+                        <line x1="0" y1="140" x2="320" y2="140"></line>
+                        <line x1="0" y1="100" x2="320" y2="100"></line>
+                        <line x1="0" y1="60" x2="320" y2="60"></line>
+                        <line x1="0" y1="20" x2="320" y2="20"></line>
+                        <text x="4" y="20">70K</text>
+                        <text x="4" y="60">50K</text>
+                        <text x="4" y="100">30K</text>
+                        <text x="4" y="140">10K</text>
+                    </g>
+                    <polyline class="youtube" points="12,120 74,102 136,88 198,72 260,54 312,38"></polyline>
+                    <polyline class="instagram" points="12,136 74,122 136,110 198,94 260,80 312,66"></polyline>
+                    <polyline class="tiktok" points="12,142 74,132 136,118 198,106 260,92 312,80"></polyline>
+                    <g class="youtube-point">
+                        <circle cx="12" cy="120"></circle>
+                        <circle cx="74" cy="102"></circle>
+                        <circle cx="136" cy="88"></circle>
+                        <circle cx="198" cy="72"></circle>
+                        <circle cx="260" cy="54"></circle>
+                        <circle cx="312" cy="38"></circle>
+                    </g>
+                    <g class="instagram-point">
+                        <circle cx="12" cy="136"></circle>
+                        <circle cx="74" cy="122"></circle>
+                        <circle cx="136" cy="110"></circle>
+                        <circle cx="198" cy="94"></circle>
+                        <circle cx="260" cy="80"></circle>
+                        <circle cx="312" cy="66"></circle>
+                    </g>
+                    <g class="tiktok-point">
+                        <circle cx="12" cy="142"></circle>
+                        <circle cx="74" cy="132"></circle>
+                        <circle cx="136" cy="118"></circle>
+                        <circle cx="198" cy="106"></circle>
+                        <circle cx="260" cy="92"></circle>
+                        <circle cx="312" cy="80"></circle>
+                    </g>
+                </svg>
+                <div class="chart-legend">
+                    <span><span class="legend-dot" style="background: var(--color-line-yt);"></span>YouTube</span>
+                    <span><span class="legend-dot" style="background: var(--color-line-ig);"></span>Instagram</span>
+                    <span><span class="legend-dot" style="background: var(--color-line-tt);"></span>TikTok</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">우대금리 달성 로드맵</h2>
+                    <p class="section-subtitle">추천 건수와 시청자 참여도를 기반으로 금리가 누적 상승합니다.</p>
+                </div>
+                <div class="section-actions">
+                    <span class="tag">Benefit Booster</span>
+                    <a class="link-button" th:href="@{/test/events}">이벤트 연동 보기</a>
+                </div>
+            </div>
+            <div class="highlight-panel">
+                <div class="highlight-box">
+                    <h4>추천 기반 우대</h4>
+                    <p>추천 링크를 통해 가입한 팔로워 수에 따라 우대금리가 단계적으로 적용됩니다.</p>
+                    <div class="timeline">
+                        <div class="timeline-step">
+                            <h4>STEP 1 · 추천 10명 달성</h4>
+                            <p>Creator 성장 적금 +0.3% 우대</p>
+                        </div>
+                        <div class="timeline-step">
+                            <h4>STEP 2 · 추천 25명 달성</h4>
+                            <p>글로벌 팔로워 외화예금 환전 수수료 면제</p>
+                        </div>
+                        <div class="timeline-step">
+                            <h4>STEP 3 · 추천 50명 달성</h4>
+                            <p>콘텐츠 크루 비상금통장 +0.4% 추가 우대</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <h4>채널별 추천 현황</h4>
+                    <p>채널별 추천 누적과 전주 대비 증감률을 한 눈에 비교하세요.</p>
+                    <div class="table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                            <tr>
+                                <th>채널</th>
+                                <th>이번 주 추천</th>
+                                <th>전주 대비</th>
+                                <th>누적 가입</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>YouTube</td>
+                                <td>28건</td>
+                                <td>+18%</td>
+                                <td>142건</td>
+                            </tr>
+                            <tr>
+                                <td>Instagram</td>
+                                <td>22건</td>
+                                <td>+12%</td>
+                                <td>108건</td>
+                            </tr>
+                            <tr>
+                                <td>TikTok</td>
+                                <td>16건</td>
+                                <td>+9%</td>
+                                <td>76건</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="cta-panel">
+                <div>
+                    <h3>팔로워 인사이트 & 캠페인 통합 관리</h3>
+                    <p>추천한 팔로워의 가입 현황, 목표 달성률, 이벤트 참여율까지 한 번에 확인하고
+                        플로뱅크와 함께 성장하는 크리에이터 여정을 설계하세요.</p>
+                </div>
+                <div class="cta-actions">
+                    <a class="cta-primary" th:href="@{/test/followers}">팔로워 분석 바로가기</a>
+                    <a class="cta-secondary" th:href="@{/test/events}">이벤트 연동 살펴보기</a>
+                </div>
+            </div>
+        </section>
+    </div>
+</main>
+
+<div th:replace="~{_template/_footer.html}"></div>
+</body>
+</html>
