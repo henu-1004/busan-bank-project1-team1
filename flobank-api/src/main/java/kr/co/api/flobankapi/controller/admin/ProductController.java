@@ -23,8 +23,49 @@ public class ProductController {
     @GetMapping("")
     public String productList(Model model) {
         model.addAttribute("activeItem", "products");
+
+        model.addAttribute("approveList", productService.getProductsByStatus(1));
+        model.addAttribute("pendingList", productService.getProductsByStatus(2));
+        model.addAttribute("saleList", productService.getProductsByStatus(3));
+        model.addAttribute("stopList", productService.getProductsByStatus(4));
+
         return "admin/products";
     }
+
+
+
+
+    @GetMapping("/view/{dpstId}")
+    public String productView(@PathVariable String dpstId, Model model) {
+
+        ProductDTO product = productService.getProductById(dpstId);
+
+        // 기간 목록
+        List<ProductPeriodDTO> periods = productService.getPeriods(dpstId);
+
+        // 일부인출 규정
+        ProductWithdrawRuleDTO wdrwRule = productService.getWithdrawRule(dpstId);
+
+        // 통화별 최소출금액
+        List<ProductWithdrawAmtDTO> wdrwAmts = productService.getWithdrawAmts(dpstId);
+
+        // 최소/최대 가입액 제한
+        List<ProductLimitDTO> limits = productService.getLimits(dpstId);
+
+        model.addAttribute("product", product);
+        model.addAttribute("periods", periods);
+        model.addAttribute("withdrawRule", wdrwRule);
+        model.addAttribute("withdrawAmts", wdrwAmts);
+        model.addAttribute("limits", limits);
+
+        return "admin/products_view";
+    }
+
+
+
+
+
+
 
     @PostMapping("/register")
     public String registerProduct(
@@ -64,10 +105,10 @@ public class ProductController {
         List<ProductLimitDTO> limits = new ArrayList<>();
 
         // 1) 거치식일 때만 limits 생성
-        if (dto.getDpstType() == 1 && lmtCurrency != null) {
-            for (int i = 0; i < lmtCurrency.length; i++) {
+        if (dto.getDpstType() == 1 && currencies != null) {
+            for (int i = 0; i < currencies.length; i++) {
                 ProductLimitDTO limit = new ProductLimitDTO();
-                limit.setLmtCurrency(lmtCurrency[i]);
+                limit.setLmtCurrency(currencies[i]);
                 limit.setLmtMinAmt(lmtMinAmt[i]);
                 limit.setLmtMaxAmt(lmtMaxAmt[i]);
                 limits.add(limit);
@@ -169,5 +210,20 @@ public class ProductController {
 
         return "redirect:/admin/products";
     }
+
+
+    @PostMapping("/approve/{dpstId}")
+    @ResponseBody
+    public void approveProduct(@PathVariable String dpstId) {
+        productService.updateStatus(dpstId, 2);
+    }
+
+
+
+
+
+
+
+
 
 }

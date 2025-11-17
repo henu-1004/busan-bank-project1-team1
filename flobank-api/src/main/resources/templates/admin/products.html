@@ -217,10 +217,10 @@
 
             <!-- 상품 게시일자 선택 -->
             <div class="form-section">
-                <h3>상품 게시일자</h3>
+                <h3>상품 개시일자</h3>
 
                 <div class="form-group">
-                    <label for="dpstRegDt">게시일자 선택</label>
+                    <label for="dpstRegDt">개시일자 선택</label>
                     <input type="date" id="dpstRegDt" name="dpstRegDt" required />
                 </div>
             </div>
@@ -235,22 +235,21 @@
     </section>
 
 
-
-
-
-    <!-- 외화예금 상품 관리 -->
     <section class="product-card">
+
         <h2 class="product-title">외화예금 상품 관리</h2>
 
         <!-- 상태 탭 -->
         <div class="product-tabs">
             <button class="tab-btn active" data-status="approve">승인 대기 중</button>
-            <button class="tab-btn" data-status="review">심사 대기 중</button>
             <button class="tab-btn" data-status="pending">상품 등록 대기 중</button>
         </div>
 
-        <!-- 상품 목록 테이블 -->
-        <div class="product-table-wrap">
+
+        <!-- ============================
+             승인 대기 중 (STATUS = 1)
+        ============================= -->
+        <div class="product-table-wrap" data-status-group="approve">
             <table class="product-table">
                 <thead>
                 <tr>
@@ -261,42 +260,47 @@
                 </thead>
 
                 <tbody>
-                <!-- 승인 대기 중 -->
-                <tr data-status="approve">
-                    <td>BNK 외화예금 상품1</td>
-                    <td><span class="status-badge status-approve">승인 대기 중</span></td>
-                    <td><button class="btn-approve">승인</button></td>
-                </tr>
-
-                <!-- 심사 대기 중 -->
-                <tr data-status="review">
-                    <td>BNK 외화예금 상품2</td>
-                    <td><span class="status-badge status-review">심사 대기 중</span></td>
-                    <td><button class="btn-disabled" disabled>처리 불가</button></td>
-                </tr>
-
-                <!-- 상품 등록 대기 중 -->
-                <tr data-status="pending">
-                    <td>BNK 외화예금 상품3</td>
-                    <td><span class="status-badge status-pending">상품 등록 대기 중</span></td>
-                    <td><button class="btn-post">상품 게시</button></td>
-                </tr>
-
-                <tr data-status="pending">
-                    <td>BNK 외화예금 상품4</td>
-                    <td><span class="status-badge status-pending">상품 등록 대기 중</span></td>
-                    <td><button class="btn-post">상품 게시</button></td>
-                </tr>
-
-                <tr data-status="approve">
-                    <td>BNK 외화예금 상품5</td>
-                    <td><span class="status-badge status-approve">승인 대기 중</span></td>
-                    <td><button class="btn-approve">승인</button></td>
+                <tr th:each="p : ${approveList}" data-status="approve" th:data-id="${p.dpstId}">
+                    <td th:text="${p.dpstName}"></td>
+                    <td>
+                        <span class="status-badge status-approve">승인 대기 중</span>
+                    </td>
+                    <td>
+                        <button class="btn-approve">승인</button>
+                    </td>
                 </tr>
                 </tbody>
             </table>
         </div>
+
+
+        <!-- ============================
+             상품 등록 대기 중 (STATUS = 2)
+        ============================= -->
+        <div class="product-table-wrap" data-status-group="pending" style="display:none;">
+            <table class="product-table">
+                <thead>
+                <tr>
+                    <th>상품명</th>
+                    <th>상태</th>
+                    <th>상품 게시일</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr th:each="p : ${pendingList}" th:data-id="${p.dpstId}">
+                    <td th:text="${p.dpstName}"></td>
+                    <td>
+                        <span class="status-badge status-pending">상품 등록 대기 중</span>
+                    </td>
+                    <td th:text="${p.dpstRegDt}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
     </section>
+
 
     <!-- 외화예금 상품 현황 -->
     <section class="product-card">
@@ -312,46 +316,44 @@
                     <th>상태</th>
                 </tr>
                 </thead>
+
                 <tbody>
-                <tr>
-                    <td><a th:href="@{/admin/products_view}" class="product-link">BNK 외화예금 상품1</a></td>
-                    <td>2025-11-01 09:00</td>
-                    <td>127</td>
+
+                <!-- STATUS = 3 (판매중) -->
+                <tr th:each="p : ${saleList}">
+                    <td>
+                        <a th:href="@{/admin/products/view/{id}(id=${p.dpstId})}"
+                           class="product-link"
+                           th:text="${p.dpstName}"></a>
+                    </td>
+
+                    <!-- 상품 개시일 → dpstRegDt 사용 -->
+                    <td th:text="${p.dpstRegDt}"></td>
+
+                    <!-- 가입자 수 → 0 고정 -->
+                    <td>0</td>
+
                     <td><span class="status-badge status-sale">판매중</span></td>
                 </tr>
 
-                <tr>
-                    <td><a href="#" class="product-link">BNK 외화예금 상품2</a></td>
-                    <td>2025-10-25 10:30</td>
-                    <td>88</td>
-                    <td><span class="status-badge status-sale">판매중</span></td>
-                </tr>
+                <!-- STATUS = 4 (판매중단) -->
+                <tr th:each="p : ${stopList}">
+                    <td>
+                        <a th:href="@{/admin/products/view/{id}(id=${p.dpstId})}"
+                           class="product-link"
+                           th:text="${p.dpstName}"></a>
+                    </td>
 
-                <tr>
-                    <td><a href="#" class="product-link">BNK 외화예금 상품3</a></td>
-                    <td>2025-10-05 14:20</td>
-                    <td>152</td>
-                    <td><span class="status-badge status-sale">판매중</span></td>
-                </tr>
+                    <td th:text="${p.dpstRegDt}"></td>
+                    <td>0</td>
 
-                <tr>
-                    <td><a href="#" class="product-link">BNK 외화예금 상품4</a></td>
-                    <td>2025-09-18 09:15</td>
-                    <td>96</td>
                     <td><span class="status-badge status-stop">판매중단</span></td>
                 </tr>
 
-                <tr>
-                    <td><a href="#" class="product-link">BNK 외화예금 상품5</a></td>
-                    <td>2025-08-30 11:00</td>
-                    <td>203</td>
-                    <td><span class="status-badge status-stop">판매중단</span></td>
-                </tr>
                 </tbody>
             </table>
         </div>
     </section>
-
 </div>
 
 <script th:src="@{/js/product1.js}"></script>

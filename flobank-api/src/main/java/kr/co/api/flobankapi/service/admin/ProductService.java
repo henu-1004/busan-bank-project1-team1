@@ -60,7 +60,7 @@ public class ProductService {
             for (ProductLimitDTO limit : limits) {
                 limit.setLmtDpstId(dpstId);
             }
-            productMapper.insertProductLimits(limits);
+            productMapper.insertProductLimits(dpstId, limits);
         }
 
         // 4) 가입 기간 INSERT
@@ -83,6 +83,47 @@ public class ProductService {
             productMapper.insertWithdrawalAmounts(withdrawAmts);
         }
     }
+
+
+    public List<ProductDTO> getProductsByStatus(int status) {
+        return productMapper.getProductsByStatus(status);
+    }
+
+
+    public void updateStatus(String dpstId, int status) {
+        productMapper.updateStatus(dpstId, status);
+    }
+
+
+    public ProductDTO getProductById(String dpstId) {
+        return productMapper.getProductById(dpstId);
+    }
+
+
+
+    public List<ProductPeriodDTO> getPeriods(String dpstId) {
+        return productMapper.getPeriods(dpstId);
+    }
+
+
+    public ProductWithdrawRuleDTO getWithdrawRule(String dpstId) {
+        return productMapper.getWithdrawRule(dpstId);
+    }
+
+
+    public List<ProductWithdrawAmtDTO> getWithdrawAmts(String dpstId) {
+        return productMapper.getWithdrawAmts(dpstId);
+    }
+
+
+    public List<ProductLimitDTO> getLimits(String dpstId) {
+        return productMapper.getLimits(dpstId);
+    }
+
+
+
+
+
 
 
 

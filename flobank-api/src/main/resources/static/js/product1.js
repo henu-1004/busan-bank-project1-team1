@@ -71,7 +71,6 @@ document.addEventListener("DOMContentLoaded", function () {
         updateAgeLimit();
         updateWithdrawal();
         updateAutoRenew();
-        updateMinYn();
     }
 
 
@@ -116,7 +115,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 <h4>${label}</h4>
             
                 <input type="hidden" name="lmtCurrency[]" value="${code}">
-            
+                
                 <div class="form-inline">
                     <label>최소 가입액</label>
                     <input type="number" name="lmtMinAmt[]" data-code="${code}" 
@@ -221,19 +220,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
-    function updateMinYn() {
-        const type = document.querySelector('input[name="dpstType"]:checked').value;
 
-        const old = document.querySelector('input[name="dpstMinYn"]');
-        if (old) old.remove();
-
-        const hidden = document.createElement("input");
-        hidden.type = "hidden";
-        hidden.name = "dpstMinYn";
-        hidden.value = (type === "1") ? "Y" : "N";
-
-        document.getElementById("foreignDepositForm").appendChild(hidden);
-    }
 
 
 });

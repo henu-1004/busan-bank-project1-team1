@@ -60,37 +60,22 @@
     </insert>
 
 
-
-
-
     <insert id="insertProductLimits">
-        INSERT ALL
-        <foreach collection="list" item="item">
-            INTO TB_DPST_AMT_LMT (
+        <foreach collection="limits" item="l" separator=";">
+            INSERT INTO TB_DPST_AMT_LMT (
             lmt_dpst_id,
             lmt_currency,
             lmt_min_amt,
             lmt_max_amt
             )
             VALUES (
-            #{item.lmtDpstId},
-            #{item.lmtCurrency},
-            #{item.lmtMinAmt},
-            #{item.lmtMaxAmt}
+            #{dpstId},
+            #{l.lmtCurrency},
+            #{l.lmtMinAmt},
+            #{l.lmtMaxAmt}
             )
         </foreach>
-        SELECT 1 FROM dual
     </insert>
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -139,6 +124,71 @@
             FROM dual
         </foreach>
     </insert>
+
+
+    <update id="updateStatus">
+        UPDATE TB_DPST_PROD_INFO
+        SET dpst_status = #{status}
+        WHERE dpst_id = #{dpstId}
+    </update>
+
+
+    <select id="getProductsByStatus" resultType="kr.co.api.flobankapi.dto.ProductDTO">
+        SELECT *
+        FROM TB_DPST_PROD_INFO
+        WHERE dpst_status = #{status}
+        ORDER BY dpst_reg_dt DESC
+    </select>
+
+    <select id="getProductById" resultType="kr.co.api.flobankapi.dto.ProductDTO">
+        SELECT *
+        FROM TB_DPST_PROD_INFO
+        WHERE dpst_id = #{dpstId}
+    </select>
+
+
+    <select id="getPeriods" resultType="kr.co.api.flobankapi.dto.ProductPeriodDTO">
+        SELECT
+        period_min_month AS minMonth,
+        period_max_month AS maxMonth,
+        period_fixed_month AS fixedMonth,
+        period_dpst_id AS dpstId
+        FROM TB_DPST_PROD_PERIOD
+        WHERE period_dpst_id = #{dpstId}
+    </select>
+
+
+    <select id="getWithdrawRule" resultType="kr.co.api.flobankapi.dto.ProductWithdrawRuleDTO">
+        SELECT
+        wdrw_min_month AS minMonths,
+        wdrw_max AS maxCount,
+        wdrw_dpst_id AS dpstId
+        FROM TB_DPST_PARTIAL_WDRW_INFO
+        WHERE wdrw_dpst_id = #{dpstId}
+    </select>
+
+
+    <select id="getWithdrawAmts" resultType="kr.co.api.flobankapi.dto.ProductWithdrawAmtDTO">
+        SELECT
+        amt_currency AS currency,
+        amt_min AS minAmt,
+        amt_dpst_id AS dpstId
+        FROM TB_DPST_PARTIAL_WDRW_AMT
+        WHERE amt_dpst_id = #{dpstId}
+    </select>
+
+    <select id="getLimits" parameterType="string"
+            resultType="kr.co.api.flobankapi.dto.ProductLimitDTO">
+        SELECT
+            LMT_DPST_ID   AS lmtDpstId,
+            LMT_CURRENCY  AS lmtCurrency,
+            LMT_MIN_AMT   AS lmtMinAmt,
+            LMT_MAX_AMT   AS lmtMaxAmt
+        FROM TB_DPST_AMT_LMT
+        WHERE LMT_DPST_ID = #{dpstId}
+
+    </select>
+
 
 
 
