@@ -1,3 +1,6 @@
+/*******************************************
+ *   날짜 관련 함수
+ *******************************************/
 // 오늘 날짜 yyyy-MM-dd
 function getToday() {
     const today = new Date();
@@ -7,52 +10,51 @@ function getToday() {
     return `${y}-${m}-${d}`;
 }
 
-// yyyy-MM-dd 형식 변환
+// yyyy-MM-dd 변환
 function formatDate(date) {
     const y = date.getFullYear();
-    const m = String(date.getMonth() + 1).padStart(2, '0');
-    const d = String(date.getDate()).padStart(2, '0');
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    const d = String(date.getDate()).padStart(2, "0");
     return `${y}-${m}-${d}`;
 }
 
-// API 조회 날짜 계산 로직
-function getApiDate() {
-    const now = new Date();
-    const day = now.getDay();  // 0=일, 6=토
-    const hour = now.getHours();
-    let target = new Date(now);
-
-    // ★ 토요일 → 금요일
-    if (day === 6) {
-        target.setDate(target.getDate() - 1);
-        return formatDate(target);
-    }
-
-    // ★ 일요일 → 금요일
-    if (day === 0) {
-        target.setDate(target.getDate() - 2);
-        return formatDate(target);
-    }
-
-    // ★ 월요일 오전 11시 이전 → 금요일
-    if (day === 1 && hour < 11) {
-        target.setDate(target.getDate() - 3);
-        return formatDate(target);
-    }
-
-    // ★ 화~금 오전 11시 이전 → 전날
-    if (day >= 2 && day <= 5 && hour < 11) {
-        target.setDate(target.getDate() - 1);
-        return formatDate(target);
-    }
-
-    // ★ 그 외(평일 11시 이후) → 오늘
-    return formatDate(target);
+// 전날 계산
+function getPreviousDate(dateStr) {
+    const d = new Date(dateStr);
+    d.setDate(d.getDate() - 1);
+    return formatDate(d);
 }
 
+
+/*******************************************
+ *   API 호출 + fallback
+ *******************************************/
+async function fetchRateWithFallback() {
+    let date = getToday();
+
+    for (let i = 0; i < 5; i++) {
+        const res = await fetch(`/flobank/rate/data?date=${date}`);
+        const data = await res.json();
+
+        // 데이터 정상 여부
+        if (data && data.length > 0 && data[0].result === 1) {
+            return { date, data };
+        }
+
+        // 데이터 없으면 전날로 이동
+        date = getPreviousDate(date);
+    }
+
+    return null;
+}
+
+
+/*******************************************
+ *   환율 계산 로직
+ *******************************************/
 let exchangeRates = [];
 
-// 통화 환율값 추출
+// 통화별 환율 획득
 function getRate(currency, type) {
     const cur = exchangeRates.find(c =>
         c.cur_unit === currency || c.cur_unit.startsWith(currency)
@@ -66,8 +68,8 @@ function getRate(currency, type) {
     };
 
     const base = toNum(cur.deal_bas_r);
-    const ttb  = toNum(cur.ttb);
-    const tts  = toNum(cur.tts);
+    const ttb = toNum(cur.ttb);  // 송금 받을 때
+    const tts = toNum(cur.tts);  // 송금 보낼 때
 
     switch (type) {
         case "매매기준율": return base;
@@ -87,13 +89,14 @@ function calculate() {
     if (!amount || amount <= 0) return;
 
     const fromRate = getRate(from, type);
-    const toRate   = getRate(to, type);
+    const toRate = getRate(to, type);
 
     if (isNaN(fromRate) || isNaN(toRate)) {
         document.getElementById("convertedValue").innerText = "-";
         return;
     }
 
+    // 동일 통화
     if (from === to) {
         document.getElementById("convertedValue").innerText = amount.toLocaleString();
         document.querySelector(".unit").innerText = to;
@@ -106,24 +109,37 @@ function calculate() {
     document.querySelector(".unit").innerText = to;
 }
 
-// 페이지 로딩 시
-document.addEventListener("DOMContentLoaded", async () => {
-    const apiDate = getApiDate();
 
-    const displayDate = apiDate.replace(/-/g, ".");
-    const dateTextEl = document.getElementById("rate-date-text");
-    if (dateTextEl) {
-        dateTextEl.innerText = `${displayDate} 기준 환율입니다.`;
+/*******************************************
+ *   페이지 초기 로딩
+ *******************************************/
+document.addEventListener("DOMContentLoaded", async () => {
+
+    const result = await fetchRateWithFallback();
+
+    if (!result) {
+        alert("환율 데이터를 불러올 수 없습니다.");
+        return;
     }
 
-    const res = await fetch(`/flobank/rate/data?date=${apiDate}`);
-    exchangeRates = await res.json();
+    // 실제 API 조회 날짜
+    const apiDate = result.date;
+    exchangeRates = result.data;
 
+    // 날짜 표시 (yyyy.MM.dd 변환)
+    const dateText = apiDate.replace(/-/g, ".");
+    const dateEl = document.getElementById("rate-date-text");
+    if (dateEl) {
+        dateEl.innerText = `${dateText} 기준 환율입니다.`;
+    }
+
+    // 초기 계산 실행
     calculate();
 });
 
-// 이벤트
+
 document.getElementById("fromCurrency").addEventListener("change", calculate);
 document.getElementById("toCurrency").addEventListener("change", calculate);
 document.getElementById("rateStandard").addEventListener("change", calculate);
 document.getElementById("amount").addEventListener("input", calculate);
+
