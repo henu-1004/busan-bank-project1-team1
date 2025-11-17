@@ -43,7 +43,7 @@ jobs:
         ./gradlew build -x test
 
     # 2-2. [복사] 빌드된 JAR 파일을 bnk-api-server VM으로 복사
-    # Dockerfile이 app.jar를 찾으므로, 이름을 바꿔서 /opt/flobank-api/ 위치에 복사합니다.
+    # /tmp/app.jar 로 복사하도록 수정됨 (잘하셨습니다!)
     - name: bnk-api-server (flobank-api)에 JAR 파일 복사
       run: |
         JAR_FILE=$(find flobank-api/build/libs -name "*.jar" ! -name "*-plain.jar")
@@ -54,17 +54,17 @@ jobs:
         fi
         
         gcloud beta compute scp "$JAR_FILE" \
-          bnk-api-server:~/app.jar \
+          bnk-api-server:/tmp/app.jar \
           --project=${{ secrets.GCP_PROJECT_ID }} \
           --zone=asia-northeast3-a
 
     # 2-3. [실행] bnk-api-server VM에 접속해 Docker Compose 재시작
-    - name: bnk-api-server (flobank-api) 재시작
+    - name: bnk-api-server (flobank-api) 재시작 및 정리
       run: |
         gcloud beta compute ssh bnk-api-server \
           --project=${{ secrets.GCP_PROJECT_ID }} \
           --zone=asia-northeast3-a \
-          --command="sudo rm -rf /opt/flobank-api/app.jar && sudo mv ~/app.jar /opt/flobank-api/app.jar && cd /opt/flobank-api && OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} sudo docker-compose down && OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} sudo docker-compose up -d --build"
+          --command="sudo rm -rf /opt/flobank-api/app.jar && sudo mv /tmp/app.jar /opt/flobank-api/app.jar && cd /opt/flobank-api && OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} sudo docker-compose down && OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} sudo docker-compose up -d --build && sudo docker system prune -a -f"
 
     # 3-1. [빌드] GitHub Actions 실행기에서 flobank-ap 프로젝트를 빌드
     - name: bnk-ap-server (flobank-ap) 빌드
@@ -74,7 +74,7 @@ jobs:
         ./gradlew build -x test
 
     # 3-2. [복사] 빌드된 JAR 파일을 bnk-ap-server VM으로 복사
-    # Dockerfile이 app.jar를 찾으므로, 이름을 바꿔서 /opt/flobank-ap/ 위치에 복사합니다.
+    # /tmp/app.jar 로 복사하도록 수정됨 (잘하셨습니다!)
     - name: bnk-ap-server (flobank-ap)에 JAR 파일 복사
       run: |
         JAR_FILE=$(find flobank-ap/build/libs -name "*.jar" ! -name "*-plain.jar")
@@ -85,14 +85,14 @@ jobs:
         fi
         
         gcloud beta compute scp "$JAR_FILE" \
-          bnk-ap-server:~/app.jar \
+          bnk-ap-server:/tmp/app.jar \
           --project=${{ secrets.GCP_PROJECT_ID }} \
           --zone=asia-northeast3-a
 
     # 3-3. [실행] bnk-ap-server VM에 접속해 Docker Compose 재시작
-    - name: bnk-ap-server (flobank-ap) 재시작
+    - name: bnk-ap-server (flobank-ap) 재시작 및 정리
       run: |
         gcloud beta compute ssh bnk-ap-server \
           --project=${{ secrets.GCP_PROJECT_ID }} \
           --zone=asia-northeast3-a \
-          --command="sudo rm -rf /opt/flobank-ap/app.jar && sudo mv ~/app.jar /opt/flobank-ap/app.jar && cd /opt/flobank-ap && sudo docker-compose down && sudo docker-compose up -d --build"
+          --command="sudo rm -rf /opt/flobank-ap/app.jar && sudo mv /tmp/app.jar /opt/flobank-ap/app.jar && cd /opt/flobank-ap && sudo docker-compose down && sudo docker-compose up -d --build && sudo docker system prune -a -f"
