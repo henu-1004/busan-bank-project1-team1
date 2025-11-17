@@ -18,65 +18,92 @@
 <body>
 <div th:replace="~{_template/_header.html}"></div>
 
-<main class="open2-account-container">
-    <div class="open2-account-box">
-        <h2>입출금 통장 개설</h2>
-        <p class="desc">고객 정보를 확인하고 이체한도를 설정해주세요.</p>
+<form id="koAccountOpenForm" th:action="@{/mypage/ko_account_open_2}" method="post" th:object="${custAcctDTO}">
+    <main class="open2-account-container" th:data-phone-number="${custInfoDTO.custHp}">
+        <div class="open2-account-box">
 
-        <section class="open2-user-info-section">
-            <div class="open2-form-group">
-                <label class="open2-form-label">아이디</label>
-                <input type="text" class="open2-form-input readonly" value="a123" readonly>
-            </div>
+            <input type="hidden" name="acctCustCode" th:value="${custInfoDTO.custCode}"/>
 
-            <div class="open2-form-row">
-                <div class="open2-form-group half">
-                    <label class="open2-form-label">생년월일</label>
-                    <input type="text" class="open2-form-input readonly" value="2001-02-16" readonly>
+            <h2>입출금 통장 개설</h2>
+            <p class="desc">고객 정보를 확인하고 이체한도를 설정해주세요.</p>
+
+            <section class="open2-user-info-section">
+                <div class="open2-form-group">
+                    <label class="open2-form-label">휴대폰 번호</label>
+                    <input type="text" class="open2-form-input readonly" th:value="${custInfoDTO.custMaskHp}" readonly>
                 </div>
-                <div class="open2-form-group half">
-                    <label class="open2-form-label">성별</label>
-                    <input type="text" class="open2-form-input readonly" value="남자" readonly>
+            </section>
+
+            <section class="open2-verify-section">
+                <div class="open2-form-group">
+                    <label class="open2-form-label">휴대폰 인증</label>
+                    <div class="open2-verify-box">
+                        <input type="text" class="open2-form-input short" id="koAcctVerifyCodeInput" placeholder="인증번호 입력">
+                        <button type="button" class="open2-btn-verify" id="koAcctBtnSendCode">인증요청</button>
+                        <button type="button" id="koAcctBtnVerifyCode" class="register-btn" style="display:none;">확인</button>
+                    </div>
                 </div>
-            </div>
+            </section>
 
-            <div class="open2-form-group">
-                <label class="open2-form-label">휴대폰 번호</label>
-                <input type="text" class="open2-form-input readonly" value="010-2109-8237" readonly>
-            </div>
-        </section>
-
-        <section class="open2-verify-section">
-            <div class="open2-form-group">
-                <label class="open2-form-label">휴대폰 인증</label>
-                <div class="open2-verify-box">
-                    <input type="text" class="open2-form-input short" placeholder="인증번호 입력">
-                    <button class="open2-btn-verify">인증요청</button>
+            <section class="open2-cdd-section">
+                <div class="open2-form-group">
+                    <label class="open2-form-label" for="cddPurpose">거래 목적 (필수)</label>
+                    <select id="cddPurpose" th:field="*{acctPurpose}" class="open2-form-input">
+                        <option value="">거래 목적을 선택하세요</option>
+                        <option value="급여 및 생활비">급여 및 생활비</option>
+                        <option value="저축 및 투자">저축 및 투자</option>
+                        <option value="사업 목적">사업 목적</option>
+                        <option value="공과금 및 대출 상환">공과금 및 대출 상환</option>
+                        <option value="친목회비 및 용돈">친목회비 및 용돈</option>
+                        <option value="6">기타</option>
+                    </select>
                 </div>
+                <div class="open2-form-group">
+                    <label class="open2-form-label" for="cddSource">자금 출처 (필수)</label>
+                    <select id="cddSource" th:field="*{acctFundSource}" class="open2-form-input">
+                        <option value="">자금 출처를 선택하세요</option>
+                        <option value="근로 및 연금 소득">근로 및 연금 소득</option>
+                        <option value="사업 소득">사업 소득</option>
+                        <option value="재산 소득 (이자, 배당 등)">재산 소득 (이자, 배당 등)</option>
+                        <option value="저축 및 투자">저축 및 투자</option>
+                        <option value="상속 및 증여">상속 및 증여</option>
+                        <option value="6">기타</option>
+                    </select>
+                </div>
+            </section>
+
+            <section class="open2-limit-section">
+                <div class="open2-form-group">
+                    <label class="open2-form-label" for="dayLimit">1일 이체 한도</label>
+                    <input type="text" class="open2-form-input readonly" id="dayLimit" name="dayLimit" th:value="|${custInfoDTO.custName}님의 1일 이체 한도는 ${dayTrsfLmt}입니다.|" readonly >
+                </div>
+                <div class="open2-form-group">
+                    <label class="open2-form-label" for="onceLimit">1회 이체 한도</label>
+                    <input type="text" class="open2-form-input readonly" id="onceLimit" name="onceLimit" th:value="|${custInfoDTO.custName}님의 1회 이체 한도는 ${onceTrsfLmt}입니다.|" readonly>
+                </div>
+            </section>
+
+            <section class="open2-password-section">
+                <div class="open2-form-group">
+                    <label class="open2-form-label">계좌 비밀번호</label>
+                    <input type="password" class="open2-form-input" maxlength="4" placeholder="숫자 4자리 입력" id="acctPw" th:field="*{acctPw}">
+                    <p class="open2-guide-text">입력하신 비밀번호는 이체 및 출금 시 사용됩니다.</p>
+                </div>
+
+                <div class="open2-form-group">
+                    <label class="open2-form-label">계좌 비밀번호 확인</label>
+                    <input type="password" class="open2-form-input" maxlength="4" placeholder="비밀번호 재입력" id="acctPwConfirm">
+
+                    <div id="pwMatchMessage" class="open2-guide-text" style="font-weight: 600;"></div>
+                </div>
+            </section>
+
+            <div class="open2-form-actions">
+                <button type="submit" class="open2-btn-next">완료</button>
             </div>
-        </section>
-
-
-
-        <section class="open2-password-section">
-            <div class="open2-form-group">
-                <label class="open2-form-label">계좌 비밀번호</label>
-                <input type="password" class="open2-form-input" maxlength="4" placeholder="숫자 4자리 입력">
-                <p class="open2-guide-text">입력하신 비밀번호는 이체 및 출금 시 사용됩니다.</p>
-            </div>
-
-            <div class="open2-form-group">
-                <label class="open2-form-label">계좌 비밀번호 확인</label>
-                <input type="password" class="open2-form-input" maxlength="4" placeholder="비밀번호 재입력">
-            </div>
-        </section>
-
-        <div class="open2-form-actions">
-            <a th:href="@{/mypage/ko_account_open_3}" class="open2-btn-next">완료</a>
         </div>
-    </div>
-</main>
-
+    </main>
+</form>
 <div th:replace="~{_template/_footer.html}"></div>
 <script th:src="@{/js/mypage.js}"></script>
 

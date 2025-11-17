@@ -3,8 +3,26 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="kr.co.api.flobankapi.mapper.ProductMapper" >
+<mapper namespace="kr.co.api.flobankapi.mapper.MypageMapper" >
     <insert id="insertAcct" parameterType="kr.co.api.flobankapi.dto.CustAcctDTO">
-        INSERT INTO TB_CUST_ACCT values('1234-1234-01-1234', #{acctPw}, #{acctBalance}, #{acctRegDt}, #{acctStatus}, #{acctCustCode})
+
+        INSERT INTO TB_CUST_ACCT(ACCT_PW, ACCT_REG_DT, ACCT_CUST_CODE, ACCT_FUND_SOURCE, ACCT_PURPOSE)
+        values(#{acctPw}, sysdate, #{acctCustCode}, #{acctFundSource}, #{acctPurpose})
     </insert>
+
+    <select id="selectCustInfo">
+        select *
+        from tb_cust_info
+        where CUST_ID = #{custId}
+    </select>
+
+    <select id="selectCheckKoAcct">
+        SELECT max(ACCT_REG_DT) FROM TB_CUST_ACCT
+        WHERE ACCT_CUST_CODE = #{custCode}
+    </select>
+
+    <select id="selectCheckCntKoAcct">
+        SELECT count(*) from TB_CUST_ACCT
+        WHERE ACCT_CUST_CODE = #{custCode}
+    </select>
 </mapper>

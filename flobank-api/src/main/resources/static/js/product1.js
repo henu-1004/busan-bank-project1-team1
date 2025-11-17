@@ -115,7 +115,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 <h4>${label}</h4>
             
                 <input type="hidden" name="lmtCurrency[]" value="${code}">
-            
+                
                 <div class="form-inline">
                     <label>최소 가입액</label>
                     <input type="number" name="lmtMinAmt[]" data-code="${code}" 
@@ -217,5 +217,10 @@ document.addEventListener("DOMContentLoaded", function () {
         const selected = document.querySelector('input[name="dpstAutoRenewYn"]:checked').value;
         autoRenewSection.style.display = (selected === "Y") ? "block" : "none";
     }
+
+
+
+
+
 
 });

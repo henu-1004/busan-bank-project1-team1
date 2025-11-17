@@ -1,5 +1,7 @@
 package kr.co.api.flobankapi.controller;
 
+import kr.co.api.flobankapi.dto.FaqDTO;
+import kr.co.api.flobankapi.service.FaqService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,6 +14,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.bind.annotation.RequestParam;
 import java.util.Map;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import kr.co.api.flobankapi.dto.FaqDTO;
+import kr.co.api.flobankapi.service.FaqService;
+
 
 
 
@@ -24,6 +32,8 @@ import java.util.Map;
 public class CustomerController {
 
     private final BoardService boardService;
+    private final FaqService faqService;
+
 
 
     @GetMapping("/event_list")
@@ -65,10 +75,23 @@ public class CustomerController {
 
 
     @GetMapping("/faq_list")
-    public String faq_list(Model model){
-        model.addAttribute("activeItem","faq");
+    public String faqList(Model model) {
+
+        List<FaqDTO> faqList = faqService.getFaqList();
+
+        // 카테고리별 그룹핑
+        Map<Integer, List<FaqDTO>> grouped = faqList.stream()
+                .collect(Collectors.groupingBy(FaqDTO::getFaqCate));
+
+        model.addAttribute("faqMap", grouped);
+        model.addAttribute("activeItem", "faq");
+
         return "customer/faq_list";
     }
+
+
+
+
 
     @GetMapping("/intro")
     public String intro(Model model){

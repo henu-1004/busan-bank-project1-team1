@@ -251,11 +251,11 @@
   </div>
 
   <div class="terms-actions">
-  <a href="/mypage/en_account_open_2.html" class="btn-next">다음</a>
+  <a th:href="@{/mypage/en_account_open_2}" class="btn-next">다음</a>
 </div>
 </main>
 <div th:replace="~{_template/_footer.html}"></div>
-<script src ="/static/js/mypage.js"></script>
+<script th:src="@{/js/mypage.js}"></script>
 
 </body>
 </html>

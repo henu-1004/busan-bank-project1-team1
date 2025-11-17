@@ -3,6 +3,7 @@ package kr.co.api.flobankapi.dto;
 
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -25,13 +26,14 @@ public class ProductDTO {
     private String dpstAddPayYn;           // CHAR(1)
     private Integer dpstAddPayMax;         // NUMBER
     private String dpstPartWdrwYn;         // CHAR(1)
-    private Date dpstRegDt;                // DATE
-    private String dpstAppNo;              // VARCHAR2(50)
+    private LocalDate dpstRegDt;
+    private String dpstAppNo;               // VARCHAR2(50)
     private String dpstAppInstitution;     // VARCHAR2(50)
     private String dpstAppDy;              // CHAR(8)
     private String dpstDelibNo;            // CHAR(9)
     private String dpstDelibDy;            // CHAR(8)
     private String dpstDelibStartDy;       // CHAR(8)
+    private String dpstInfoPdf;
 
 
 

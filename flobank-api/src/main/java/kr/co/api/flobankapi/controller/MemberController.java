@@ -54,7 +54,7 @@ public class MemberController {
     // 4. registerProcess 메소드가 응답을 처리하도록 수정
     @PostMapping("/register")
     public String registerProcess(@ModelAttribute CustInfoDTO custInfoDTO) {
-
+        log.info("custInfoDTO={}", custInfoDTO);
         if(custInfoDTO != null){
             custInfoService.register(custInfoDTO);
             return "redirect:/member/complete";

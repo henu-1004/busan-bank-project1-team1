@@ -6,9 +6,14 @@ spring:
     application:
         name: flobank_api
 
+management:
+  info:
+    build:
+      enabled: true
+
     # ✅ 1. DB 접속 정보
     datasource:
-      url: jdbc:oracle:thin:@34.22.80.47:1521/XEPDB1
+      url: jdbc:oracle:thin:@34.64.225.88:1521/XEPDB1
       username: flobank
       password: 1234
       driver-class-name: oracle.jdbc.OracleDriver
@@ -31,7 +36,7 @@ spring:
 
 flobank:
   ap: # 접속해야 할 flobank_ap (AP 서버) 정보
-    host: 34.22.80.47
+    host: 34.64.225.88
     port: 9090 # AP 서버와 약속한 TCP 포트
   aes:
     secret: "01234567890123456789012345678901"

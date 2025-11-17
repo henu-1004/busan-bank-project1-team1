@@ -66,7 +66,7 @@ public class JwtTokenProvider {
             custName = "Unknown";
         }
 
-        // User 대신 CustomUserDetails 객체 생성
+        // CustomUserDetails 객체 생성
         CustomUserDetails userDetails = new CustomUserDetails(claims.getSubject(), "", Collections.emptyList(), custName);
 
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
