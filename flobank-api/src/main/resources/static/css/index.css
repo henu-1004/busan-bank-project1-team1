@@ -496,6 +496,14 @@
   background: #fff;
 }
 
+.briefing-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
 .briefing-box h3 {
   font-size: 18px;
   font-weight: 700;
@@ -544,7 +552,7 @@
 
 .briefing-box .more {
   text-align: right;
-  margin-top: 10px;
+  margin-top: 0;
 }
 
 .briefing-box .more a {
@@ -572,7 +580,6 @@
 .briefing-tabs {
     display: flex;
     gap: 15px;
-    margin-bottom: 20px;
 }
 
 .briefing-tabs a {
