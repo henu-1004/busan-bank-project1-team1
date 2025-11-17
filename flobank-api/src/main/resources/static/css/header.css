@@ -26,7 +26,7 @@ body.modal-open {
 }
 
 /* 상단 헤더 */
-.top-bar {
+header .top-bar {
   background: #fafafa;
   border-bottom: 1px solid #ddd;
   display: flex;
@@ -36,36 +36,36 @@ body.modal-open {
   font-size: 14px;
 }
 
-.top-bar ul {
+header .top-bar > ul {
   display: flex;
   gap: 20px;
   list-style: none;
 }
 
-.top-bar a {
+header .top-bar a {
   text-decoration: none;
   color: #555;
 }
 
-.right-menu {
+header .right-menu {
   display: flex;
   align-items: center;
   gap: 15px;
 }
 
-.right-menu a {
+header .right-menu a {
   text-decoration: none;
   color: #555;
   font-size: 14px;
   transition: color 0.2s ease;
 }
 
-.right-menu a:hover {
-  color: #4A6FA5; 
+header .right-menu a:hover {
+  color: #4A6FA5;
 }
 
 
-#welcome-msg {
+header #welcome-msg {
   font-size: 14px;
   color: #111;
   margin-right: 10px;
@@ -79,7 +79,7 @@ header {
 
 
 /* ✅ 드롭다운 완전 숨김 */
-.mega-menu {
+header .mega-menu {
   position: absolute;
   top: 100%;
   left: 50%;
@@ -104,33 +104,33 @@ header {
 }
 
 /* ✅ hover 시 보여주기 */
-.mega-menu.show {
+header .mega-menu.show {
   display: grid !important;
   opacity: 1;
   visibility: visible;
 }
 
 /* ✅ 각 column (상단 메뉴 바로 밑으로 배치됨) */
-.menu-group {
+header .menu-group {
   display: flex;
   flex-direction: column;
   gap: 10px;
   text-align: center;
 }
 
-.menu-group a {
+header .menu-group a {
   text-decoration: none;
   color: #333;
   font-size: 14px;
   transition: color 0.2s ease;
 }
 
-.menu-group a:hover {
+header .menu-group a:hover {
   color: #4A6FA5;
 }
 
 /* ✅ 메뉴 항목 */
-.menu-item {
+header .menu-item {
   position: relative;
   font-weight: 600;
   color: #222;
@@ -138,12 +138,12 @@ header {
   padding: 20px 0;
 }
 
-.menu-item.active {
+header .menu-item.active {
   color: #4A6FA5;
 }
 
 /* ✅ nav-menu 그대로 유지 */
-.nav-menu {
+header .nav-menu {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -158,7 +158,7 @@ header {
 /* -------------------------------
    🔹 메인 네비게이션 (비율 고정형)
 -------------------------------- */
-.main-nav {
+header .main-nav {
   display: flex;
   align-items: center;
   justify-content: space-between; /* 좌 - 중 - 우 3분할 정렬 */
@@ -170,13 +170,13 @@ header {
 }
 
 /* 🔹 로고: 좌측 고정, 비율 유지 */
-.logo {
+header .logo {
   flex: 0 0 auto;
   display: flex;
   align-items: center;
 }
 
-.logo img {
+header .logo img {
   height: 50px;
   width: auto;
   max-width: 100%;
@@ -184,7 +184,7 @@ header {
 }
 
 /* 🔹 메뉴: 중앙 정렬 */
-.nav-menu {
+header .nav-menu {
   flex: 1; /* 가운데 영역 차지 */
   display: flex;
   justify-content: center;
@@ -196,21 +196,21 @@ header {
 }
 
 /* 🔹 오른쪽 아이콘 */
-.nav-icons {
+header .nav-icons {
   flex: 0 0 auto;
   display: flex;
   align-items: center;
   gap: 1.5vw;
 }
 
-.nav-icons a {
+header .nav-icons a {
   color: #333;
   font-size: 18px;
   text-decoration: none;
   transition: color 0.2s ease;
 }
 
-.nav-icons a:hover {
+header .nav-icons a:hover {
   color: #4A6FA5;
 }
 
@@ -224,21 +224,67 @@ header {
 
 /* FontAwesome 기본 스타일 */
 /* 아이콘 오른쪽 정렬 */
-.nav-icons {
+header .nav-icons {
   display: flex;
   align-items: center;
   gap: 22px;
 }
 
-.nav-icons a {
+header .nav-icons a {
   color: #333;
   font-size: 18px;
   text-decoration: none;
   transition: color 0.2s ease;
 }
 
-.nav-icons a:hover {
+header .nav-icons a:hover {
   color: #4A6FA5;
+}
+
+/* 언어 드롭다운 */
+header .language-dropdown {
+  position: relative;
+}
+
+header .language-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #555;
+  text-decoration: none;
+}
+
+header .language-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+  padding: 8px 0;
+  list-style: none;
+  min-width: 170px;
+  display: none;
+  z-index: 10000;
+}
+
+header .language-menu.show {
+  display: block;
+}
+
+header .language-menu li {
+  padding: 9px 14px;
+  font-size: 14px;
+  color: #444;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+header .language-menu li:hover {
+  background: #f0f4ff;
+  color: #2C5DE5;
 }
 
 /* 검색 Top Sheet */
