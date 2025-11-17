@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>브리핑 기사 목록</title>
+
+    <!-- header.css는 항상 가장 먼저 -->
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+
+    <!-- article 전용 스타일 -->
+    <link rel="stylesheet" th:href="@{/css/article.css}">
+
+    <link rel="stylesheet" th:href="@{/css/footer.css}">
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+          crossorigin="anonymous"
+    />
+</head>
+
+<body>
+
+<!-- ⭐ HEADER -->
+<div th:replace="~{_template/_header.html}"></div>
+
+<!-- ⭐ Article 페이지 전체 감싸기 -->
+<div class="article-page">
+
+    <main class="article-layout">
+
+        <!-- ===========================
+             브리핑
+        ============================== -->
+        <section class="article-briefing">
+            <div class="briefing-card">
+
+                <div class="briefing-tabs">
+                    <a href="#" data-mode="oneday"
+                       th:class="${briefingMode} == 'oneday' ? 'active' : ''">오늘의 브리핑</a>
+
+                    <a href="#" data-mode="recent5"
+                       th:class="${briefingMode} == 'recent5' ? 'active' : ''">최근 5일 브리핑</a>
+                </div>
+
+                <div class="briefing-headline">
+                    <div>
+                        <p class="label">브리핑</p>
+                        <h1 data-briefing-title th:text="${briefingTitle}">오늘의 브리핑</h1>
+                    </div>
+                    <span class="date" data-briefing-date
+                          th:text="${briefingDateText}">-</span>
+                </div>
+
+                <ul class="briefing-lines" data-briefing-lines>
+                    <li th:each="line : ${briefingLines}" th:text="${line}"></li>
+                    <li th:if="${briefingLines == null}">
+                        아직 생성된 브리핑이 없습니다.
+                    </li>
+                </ul>
+
+            </div>
+        </section>
+
+        <!-- ===========================
+             기사 리스트
+        ============================== -->
+        <section class="article-list-section">
+
+            <div class="article-list-header">
+                <div>
+                    <p class="label">뉴스</p>
+                    <h2>기사 목록</h2>
+                </div>
+                <div class="count" th:text="|총 ${totalCount}건|">총 0건</div>
+            </div>
+
+            <div class="article-grid">
+
+                <article class="article-card" th:each="article : ${articles}">
+                    <div class="article-meta">
+                        <span class="pill category"
+                              th:text="${article.category}">macro</span>
+
+                        <span class="pill company"
+                              th:text="${article.company}">MK</span>
+
+                        <span class="written"
+                              th:text="${article.writtenAt != null ?
+                                   #temporals.format(article.writtenAt,'yyyy-MM-dd HH:mm')
+                                   : '-'}">-</span>
+                    </div>
+
+                    <h3>
+                        <a th:href="${article.url}" target="_blank"
+                           rel="noopener noreferrer"
+                           th:text="${article.title}">
+                            기사 제목
+                        </a>
+                    </h3>
+
+                    <p class="summary"
+                       th:text="${article.summaryAi != null ? article.summaryAi :
+                                (article.summary != null ? article.summary :
+                                 '요약문이 제공되지 않았습니다.')}">
+                        요약문이 제공되지 않았습니다.
+                    </p>
+                </article>
+
+                <div class="empty" th:if="${#lists.isEmpty(articles)}">
+                    조회된 기사가 없습니다.
+                </div>
+
+            </div>
+
+            <!-- ===========================
+                 페이징
+            ============================== -->
+            <div class="pagination">
+
+                <!-- ◀ 이전 -->
+                <a th:href="@{/articles(page=${page > 1 ? page - 1 : 1})}"
+                   th:class="'page-prev ' + (${page == 1} ? 'disabled' : '')">
+                    〈 이전
+                </a>
+
+                <!-- 페이지 숫자 -->
+                <a th:each="p : ${#numbers.sequence(startPage, endPage)}"
+                   th:href="@{/articles(page=${p})}"
+                   th:text="${p}"
+                   th:classappend="${p == page} ? 'active'">
+                </a>
+
+                <!-- ▶ 다음 -->
+                <a th:href="@{/articles(page=${
+                       page == totalPage ? totalPage
+                       : (page == endPage ? endPage + 1 : page + 1)
+                })}"
+                   th:class="'page-next ' + (${page == totalPage} ? 'disabled' : '')">
+                    다음 〉
+                </a>
+
+            </div>
+
+        </section>
+
+    </main>
+</div>
+
+<!-- ⭐ FOOTER -->
+<div th:replace="~{_template/_footer.html}"></div>
+
+
+<!-- JS: 브리핑 fetch -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const tabs = document.querySelectorAll('.briefing-tabs a');
+        const titleEl = document.querySelector('[data-briefing-title]');
+        const dateEl = document.querySelector('[data-briefing-date]');
+        const linesEl = document.querySelector('[data-briefing-lines]');
+
+        function renderBriefing(data) {
+            tabs.forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.mode === data.briefingMode);
+            });
+
+            titleEl.textContent = data.briefingTitle || '브리핑';
+            dateEl.textContent = data.briefingDateText || '-';
+
+            linesEl.innerHTML = '';
+
+            if (data.briefingLines?.length > 0) {
+                data.briefingLines.forEach(line => {
+                    const li = document.createElement('li');
+                    li.textContent = line;
+                    linesEl.appendChild(li);
+                });
+            } else {
+                const li = document.createElement('li');
+                li.textContent = '아직 생성된 브리핑이 없습니다.';
+                linesEl.appendChild(li);
+            }
+        }
+
+        function fetchBriefing(mode) {
+            fetch(`/flobank/api/briefing?mode=${mode}`)
+                .then(res => res.json())
+                .then(renderBriefing)
+                .catch(() => {});
+        }
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', e => {
+                e.preventDefault();
+                fetchBriefing(tab.dataset.mode);
+            });
+        });
+    });
+</script>
+
+</body>
+</html>

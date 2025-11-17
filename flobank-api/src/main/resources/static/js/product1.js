@@ -1,144 +1,226 @@
 document.addEventListener("DOMContentLoaded", function () {
-  const depositTypeRadios = document.querySelectorAll('input[name="depositType"]');
-  const depositTypeSection = document.querySelector(".conditional.deposit-type");
-  const extraDepositRadios = document.querySelectorAll('input[name="extraDeposit"]');
-  const extraDepositSection = document.querySelector(".conditional.extra-deposit");
-  const currencyCheckboxes = document.querySelectorAll('input[name="currency"]');
-  const currencyAmountContainer = document.getElementById("currencyAmountContainer");
 
-  const joinTypeRadios = document.querySelectorAll('input[name="joinType"]');
-  const joinTypeFree = document.querySelector('.conditional.join-type[data-type="자유형"]');
-  const joinTypeFixed = document.querySelector('.conditional.join-type[data-type="고정형"]');
+    /* ----------------------------------------------------
+       통화별 최소/최대 금액 값 저장 (key: lmtMinAmt_USD)
+    ------------------------------------------------------ */
+    const currencyAmountValues = {};
 
-  const ageLimitRadios = document.querySelectorAll('input[name="ageLimit"]');
-  const ageLimitSection = document.querySelector(".conditional.age-limit");
+    /* === DOM 참조 === */
+    const currencyCheckboxes = document.querySelectorAll('input[name="dpstCurrency"]');
+    const currencyAmountContainer = document.getElementById("currencyAmountContainer");
 
-  const withdrawalRadios = document.querySelectorAll('input[name="partialWithdrawal"]');
-  const withdrawalSection = document.querySelector(".conditional.partial-withdrawal");
-  const withdrawCurrencyContainer = document.getElementById("withdrawCurrencyContainer");
+    const depositTypeRadios = document.querySelectorAll('input[name="dpstType"]');
+    const extraDepositRadios = document.querySelectorAll('input[name="dpstAddPayYn"]');
+    const extraDepositSection = document.querySelector(".conditional.extra-deposit");
 
-  const autoRenewRadios = document.querySelectorAll('input[name="autoRenew"]');
-  const autoRenewSection = document.querySelector(".conditional.auto-renew");
+    const joinTypeRadios = document.querySelectorAll('input[name="dpstPeriodType"]');
+    const joinTypeFree = document.querySelector('.conditional.join-type[data-type="1"]');
+    const joinTypeFixed = document.querySelector('.conditional.join-type[data-type="2"]');
 
-  // 초기 실행
-  updateAll();
+    const ageLimitRadios = document.querySelectorAll('input[name="ageLimit"]');
+    const ageLimitSection = document.querySelector(".conditional.age-limit");
 
-  // 이벤트 등록
-  depositTypeRadios.forEach(radio => radio.addEventListener("change", updateAll));
-  extraDepositRadios.forEach(radio => radio.addEventListener("change", updateExtraDeposit));
-  joinTypeRadios.forEach(radio => radio.addEventListener("change", updateJoinType));
-  ageLimitRadios.forEach(radio => radio.addEventListener("change", updateAgeLimit));
-  withdrawalRadios.forEach(radio => radio.addEventListener("change", updateAll));
-  autoRenewRadios.forEach(radio => radio.addEventListener("change", updateAutoRenew));
-  currencyCheckboxes.forEach(box => box.addEventListener("change", updateAll));
+    const withdrawalRadios = document.querySelectorAll('input[name="dpstPartWdrwYn"]');
+    const withdrawalSection = document.querySelector(".conditional.partial-withdrawal");
+    const withdrawCurrencyContainer = document.getElementById("withdrawCurrencyContainer");
 
-  function updateAll() {
-    updateDepositType();
-    updateExtraDeposit();
-    updateJoinType();
-    updateAgeLimit();
-    updateWithdrawal();
-    updateAutoRenew();
-  }
+    const autoRenewRadios = document.querySelectorAll('input[name="dpstAutoRenewYn"]');
+    const autoRenewSection = document.querySelector(".conditional.auto-renew");
 
-  function updateDepositType() {
-    const selected = document.querySelector('input[name="depositType"]:checked').value;
-    if (selected === "거치식") {
-      depositTypeSection.style.display = "block";
-      updateCurrencyAmountFields();
-    } else {
-      depositTypeSection.style.display = "none";
-      currencyAmountContainer.innerHTML = "";
-    }
-  }
 
-  function updateExtraDeposit() {
-    const selected = document.querySelector('input[name="extraDeposit"]:checked');
-    extraDepositSection.style.display = (selected && selected.value === "yes") ? "block" : "none";
-  }
+    /* ----------------------------------------------------
+       초기 렌더링
+    ------------------------------------------------------ */
+    updateAll();
 
-  function updateJoinType() {
-    const selected = document.querySelector('input[name="joinType"]:checked').value;
-    joinTypeFree.style.display = selected === "자유형" ? "block" : "none";
-    joinTypeFixed.style.display = selected === "고정형" ? "block" : "none";
-  }
 
-  function updateAgeLimit() {
-    const selected = document.querySelector('input[name="ageLimit"]:checked').value;
-    ageLimitSection.style.display = selected === "yes" ? "block" : "none";
-  }
+    /* ----------------------------------------------------
+       이벤트 등록
+    ------------------------------------------------------ */
+    depositTypeRadios.forEach(r => r.addEventListener("change", updateAll));
+    currencyCheckboxes.forEach(c => c.addEventListener("change", updateAll));
+    extraDepositRadios.forEach(r => r.addEventListener("change", updateExtraDeposit));
+    joinTypeRadios.forEach(r => r.addEventListener("change", updateJoinType));
+    ageLimitRadios.forEach(r => r.addEventListener("change", updateAgeLimit));
+    withdrawalRadios.forEach(r => r.addEventListener("change", updateAll));
+    autoRenewRadios.forEach(r => r.addEventListener("change", updateAutoRenew));
 
-  function updateWithdrawal() {
-    const selected = document.querySelector('input[name="partialWithdrawal"]:checked').value;
-    const depositType = document.querySelector('input[name="depositType"]:checked').value;
+    /* 값 입력 시 저장 */
+    document.addEventListener("input", function (e) {
+        const target = e.target;
+        const code = target.dataset.code;
 
-    withdrawCurrencyContainer.innerHTML = "";
+        if (!code) return;
 
-    if (selected === "no") {
-      withdrawalSection.style.display = "none";
-      return;
-    }
-
-    withdrawalSection.style.display = "block";
-
-    // ✅ 항상 최신 상태 반영: 거치식 + 가능일 때 통화별 필드 다시 그림
-    if (depositType === "거치식") {
-      updateCurrencyWithdrawFields();
-    }
-  }
-
-  function updateAutoRenew() {
-    const selected = document.querySelector('input[name="autoRenew"]:checked').value;
-    autoRenewSection.style.display = selected === "yes" ? "block" : "none";
-  }
-
-  function updateCurrencyAmountFields() {
-    const selectedType = document.querySelector('input[name="depositType"]:checked').value;
-    if (selectedType !== "거치식") return;
-
-    currencyAmountContainer.innerHTML = "";
-    const checkedCurrencies = Array.from(currencyCheckboxes).filter(box => box.checked);
-
-    checkedCurrencies.forEach(box => {
-      const code = box.value;
-      const label = box.parentElement.textContent.trim();
-
-      const wrapper = document.createElement("div");
-      wrapper.classList.add("currency-amount-block");
-      wrapper.innerHTML = `
-        <h4>${label}</h4>
-        <div class="form-inline">
-          <label>최소 가입액</label>
-          <input type="number" name="minAmount_${code}" placeholder="예: 1,000" />
-        </div>
-        <div class="form-inline">
-          <label>최대 가입액</label>
-          <input type="number" name="maxAmount_${code}" placeholder="예: 1,000,000" />
-        </div>
-      `;
-      currencyAmountContainer.appendChild(wrapper);
+        if (target.name === "lmtMinAmt[]") {
+            currencyAmountValues[`lmtMinAmt_${code}`] = target.value;
+        }
+        if (target.name === "lmtMaxAmt[]") {
+            currencyAmountValues[`lmtMaxAmt_${code}`] = target.value;
+        }
     });
-  }
 
-  // ✅ 거치식 + 분할인출 가능 시 통화별 최소 출금금액 표시
-  function updateCurrencyWithdrawFields() {
-    const selectedCurrencies = Array.from(currencyCheckboxes).filter(c => c.checked);
-    withdrawCurrencyContainer.innerHTML = "";
 
-    if (selectedCurrencies.length === 0) return;
+    /* ----------------------------------------------------
+       전체 업데이트
+    ------------------------------------------------------ */
+    function updateAll() {
+        updateDepositType();
+        updateExtraDeposit();
+        updateJoinType();
+        updateAgeLimit();
+        updateWithdrawal();
+        updateAutoRenew();
+    }
 
-    selectedCurrencies.forEach(currency => {
-      const label = currency.parentElement.textContent.trim();
-      const block = document.createElement("div");
-      block.classList.add("currency-amount-block");
-      block.innerHTML = `
-        <h4>${label} 최소 출금 금액</h4>
-        <div class="form-inline">
-          <label>최소 출금금액</label>
-          <input type="number" name="minWithdraw_${currency.value}" placeholder="예: ${currency.value} 최소 금액" />
-        </div>
-      `;
-      withdrawCurrencyContainer.appendChild(block);
-    });
-  }
+
+    /* ----------------------------------------------------
+       예금 유형 (거치식일 때만 통화별 금액 보이기)
+    ------------------------------------------------------ */
+    function updateDepositType() {
+        const selectedType = document.querySelector('input[name="dpstType"]:checked').value;
+
+        if (selectedType === "1") {
+            document.querySelector(".conditional.deposit-type").style.display = "block";
+            updateCurrencyAmountFields();
+        } else {
+            document.querySelector(".conditional.deposit-type").style.display = "none";
+            currencyAmountContainer.innerHTML = "";
+        }
+    }
+
+
+    /* ----------------------------------------------------
+       통화별 최소/최대 금액 생성
+    ------------------------------------------------------ */
+    function updateCurrencyAmountFields() {
+        const selectedType = document.querySelector('input[name="dpstType"]:checked').value;
+        if (selectedType !== "1") return;
+
+        currencyAmountContainer.innerHTML = "";
+
+        const checkedCurrencyBoxes = Array.from(currencyCheckboxes).filter(c => c.checked);
+
+        checkedCurrencyBoxes.forEach(box => {
+            const code = box.value;
+            const label = box.parentElement.textContent.trim();
+
+            const minKey = `lmtMinAmt_${code}`;
+            const maxKey = `lmtMaxAmt_${code}`;
+
+            const block = document.createElement("div");
+            block.classList.add("currency-amount-block");
+
+            block.innerHTML = `
+                <h4>${label}</h4>
+            
+                <input type="hidden" name="lmtCurrency[]" value="${code}">
+                
+                <div class="form-inline">
+                    <label>최소 가입액</label>
+                    <input type="number" name="lmtMinAmt[]" data-code="${code}" 
+                           value="${currencyAmountValues[minKey] || ''}">
+                </div>
+            
+                <div class="form-inline">
+                    <label>최대 가입액</label>
+                    <input type="number" name="lmtMaxAmt[]" data-code="${code}" 
+                           value="${currencyAmountValues[maxKey] || ''}">
+                </div>
+            `;
+
+            currencyAmountContainer.appendChild(block);
+        });
+    }
+
+
+    /* ----------------------------------------------------
+       추가 납입
+    ------------------------------------------------------ */
+    function updateExtraDeposit() {
+        const selected = document.querySelector('input[name="dpstAddPayYn"]:checked').value;
+        extraDepositSection.style.display = (selected === "Y") ? "block" : "none";
+    }
+
+
+    /* ----------------------------------------------------
+       가입기간 유형
+    ------------------------------------------------------ */
+    function updateJoinType() {
+        const selected = document.querySelector('input[name="dpstPeriodType"]:checked').value;
+
+        joinTypeFree.style.display = (selected === "1") ? "block" : "none";
+        joinTypeFixed.style.display = (selected === "2") ? "block" : "none";
+    }
+
+
+    /* ----------------------------------------------------
+       나이 제한
+    ------------------------------------------------------ */
+    function updateAgeLimit() {
+        const selected = document.querySelector('input[name="ageLimit"]:checked').value;
+        ageLimitSection.style.display = (selected === "yes") ? "block" : "none";
+    }
+
+
+    /* ----------------------------------------------------
+       분할 인출
+    ------------------------------------------------------ */
+    function updateWithdrawal() {
+        const selected = document.querySelector('input[name="dpstPartWdrwYn"]:checked').value;
+        const type = document.querySelector('input[name="dpstType"]:checked').value;
+
+        withdrawCurrencyContainer.innerHTML = "";
+
+        if (selected === "N") {
+            withdrawalSection.style.display = "none";
+            return;
+        }
+
+        withdrawalSection.style.display = "block";
+
+        if (type === "1") updateCurrencyWithdrawFields();
+    }
+
+
+    /* 통화별 최소 출금 금액 */
+    function updateCurrencyWithdrawFields() {
+
+        const selectedCurrencies = Array.from(currencyCheckboxes).filter(c => c.checked);
+
+        withdrawCurrencyContainer.innerHTML = "";
+
+        selectedCurrencies.forEach(currency => {
+            const label = currency.parentElement.textContent.trim();
+
+            const block = document.createElement("div");
+            block.classList.add("currency-amount-block");
+
+            block.innerHTML = `
+                <h4>${label} 최소 출금 금액</h4>
+                <div class="form-inline">
+                    <label>최소 출금금액</label>
+                    <input type="number" name="minWithdraw_${currency.value}"
+                        placeholder="예: ${currency.value} 최소 금액" />
+                </div>
+            `;
+
+            withdrawCurrencyContainer.appendChild(block);
+        });
+    }
+
+
+    /* ----------------------------------------------------
+       자동연장
+    ------------------------------------------------------ */
+    function updateAutoRenew() {
+        const selected = document.querySelector('input[name="dpstAutoRenewYn"]:checked').value;
+        autoRenewSection.style.display = (selected === "Y") ? "block" : "none";
+    }
+
+
+
+
+
+
 });

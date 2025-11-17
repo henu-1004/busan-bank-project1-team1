@@ -1,11 +1,27 @@
 
 
-<header>
+<header xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
     <div class="top-bar">
         <ul></ul>
         <div class="right-menu">
-            <a th:href="@{/member/login}">로그인</a>
-            <a href="#">회원가입</a>
+            <!--
+             sec:authorize="isAnonymous()": 로그인하지 않은 사람에게만 보이는 영역.
+             sec:authorize="isAuthenticated()": 로그인 성공해서 SecurityContext에 인증 정보가 있는 사람에게만 보임.
+             sec:authentication="name": 토큰에 담긴 사용자 ID(Subject)를 화면에 출력.
+             -->
+            <div sec:authorize="isAnonymous()">
+                <a th:href="@{/member/login}">로그인</a>
+                <a th:href="@{/member/terms}">회원가입</a>
+            </div>
+
+            <div sec:authorize="isAuthenticated()">
+                <a th:href="@{/mypage/main}">
+                <span sec:authentication="principal.custName">사용자ID</span>님 환영합니다!
+                </a>
+                <form th:action="@{/member/logout}" method="post" style="display:inline;">
+                    <button type="submit" style="border:none; background:none; cursor:pointer;">로그아웃</button>
+                </form>
+            </div>
             <div class="language-dropdown">
                 <a href="#" class="language-toggle">Language ▾</a>
                 <ul class="language-menu">
@@ -63,6 +79,7 @@
             <a th:href="@{/customer/faq_list}">자주 묻는 질문(FAQ)</a>
             <a th:href="@{/customer/event_list}">이벤트</a>
             <a th:href="@{/customer/notice_list}">공지사항</a>
+            <a th:href="@{/articles}">뉴스 리스트</a>
         </div>
     </div>
 </header>

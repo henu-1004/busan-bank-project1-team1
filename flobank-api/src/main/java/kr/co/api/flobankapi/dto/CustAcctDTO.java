@@ -4,10 +4,12 @@ import lombok.Data;
 
 @Data
 public class CustAcctDTO {
-    String acctNo;
-    String acctPw;
-    Integer acctBalance;
-    String acctRegDt;
-    String acctStatus;
-    String acctCustCode;
+    private String acctNo;
+    private String acctPw;
+    private Integer acctBalance;
+    private String acctRegDt;
+    private String acctStatus;
+    private String acctCustCode;
+    private String acctFundSource;
+    private String acctPurpose;
 }

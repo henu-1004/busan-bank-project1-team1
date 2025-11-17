@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>이벤트리스트</title>
+  <title>공지사항</title>
     <link rel="stylesheet" th:href="@{/css/customer.css}">
     <link rel="stylesheet" th:href="@{/css/header.css}">
     <link rel="stylesheet" th:href="@{/css/footer.css}">
@@ -35,41 +35,51 @@
           <th>조회수</th>
         </tr>
       </thead>
-      <tbody>
-        <tr>
-          <td>6</td>
-          <td><a href="noticeView.html">모바일 뱅킹 긴급 점검 안내 (11/12)</a></td>
-          <td>2025-11-06</td>
-          <td>104</td>
+        <tbody>
+        <tr th:each="notice, noticeStat : ${noticeList}">
+            <td th:text="${totalCount - ((page - 1) * pageSize) - noticeStat.index}"></td>
+            <td class="title">
+                <a th:href="@{/customer/notice_view/{no}(no=${notice.boardNo})}"
+                   th:text="${notice.boardTitle}"></a>
+            </td>
+            <td th:text="${notice.boardRegDt}"></td>
+            <td th:text="${notice.boardHit}"></td>
         </tr>
-        <tr>
-          <td>5</td>
-          <td><a href="noticeView.html">외화예금 금리 인상 안내</a></td>
-          <td>2025-11-02</td>
-          <td>87</td>
-        </tr>
-        <tr>
-          <td>4</td>
-          <td><a href="noticeView.html">이용약관 개정 공지 (11월 1일 시행)</a></td>
-          <td>2025-10-28</td>
-          <td>125</td>
-        </tr>
-        <tr>
-          <td>3</td>
-          <td><a href="noticeView.html">해외송금 서비스 일시 중단 안내</a></td>
-          <td>2025-10-20</td>
-          <td>76</td>
-        </tr>
-      </tbody>
-    </table>
 
-<div class="pagination">
-  <a href="#" class="page-prev">〈 이전</a>
-  <a href="#" class="active">1</a>
-  <a href="#">2</a>
-  <a href="#">3</a>
-  <a href="#" class="page-next">다음 〉</a>
-</div>
+        <tr th:if="${#lists.isEmpty(noticeList)}">
+            <td colspan="4" class="empty">등록된 공지사항이 없습니다.</td>
+        </tr>
+        </tbody>
+
+    </table>
+      <!-- 페이지네이션 -->
+      <div class="pagination">
+
+          <!-- 이전 버튼 -->
+          <a th:if="${page > 1}"
+             th:href="@{/customer/notice_list(page=${page-1})}"
+             class="page-prev">
+              〈 이전
+          </a>
+
+          <!-- 페이지 번호 -->
+          <a th:each="p : ${#numbers.sequence(1, totalPage)}"
+             th:href="@{/customer/notice_list(page=${p})}"
+             th:text="${p}"
+             th:classappend="${p == page} ? 'active'">
+          </a>
+
+          <!-- 다음 버튼 -->
+          <a th:if="${page < totalPage}"
+             th:href="@{/customer/notice_list(page=${page+1})}"
+             class="page-next">
+              다음 〉
+          </a>
+
+      </div>
+
+  </div>
+
 
 
 </section>

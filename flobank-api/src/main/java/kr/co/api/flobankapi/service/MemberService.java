@@ -2,7 +2,9 @@ package kr.co.api.flobankapi.service;
 
 import kr.co.api.flobankapi.dto.ApRequestDTO;
 import kr.co.api.flobankapi.dto.ApResponseDTO;
+import kr.co.api.flobankapi.dto.CustInfoDTO;
 import kr.co.api.flobankapi.dto.MemberDTO;
+import kr.co.api.flobankapi.mapper.MemberMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 // import org.springframework.security.crypto.password.PasswordEncoder; // [제거]
@@ -22,37 +24,9 @@ public class MemberService {
     private static final String API_MEMBER_CHECK_EMAIL= "MEMBER_CHECK_EMAIL";
     // AP 서버 공용 통신 모듈
     private final ApRequestService apRequestService;
+    private final MemberMapper memberMapper;
 
-    /**
-     * 회원가입을 처리
-     */
-    public ApResponseDTO register(MemberDTO memberDTO) {
 
-        log.info("[회원가입 요청] DTO 전송: {}", memberDTO.getCustId());
-
-        ApResponseDTO invalid = validateForRegister(memberDTO);if (invalid != null) return invalid;
-
-        try {
-
-            return apRequestService.execute(API_MEMBER_REGISTER, memberDTO, ApResponseDTO.class);
-
-        } catch (Exception e) {
-            return ApResponseDTO.fail("AP 통신 오류: " + e.getMessage());
-        }
-    }
-
-    public ApResponseDTO checkId(String custId) {
-        if (!StringUtils.hasText(custId)) {
-            return ApResponseDTO.fail("아이디를 입력하세요.");
-        }
-        try {
-            Map<String, Object> payload = Map.of("custId", custId);
-            return apRequestService.execute(API_MEMBER_CHECK_ID, payload, ApResponseDTO.class);
-
-        } catch (Exception e) {
-            return ApResponseDTO.fail("AP 통신 오류: " + e.getMessage());
-        }
-    }
 
     public ApResponseDTO checkEmail(String custEmail) {
         if (!StringUtils.hasText(custEmail)) {
@@ -67,7 +41,7 @@ public class MemberService {
         }
     }
 
-    private ApResponseDTO validateForRegister(MemberDTO d) {
+    private ApResponseDTO validateForRegister(CustInfoDTO d) {
         if (!StringUtils.hasText(d.getCustId()))
             return ApResponseDTO.fail("아이디를 입력하세요.");
 
@@ -80,7 +54,7 @@ public class MemberService {
         if (!StringUtils.hasText(d.getCustName()))
             return ApResponseDTO.fail("이름을 입력하세요.");
 
-        if (d.getCustBirth() == null)
+        if (d.getCustBirthDt() == null)
             return ApResponseDTO.fail("생년월일을 입력하세요.");
 
         if (!StringUtils.hasText(d.getCustGen()))

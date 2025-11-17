@@ -1,120 +1,69 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>질문과답변</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>자주 묻는 질문 (FAQ)</title>
+
     <link rel="stylesheet" th:href="@{/css/customer.css}">
     <link rel="stylesheet" th:href="@{/css/header.css}">
     <link rel="stylesheet" th:href="@{/css/footer.css}">
-
-    <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-    crossorigin="anonymous"
-    />
-
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+          crossorigin="anonymous"/>
 </head>
+
 <body>
+
+<!-- 상단 헤더 -->
 <div th:replace="~{_template/_header.html}"></div>
 
- <main class="customer-container">
-     <div th:replace="~{customer/_side.html}"></div>
+<main class="customer-container">
 
-    <!-- 🔹 본문 -->
+    <!-- 사이드바 -->
+    <div th:replace="~{customer/_side.html}"></div>
+
+    <!-- 본문 -->
     <section class="customer-content">
-      <h2>자주 묻는 질문(FAQ)</h2>
+        <h2>자주 묻는 질문(FAQ)</h2>
 
-      <div class="faq-container">
-        <!-- 🔸 카테고리: 환율 -->
-        <div class="faq-category">환율</div>
-        <div class="faq-item">
-          <div class="faq-question">
-            환율은 어떻게 결정되나요?
-            <i class="fa-solid fa-chevron-down"></i>
-          </div>
-          <div class="faq-answer">
-            환율은 외환시장에서의 수요와 공급에 따라 결정됩니다. 주요 요인은 경제지표, 금리 수준, 국제 정세, 수출입 규모 등이며, 중앙은행의 정책도 영향을 미칠 수 있습니다.
-          </div>
-        </div>
-        <div class="faq-item">
-          <div class="faq-question">
-            오늘의 환율은 어디서 확인할 수 있나요?
-            <i class="fa-solid fa-chevron-down"></i>
-          </div>
-          <div class="faq-answer">
-            OO은행 홈페이지의 <strong>환율 메뉴</strong> 또는 모바일 앱의 ‘환율조회’ 기능을 통해 실시간 환율을 확인할 수 있습니다.
-          </div>
-        </div>
+        <div class="faq-container">
 
-        <!-- 🔸 카테고리: 환전 -->
-        <div class="faq-category">환전</div>
-        <div class="faq-item">
-          <div class="faq-question">
-            환전 가능한 통화는 어떤 것이 있나요?
-            <i class="fa-solid fa-chevron-down"></i>
-          </div>
-          <div class="faq-answer">
-            주요 통화(USD, JPY, EUR, CNY 등) 외에도 다양한 통화를 취급하고 있습니다. 지점별로 취급 통화가 다를 수 있으므로 방문 전 확인을 권장드립니다.
-          </div>
-        </div>
-        <div class="faq-item">
-          <div class="faq-question">
-            환전은 어떻게 신청하나요?
-            <i class="fa-solid fa-chevron-down"></i>
-          </div>
-          <div class="faq-answer">
-            인터넷뱅킹 또는 모바일뱅킹에서 환전 신청 후 가까운 지점에서 수령이 가능합니다. 일부 통화는 예약 환전만 가능합니다.
-          </div>
-        </div>
+            <!-- 🔥 카테고리 루프 -->
+            <div th:each="entry : ${faqMap}">
 
-        <!-- 🔸 카테고리: 환전 수수료 -->
-        <div class="faq-category">환전 수수료</div>
-        <div class="faq-item">
-          <div class="faq-question">
-            환전 수수료는 얼마인가요?
-            <i class="fa-solid fa-chevron-down"></i>
-          </div>
-          <div class="faq-answer">
-            통화 종류와 금액, 거래 채널(인터넷, 모바일, 지점)에 따라 다릅니다. 일반적으로 USD 기준 약 1.75% 수준이며, 이벤트나 VIP 우대 시 감면 혜택이 제공됩니다.
-          </div>
-        </div>
-        <div class="faq-item">
-          <div class="faq-question">
-            환율 우대란 무엇인가요?
-            <i class="fa-solid fa-chevron-down"></i>
-          </div>
-          <div class="faq-answer">
-            환율 우대는 고객 등급 또는 이벤트 참여 시 환전 시 적용되는 환율을 일정 비율로 할인(우대)해주는 서비스입니다.
-          </div>
-        </div>
+                <!-- 카테고리 텍스트 -->
+                <div class="faq-category"
+                     th:switch="${entry.key}">
+                    <span th:case="1">환율</span>
+                    <span th:case="2">환전</span>
+                    <span th:case="3">외화예금</span>
+                    <span th:case="*">환전수수료</span>
+                </div>
 
-        <!-- 🔸 카테고리: 외화예금 -->
-        <div class="faq-category">외화예금</div>
-        <div class="faq-item">
-          <div class="faq-question">
-            외화예금은 어떻게 개설하나요?
-            <i class="fa-solid fa-chevron-down"></i>
-          </div>
-          <div class="faq-answer">
-            인터넷뱅킹 또는 가까운 지점 방문을 통해 외화예금을 개설할 수 있습니다. 신분증과 외화 입금수단(현찰, 송금 등)이 필요합니다.
-          </div>
+
+
+                <!-- 🔥 FAQ 항목 출력 -->
+                <div th:each="faq : ${entry.value}" class="faq-item">
+
+                    <div class="faq-question">
+                        <span th:text="${faq.faqQuestion}"></span>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </div>
+
+                    <div class="faq-answer" th:text="${faq.faqAnswer}"></div>
+                </div>
+            </div>
+
         </div>
-        <div class="faq-item">
-          <div class="faq-question">
-            외화예금의 이자는 어떻게 계산되나요?
-            <i class="fa-solid fa-chevron-down"></i>
-          </div>
-          <div class="faq-answer">
-            예금 통화별 금리에 따라 계산되며, 외화예금의 경우 국내 원화예금보다 변동폭이 클 수 있습니다. 금리는 환율 변동에 따라 주기적으로 조정됩니다.
-          </div>
-        </div>
-      </div>
     </section>
-  </main>
+
+</main>
+
+<!-- 하단 푸터 -->
 <div th:replace="~{_template/_footer.html}"></div>
-<script src ="/static/js/customer.js"></script>
+
+<script th:src="@{/js/customer.js}"></script>
 
 </body>
 </html>
-

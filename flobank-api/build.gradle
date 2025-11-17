@@ -4,6 +4,10 @@ plugins {
     id 'io.spring.dependency-management' version '1.1.7'
 }
 
+springBoot {
+    buildInfo()
+}
+
 group = 'kr.co.api'
 version = '0.0.1-SNAPSHOT'
 description = 'flobank-api'
@@ -53,6 +57,24 @@ dependencies {
     testImplementation 'org.springframework.integration:spring-integration-test'
     runtimeOnly 'com.oracle.database.jdbc:ojdbc11'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // Spring Security: 인증 및 권한 제어의 핵심 프레임워크
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+
+    // JWT 라이브러리 (jjwt): 토큰 생성 및 검증 담당
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5' // JSON 변환용
+
+    // 타임리프용 시큐리티 확장 라이브러리 (화면 처리용)
+    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
+
+    // 솔라피 라이브러리
+    implementation 'com.solapi:sdk:1.0.3'
+
+    // 메일 인증 관련
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-mail', version: '3.3.3'
+    implementation group: 'org.modelmapper', name: 'modelmapper', version: '3.2.1'
 }
 
 tasks.named('test') {

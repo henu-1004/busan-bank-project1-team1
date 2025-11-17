@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.api.flobankapi.mapper.TermsInfoMapper">
+
+    <resultMap id="TermsInfoMap" type="kr.co.api.flobankapi.dto.TermsDTO">
+        <id     property="termNo"    column="TERM_NO"/>
+        <result property="termTitle" column="TERM_TITLE"/>
+        <result property="termFile"  column="TERM_FILE"/>
+        <result property="termRegDy" column="TERM_REG_DY"/>
+        <result property="termType"  column="TERM_TYPE"/>
+    </resultMap>
+
+    <select id="findByType" parameterType="int" resultMap="TermsInfoMap">
+        SELECT
+            TERM_NO,
+            TERM_TITLE,
+            TERM_FILE,
+            TERM_REG_DY,
+            TERM_TYPE
+        FROM TB_TERMS_INFO
+        WHERE TERM_TYPE = #{termType}
+        ORDER BY TERM_NO
+    </select>
+
+</mapper>

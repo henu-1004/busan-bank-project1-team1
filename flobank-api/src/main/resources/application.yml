@@ -65,7 +65,9 @@ solapi:
 terms:
   base-dir: C:/Users/GGG/Desktop/workspace
 
+
 pinecone:
   api-key: "pcsk_4WFJGX_DNAQ7nLt7pD7aLSzixdEp4yfHLDF4itTupWn5Rf7L2ehoDdv7eoXkuk5584Kzyx"
   index-host: https://bank-db-46fp8tb.svc.aped-4627-b74a.pinecone.io
   index-name: bank-db
+

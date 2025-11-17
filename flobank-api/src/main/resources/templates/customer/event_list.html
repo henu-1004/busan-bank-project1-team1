@@ -36,35 +36,51 @@
           <th>상태</th>
         </tr>
       </thead>
-      <tbody>
-        <tr>
-          <td>3</td>
-          <td><a href="#">해외송금 수수료 0원 이벤트</a></td>
-          <td>2025.11.01 ~ 2025.12.31</td>
-          <td><span class="tag">진행중</span></td>
+        <tbody>
+        <tr th:each="event, eventStat : ${eventList}">
+            <td th:text="${totalCount - ((page - 1) * pageSize) - eventStat.index}"></td>
+            <td>
+                <a th:href="@{/customer/event_view/{no}(no=${event.boardNo})}"
+                   th:text="${event.boardTitle}"></a>
+            </td>
+            <td th:text="${event.boardRegDt}"></td>
+            <td><span class="tag">진행중</span></td>
         </tr>
-        <tr>
-          <td>2</td>
-          <td><a href="#">외화예금 신규고객 캐시백 이벤트</a></td>
-          <td>2025.10.01 ~ 2025.11.15</td>
-          <td><span class="tag end">종료</span></td>
+
+
+        <tr th:if="${#lists.isEmpty(eventList)}">
+            <td colspan="4" class="empty">진행 중인 이벤트가 없습니다.</td>
         </tr>
-        <tr>
-          <td>1</td>
-          <td><a href="#">유학생 전용 외화송금 혜택 이벤트</a></td>
-          <td>2025.11.05 ~ 2026.01.31</td>
-          <td><span class="tag">진행중</span></td>
-        </tr>
-      </tbody>
+        </tbody>
+
+
     </table>
 
-<div class="pagination">
-  <a href="#" class="page-prev">〈 이전</a>
-  <a href="#" class="active">1</a>
-  <a href="#">2</a>
-  <a href="#">3</a>
-  <a href="#" class="page-next">다음 〉</a>
-</div>
+      <div class="pagination">
+
+          <!-- 이전 버튼 -->
+          <a th:if="${page > 1}"
+             th:href="@{/customer/event_list(page=${page-1})}"
+             class="page-prev">
+              〈 이전
+          </a>
+
+          <!-- 페이지 번호 -->
+          <a th:each="p : ${#numbers.sequence(1, totalPage)}"
+             th:href="@{/customer/event_list(page=${p})}"
+             th:text="${p}"
+             th:classappend="${p == page} ? 'active'">
+          </a>
+
+          <!-- 다음 버튼 -->
+          <a th:if="${page < totalPage}"
+             th:href="@{/customer/event_list(page=${page+1})}"
+             class="page-next">
+              다음 〉
+          </a>
+
+      </div>
+
 
 
   </div>

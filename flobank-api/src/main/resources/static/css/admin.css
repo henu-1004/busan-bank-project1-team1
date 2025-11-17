@@ -2054,3 +2054,108 @@ input[type="file"] {
 .page-btn:disabled {
   opacity: 0.4;
 }
+
+
+
+/*=================================*/
+/* 아래 부분 부터 새로 추가한 부분*/
+/*=================================*/
+
+
+/*==============================*/
+/*관리자 페이지 글 목록 부분 삭제 버튼에 밑줄 제거*/
+.board-btn-delete,
+.board-btn-delete * {
+    text-decoration: none !important;
+}
+/*=================================*/
+
+
+
+/* -------------------------------------- */
+/* 페이지네이션 디자인 개선 */
+/* -------------------------------------- */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    margin-top: 25px;
+}
+
+.page-btn {
+    display: inline-block;
+    padding: 8px 12px;
+    background: #fff;
+    border: 1px solid #d0d4dc;
+    border-radius: 8px;
+    font-size: 14px;
+    text-decoration: none;
+    color: #333;
+    min-width: 34px;
+    text-align: center;
+    transition: all 0.2s ease;
+}
+
+.page-btn:hover {
+    background: #eef3ff;
+    border-color: #6a8dd8;
+    color: #2e4aa8;
+}
+
+.page-btn.active {
+    background: #3c4f76;
+    color: #fff;
+    border-color: #3c4f76;
+    font-weight: 700;
+}
+
+.page-btn.prev,
+.page-btn.next {
+    font-weight: bold;
+}
+
+.ellipsis {
+    padding: 6px 4px;
+    font-size: 14px;
+    color: #666;
+}
+
+
+/*글 등록에서 수정 취소 버튼 스타일*/
+
+.board-btn-cancel {
+    background: #ddd;                  /* 색만 회색 */
+    color: #333;
+    border: none;
+    border-radius: 10px;               /* 수정 완료 버튼과 동일하게 */
+    padding: 12px 20px;                /* 동일 패딩 */
+    font-size: 14px;
+    font-weight: 500;                  /* 동일 폰트 */
+    cursor: pointer;
+    margin-top: 20px;
+    margin-left: 10px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease; /* 동일 호버 효과 */
+}
+
+.board-btn-cancel:hover {
+    background: #c7c7c7;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 18px rgba(34, 48, 78, 0.15);
+}
+
+
+/*=================================*/
+/*=================================*/
+
+
+/*faq 관련 스타일 이벤트 관련 스타일과 통일 후  */
+/* FAQ 등록 - 카테고리 선택 select는 좁게 */
+/* FAQ 등록/수정에서만 row 비율 조정 */
+#faq-register .board-row {
+    grid-template-columns: 1fr 3fr;  /* 왼쪽 좁게, 오른쪽 넓게 */
+}
+
+
+/*=================================*/
+/*=================================*/
