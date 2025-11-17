@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>브리핑 기사 목록</title>
+    <link rel="stylesheet" th:href="@{/css/article.css}">
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+    <link rel="stylesheet" th:href="@{/css/footer.css}">
+    <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+            crossorigin="anonymous"
+    />
+</head>
+<body>
+<div th:replace="~{_template/_header.html}"></div>
+
+<main class="article-layout">
+    <section class="article-briefing">
+        <div class="briefing-card">
+            <div class="briefing-tabs">
+                <a th:href="@{/articles(mode='oneday')}" th:class="${briefingMode} == 'oneday' ? 'active' : ''">오늘의 브리핑</a>
+                <a th:href="@{/articles(mode='recent5')}" th:class="${briefingMode} == 'recent5' ? 'active' : ''">최근 5일 브리핑</a>
+            </div>
+
+            <div class="briefing-headline">
+                <div>
+                    <p class="label">브리핑</p>
+                    <h1 th:text="${briefingTitle}">오늘의 브리핑</h1>
+                </div>
+                <span class="date" th:text="${briefingDateText}">-</span>
+            </div>
+
+            <ul class="briefing-lines">
+                <li th:each="line : ${briefingLines}" th:text="${line}"></li>
+                <li th:if="${briefingLines == null}">아직 생성된 브리핑이 없습니다.</li>
+            </ul>
+        </div>
+    </section>
+
+    <section class="article-list-section">
+        <div class="article-list-header">
+            <div>
+                <p class="label">뉴스</p>
+                <h2>기사 목록</h2>
+            </div>
+            <div class="count" th:text="|총 ${totalCount}건|">총 0건</div>
+        </div>
+
+        <div class="article-grid">
+            <article class="article-card" th:each="article, stat : ${articles}">
+                <div class="article-meta">
+                    <span class="pill category" th:text="${article.category}">macro</span>
+                    <span class="pill company" th:text="${article.company}">MK</span>
+                    <span class="written"
+                          th:text="${article.writtenAt != null ? #temporals.format(article.writtenAt, 'yyyy-MM-dd HH:mm') : '-'}">-</span>
+                </div>
+                <h3>
+                    <a th:href="${article.url}" target="_blank" rel="noopener noreferrer" th:text="${article.title}">기사 제목</a>
+                </h3>
+                <p class="summary"
+                   th:text="${article.summaryAi != null ? article.summaryAi : (article.summary != null ? article.summary : '요약문이 제공되지 않았습니다.')}">
+                    요약문이 제공되지 않았습니다.
+                </p>
+            </article>
+
+            <div class="empty" th:if="${#lists.isEmpty(articles)}">
+                조회된 기사가 없습니다.
+            </div>
+        </div>
+
+        <div class="pagination">
+            <a th:if="${page > 1}" th:href="@{/articles(page=${page-1}, mode=${briefingMode})}" class="page-prev">〈 이전</a>
+
+            <a th:each="p : ${#numbers.sequence(1, totalPage)}"
+               th:href="@{/articles(page=${p}, mode=${briefingMode})}"
+               th:text="${p}"
+               th:classappend="${p == page} ? 'active'">
+            </a>
+
+            <a th:if="${page < totalPage}" th:href="@{/articles(page=${page+1}, mode=${briefingMode})}" class="page-next">다음 〉</a>
+        </div>
+    </section>
+</main>
+
+<div th:replace="~{_template/_footer.html}"></div>
+</body>
+</html>
