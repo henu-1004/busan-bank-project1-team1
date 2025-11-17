@@ -1,16 +1,26 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
 plugins {
     id 'java'
     id 'org.springframework.boot' version '3.5.7'
     id 'io.spring.dependency-management' version '1.1.7'
 }
 
-springBoot {
-    buildInfo()
-}
-
 group = 'kr.co.api'
-version = '0.0.1-SNAPSHOT'
+version = '0.0.2-SNAPSHOT'
 description = 'flobank-api'
+
+processResources {
+    filesMatching('application.yml') {
+        // 1. expand 대신 filter를 사용합니다.
+        // 2. ReplaceTokens는 기본적으로 @key@ 형식을 찾습니다.
+        filter(ReplaceTokens, tokens: [
+                // 3. 'version' 토큰(@version@)을 프로젝트 버전으로 교체합니다.
+                'version': project.version
+        ])
+        // 4. 이 필터는 ${OPENAI_API_KEY}를 무시하므로 에러가 발생하지 않습니다.
+    }
+}
 
 java {
     toolchain {
@@ -31,6 +41,9 @@ repositories {
 dependencies {
     // 1. HTTP 요청을 받기 위한 Web
     implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    // (DB 연결 에러 해결용)
+    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
 
     // 2. Integration 기본
     implementation 'org.springframework.boot:spring-boot-starter-integration'

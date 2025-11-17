@@ -3,6 +3,8 @@ server:
   servlet:
     context-path: /flobank
 
+app-version: @version@
+
 spring:
   application:
     name: flobank_api
@@ -27,11 +29,6 @@ spring:
             enable: true
           ssl:
             trust: smtp.gmail.com
-
-management:
-  info:
-    build:
-      enabled: true
 
 flobank:
   ap:
