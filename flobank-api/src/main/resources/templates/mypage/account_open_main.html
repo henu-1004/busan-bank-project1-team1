@@ -24,13 +24,17 @@
         <img th:src="@{/images/character10.png}" alt="플로뱅크 캐릭터" class="choice-main-img" />
         <h2>어떤 입출금통장을 개설하시겠어요?</h2>
 
+        <div th:if="${errorMessage}" style="color: red; font-weight: bold; margin-bottom: 20px; border: 1px solid red; padding: 10px; border-radius: 8px;">
+            <p th:text="${errorMessage}"></p>
+        </div>
+
         <div class="choice-buttons">
-            <a th:href="@{/mypage/ko_account_open_1}" class="choice-btn">
+            <a th:href="@{/mypage/koAcctCheck}" class="choice-btn">
                 <i class="fa-solid fa-won-sign"></i>
                 원화 입출금통장
             </a>
 
-            <a th:href="@{/mypage/en_account_open_1}" class="choice-btn">
+            <a th:href="@{/mypage/enAcctCheck}" class="choice-btn">
                 <i class="fa-solid fa-globe"></i>
                 외화 입출금통장
             </a>
