@@ -64,7 +64,7 @@ jobs:
         gcloud beta compute ssh bnk-api-server \
           --project=${{ secrets.GCP_PROJECT_ID }} \
           --zone=asia-northeast3-a \
-          --command="sudo rm -rf /opt/flobank-api/app.jar && sudo mv /tmp/app.jar /opt/flobank-api/app.jar && cd /opt/flobank-api && OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} sudo docker-compose down && OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} sudo docker-compose up -d --build"
+          --command="sudo rm -rf /opt/flobank-api/app.jar && sudo mv ~/app.jar /opt/flobank-api/app.jar && cd /opt/flobank-api && OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} sudo docker-compose down && OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} sudo docker-compose up -d --build"
 
     # 3-1. [빌드] GitHub Actions 실행기에서 flobank-ap 프로젝트를 빌드
     - name: bnk-ap-server (flobank-ap) 빌드
@@ -95,4 +95,4 @@ jobs:
         gcloud beta compute ssh bnk-ap-server \
           --project=${{ secrets.GCP_PROJECT_ID }} \
           --zone=asia-northeast3-a \
-          --command="sudo rm -rf /opt/flobank-ap/app.jar && sudo mv /tmp/app.jar /opt/flobank-ap/app.jar && cd /opt/flobank-ap && sudo docker-compose down && sudo docker-compose up -d --build"
+          --command="sudo rm -rf /opt/flobank-ap/app.jar && sudo mv ~/app.jar /opt/flobank-ap/app.jar && cd /opt/flobank-ap && sudo docker-compose down && sudo docker-compose up -d --build"
