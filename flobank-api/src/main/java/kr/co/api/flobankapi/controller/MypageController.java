@@ -1,26 +1,23 @@
 package kr.co.api.flobankapi.controller;
 
-import kr.co.api.flobankapi.dto.CustAcctDTO;
+import kr.co.api.flobankapi.dto.*;
 
-import kr.co.api.flobankapi.dto.CustFrgnAcctDTO;
-import kr.co.api.flobankapi.dto.SearchResDTO;
 import kr.co.api.flobankapi.service.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import kr.co.api.flobankapi.dto.CustInfoDTO;
 import kr.co.api.flobankapi.jwt.CustomUserDetails;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -52,7 +49,10 @@ public class MypageController {
                 if (custAcctDTO.getAcctName() == null){
                     String name = "FLO 입출금통장" + i++;
                     custAcctDTO.setAcctName(name);
+                }else{
+                    i++;
                 }
+
             }
             model.addAttribute("custAcctDTOList",custAcctDTOList);
         }
@@ -69,8 +69,41 @@ public class MypageController {
     }
 
     @PostMapping("/updateAcctName")
-    public String updateAcctName() {
-        return "mypage/updateAcctName";
+    public ResponseEntity<?> updateAcctName(@RequestBody AcctNameUpdateRequestDTO requestDTO) {
+
+        Map<String, Object> response = new HashMap<>();
+        log.info("updateAcctName requestDTO:{}", requestDTO);
+        try {
+            // --- 비즈니스 로직 ---
+            // 1. 유효성 검사 (예: requestDTO.getAcctName()의 길이 등)
+            // (JavaScript에서 이미 검사했지만, 서버에서도 이중 검사하는 것이 안전합니다)
+            String newName = requestDTO.getAcctName();
+            if (newName == null || newName.trim().isEmpty() || newName.length() > 20) {
+                response.put("status", "error");
+                response.put("message", "별명은 1자 이상 20자 이하로 입력하세요.");
+                // 400 Bad Request 상태와 에러 메시지를 반환
+                return ResponseEntity.badRequest().body(response);
+            }
+
+            if ("KRW".equals(requestDTO.getAcctType())){
+                mypageService.modifyAcctName(requestDTO.getAcctName(), requestDTO.getAcctNo());
+            }else{
+                mypageService.modifyFrgnAcctName(requestDTO.getAcctName(), requestDTO.getAcctNo());
+            }
+
+            // 3. 성공 응답 반환
+            response.put("status", "success");
+            // 200 OK 상태와 성공 메시지를 반환
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            log.error("계좌 별명 변경 중 심각한 오류 발생", e);
+            // 4. 예기치 못한 서버 오류 처리
+            response.put("status", "error");
+            response.put("message", "서버 오류로 인해 별명 변경에 실패했습니다.");
+            // 500 Internal Server Error 상태와 에러 메시지를 반환
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
     }
 
     @GetMapping("/account_open_main")

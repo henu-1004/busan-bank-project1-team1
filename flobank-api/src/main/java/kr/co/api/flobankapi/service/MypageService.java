@@ -53,6 +53,16 @@ public class MypageService {
         return mypageMapper.selectFrgnAcct(custCode);
     }
 
+    // 원화 계좌 이름 바꾸기
+    public void modifyAcctName(String name, String acctNo) {
+        mypageMapper.updateAcctName(name, acctNo);
+    }
+
+    // 외화 계좌 이름 바꾸기
+    public void modifyFrgnAcctName(String name, String acctNo) {
+        mypageMapper.updateFrgnAcctName(name, acctNo);
+    }
+
     public CustInfoDTO getCustInfo(String userCode) { // 고객 정보 받아오기
         CustInfoDTO custInfoDTO = memberMapper.findByCodeCustInfo(userCode);
 
