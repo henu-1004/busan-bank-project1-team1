@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.api.flobankapi.mapper.TermsDbMapper">
+
+    <!-- MASTER INSERT (term_order는 트리거가 자동 입력) -->
+    <insert id="insertTermsMaster">
+        INSERT INTO TB_TERMS_MASTER(term_cate, term_title, term_reg_dy)
+        VALUES(#{termCate}, #{termTitle}, #{termRegDy})
+    </insert>
+
+    <!-- 방금 생성된 term_order 조회 -->
+    <select id="selectMaxOrderByCate" resultType="int">
+        SELECT MAX(term_order)
+        FROM TB_TERMS_MASTER
+        WHERE term_cate = #{cate}
+    </select>
+
+    <!-- HIST INSERT -->
+    <insert id="insertTermsHist">
+        INSERT INTO TB_TERMS_HIST(
+            thist_term_cate,
+            thist_term_order,
+            thist_file,
+            thist_content,
+            thist_version,
+            thist_ver_memo,
+            thist_admin_id,
+            thist_reg_dy
+        )
+        VALUES(
+                  #{thistTermCate},
+                  #{thistTermOrder},
+                  #{thistFile},
+                  #{thistContent},
+                  #{thistVersion},
+                  #{thistVerMemo},
+                  #{thistAdminId},
+                  #{thistRegDy}
+              )
+    </insert>
+
+    <!-- 전체 약관 목록 + 최신 버전 -->
+    <select id="selectAllTermsWithLatestVersion"
+            resultType="kr.co.api.flobankapi.dto.TermsMasterDTO">
+
+        SELECT m.term_cate,
+               m.term_order,
+               m.term_title,
+               m.term_reg_dy,
+               (SELECT MAX(h.thist_version)
+                FROM TB_TERMS_HIST h
+                WHERE h.thist_term_cate = m.term_cate
+                  AND h.thist_term_order = m.term_order) AS latestVersion,
+               (SELECT MAX(h.thist_reg_dy)
+                FROM TB_TERMS_HIST h
+                WHERE h.thist_term_cate = m.term_cate
+                  AND h.thist_term_order = m.term_order) AS latestRegDy
+        FROM TB_TERMS_MASTER m
+        ORDER BY m.term_cate, m.term_order
+    </select>
+
+    <!-- 최신 HIST 내용 조회 -->
+    <select id="selectLatestHist"
+            resultType="kr.co.api.flobankapi.dto.TermsHistDTO">
+        SELECT *
+        FROM TB_TERMS_HIST
+        WHERE thist_term_cate = #{termCate}
+          AND thist_term_order = #{termOrder}
+        ORDER BY thist_version DESC
+            FETCH FIRST 1 ROW ONLY
+    </select>
+
+    <!-- MASTER 수정 -->
+    <update id="updateTermsMaster">
+        UPDATE TB_TERMS_MASTER
+        SET term_title = #{termTitle}
+        WHERE term_cate = #{termCate}
+          AND term_order = #{termOrder}
+    </update>
+
+    <!-- MASTER 삭제 -->
+    <delete id="deleteTerms">
+        DELETE FROM TB_TERMS_MASTER
+        WHERE term_cate = #{cate}
+          AND term_order = #{order}
+    </delete>
+
+    <!-- HIST 삭제 -->
+    <delete id="deleteTermsHist">
+        DELETE FROM TB_TERMS_HIST
+        WHERE thist_term_cate = #{cate}
+          AND thist_term_order = #{order}
+    </delete>
+
+    <!-- 고객 약관 동의 기록 저장 -->
+    <insert id="saveAgreeHist">
+        INSERT INTO TB_TERMS_AGREE_HIST(
+            agree_cust_code,
+            agree_term_order,
+            agree_term_cate,
+            agree_yn,
+            agree_dt
+        ) VALUES(
+                    #{agreeCustCode},
+                    #{agreeTermOrder},
+                    #{agreeTermCate},
+                    'Y',
+                    SYSDATE
+                )
+    </insert>
+
+</mapper>

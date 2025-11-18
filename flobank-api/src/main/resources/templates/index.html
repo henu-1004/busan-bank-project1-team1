@@ -125,24 +125,28 @@
         <div class="board-box">
             <h3>공지사항</h3>
             <ul>
-                <li><a href="#">[공지] 외화예금 서비스 점검 안내</a><span>2025.11.01</span></li>
-                <li><a href="#">해외송금 수수료 변경 안내</a><span>2025.10.27</span></li>
-                <li><a href="#">모바일뱅킹 시스템 점검 안내</a><span>2025.10.24</span></li>
-                <li><a href="#">환율우대 이벤트 종료 안내</a><span>2025.10.18</span></li>
-                <li><a href="#">영업점 이전 안내 (부산중앙지점)</a><span>2025.10.10</span></li>
+                <li th:each="n : ${noticeList}">
+                    <a th:href="@{/customer/notice_view/{id}(id=${n.boardNo})}"
+                       th:text="${n.boardTitle}"></a>
+                    <span th:text="${#temporals.format(n.boardRegDt, 'yyyy.MM.dd')}"></span>
+                </li>
             </ul>
+
+
             <div class="more"><a th:href="@{/customer/notice_list}">+ 더보기</a></div>
         </div>
 
         <div class="board-box">
             <h3>이벤트</h3>
             <ul>
-                <li><a href="#">[이벤트] 외화송금 수수료 50% 할인</a><span>2025.11.01</span></li>
-                <li><a href="#">하나은행, ESG 경영 우수기관 선정</a><span>2025.10.28</span></li>
-                <li><a href="#">글로벌 파이낸스 어워즈 수상</a><span>2025.10.22</span></li>
-                <li><a href="#">하나머니 환전 캐시백 프로모션</a><span>2025.10.17</span></li>
-                <li><a href="#">외화예금 신규고객 이벤트 진행</a><span>2025.10.09</span></li>
+                <li th:each="e : ${eventList}">
+                    <a th:href="@{/customer/event_view/{id}(id=${e.boardNo})}"
+                       th:text="${e.boardTitle}"></a>
+                    <span th:text="${#temporals.format(e.boardRegDt, 'yyyy.MM.dd')}"></span>
+                </li>
             </ul>
+
+
             <div class="more"><a th:href="@{/customer/event_list}">+ 더보기</a></div>
         </div>
 

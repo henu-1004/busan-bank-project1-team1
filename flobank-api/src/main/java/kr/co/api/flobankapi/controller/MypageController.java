@@ -3,17 +3,12 @@ package kr.co.api.flobankapi.controller;
 import kr.co.api.flobankapi.dto.CustAcctDTO;
 
 import kr.co.api.flobankapi.dto.SearchResDTO;
-import kr.co.api.flobankapi.service.ChatGPTService;
-import kr.co.api.flobankapi.service.EmbeddingService;
-import kr.co.api.flobankapi.service.PineconeService;
-import kr.co.api.flobankapi.service.QTypeClassifierService;
+import kr.co.api.flobankapi.service.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import kr.co.api.flobankapi.dto.CustInfoDTO;
 import kr.co.api.flobankapi.jwt.CustomUserDetails;
-import kr.co.api.flobankapi.service.MypageService;
-import kr.co.api.flobankapi.service.TermsService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 import org.springframework.stereotype.Controller;
@@ -34,7 +29,7 @@ import java.util.Map;
 @Slf4j
 @RequiredArgsConstructor
 public class MypageController {
-    private final TermsService termsService;
+    private final TermsDbService termsService;
     private final MypageService mypageService;
 
     private final QTypeClassifierService typeClassifier;

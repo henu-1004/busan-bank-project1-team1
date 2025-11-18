@@ -28,6 +28,12 @@
                     <i class="fa-solid fa-hand-holding-dollar"></i>환전
                 </a>
             </li>
+            <li>
+                <a th:href="@{/admin/terms}"
+                   th:classappend="${menu} == 'terms' ? ' active' : ''">
+                    <i class="fa-solid fa-file-contract"></i>약관관리
+                </a>
+            </li>
         </ul>
     </nav>
 </aside>

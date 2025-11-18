@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko"
+      th:replace="~{admin/admin_template :: admin_template('약관관리','약관 설정',~{::content})}">
+
+<th:block th:fragment="content">
+
+            <!-- ===================================================== -->
+            <!-- 1) 약관 등록 -->
+            <!-- ===================================================== -->
+            <section class="terms-section">
+                <h2 class="product-title">약관 등록</h2>
+
+                <form class="terms-form">
+
+                    <!-- 카테고리 선택 -->
+                    <div class="form-section">
+                        <h3>약관 카테고리</h3>
+                        <div class="form-group">
+                            <label>카테고리 선택</label>
+                            <select name="termsCategory" class="terms-select">
+                                <option value="">선택하세요</option>
+                                <option value="회원가입">회원가입</option>
+                                <option value="외화송금">외화송금</option>
+                                <option value="외환예금">외환예금</option>
+                                <option value="원화송금">환전하기</option>
+                                <option value="원화송금">원화통장개설</option>
+                                <option value="원화송금">외화통장개설</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- 약관 제목 -->
+                    <div class="form-section">
+                        <h3>약관 제목</h3>
+                        <div class="form-group">
+                            <input type="text" class="terms-title-input"
+                                   placeholder="약관 제목을 입력하세요" />
+                        </div>
+                    </div>
+
+                    <!-- 약관 내용 -->
+                    <div class="form-section">
+                        <h3>약관 내용</h3>
+                        <div class="form-group">
+                            <textarea class="terms-textarea" rows="8"
+                                      placeholder="약관 내용을 입력하세요"></textarea>
+                        </div>
+
+
+
+                    <div class="terms-modal-group">
+                        <h3>약관 파일 첨부</h3>
+                        <input type="file" id="modalFile" class="terms-input" accept=".pdf,.doc,.docx">
+                    </div>
+
+                </div>
+
+                    <!-- 등록 버튼 -->
+                    <div class="form-submit">
+                        <button type="submit" class="btn-submit terms-submit">등록하기</button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- ===================================================== -->
+            <!-- 2) 약관 현황 -->
+            <!-- ===================================================== -->
+            <section class="terms-section">
+                <h2 class="product-title">약관 현황</h2>
+
+                <!-- 검색 영역 -->
+                <div class="terms-search-area">
+
+                    <!-- 검색 조건 선택 -->
+                    <select class="terms-search-type">
+                        <option value="category">약관 카테고리</option>
+                        <option value="title">약관 제목</option>
+                        <option value="content">약관 내용</option>
+                    </select>
+
+                    <!-- 검색어 입력 -->
+                    <input type="text"
+                        class="terms-search-input"
+                        placeholder="검색어를 입력하세요">
+
+                    <!-- 검색 버튼 -->
+                    <button class="terms-search-btn">
+                        <i class="fa-solid fa-search"></i>
+                    </button>
+                </div>
+
+
+                <!-- 테이블 -->
+                <!-- 테이블 -->
+                <div class="product-table-wrap">
+                    <table class="product-table terms-table">
+                        <thead>
+                        <tr>
+                            <th>약관 카테고리</th>   <!-- row.children[0] -->
+                            <th>약관 제목</th>       <!-- row.children[1] -->
+                            <th>버전</th>            <!-- row.children[2] -->
+                            <th>등록일</th>          <!-- row.children[3] -->
+                            <th>수정일</th>          <!-- row.children[4] -->
+                            <th>관리</th>            <!-- row.children[5] -->
+                        </tr>
+                        </thead>
+
+                        <tbody>
+                        <tr th:each="t : ${termsList}">
+                            <td th:text="${t.termCate} == 1 ? '회원가입' :
+                         ${t.termCate} == 2 ? '원화송금' :
+                         ${t.termCate} == 3 ? '외화송금' : '외환예금'"></td>
+
+                            <td th:text="${t.termTitle}"></td>
+
+                            <td th:text="'v' + ${t.latestVersion}"></td>
+
+                            <td th:text="${t.termRegDy}"></td>
+                            <td th:text="${t.latestRegDy}"></td>
+
+                            <td class="terms-actions">
+                                <button class="terms-edit-btn">수정</button>
+
+                                <button class="terms-delete-btn"
+                                        th:attr="data-cate=${t.termCate}, data-order=${t.termOrder}">
+                                    삭제
+                                </button>
+                            </td>
+                        </tr>
+                        </tbody>
+
+                    </table>
+                </div>
+
+            </section>
+
+        </div>
+
+
+<!-- ==========================
+     🔹 약관 수정 모달 
+========================== -->
+<div class="terms-modal" id="termsModal">
+    <div class="terms-modal-content">
+
+        <span class="terms-modal-close">&times;</span>
+
+        <h2 class="terms-modal-title">약관 수정</h2>
+
+        <div class="terms-modal-body">
+
+            <!-- 카테고리 -->
+            <div class="terms-modal-group">
+                <label>약관 카테고리</label>
+                <input type="text" id="modalCategory" class="terms-input" disabled>
+            </div>
+
+            <!-- 제목 -->
+            <div class="terms-modal-group">
+                <label>약관 제목</label>
+                <input type="text" id="modalTitle" class="terms-input" disabled>
+            </div>
+
+            <!-- 버전 / 등록일 / 등록자 -->
+            <div class="terms-modal-row">
+                <div class="terms-modal-group">
+                    <label>버전</label>
+                    <input type="text" id="modalVersion" class="terms-input" disabled>
+                </div>
+
+                <div class="terms-modal-group">
+                    <label>등록일</label>
+                    <input type="text" id="modalRegDate" class="terms-input" disabled>
+                </div>
+
+                <div class="terms-modal-group">
+                    <label>등록자</label>
+                    <input type="text" id="modalWriter" class="terms-input" disabled>
+                </div>
+            </div>
+
+            <!-- 내용 수정 -->
+            <div class="terms-modal-group">
+                <label>약관 내용</label>
+                <textarea id="modalContent" class="terms-textarea" rows="8"></textarea>
+            </div>
+
+
+
+
+        </div>
+
+        <div class="terms-modal-footer">
+            <button class="terms-modal-cancel">취소</button>
+            <button class="terms-modal-save">저장하기</button>
+        </div>
+
+    </div>
+</div>
+
+
+</div>
+
+
+
+
+
+    <script src="/static/js/terms.js"></script>
+</th:block>
+</html>

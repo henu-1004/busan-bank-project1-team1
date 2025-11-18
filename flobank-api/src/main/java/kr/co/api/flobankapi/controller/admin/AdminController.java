@@ -222,6 +222,13 @@ public class AdminController {
     }
 
 
+    @GetMapping("/terms")
+    public String terms(){
+        return "admin/terms";
+    }
+
+
+
 
 
 }

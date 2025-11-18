@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>약관 테스트 통합 페이지</title>
+
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background: #f5f6fa;
+            padding: 40px;
+            margin: 0;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .desc {
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        .table-wrap {
+            background: #fff;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.07);
+            margin-bottom: 35px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th {
+            background: #4A6FA5;
+            color: #fff;
+            padding: 12px;
+            font-size: 14px;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        tr:hover {
+            background: #eef4ff;
+            cursor: pointer;
+        }
+
+        /* 상세 박스 */
+        .detail-section {
+            background: #fff;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.07);
+            display: none; /* 기본 숨김 */
+        }
+
+        .detail-title {
+            font-size: 22px;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .info-box {
+            background: #fafafa;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #eee;
+            margin-bottom: 25px;
+        }
+
+        .info-item {
+            margin-bottom: 8px;
+            font-size: 15px;
+        }
+
+        /* 버전 테이블 */
+        .version-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 25px;
+        }
+
+        .version-table th {
+            background: #6A8DC4;
+            color: #fff;
+            padding: 10px;
+        }
+
+        .version-table td {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            text-align: center;
+        }
+
+        /* 약관 본문 */
+        .content-box {
+            background: #fafafa;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #eee;
+            white-space: pre-wrap;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+    </style>
+
+    <script>
+        // JS로 상세 정보 표시
+        function showDetail(cate, order) {
+            location.href = `/flobank/test/terms?cate=${cate}&order=${order}`;
+        }
+    </script>
+
+</head>
+<body>
+
+<h1>📄 약관 테스트 페이지 (ALL-IN-ONE)</h1>
+<p class="desc">한 페이지에서 약관 목록, 상세 내용, 버전 이력을 모두 확인할 수 있습니다.</p>
+
+<!-- ===================== -->
+<!-- ▶▶ 약관 목록 테이블  -->
+<!-- ===================== -->
+<div class="table-wrap">
+    <table>
+        <thead>
+        <tr>
+            <th>카테고리</th>
+            <th>순번</th>
+            <th>제목</th>
+            <th>최초 등록일</th>
+            <th>최신 버전</th>
+            <th>최신 수정일</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:each="t : ${termsList}"
+            th:onclick="|showDetail(${t.termCate},${t.termOrder})|">
+            <td th:text="${t.termCate}"></td>
+            <td th:text="${t.termOrder}"></td>
+            <td th:text="${t.termTitle}"></td>
+            <td th:text="${t.termRegDy}"></td>
+            <td th:text="'v' + ${t.latestVersion}"></td>
+            <td th:text="${t.latestRegDy}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- ========================== -->
+<!-- ▶▶ 상세 보기 영역 (선택 시 표시) -->
+<!-- ========================== -->
+<div class="detail-section" th:if="${master != null}">
+
+    <h2 class="detail-title">📘 약관 상세 보기</h2>
+
+    <!-- 기본 정보 -->
+    <div class="info-box">
+        <div class="info-item"><b>카테고리:</b> <span th:text="${master.termCate}"></span></div>
+        <div class="info-item"><b>순번:</b> <span th:text="${master.termOrder}"></span></div>
+        <div class="info-item"><b>제목:</b> <span th:text="${master.termTitle}"></span></div>
+        <div class="info-item"><b>최초 등록일:</b> <span th:text="${master.termRegDy}"></span></div>
+    </div>
+
+    <!-- 버전 목록 -->
+    <h3>📌 버전 이력</h3>
+    <table class="version-table">
+        <thead>
+        <tr>
+            <th>버전</th>
+            <th>등록일</th>
+            <th>메모</th>
+            <th>작성자</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="v : ${versions}">
+            <td th:text="'v' + ${v.thistVersion}"></td>
+            <td th:text="${v.thistRegDy}"></td>
+            <td th:text="${v.thistVerMemo}"></td>
+            <td th:text="${v.thistAdminId}"></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <!-- 최신 내용 -->
+    <h3>📘 최신 약관 내용</h3>
+    <div class="content-box" th:text="${latestHist.thistContent}"></div>
+
+</div>
+
+</body>
+</html>
