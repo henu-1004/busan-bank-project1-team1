@@ -6,9 +6,10 @@
 
     <!-- MASTER INSERT (term_order는 트리거가 자동 입력) -->
     <insert id="insertTermsMaster">
-        INSERT INTO TB_TERMS_MASTER(term_cate, term_title, term_reg_dy)
-        VALUES(#{termCate}, #{termTitle}, #{termRegDy})
+        INSERT INTO TB_TERMS_MASTER(term_cate, term_order, term_title, term_reg_dy)
+        VALUES(#{termCate}, #{termOrder}, #{termTitle}, #{termRegDy})
     </insert>
+
 
     <!-- 방금 생성된 term_order 조회 -->
     <select id="selectMaxOrderByCate" resultType="int">
@@ -43,21 +44,26 @@
     <select id="selectAllTermsWithLatestVersion"
             resultType="kr.co.api.flobankapi.dto.TermsMasterDTO">
 
-        SELECT m.term_cate,
-               m.term_order,
-               m.term_title,
-               m.term_reg_dy,
-               (SELECT MAX(h.thist_version)
-                FROM TB_TERMS_HIST h
-                WHERE h.thist_term_cate = m.term_cate
-                  AND h.thist_term_order = m.term_order) AS latestVersion,
-               (SELECT MAX(h.thist_reg_dy)
-                FROM TB_TERMS_HIST h
-                WHERE h.thist_term_cate = m.term_cate
-                  AND h.thist_term_order = m.term_order) AS latestRegDy
+        SELECT
+            m.term_cate  AS termCate,
+            m.term_order AS termOrder,
+            m.term_title AS termTitle,
+            m.term_reg_dy AS termRegDy,
+
+            (SELECT MAX(h.thist_version)
+             FROM TB_TERMS_HIST h
+             WHERE h.thist_term_cate = m.term_cate
+               AND h.thist_term_order = m.term_order) AS latestVersion,
+
+            (SELECT MAX(h.thist_reg_dy)
+             FROM TB_TERMS_HIST h
+             WHERE h.thist_term_cate = m.term_cate
+               AND h.thist_term_order = m.term_order) AS latestRegDy
+
         FROM TB_TERMS_MASTER m
         ORDER BY m.term_cate, m.term_order
     </select>
+
 
     <!-- 최신 HIST 내용 조회 -->
     <select id="selectLatestHist"
@@ -108,5 +114,99 @@
                     SYSDATE
                 )
     </insert>
+
+
+    <select id="selectTermsPage" resultType="kr.co.api.flobankapi.dto.TermsMasterDTO">
+        SELECT
+            m.term_cate AS termCate,
+            m.term_order AS termOrder,
+            m.term_title AS termTitle,
+            m.term_reg_dy AS termRegDy,
+            (SELECT MAX(h.thist_version)
+             FROM TB_TERMS_HIST h
+             WHERE h.thist_term_cate = m.term_cate
+               AND h.thist_term_order = m.term_order) AS latestVersion,
+            (SELECT MAX(h.thist_reg_dy)
+             FROM TB_TERMS_HIST h
+             WHERE h.thist_term_cate = m.term_cate
+               AND h.thist_term_order = m.term_order) AS latestRegDy
+        FROM TB_TERMS_MASTER m
+        ORDER BY m.term_cate, m.term_order
+        OFFSET #{start} ROWS FETCH NEXT #{pageSize} ROWS ONLY
+    </select>
+
+    <select id="countTerms" resultType="int">
+        SELECT COUNT(*) FROM TB_TERMS_MASTER
+    </select>
+
+    <select id="selectTermsPageFiltered" resultType="kr.co.api.flobankapi.dto.TermsMasterDTO">
+        SELECT
+        m.term_cate AS termCate,
+        m.term_order AS termOrder,
+        m.term_title AS termTitle,
+        m.term_reg_dy AS termRegDy,
+        (SELECT MAX(h.thist_version)
+        FROM TB_TERMS_HIST h
+        WHERE h.thist_term_cate = m.term_cate
+        AND h.thist_term_order = m.term_order) AS latestVersion,
+        (SELECT MAX(h.thist_reg_dy)
+        FROM TB_TERMS_HIST h
+        WHERE h.thist_term_cate = m.term_cate
+        AND h.thist_term_order = m.term_order) AS latestRegDy
+        FROM TB_TERMS_MASTER m
+        <where>
+            <if test="type == 'category' and keyword != null">
+                AND m.term_cate = #{keyword}
+            </if>
+
+            <if test="type == 'title' and keyword != null">
+                AND m.term_title LIKE '%' || #{keyword} || '%'
+            </if>
+
+            <if test="type == 'content' and keyword != null">
+                AND m.term_order IN (
+                SELECT thist_term_order
+                FROM TB_TERMS_HIST
+                WHERE thist_content LIKE '%' || #{keyword} || '%'
+                )
+            </if>
+        </where>
+        ORDER BY m.term_cate, m.term_order
+        OFFSET #{start} ROWS FETCH NEXT #{pageSize} ROWS ONLY
+    </select>
+
+
+    <select id="countTermsFiltered" resultType="int">
+        SELECT COUNT(*)
+        FROM TB_TERMS_MASTER m
+        <where>
+            <if test="type == 'category' and keyword != null">
+                AND m.term_cate = #{keyword}
+            </if>
+
+            <if test="type == 'title' and keyword != null">
+                AND m.term_title LIKE '%' || #{keyword} || '%'
+            </if>
+
+            <if test="type == 'content' and keyword != null">
+                AND m.term_order IN (
+                SELECT thist_term_order
+                FROM TB_TERMS_HIST
+                WHERE thist_content LIKE '%' || #{keyword} || '%'
+                )
+            </if>
+        </where>
+    </select>
+
+    <select id="selectMaster" resultType="kr.co.api.flobankapi.dto.TermsMasterDTO">
+        SELECT *
+        FROM TB_TERMS_MASTER
+        WHERE term_cate = #{cate}
+          AND term_order = #{order}
+    </select>
+
+
+
+
 
 </mapper>

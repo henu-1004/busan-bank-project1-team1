@@ -1,6 +1,5 @@
 package kr.co.api.flobankapi.controller;
 
-import kr.co.api.flobankapi.dto.*;
 import kr.co.api.flobankapi.service.TermsDbService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -8,26 +7,48 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Controller
-@RequestMapping("/admin/termsdb")
+@RequestMapping("/admin/terms")
 @RequiredArgsConstructor
 public class AdminTermsDbController {
 
     private final TermsDbService service;
 
-    /** 목록 */
+    /** 약관 목록 */
     @GetMapping
-    public String list(Model model) {
-        model.addAttribute("termsList", service.getAllTerms());
+    public String list(@RequestParam(defaultValue = "1") int page,
+                       @RequestParam(required = false) String type,
+                       @RequestParam(required = false) String keyword,
+                       Model model) {
+
+        int pageSize = 3;
+
+        Map<String, Object> result = service.getTermsPage(page, pageSize, type, keyword);
+
+        model.addAttribute("termsList", result.get("list"));
+        model.addAttribute("totalPage", result.get("totalPage"));
+        model.addAttribute("page", page);
+
+        model.addAttribute("type", type);
+        model.addAttribute("keyword", keyword);
         model.addAttribute("activeItem", "terms");
-        return "test/terms_list";   // 테스트 페이지로 연결
+
+        return "admin/terms";
     }
 
-    /** 등록 페이지 → 테스트는 필요없어서 목록만 보여줌 */
-    @GetMapping("/register")
-    public String registerPage() {
-        return "redirect:/admin/termsdb";
+
+    /** 약관 상세(JSON) */
+    @GetMapping("/detail")
+    @ResponseBody
+    public Map<String, Object> detail(@RequestParam int cate,
+                                      @RequestParam int order) {
+
+        return service.getTermsDetail(cate, order);
     }
+
 
     /** 등록 처리 */
     @PostMapping("/register")
@@ -37,47 +58,44 @@ public class AdminTermsDbController {
                            RedirectAttributes ra) {
 
         service.createTerms(cate, title, content, "admin");
-        ra.addFlashAttribute("msg", "약관이 등록되었습니다!");
+        ra.addFlashAttribute("msg", "약관이 등록되었습니다.");
 
-        return "redirect:/admin/termsdb";
+        return "redirect:/admin/terms";
     }
 
-    /** 수정 페이지 → 테스트는 단일 페이지에서 처리 */
-    @GetMapping("/edit")
-    public String edit(@RequestParam int cate,
-                       @RequestParam int order,
-                       RedirectAttributes ra) {
-
-        ra.addFlashAttribute("editCate", cate);
-        ra.addFlashAttribute("editOrder", order);
-
-        return "redirect:/admin/termsdb";
-    }
 
     /** 수정 처리 */
     @PostMapping("/update")
-    public String update(@RequestParam int cate,
-                         @RequestParam int order,
-                         @RequestParam String title,
-                         @RequestParam String content,
-                         @RequestParam int currentVersion,
-                         RedirectAttributes ra) {
+    @ResponseBody
+    public Map<String, Object> update(@RequestParam int cate,
+                                      @RequestParam int order,
+                                      @RequestParam String title,
+                                      @RequestParam String content,
+                                      @RequestParam int currentVersion) {
 
-        service.updateTerms(cate, order, title, content, currentVersion, "admin");
-        ra.addFlashAttribute("msg", "약관이 수정되었습니다!");
+        Map<String, Object> result = new HashMap<>();
 
-        return "redirect:/admin/termsdb";
+        try {
+            service.updateTerms(cate, order, title, content, currentVersion, "admin");
+            result.put("status", "OK");
+        } catch (Exception e) {
+            result.put("status", "ERROR");
+            result.put("message", e.getMessage());
+        }
+
+        return result;
     }
 
-    /** 삭제 */
+
+    /** 삭제 처리 */
     @GetMapping("/delete")
     public String delete(@RequestParam int cate,
                          @RequestParam int order,
                          RedirectAttributes ra) {
 
         service.deleteTerms(cate, order);
-        ra.addFlashAttribute("msg", "약관이 삭제되었습니다!");
+        ra.addFlashAttribute("msg", "약관이 삭제되었습니다.");
 
-        return "redirect:/admin/termsdb";
+        return "redirect:/admin/terms";
     }
 }
