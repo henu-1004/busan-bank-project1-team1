@@ -68,3 +68,6 @@ pinecone:
   index-host: https://bank-db-46fp8tb.svc.aped-4627-b74a.pinecone.io
   index-name: bank-db
 
+file:
+  upload:
+    pdf-ai-path: /home/mjgemini987_gmail_com/uploads/pdf_ai

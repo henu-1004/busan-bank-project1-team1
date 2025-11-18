@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.api.flobankapi.mapper.PdfAiMapper">
+
+    <!-- 1) Insert -->
+    <insert id="insertPdf" useGeneratedKeys="true" keyProperty="pdfId">
+        INSERT INTO TB_PDF_AI (
+            ORG_FILE_NAME,
+            STORED_FILE_NAME,
+            FILE_PATH,
+            STATUS
+        ) VALUES (
+                     #{orgFileName},
+                     #{storedFileName},
+                     #{filePath},
+                     #{status}
+                 )
+    </insert>
+
+    <!-- 2) 상태별 조회 -->
+    <select id="findByStatus" resultType="kr.co.api.flobankapi.dto.PdfAiDTO">
+        SELECT *
+        FROM TB_PDF_AI
+        WHERE STATUS = #{status}
+        ORDER BY CREATED_AT DESC
+    </select>
+
+    <!-- 3) ID 조회 -->
+    <select id="findById" resultType="kr.co.api.flobankapi.dto.PdfAiDTO">
+        SELECT *
+        FROM TB_PDF_AI
+        WHERE PDF_ID = #{pdfId}
+    </select>
+
+    <!-- 4) 상태 업데이트 -->
+    <update id="updateStatus">
+        UPDATE TB_PDF_AI
+        SET STATUS = #{status},
+            UPDATED_AT = CURRENT_TIMESTAMP
+        WHERE PDF_ID = #{pdfId}
+    </update>
+
+    <select id="findAll" resultType="kr.co.api.flobankapi.dto.PdfAiDTO">
+        SELECT *
+        FROM TB_PDF_AI
+        ORDER BY CREATED_AT DESC
+    </select>
+
+</mapper>
