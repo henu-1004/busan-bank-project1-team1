@@ -8,3 +8,8 @@ services:
     restart: always
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
+    volumes:
+      - flobank_uploads:/app/uploads
+volumes:
+  flobank_uploads:
+    external: true

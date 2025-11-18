@@ -58,6 +58,15 @@ jobs:
           --project=${{ secrets.GCP_PROJECT_ID }} \
           --zone=asia-northeast3-a
 
+    # 2-2.5. [복사] docker-compose.yml 파일을 bnk-api-server VM으로 복사
+    - name: bnk-api-server compose 파일 복사
+      run: |
+        gcloud beta compute scp flobank-api/docker-compose.yml \
+          bnk-api-server:/opt/flobank-api/docker-compose.yml \
+          --project=${{ secrets.GCP_PROJECT_ID }} \
+          --zone=asia-northeast3-a
+        
+
     # 2-3. [실행] bnk-api-server VM에 접속해 Docker Compose 재시작
     - name: bnk-api-server (flobank-api) 재시작 및 정리
       run: |
