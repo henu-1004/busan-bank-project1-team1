@@ -163,9 +163,6 @@ public class MypageController {
 
     @GetMapping("/en_account_open_2")
     public String en_account_open_2(@AuthenticationPrincipal CustomUserDetails userDetails) {
-        String custCode = user
-        mypageService.getCustInfo()
-
 
         return "mypage/en_account_open_2";
     }
