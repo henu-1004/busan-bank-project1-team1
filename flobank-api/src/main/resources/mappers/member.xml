@@ -19,5 +19,10 @@
         VALUES(#{custId}, #{custPw}, #{custName}, #{custJumin}, #{custEmail}, #{custHp}, #{custBirthDt}, #{custGen}, #{custEngName}, #{custZip}, #{custAddr1}, #{custAddr2}, SYSDATE)
     </insert>
 
+    <update id="insertLastLogin">
+        UPDATE TB_CUST_INFO
+        SET CUST_LAST_LOGIN_DT = sysdate
+        WHERE CUST_ID = #{custId};
+    </update>
 
 </mapper>

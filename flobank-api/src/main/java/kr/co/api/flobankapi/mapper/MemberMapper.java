@@ -8,4 +8,5 @@ import org.apache.ibatis.annotations.Param;
 public interface MemberMapper {
     CustInfoDTO findByIdCustInfo(String custId);
     void registerCustInfo(CustInfoDTO custInfoDTO);
+    void insertLastLogin(String custId);
 }
