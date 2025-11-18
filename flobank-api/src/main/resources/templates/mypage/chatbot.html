@@ -38,33 +38,24 @@
         </header>
 
         <div class="chat-window">
-          <div class="message bot">
-            <div class="avatar"><i class="fa-solid fa-robot"></i></div>
-            <div class="bubble">
-              <span class="meta">AI 외환 도우미 · 09:32</span>
-              <p>안녕하세요. OO은행 AI 외환 도우미입니다. 어떤 업무를 도와드릴까요?</p>
+            <div class="message bot">
+                <div class="avatar"><i class="fa-solid fa-robot"></i></div>
+                <div class="bubble">
+                    <span class="meta">AI 외환 도우미 · 09:32</span>
+                    <p>안녕하세요. 플로뱅크 AI 외환 도우미입니다. 어떤 업무를 도와드릴까요?</p>
+                </div>
             </div>
-          </div>
-          <div class="message user">
-            <div class="avatar"><i class="fa-solid fa-user"></i></div>
-            <div class="bubble">
-              <span class="meta">나 · 09:33</span>
-              <p>유학 준비 중인데, 환율 우대를 받으려면 어떻게 해야 하나요?</p>
+
+            <div th:each="hist : ${dtoList}" th:class="${hist.botType==1} ? 'message user' : 'message bot'">
+                <div class="avatar"><i th:class="${hist.botType==1} ? 'fa-solid fa-user' : 'fa-solid fa-robot'"></i></div>
+                <div class="bubble">
+                    <span th:if="${hist.botType==2}" class="meta">AI 외환 도우미 · [[${hist.botDt}]]</span>
+                    <span th:if="${hist.botType==1}" class="meta">나 · [[${hist.botDt}]]</span>
+                    <p>[[${hist.botContent}]]</p>
+                </div>
+
             </div>
-          </div>
-          <div class="message bot">
-            <div class="avatar"><i class="fa-solid fa-robot"></i></div>
-            <div class="bubble">
-              <span class="meta">AI 외환 도우미 · 09:33</span>
-              <p>
-                [[${response}]]
-              </p>
-              <div class="suggested-actions">
-                <button><i class="fa-solid fa-link"></i> 우대 신청 바로가기</button>
-                <button><i class="fa-solid fa-store"></i> 가까운 영업점 찾기</button>
-              </div>
-            </div>
-          </div>
+
         </div>
 
         <div class="chat-input">
@@ -75,7 +66,8 @@
             <button>외화예금 금리</button>
           </div>
           <div class="input-row">
-              <form method="post">
+              <form method="post">'
+                  <input type="hidden" name="sessId" th:value="${sessId}">
                   <input type="text" name="q" placeholder="질문을 입력하거나 우측 메뉴에서 선택하세요.">
                   <button class="send-btn" type="submit"><i class="fa-solid fa-paper-plane"></i></button>
               </form>

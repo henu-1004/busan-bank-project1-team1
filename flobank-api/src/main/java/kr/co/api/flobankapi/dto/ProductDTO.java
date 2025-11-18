@@ -40,4 +40,20 @@ public class ProductDTO {
     // 통화코드별 한도금액
     private List<ProductLimitDTO> limits;
 
+    // 분할인출
+    private int wdrwMinMonth;
+    private int wdrwMax;
+    private String amtCurrency;
+    private int amtMin;
+
+    // 예치 기간
+    private int periodMinMonth;
+    private int periodMaxMonth;
+    private int periodFixedMonth;
+
+    // 가입 금액 제한
+    private String lmtCurrency;
+    private int lmtMinAmt;
+    private int lmtMaxAmt;
+
 }
