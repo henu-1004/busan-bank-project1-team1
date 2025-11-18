@@ -45,8 +45,37 @@ public class MypageController {
 
 
     @GetMapping({"/main","/"})
-    public String mypage() {
+    public String mypage(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
+        String userCode = userDetails.getUsername();
+        List<CustAcctDTO> custAcctDTOList = mypageService.findAllAcct(userCode);
+        CustFrgnAcctDTO  custFrgnAcctDTO = mypageService.findFrgnAcct(userCode);
+
+        if(!custAcctDTOList.isEmpty()){
+            // 원화 입출금 통장 이름 설정
+            int i = 1;
+            for(CustAcctDTO custAcctDTO : custAcctDTOList){
+                if (custAcctDTO.getAcctName() == null){
+                    String name = "FLO 입출금통장" + i++;
+                    custAcctDTO.setAcctName(name);
+                }
+            }
+            model.addAttribute("custAcctDTOList",custAcctDTOList);
+        }
+        if(custFrgnAcctDTO != null){
+            // 외화 입출금 통장 이름 설정
+            if (custFrgnAcctDTO.getFrgnAcctName() == null){
+                String name = "FLO 외화통장";
+                custFrgnAcctDTO.setFrgnAcctName(name);
+            }
+            model.addAttribute("custFrgnAcctDTO",custFrgnAcctDTO);
+        }
+
         return "mypage/main";
+    }
+
+    @PostMapping("/updateAcctName")
+    public String updateAcctName() {
+        return "mypage/updateAcctName";
     }
 
     @GetMapping("/account_open_main")

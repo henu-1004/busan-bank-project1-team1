@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -40,6 +41,16 @@ public class MypageService {
     // 외화 입출금 통장 이미 있는지 확인
     public int checkEnAcct(String custCode) {
         return mypageMapper.selectCheckCntEnAcct(custCode);
+    }
+
+    // 고객 보유 전체 계좌 확인
+    public List<CustAcctDTO> findAllAcct(String custCode) {
+        return mypageMapper.selectAllKoAcct(custCode);
+    }
+
+    // 고객 외환 계좌 확인
+    public CustFrgnAcctDTO findFrgnAcct(String custCode) {
+        return mypageMapper.selectFrgnAcct(custCode);
     }
 
     public CustInfoDTO getCustInfo(String userCode) { // 고객 정보 받아오기

@@ -12,4 +12,5 @@ public class CustAcctDTO {
     private String acctCustCode;
     private String acctFundSource;
     private String acctPurpose;
+    private String acctName;
 }

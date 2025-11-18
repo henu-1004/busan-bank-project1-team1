@@ -4,12 +4,13 @@ import lombok.Data;
 
 @Data
 public class CustFrgnAcctDTO {
-    String frgnAcctNo;
-    String frgnAcctPw;
-    String frgnAcctRegDt;
-    String frgnAcctStatus;
-    String frgnAcctCustEngName;
-    String frgnAcctCustCode;
-    String frgnAcctFundSource;
-    String frgnPurpose;
+    private String frgnAcctNo;
+    private String frgnAcctPw;
+    private String frgnAcctRegDt;
+    private Integer frgnAcctStatus;
+    private String frgnAcctCustEngName;
+    private String frgnAcctCustCode;
+    private String frgnAcctFundSource;
+    private String frgnPurpose;
+    private String frgnAcctName;
 }
