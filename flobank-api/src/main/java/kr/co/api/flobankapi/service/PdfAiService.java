@@ -29,28 +29,28 @@ public class PdfAiService {
 
     public Long savePdf(MultipartFile file) throws Exception {
 
-        // 원본 파일명
         String orgName = file.getOriginalFilename();
-
-        // 저장 파일명 (UUID 붙이기)
         String storedName = UUID.randomUUID() + "_" + orgName;
-
-        // 실제 파일 저장 경로
         String fullPath = uploadDir + "/" + storedName;
 
-        // 서버에 파일 저장
         File target = new File(fullPath);
         file.transferTo(target);
 
-        // DB insert
+        // DTO 구성
         PdfAiDTO dto = new PdfAiDTO();
         dto.setOrgFileName(orgName);
         dto.setStoredFileName(storedName);
         dto.setFilePath(fullPath);
-        dto.setStatus("wait");  // 초기 상태
+        dto.setStatus("wait");
 
+        // INSERT
         pdfAiMapper.insertPdf(dto);
 
-        return dto.getPdfId();
+        // ⭐ INSERT 된 row의 PDF_ID 조회
+        Long newId = pdfAiMapper.findInsertedId(dto);
+        dto.setPdfId(newId);
+
+        return newId;   // ✔ 이제 null 아님!
     }
+
 }

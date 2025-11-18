@@ -18,8 +18,17 @@
                      #{filePath},
                      #{status}
                  )
-            RETURNING PDF_ID INTO #{pdfId}
     </insert>
+
+    <select id="findInsertedId" resultType="long">
+        SELECT PDF_ID
+        FROM TB_PDF_AI
+        WHERE ORG_FILE_NAME = #{orgFileName}
+          AND STORED_FILE_NAME = #{storedFileName}
+          AND FILE_PATH = #{filePath}
+        ORDER BY CREATED_AT DESC
+            FETCH FIRST 1 ROW ONLY
+    </select>
 
 
     <!-- 2) 상태별 조회 -->
