@@ -22,223 +22,234 @@
   <h2>외화 입출금 통장 개설 약관 동의</h2>
   <p class="terms-desc">통장 개설을 위해 아래 약관을 확인하시고 동의해주세요.</p>
 
-  <!-- 1️⃣ 전자금융 약관 동의 -->
   <section class="terms-group">
     <h3 class="group-title">전자금융 약관 동의</h3>
 
-    <!-- 전자금융이용약관 -->
-    <div class="terms-box">
-      <h4 class="terms-title">전자금융이용약관</h4>
-      <div class="terms-content">
-        <p>
-          제1조 (목적)<br>
-          본 약관은 OO은행과 고객 간 전자금융거래에 관한 기본적인 권리, 의무 및 책임사항을 규정합니다.<br><br>
-          제2조 (정의)<br>
-          "전자금융거래"라 함은 고객이 전자적 장치를 통하여 은행의 금융서비스를 이용하는 거래를 말합니다.<br><br>
-          제3조 (적용범위)<br>
-          본 약관은 전자금융거래를 이용하는 고객에게 적용됩니다.<br><br>
-          제4조 (이용시간 및 중단)<br>
-          은행은 시스템 점검 등의 사유로 전자금융거래 이용을 일시 중단할 수 있습니다.
-        </p>
+
+      <div class="terms-box" th:each="t : ${termsList}">
+          <h4 class="terms-title" th:text="${t.termTitle}">전자금융이용약관</h4>
+          <div class="terms-content">
+              <p th:utext="${t.termContent}">
+              </p>
+          </div>
+          <div class="terms-check">
+              <label class="custom-check">
+                  <input type="checkbox" class="term-check"
+                         th:attr="data-cate=${t.termCate}, data-order=${t.termOrder}">
+                  <span class="checkmark"></span>
+                  위 약관에 동의합니다.
+              </label>
+          </div>
       </div>
-      <div class="terms-check">
-        <label class="custom-check">
-          <input type="checkbox" class="term-check">
-          <span class="checkmark"></span>
-          위 약관에 동의합니다.
-        </label>
-      </div>
-    </div>
 
     <!-- 전자금융서비스 이용약관 -->
-    <div class="terms-box">
-      <h4 class="terms-title">전자금융서비스 이용약관</h4>
-      <div class="terms-content">
-        <p>
-          제1조 (목적)<br>
-          본 약관은 OO은행이 제공하는 전자금융서비스의 이용조건 및 절차 등에 관한 사항을 정함을 목적으로 합니다.<br><br>
-          제2조 (서비스 종류)<br>
-          인터넷뱅킹, 모바일뱅킹, 텔레뱅킹, 자동화기기 거래 등으로 구성됩니다.<br><br>
-          제3조 (이용시간)<br>
-          은행은 서비스별 이용시간을 정하여 홈페이지에 게시합니다.<br><br>
-          제4조 (이용자의 의무)<br>
-          이용자는 접근매체를 제3자에게 대여하거나 누설하여서는 아니됩니다.
-        </p>
+      <div class="terms-box" th:each="t : ${termsList}">
+          <h4 class="terms-title" th:text="${t.termTitle}">전자금융서비스 이용약관</h4>
+          <div class="terms-content">
+              <p th:utext="${t.termContent}">
+              </p>
+          </div>
+          <div class="terms-check">
+              <label class="custom-check">
+                  <input type="checkbox" class="term-check"
+                         th:attr="data-cate=${t.termCate}, data-order=${t.termOrder}">
+                  <span class="checkmark"></span>
+                  위 약관에 동의합니다.
+              </label>
+          </div>
       </div>
-      <div class="terms-check">
-        <label class="custom-check">
-          <input type="checkbox" class="term-check">
-          <span class="checkmark"></span>
-          위 약관에 동의합니다.
-        </label>
-      </div>
-    </div>
 
     <!-- 개인(신용)정보 수집·이용 동의서(전자금융) -->
-    <div class="terms-box">
-      <h4 class="terms-title">개인(신용)정보 수집·이용 동의서 (전자금융)</h4>
-      <div class="terms-content">
-        <p>
-          수집항목: 성명, 연락처, 계좌번호, 로그인정보 등<br>
-          이용목적: 본인확인, 거래이력 관리, 고객서비스 제공<br>
-          보유기간: 관계법령에 의한 보존기간까지<br><br>
-          고객은 개인정보 보호법에 따라 언제든 동의를 철회할 수 있습니다.
-        </p>
+      <div class="terms-box" th:each="t : ${termsList}">
+          <h4 class="terms-title" th:text="${t.termTitle}">개인(신용)정보 수집·이용 동의서 (전자금융)</h4>
+          <div class="terms-content">
+              <p th:utext="${t.termContent}">
+              </p>
+          </div>
+          <div class="terms-check">
+              <label class="custom-check">
+                  <input type="checkbox" class="term-check"
+                         th:attr="data-cate=${t.termCate}, data-order=${t.termOrder}">
+                  <span class="checkmark"></span>
+                  위 약관에 동의합니다.
+              </label>
+          </div>
       </div>
-      <div class="terms-check">
-        <label class="custom-check">
-          <input type="checkbox" class="term-check">
-          <span class="checkmark"></span>
-          위 약관에 동의합니다.
-        </label>
-      </div>
-    </div>
 
     <!-- 스타뱅킹서비스 이용 및 상품가입 동의 -->
-    <div class="terms-box">
-      <h4 class="terms-title">스타뱅킹서비스 이용 및 상품가입 동의</h4>
-      <div class="terms-content">
-        <p>
-          제1조 (목적)<br>
-          본 약관은 OO은행의 스타뱅킹 서비스 이용에 관한 기본사항을 규정합니다.<br><br>
-          제2조 (서비스 이용)<br>
-          이용자는 본인의 인증을 통해 스타뱅킹 서비스를 이용할 수 있습니다.<br><br>
-          제3조 (이용자의 의무)<br>
-          이용자는 비밀번호와 접근수단을 안전하게 관리해야 합니다.
-        </p>
+      <div class="terms-box" th:each="t : ${termsList}">
+          <h4 class="terms-title" th:text="${t.termTitle}">스타뱅킹서비스 이용 및 상품가입 동의</h4>
+          <div class="terms-content">
+              <p th:utext="${t.termContent}">
+              </p>
+          </div>
+          <div class="terms-check">
+              <label class="custom-check">
+                  <input type="checkbox" class="term-check"
+                         th:attr="data-cate=${t.termCate}, data-order=${t.termOrder}">
+                  <span class="checkmark"></span>
+                  위 약관에 동의합니다.
+              </label>
+          </div>
       </div>
-      <div class="terms-check">
-        <label class="custom-check">
-          <input type="checkbox" class="term-check">
-          <span class="checkmark"></span>
-          위 약관에 동의합니다.
-        </label>
-      </div>
-    </div>
   </section>
 
   <!-- 2️⃣ 상품 약관 동의 -->
   <section class="terms-group">
     <h3 class="group-title">상품 약관 동의</h3>
 
-    <div class="terms-box">
-      <h4 class="terms-title">예금거래기본약관</h4>
-      <div class="terms-content">
-        <p>
-          본 약관은 예금거래에 관한 기본적인 사항을 정함을 목적으로 합니다.<br><br>
-          제2조 (예금계약의 성립)<br>
-          고객의 신청과 은행의 승낙으로 예금계약이 성립됩니다.
-        </p>
+      <div class="terms-box" th:each="t : ${termsList}">
+          <h4 class="terms-title" th:text="${t.termTitle}">예금거래기본약관</h4>
+          <div class="terms-content">
+              <p th:utext="${t.termContent}">
+              </p>
+          </div>
+          <div class="terms-check">
+              <label class="custom-check">
+                  <input type="checkbox" class="term-check"
+                         th:attr="data-cate=${t.termCate}, data-order=${t.termOrder}">
+                  <span class="checkmark"></span>
+                  위 약관에 동의합니다.
+              </label>
+          </div>
       </div>
-      <div class="terms-check">
-        <label class="custom-check">
-          <input type="checkbox" class="term-check">
-          <span class="checkmark"></span>
-          위 약관에 동의합니다.
-        </label>
-      </div>
-    </div>
 
-    <div class="terms-box">
-      <h4 class="terms-title">입출금이자자유로움 약관</h4>
-      <div class="terms-content">
-        <p>
-          본 상품은 자유로운 입출금이 가능한 보통예금 상품입니다.<br>
-          이자는 일정기간의 평균잔액에 따라 계산되며, 약정일에 지급됩니다.
-        </p>
+      <div class="terms-box" th:each="t : ${termsList}">
+          <h4 class="terms-title" th:text="${t.termTitle}">입출금이자자유로움 약관</h4>
+          <div class="terms-content">
+              <p th:utext="${t.termContent}">
+              </p>
+          </div>
+          <div class="terms-check">
+              <label class="custom-check">
+                  <input type="checkbox" class="term-check"
+                         th:attr="data-cate=${t.termCate}, data-order=${t.termOrder}">
+                  <span class="checkmark"></span>
+                  위 약관에 동의합니다.
+              </label>
+          </div>
       </div>
-      <div class="terms-check">
-        <label class="custom-check">
-          <input type="checkbox" class="term-check">
-          <span class="checkmark"></span>
-          위 약관에 동의합니다.
-        </label>
-      </div>
-    </div>
 
-    <div class="terms-box">
-      <h4 class="terms-title">입출금통장 상품설명서</h4>
-      <div class="terms-content">
-        <p>
-          상품명: 입출금통장<br>
-          거래한도, 이자율, 수수료 및 기타 서비스에 대한 상세 내용은 상품설명서에서 확인하실 수 있습니다.
-        </p>
+      <div class="terms-box" th:each="t : ${termsList}">
+          <h4 class="terms-title" th:text="${t.termTitle}">입출금통장 상품설명서</h4>
+          <div class="terms-content">
+              <p th:utext="${t.termContent}">
+              </p>
+          </div>
+          <div class="terms-check">
+              <label class="custom-check">
+                  <input type="checkbox" class="term-check"
+                         th:attr="data-cate=${t.termCate}, data-order=${t.termOrder}">
+                  <span class="checkmark"></span>
+                  위 약관에 동의합니다.
+              </label>
+          </div>
       </div>
-      <div class="terms-check">
-        <label class="custom-check">
-          <input type="checkbox" class="term-check">
-          <span class="checkmark"></span>
-          위 약관에 동의합니다.
-        </label>
-      </div>
-    </div>
 
-    <div class="terms-box">
-      <h4 class="terms-title">개인(신용)정보 수집·이용 동의서 (상품서비스)</h4>
-      <div class="terms-content">
-        <p>
-          고객의 신용정보는 상품 서비스 제공 목적 외로 사용되지 않습니다.<br>
-          수집항목, 이용목적, 보유기간은 관련 법령에 따라 관리됩니다.
-        </p>
+      <div class="terms-box" th:each="t : ${termsList}">
+          <h4 class="terms-title" th:text="${t.termTitle}">개인(신용)정보 수집·이용 동의서 (상품서비스)</h4>
+          <div class="terms-content">
+              <p th:utext="${t.termContent}">
+              </p>
+          </div>
+          <div class="terms-check">
+              <label class="custom-check">
+                  <input type="checkbox" class="term-check"
+                         th:attr="data-cate=${t.termCate}, data-order=${t.termOrder}">
+                  <span class="checkmark"></span>
+                  위 약관에 동의합니다.
+              </label>
+          </div>
       </div>
-      <div class="terms-check">
-        <label class="custom-check">
-          <input type="checkbox" class="term-check">
-          <span class="checkmark"></span>
-          위 약관에 동의합니다.
-        </label>
-      </div>
-    </div>
   </section>
 
   <!-- 3️⃣ 확인 및 안내사항 -->
   <section class="terms-group">
     <h3 class="group-title">확인 및 안내사항</h3>
 
-    <div class="terms-box">
-      <h4 class="terms-title">예금주 본인확인 (스타뱅킹)</h4>
-      <div class="terms-content"><p>고객 본인의 명의와 실명확인을 위해 본인 인증 절차를 수행해야 합니다.</p></div>
-      <div class="terms-check">
-        <label class="custom-check"><input type="checkbox" class="term-check"><span class="checkmark"></span> 위 약관에 동의합니다.</label>
+      <div class="terms-box" th:each="t : ${termsList}">
+          <h4 class="terms-title" th:text="${t.termTitle}">예금주 본인확인 (스타뱅킹)</h4>
+          <div class="terms-content">
+              <p th:utext="${t.termContent}">
+              </p>
+          </div>
+          <div class="terms-check">
+              <label class="custom-check">
+                  <input type="checkbox" class="term-check"
+                         th:attr="data-cate=${t.termCate}, data-order=${t.termOrder}">
+                  <span class="checkmark"></span>
+                  위 약관에 동의합니다.
+              </label>
+          </div>
       </div>
-    </div>
 
-    <div class="terms-box">
-      <h4 class="terms-title">통장·현금카드 비대면 개설 동의</h4>
-      <div class="terms-content"><p>비대면 개설 시 본인 인증 및 고객정보 보호를 위한 절차가 적용됩니다.</p></div>
-      <div class="terms-check">
-        <label class="custom-check"><input type="checkbox" class="term-check"><span class="checkmark"></span> 위 약관에 동의합니다.</label>
+      <div class="terms-box" th:each="t : ${termsList}">
+          <h4 class="terms-title" th:text="${t.termTitle}">통장·현금카드 비대면 개설 동의</h4>
+          <div class="terms-content">
+              <p th:utext="${t.termContent}">
+              </p>
+          </div>
+          <div class="terms-check">
+              <label class="custom-check">
+                  <input type="checkbox" class="term-check"
+                         th:attr="data-cate=${t.termCate}, data-order=${t.termOrder}">
+                  <span class="checkmark"></span>
+                  위 약관에 동의합니다.
+              </label>
+          </div>
       </div>
-    </div>
 
-    <div class="terms-box">
-      <h4 class="terms-title">거래 목적 및 자금 원천 확인</h4>
-      <div class="terms-content"><p>자금세탁방지법에 따라 거래 목적 및 자금 출처 확인이 필요합니다.</p></div>
-      <div class="terms-check">
-        <label class="custom-check"><input type="checkbox" class="term-check"><span class="checkmark"></span> 위 약관에 동의합니다.</label>
+      <div class="terms-box" th:each="t : ${termsList}">
+          <h4 class="terms-title" th:text="${t.termTitle}">거래 목적 및 자금 원천 확인</h4>
+          <div class="terms-content">
+              <p th:utext="${t.termContent}">
+              </p>
+          </div>
+          <div class="terms-check">
+              <label class="custom-check">
+                  <input type="checkbox" class="term-check"
+                         th:attr="data-cate=${t.termCate}, data-order=${t.termOrder}">
+                  <span class="checkmark"></span>
+                  위 약관에 동의합니다.
+              </label>
+          </div>
       </div>
-    </div>
   </section>
 
-  <!-- 4️⃣ 금융상품의 중요사항 안내 -->
-  <section class="terms-group">
-    <h3 class="group-title">금융상품의 중요사항 안내</h3>
+    <section class="terms-group">
+        <h3 class="group-title">금융상품의 중요사항 안내</h3>
 
-    <div class="terms-box">
-      <h4 class="terms-title">우선 설명사항 [필수]</h4>
-      <div class="terms-content"><p>본 상품은 예금자보호법에 따라 보호되며, 예금보험공사가 보호합니다.</p></div>
-      <div class="terms-check">
-        <label class="custom-check"><input type="checkbox" class="term-check"><span class="checkmark"></span> 위 약관에 동의합니다.</label>
-      </div>
-    </div>
+        <div class="terms-box" th:each="t : ${termsList}">
+            <h4 class="terms-title" th:text="${t.termTitle}">우선 설명사항 [필수]</h4>
+            <div class="terms-content">
+                <p th:utext="${t.termContent}">
+                </p>
+            </div>
+            <div class="terms-check">
+                <label class="custom-check">
+                    <input type="checkbox" class="term-check"
+                           th:attr="data-cate=${t.termCate}, data-order=${t.termOrder}">
+                    <span class="checkmark"></span>
+                    위 약관에 동의합니다.
+                </label>
+            </div>
+        </div>
 
-    <div class="terms-box">
-      <h4 class="terms-title">예금상품 및 연계·제휴 서비스 [필수]</h4>
-      <div class="terms-content"><p>예금상품의 금리, 수수료, 부가서비스 등은 은행의 정책에 따라 변동될 수 있습니다.</p></div>
-      <div class="terms-check">
-        <label class="custom-check"><input type="checkbox" class="term-check"><span class="checkmark"></span> 위 약관에 동의합니다.</label>
-      </div>
-    </div>
+        <div class="terms-box" th:each="t : ${termsList}">
+            <h4 class="terms-title" th:text="${t.termTitle}">예금상품 및 연계·제휴 서비스 [필수]</h4>
+            <div class="terms-content">
+                <p th:utext="${t.termContent}">
+                </p>
+            </div>
+            <div class="terms-check">
+                <label class="custom-check">
+                    <input type="checkbox" class="term-check"
+                           th:attr="data-cate=${t.termCate}, data-order=${t.termOrder}">
+                    <span class="checkmark"></span>
+                    위 약관에 동의합니다.
+                </label>
+            </div>
+        </div>
   </section>
 
   <!-- 전체 동의 -->

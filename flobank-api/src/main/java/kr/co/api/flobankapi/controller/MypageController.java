@@ -224,7 +224,15 @@ public class MypageController {
     }
 
     @GetMapping("/en_account_open_1")
-    public String en_account_open_1() {
+    public String en_account_open_1(Model model) {
+
+        int termLocation = 6; // 6번: 외화통장개설 페이지
+
+        List<TermsHistDTO> termsList = termsService.getTermsByLocation(termLocation);
+
+        System.out.println("### termsList size = " + termsList.size());
+
+        model.addAttribute("termsList", termsList);
 
         return "mypage/en_account_open_1";
     }

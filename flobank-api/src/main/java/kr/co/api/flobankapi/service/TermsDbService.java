@@ -198,6 +198,4 @@ public class TermsDbService {
         return list;
     }
 
-
-
 }
