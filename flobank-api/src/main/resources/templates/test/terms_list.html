@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <title>약관 통합 테스트 페이지</title>
+
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background: #f5f6fa;
+            padding: 40px;
+        }
+
+        h1 {
+            font-size: 26px;
+            font-weight: 700;
+            margin-bottom: 30px;
+        }
+
+        table {
+            width: 100%;
+            background: #fff;
+            border-collapse: collapse;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+        }
+
+        th {
+            background: #4A6FA5;
+            color: #fff;
+            padding: 14px;
+            text-align: center;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            text-align: center;
+            background: #fff;
+        }
+
+        tr:hover {
+            background: #f0f6ff;
+        }
+
+        .detail-box {
+            margin-top: 30px;
+            background: #fff;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+            display: none;
+        }
+
+        .detail-title {
+            font-size: 20px;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        pre {
+            white-space: pre-wrap;
+            background: #fafafa;
+            padding: 15px;
+            border-radius: 8px;
+            line-height: 1.5;
+        }
+
+        .btn-detail {
+            padding: 5px 12px;
+            background: #4A6FA5;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .btn-detail:hover {
+            background: #3c5f8a;
+        }
+    </style>
+
+</head>
+
+<body>
+
+<h1>📄 등록된 약관 전체 목록 (상세 포함)</h1>
+
+<!-- 🔹 약관 목록 테이블 -->
+<table>
+    <thead>
+    <tr>
+        <th>카테고리</th>
+        <th>순번</th>
+        <th>제목</th>
+        <th>최신 버전</th>
+        <th>수정일</th>
+        <th>관리</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="t : ${termsList}">
+
+        <!-- 카테고리 -->
+        <td>
+        <span th:switch="${t.termCate}">
+            <span th:case="1">회원가입</span>
+            <span th:case="2">원화송금</span>
+            <span th:case="3">외화송금</span>
+            <span th:case="4">외환예금</span>
+            <span th:case="5">원화통장개설</span>
+            <span th:case="6">외화통장개설</span>
+            <span th:case="*">기타</span>
+        </span>
+        </td>
+
+        <td th:text="${t.termOrder}"></td>
+        <td th:text="${t.termTitle}"></td>
+        <td th:text="'v' + ${t.latestVersion}"></td>
+        <td th:text="${t.latestRegDy}"></td>
+
+        <td>
+            <button class="btn-detail"
+                    th:onclick="'loadDetail(' + ${t.termCate} + ',' + ${t.termOrder} + ')'">
+                상세보기
+            </button>
+        </td>
+    </tr>
+    </tbody>
+
+</table>
+
+<!-- 🔻 상세보기 박스 -->
+<div id="detailBox" class="detail-box">
+    <div class="detail-title" id="detailTitle"></div>
+    <div><b>버전:</b> <span id="detailVersion"></span></div>
+    <div><b>등록일:</b> <span id="detailDate"></span></div>
+    <div><b>등록자:</b> <span id="detailWriter"></span></div>
+
+    <h3 style="margin-top:20px;">약관 내용</h3>
+    <pre id="detailContent"></pre>
+</div>
+
+<script>
+    /* 🔥 AJAX로 상세 내용 로딩 */
+    function loadDetail(cate, order) {
+
+        fetch(`/flobank/test/terms/detail/json?cate=` + cate + "&order=" + order)
+            .then(res => res.json())
+            .then(data => {
+
+                document.getElementById("detailTitle").innerText = data.thistTitle ?? "(제목 없음)";
+                document.getElementById("detailVersion").innerText = data.thistVersion;
+                document.getElementById("detailDate").innerText = data.thistRegDy;
+                document.getElementById("detailWriter").innerText = data.thistAdminId;
+                document.getElementById("detailContent").innerText = data.thistContent;
+
+                document.getElementById("detailBox").style.display = 'block';
+            })
+            .catch(err => alert("상세 정보를 불러오지 못했습니다."));
+    }
+
+</script>
+
+</body>
+</html>

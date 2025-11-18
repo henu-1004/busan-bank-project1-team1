@@ -5,16 +5,11 @@
 
 <mapper namespace="kr.co.api.flobankapi.mapper.admin.ProductMapper">
 
-    <insert id="insertProduct" parameterType="kr.co.api.flobankapi.dto.ProductDTO">
-
-        <selectKey keyProperty="dpstId" resultType="string" order="AFTER">
-            SELECT dpst_id
-            FROM TB_DPST_PROD_INFO
-            WHERE ROWID = (
-            SELECT MAX(ROWID)
-            FROM TB_DPST_PROD_INFO
-            )
-        </selectKey>
+    <insert id="insertProduct"
+            parameterType="kr.co.api.flobankapi.dto.ProductDTO"
+            useGeneratedKeys="true"
+            keyProperty="dpstId"
+            keyColumn="dpst_id">
 
         INSERT INTO TB_DPST_PROD_INFO (
         dpst_name,
@@ -41,7 +36,6 @@
         #{dpstType},
         #{dpstCurrency},
         #{dpstRateType},
-
         #{dpstMinYn, jdbcType=INTEGER},
         #{dpstMaxYn, jdbcType=INTEGER},
         #{dpstStatus},
@@ -52,35 +46,34 @@
         #{dpstAutoRenewYn},
         #{dpstAddPayYn},
         #{dpstAddPayMax, jdbcType=INTEGER},
-
         #{dpstPartWdrwYn},
         #{dpstRegDt},
         #{dpstInfoPdf}
         )
     </insert>
 
-
-    <insert id="insertProductLimits">
-        <foreach collection="limits" item="l" separator=";">
-            INSERT INTO TB_DPST_AMT_LMT (
-            lmt_dpst_id,
-            lmt_currency,
-            lmt_min_amt,
-            lmt_max_amt
-            )
-            VALUES (
+    <insert id="insertProductLimits" parameterType="map">
+        INSERT INTO TB_DPST_AMT_LMT (
+        lmt_dpst_id,
+        lmt_currency,
+        lmt_min_amt,
+        lmt_max_amt
+        )
+        <foreach collection="limits" item="l" separator="UNION ALL">
+            SELECT
             #{dpstId},
             #{l.lmtCurrency},
             #{l.lmtMinAmt},
             #{l.lmtMaxAmt}
-            )
+            FROM dual
         </foreach>
     </insert>
 
 
 
-    <insert id="insertProductPeriods" parameterType="java.util.List">
-        INSERT INTO TB_DPST_PROD_PERIOD (
+
+
+    <insert id="insertProductPeriods" parameterType="java.util.Map"> INSERT INTO TB_DPST_PROD_PERIOD (
         period_min_month,
         period_max_month,
         period_fixed_month,
@@ -91,8 +84,7 @@
             #{p.minMonth, jdbcType=INTEGER},
             #{p.maxMonth, jdbcType=INTEGER},
             #{p.fixedMonth, jdbcType=INTEGER},
-            #{p.dpstId}
-            FROM dual
+            #{dpstId, jdbcType=VARCHAR}  FROM dual
         </foreach>
     </insert>
 
@@ -110,16 +102,14 @@
     </insert>
 
 
-    <insert id="insertWithdrawalAmounts" parameterType="java.util.List">
-        INSERT INTO TB_DPST_PARTIAL_WDRW_AMT (
+    <insert id="insertWithdrawalAmounts" parameterType="java.util.Map"> INSERT INTO TB_DPST_PARTIAL_WDRW_AMT (
         amt_dpst_id,
         amt_currency,
         amt_min
         )
         <foreach collection="list" item="a" separator="UNION ALL">
             SELECT
-            #{a.dpstId},
-            #{a.currency},
+            #{dpstId, jdbcType=VARCHAR}, #{a.currency},
             #{a.minAmt}
             FROM dual
         </foreach>
@@ -188,6 +178,19 @@
         WHERE LMT_DPST_ID = #{dpstId}
 
     </select>
+
+
+    <!-- 상품 자동 업데이트 !-->
+    <update id="updateStatusToOpened">
+        UPDATE TB_DPST_PROD_INFO
+        SET dpst_status = 3
+        WHERE dpst_status = 2
+        AND dpst_reg_dt &lt;= TRUNC(SYSDATE)
+    </update>
+
+
+
+
 
 
 

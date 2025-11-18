@@ -30,6 +30,11 @@ spring:
           ssl:
             trust: smtp.gmail.com
 
+  redis:
+    host: redis
+    port: 6379
+
+
 flobank:
   ap:
     host: 34.64.225.88
@@ -68,3 +73,6 @@ pinecone:
   index-host: https://bank-db-46fp8tb.svc.aped-4627-b74a.pinecone.io
   index-name: bank-db
 
+deepl:
+  api:
+    key: 3df6a572-c72c-4544-8cd2-c5bfd6a27b53:fx

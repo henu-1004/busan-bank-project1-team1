@@ -162,8 +162,21 @@
                 <td th:text="${product.dpstPartWdrwYn == 'Y' ? '가능' : '불가능'}"></td>
             </tr>
 
-            <!-- 최소 출금 금액 (통화별) — 조건부 렌더링 -->
-            <tr th:if="${product.dpstPartWdrwYn == 'Y'}">
+            <tr th:if="${product.dpstPartWdrwYn == 'Y' and withdrawRule != null}">
+                <th>분할 인출 가능 시점</th>
+                <td th:text="${withdrawRule.minMonths} + '개월 이후'"></td>
+            </tr>
+
+            <tr th:if="${product.dpstPartWdrwYn == 'Y' and withdrawRule != null}">
+                <th>최대 인출 가능 횟수</th>
+                <td th:text="${withdrawRule.maxCount} + '회'"></td>
+            </tr>
+
+            <!-- 최소 출금 금액: 예치식 + 분할인출 Y + 실제 데이터 있을 때 -->
+            <tr th:if="${product.dpstType == 1
+            and product.dpstPartWdrwYn == 'Y'
+            and withdrawAmts != null
+            and #lists.size(withdrawAmts) > 0}">
                 <th>최소 출금 금액</th>
                 <td>
                     <span th:each="w, stat : ${withdrawAmts}">
@@ -172,6 +185,7 @@
                     </span>
                 </td>
             </tr>
+
 
 
             </tbody>
