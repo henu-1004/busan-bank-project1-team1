@@ -409,7 +409,7 @@
         const form = new FormData();
         form.append("file", input.files[0]);
 
-        const res = await fetch("/admin/pdf-ai/upload", {
+        const res = await fetch("/flobank/admin/pdf-ai/upload", {
             method: "POST",
             body: form
         });
@@ -428,7 +428,7 @@
     // PDF 목록 조회
     // ==========================
     async function loadPdfList() {
-        const res = await fetch("/admin/pdf-ai/list");
+        const res = await fetch("/flobank/admin/pdf-ai/list");
         const list = await res.json();
 
         const body = document.getElementById("pdfListBody");
