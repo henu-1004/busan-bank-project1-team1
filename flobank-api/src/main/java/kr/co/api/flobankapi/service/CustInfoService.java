@@ -21,6 +21,10 @@ public class CustInfoService {
     private final JwtTokenProvider jwtTokenProvider;
     private final MemberMapper memberMapper;
 
+    public void saveLastLogin(String custId) {
+        memberMapper.insertLastLogin(custId);
+    }
+
     /*
       회원가입 처리
      */

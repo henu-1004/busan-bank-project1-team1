@@ -115,6 +115,8 @@ public class MemberController {
             loginFlag.setMaxAge(3600);
             response.addCookie(loginFlag);
 
+            custInfoService.saveLastLogin(custInfoDTO.getCustId());
+
             return "redirect:/"; // 메인으로 이동
         }else {
             return "redirect:/member/login?error"; // 로그인 실패

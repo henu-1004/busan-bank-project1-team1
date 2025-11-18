@@ -4,14 +4,13 @@
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="kr.co.api.flobankapi.mapper.MemberMapper" >
+    <select id="findByCodeCustInfo">
+        select * from tb_cust_info where cust_code = #{custCode}
+    </select>
+
     <select id="findByIdCustInfo">
         select * from tb_cust_info where cust_id = #{custId}
     </select>
-
-    <select id="">
-        SELECT COUNT(*) FROM TB_CUST_INFO WHERE CUST_ID = #{custId}
-    </select>
-
 
     <insert id="registerCustInfo" parameterType="kr.co.api.flobankapi.dto.CustInfoDTO">
         INSERT INTO
@@ -19,5 +18,10 @@
         VALUES(#{custId}, #{custPw}, #{custName}, #{custJumin}, #{custEmail}, #{custHp}, #{custBirthDt}, #{custGen}, #{custEngName}, #{custZip}, #{custAddr1}, #{custAddr2}, SYSDATE)
     </insert>
 
+    <update id="insertLastLogin">
+        UPDATE TB_CUST_INFO
+        SET CUST_LAST_LOGIN_DT = sysdate
+        WHERE CUST_ID = #{custId}
+    </update>
 
 </mapper>

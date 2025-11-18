@@ -1,125 +1,144 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>외화 계좌개설2</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>외화 계좌개설2</title>
     <link rel="stylesheet" th:href="@{/css/mypage.css}">
     <link rel="stylesheet" th:href="@{/css/header.css}">
     <link rel="stylesheet" th:href="@{/css/footer.css}">
 
     <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-    crossorigin="anonymous"
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+            crossorigin="anonymous"
     />
 
 </head>
 <body>
 <div th:replace="~{_template/_header.html}"></div>
 
+<form id="enAccountOpenForm" th:action="@{/mypage/en_account_open_2}" method="post" th:object="${custFrgnAcctDTO}">
+    <main class="open2-account-container" th:data-phone-number="${custInfoDTO.custHp}">
+        <div class="open2-account-box">
 
-<main class="open2-account-container">
-  <div class="open2-account-box">
-    <h2>외화 입출금 통장 개설</h2>
-    <p class="desc">
-      이제 하나의 계좌로 달러부터 유로까지, 전 세계 주요 통화를 함께 관리하세요.<br>
-      USD·JPY·EUR·CNY·GBP·AUD 6개 통화가 자동으로 개설되어, 환전과 송금이 더욱 간편해집니다.
-    </p>
+            <input type="hidden" name="acctCustCode" th:value="${custInfoDTO.custCode}" />
 
-    <!-- ✅ 1. 고객 기본정보 -->
-    <section class="open2-user-info-section">
+            <h2>외화 입출금 통장 개설</h2>
+            <p class="desc">
+                이제 하나의 계좌로 달러부터 유로까지, 전 세계 주요 통화를 함께 관리하세요.<br>
+                USD·JPY·EUR·CNY·GBP·AUD 6개 통화가 자동으로 개설되어, 환전과 송금이 더욱 간편해집니다.
+            </p>
 
-      <div class="open2-form-group">
-        <label class="open2-form-label">휴대폰 번호</label>
-        <input type="text" class="open2-form-input readonly" value="010-1234-5678" readonly>
-      </div>
-    </section>
+            <section class="open2-user-info-section">
+                <div class="open2-form-group">
+                    <label class="open2-form-label">휴대폰 번호</label>
+                    <input type="text" class="open2-form-input readonly" th:value="${custInfoDTO.custMaskHp}" readonly>
+                </div>
+            </section>
 
-    <!--  4. 휴대폰 인증 -->
-    <section class="open2-verify-section">
-      <div class="open2-form-group">
-        <label class="open2-form-label">휴대폰 인증</label>
-        <div class="open2-verify-box">
-          <input type="text" class="open2-form-input short" placeholder="인증번호 입력">
-          <button class="open2-btn-verify">인증요청</button>
+            <section class="open2-verify-section">
+                <div class="open2-form-group">
+                    <label class="open2-form-label">휴대폰 인증</label>
+                    <div class="open2-verify-box">
+                        <input type="text" class="open2-form-input short js-verify-code-input" id="enAcctVerifyCodeInput" placeholder="인증번호 입력">
+                        <button type="button" class="open2-btn-verify js-btn-send-code" id="enAcctBtnSendCode">인증요청</button>
+                        <button type="button" id="enAcctBtnVerifyCode" class="register-btn js-btn-verify-code" style="display:none;">확인</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4-1. 통화 선택 -->
+            <section class="open2-currency-section">
+                <div class="open2-form-group">
+                    <label class="open2-form-label">통화 선택</label>
+                    <div class="open2-currency-box">
+                        <label><input type="checkbox" checked disabled> 달러 (USD)</label>
+                        <label><input type="checkbox" checked disabled> 엔화 (JPY)</label>
+                        <label><input type="checkbox" checked disabled> 유로 (EUR)</label>
+                        <label><input type="checkbox" checked disabled> 위안화 (CNY)</label>
+                        <label><input type="checkbox" checked disabled> 파운드 (GBP)</label>
+                        <label><input type="checkbox" checked disabled> 호주달러 (AUD)</label>
+                    </div>
+                    <p class="open2-guide-text open2-currency-guide">
+                        모든 주요 통화 계좌가 자동으로 생성됩니다.
+                    </p>
+                </div>
+            </section>
+
+            <section class="open2-cdd-section">
+                <div class="open2-form-group">
+                    <label class="open2-form-label" for="cddPurpose">거래 목적 (필수)</label>
+                    <select id="cddPurpose" th:field="*{frgnPurpose}" class="open2-form-input">
+                        <option value="">거래 목적을 선택하세요</option>
+                        <option value="급여 및 생활비">급여 및 생활비</option>
+                        <option value="저축 및 투자">저축 및 투자</option>
+                        <option value="사업 목적">사업 목적</option>
+                        <option value="공과금 및 대출 상환">공과금 및 대출 상환</option>
+                        <option value="친목회비 및 용돈">친목회비 및 용돈</option>
+                        <option value="6">기타</option>
+                    </select>
+                </div>
+                <div class="open2-form-group">
+                    <label class="open2-form-label" for="cddSource">자금 출처 (필수)</label>
+                    <select id="cddSource" th:field="*{frgnAcctFundSource}" class="open2-form-input">
+                        <option value="">자금 출처를 선택하세요</option>
+                        <option value="근로 및 연금 소득">근로 및 연금 소득</option>
+                        <option value="사업 소득">사업 소득</option>
+                        <option value="재산 소득 (이자, 배당 등)">재산 소득 (이자, 배당 등)</option>
+                        <option value="저축 및 투자">저축 및 투자</option>
+                        <option value="상속 및 증여">상속 및 증여</option>
+                        <option value="6">기타</option>
+                    </select>
+                </div>
+            </section>
+
+            <!-- 2. 외화 이체 한도 설정 -->
+            <section class="open2-limit-section">
+                <div class="open2-form-group">
+                    <label class="open2-form-label">1일 이체한도</label>
+                    <div class="open2-limit-box">
+                        <input type="text" class="open2-form-input readonly" id="daily-limit" th:value="|${custInfoDTO.custName}님의 1일 이체 한도는 ${dayTrsfLmt}입니다.|" readonly>
+                        <span class="currency-label">USD</span>
+                    </div>
+                </div>
+
+                <div class="open2-form-group">
+                    <label class="open2-form-label">1회 이체한도</label>
+                    <div class="open2-limit-box">
+                        <input type="text" class="open2-form-input readonly" id="once-limit" th:value="|${custInfoDTO.custName}님의 1회 이체 한도는 ${onceTrsfLmt}입니다.|" readonly>
+                        <span class="currency-label">USD</span>
+                    </div>
+                </div>
+
+                <div class="open2-info-box">
+                    <p style="color: red; font-weight: 600;">
+                        ※ 외화 계좌의 이체 한도는 달러 기준으로 적용됩니다.
+                    </p>
+                </div>
+            </section>
+
+            <section class="open2-password-section">
+                <div class="open2-form-group">
+                    <label class="open2-form-label">계좌 비밀번호</label>
+                    <input type="password" class="open2-form-input" maxlength="4" placeholder="숫자 4자리 입력" id="enAcctPw" th:field="*{frgnAcctPw}">
+                    <p class="open2-guide-text">입력하신 비밀번호는 이체 및 출금 시 사용됩니다.</p>
+                </div>
+
+                <div class="open2-form-group">
+                    <label class="open2-form-label">계좌 비밀번호 확인</label>
+                    <input type="password" class="open2-form-input" maxlength="4" placeholder="비밀번호 재입력" id="enAcctPwConfirm">
+                    <div id="enPwMatchMessage" class="open2-guide-text" style="font-weight: 600;"></div>
+                </div>
+            </section>
+
+            <div class="open2-form-actions">
+                <button type="submit" class="open2-btn-next">완료</button>
+            </div>
         </div>
-      </div>
-    </section>
-
-    <!-- 4-1. 통화 선택 -->
-    <section class="open2-currency-section">
-      <div class="open2-form-group">
-        <label class="open2-form-label">통화 선택</label>
-        <div class="open2-currency-box">
-          <label><input type="checkbox" checked disabled> 달러 (USD)</label>
-          <label><input type="checkbox" checked disabled> 엔화 (JPY)</label>
-          <label><input type="checkbox" checked disabled> 유로 (EUR)</label>
-          <label><input type="checkbox" checked disabled> 위안화 (CNY)</label>
-          <label><input type="checkbox" checked disabled> 파운드 (GBP)</label>
-          <label><input type="checkbox" checked disabled> 호주달러 (AUD)</label>
-        </div>
-        <p class="open2-guide-text open2-currency-guide">
-          모든 주요 통화 계좌가 자동으로 생성됩니다.
-        </p>
-      </div>
-    </section>
-
-
-
-
-    <!--  2. 외화 이체 한도 설정 -->
-    <section class="open2-limit-section">
-      <div class="open2-form-group">
-        <label class="open2-form-label">1일 이체한도</label>
-        <div class="open2-limit-box">
-          <input type="text" class="open2-limit-input" id="daily-limit" value="10,000">
-          <span class="currency-label">USD</span>
-          <button class="open2-btn-limit">최대</button>
-        </div>
-        <p class="open2-guide-text">최소 100 USD ~ 최대 50,000 USD 이내 수정 가능</p>
-      </div>
-
-      <div class="open2-form-group">
-        <label class="open2-form-label">1회 이체한도</label>
-        <div class="open2-limit-box">
-          <input type="text" class="open2-limit-input" id="once-limit" value="1,000">
-          <span class="currency-label">USD</span>
-          <button class="open2-btn-limit">최대</button>
-        </div>
-        <p class="open2-guide-text">최소 100 USD ~ 최대 10,000 USD 이내</p>
-      </div>
-
-    <div class="open2-info-box">
-      <p style="color: red; font-weight: 600;">
-        ※ 외화 계좌의 이체 한도는 달러 기준으로 적용됩니다.
-      </p>
-    </div>
-    </section>
-
-    <!--  3. 계좌 비밀번호 -->
-    <section class="open2-password-section">
-      <div class="open2-form-group">
-        <label class="open2-form-label">계좌 비밀번호</label>
-        <input type="password" class="open2-form-input" maxlength="4" placeholder="숫자 4자리 입력">
-        <p class="open2-guide-text">입력하신 비밀번호는 이체 및 출금 시 사용됩니다.</p>
-      </div>
-
-      <div class="open2-form-group">
-        <label class="open2-form-label">계좌 비밀번호 확인</label>
-        <input type="password" class="open2-form-input" maxlength="4" placeholder="비밀번호 재입력">
-      </div>
-    </section>
-
-        <!--  5. 다음 버튼 -->
-      <div class="open2-form-actions">
-          <button type="submit" class="open2-btn-next">완료</button>
-      </div>
-  </div>
-</main>
-<div th:replace="~{_template/_footer.html}"></div>
-<script src ="/static/js/mypage.js"></script>
+    </main>
+</form> <div th:replace="~{_template/_footer.html}"></div>
+<script th:src="@{/js/mypage.js}"></script>
 
 </body>
 </html>
-

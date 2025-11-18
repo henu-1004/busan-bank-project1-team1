@@ -68,18 +68,48 @@
 
             <div class="account-body">
                 <table class="account-table">
+                    <!-- 테이블 헤더 -->
+                    <thead>
                     <tr>
                         <th>계좌명</th>
                         <th>계좌번호</th>
                         <th>잔액</th>
                         <th>이체</th>
                     </tr>
-                    <tr>
-                        <td>자유저축예금</td>
-                        <td><button class="account-link">112-2188-1931-00</button></td>
-                        <td>2,450,000원</td>
-                        <td><button class="btn-transfer">이체</button></td>
+                    </thead>
+                    <tbody>
+                    <!-- 1. 원화 계좌 목록 (List) 반복 -->
+                    <tr th:each="acct : ${custAcctDTOList}">
+                        <td th:text="${acct.getAcctName()}">FLO 입출금통장1</td>
+                        <td>
+                            <button class="account-link" th:text="${acct.getAcctNo()}">112-2188-1931-00</button>
+                        </td>
+                        <!-- #numbers.formatInteger로 콤마(,) 추가 -->
+                        <td th:text="|${#numbers.formatInteger(acct.getAcctBalance(), 0, 'COMMA')}원|">2,450,000원</td>
+                        <td>
+                            <a th:href="@{/mypage/ko_transfer_1}" class="btn-transfer">이체</a>
+                        </td>
                     </tr>
+
+                    <!-- 2. 외화 계좌 (단일 객체) 표시 (null이 아닐 경우) -->
+                    <tr th:if="${custFrgnAcctDTO != null}">
+                        <td th:text="${custFrgnAcctDTO.getFrgnAcctName()}">FLO 외화통장</td>
+                        <td>
+                            <button class="account-link" th:text="${custFrgnAcctDTO.getFrgnAcctNo()}">112-5566-1823-00</button>
+                        </td>
+                        <td ><a>상세 확인</a></td>
+                        <td>
+                            <a th:href="@{/remit/en_transfer_1}" class="btn-transfer">이체</a>
+                        </td>
+                    </tr>
+
+                    <!-- 3. (선택) 계좌가 하나도 없을 경우 -->
+                    <tr th:if="${#lists.isEmpty(custAcctDTOList) && custFrgnAcctDTO == null}">
+                        <td colspan="4" style="text-align: center; padding: 20px;">
+                            보유 중인 입출금 계좌가 없습니다.
+                        </td>
+                    </tr>
+                    </tbody>
                 </table>
             </div>
         </div>
@@ -400,7 +430,7 @@
 </div>
 
 <div th:replace="~{_template/_footer.html}"></div>
-        <script th:src="@{/js/user.js}"></script>
+<script th:src="@{/js/user.js}"></script>
 
 </body>
 </html>

@@ -10,6 +10,11 @@
         values(#{acctPw}, sysdate, #{acctCustCode}, #{acctFundSource}, #{acctPurpose})
     </insert>
 
+    <insert id="insertFrgnAcct" parameterType="kr.co.api.flobankapi.dto.CustFrgnAcctDTO">
+        INSERT INTO TB_CUST_FRGN_ACCT(FRGN_ACCT_PW, FRGN_ACCT_REG_DT, FRGN_ACCT_CUST_ENG_NAME, FRGN_ACCT_CUST_CODE, FRGN_ACCT_FUND_SOURCE, FRGN_PURPOSE)
+        values(#{frgnAcctPw}, sysdate, #{frgnAcctCustEngName}, #{frgnAcctCustCode}, #{frgnAcctFundSource}, #{frgnPurpose})
+    </insert>
+
     <select id="selectCustInfo">
         select *
         from tb_cust_info
@@ -24,5 +29,20 @@
     <select id="selectCheckCntKoAcct">
         SELECT count(*) from TB_CUST_ACCT
         WHERE ACCT_CUST_CODE = #{custCode}
+    </select>
+
+    <select id="selectCheckCntEnAcct">
+        SELECT COUNT(*) FROM TB_CUST_FRGN_ACCT WHERE FRGN_ACCT_CUST_CODE = #{custCode}
+    </select>
+    
+    <select id="selectAllKoAcct">
+        SELECT * FROM TB_CUST_ACCT
+        WHERE ACCT_CUST_CODE = #{custCode}
+        ORDER BY ACCT_REG_DT
+    </select>
+
+    <select id="selectFrgnAcct">
+        SELECT * FROM TB_CUST_FRGN_ACCT
+        WHERE FRGN_ACCT_CUST_CODE = #{custCode}
     </select>
 </mapper>
