@@ -38,16 +38,20 @@ public class TranslationService {
 
         System.out.println(" DeepL API 호출...");
 
-        // DeepL API 요청 Body
-        Map<String, String> body = Map.of(
-                "auth_key", deepLApiKey,
-                "text", text,
+        // ------------------ [수정 시작] ------------------
+
+        // ✅ 1. DeepL API 요청 Body (스펙에 맞게 수정)
+        Map<String, Object> body = Map.of(
+                // "auth_key" 필드 제거
+                "text", List.of(text), // 🚨 text를 List<String>으로 변경
                 "target_lang", targetLang.toUpperCase()
         );
 
         // DeepL 호출
         String translated = webClient.post()
                 .uri("/translate")
+                // ✅ 2. 인증 키를 Body가 아닌 Header로 전송
+                .header("Authorization", "DeepL-Auth-Key " + deepLApiKey)
                 .bodyValue(body)
                 .retrieve()
                 .bodyToMono(Map.class)
@@ -56,6 +60,9 @@ public class TranslationService {
                     return t.get(0).get("text");
                 })
                 .block();
+
+        // ------------------ [수정 끝] ------------------
+
 
         // Redis에 캐시 저장 (12시간 유지)
         redisTemplate.opsForValue().set(cacheKey, translated, 12, TimeUnit.HOURS);
