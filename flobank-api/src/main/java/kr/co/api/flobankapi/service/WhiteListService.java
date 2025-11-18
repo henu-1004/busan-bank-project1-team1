@@ -1,0 +1,195 @@
+package kr.co.api.flobankapi.service;
+
+import kr.co.api.flobankapi.dto.ProductDTO;
+import kr.co.api.flobankapi.mapper.WhiteListMapper;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Service
+@Slf4j
+@RequiredArgsConstructor
+public class WhiteListService {
+    private final WhiteListMapper whiteListMapper;
+/*
+    public String queryAndFormat(String templateName) {
+
+        return switch (templateName) {
+            case "formatDepositProd" -> {
+
+                List<String> list = whiteListMapper.dpstIdList();
+                List<ProductDTO> dtoList = new ArrayList<>();
+                for (String dpstId : list) {
+                    dtoList = whiteListMapper.dpstAllInfo(dpstId);
+                }
+
+
+                yield formatDepositProd(dtoList);
+            }
+
+            default -> "";
+        };
+    }
+
+
+    private String formatDepositProd(List<ProductDTO> dtoList) {
+
+        String dpstId = dtoList.get(0).getDpstId();
+        String dpstName = dtoList.get(0).getDpstName();
+        String dpstInfo = dtoList.get(0).getDpstInfo();
+        String dpstType;
+        if (dtoList.get(0).getDpstType() == 1){
+            dpstType = "거치식 예금";
+        }else {
+            dpstType = "자유적립식 예금";
+        }
+        String dpstCurrency = dtoList.get(0).getDpstCurrency();
+        String dpstRateType;
+        if (dtoList.get(0).getDpstRateType() == 1){
+            dpstRateType = "가입시점환율형";
+        }else {
+            dpstRateType = "만기시점환율형";
+        }
+        String dpstDescript =  dtoList.get(0).getDpstDescript();
+        String dpstMinAge;
+        String dpstMaxAge;
+        if (dtoList.get(0).getDpstMinAge() == null){
+            dpstMinAge = "최소 나이 제한 없음";
+        }else{
+            dpstMinAge = String.valueOf(dtoList.get(0).getDpstMinAge())+"세";
+        }
+        if (dtoList.get(0).getDpstMaxAge() == null){
+            dpstMaxAge = "최대 나이 제한 없음";
+        }else{
+            dpstMaxAge = String.valueOf(dtoList.get(0).getDpstMaxAge())+"세";
+        }
+        String dpstAutoRenewYn;
+        if (dtoList.get(0).getDpstAutoRenewYn().equals("Y")){
+            dpstAutoRenewYn = "가능";
+        }else {
+            dpstAutoRenewYn = "불가능";
+        }
+        String dpstAddPay;
+        if (dtoList.get(0).getDpstAddPayYn().equals("Y")){
+            dpstAddPay = "가능, 추가납입 최대 "+dtoList.get(0).getDpstAddPayMax()+"회";
+        }else{
+            dpstAddPay = "불가능";
+        }
+        String dpstRegDt = dtoList.get(0).getDpstRegDt().toString();
+
+        String dpstAge;
+        if (dtoList.get(0).getDpstMinAge() == null && dtoList.get(0).getDpstMaxAge() == null){
+            dpstAge = "제한 없음";
+        }else if (dtoList.get(0).getDpstMinAge() == null){
+            dpstAge =  "만 " + dtoList.get(0).getDpstMaxAge()+"세 이하";
+        }else if (dtoList.get(0).getDpstMaxAge() == null){
+            dpstAge = "만 " + dtoList.get(0).getDpstMinAge()+"세 이상";
+        }else {
+            dpstAge = "만 " + dtoList.get(0).getDpstMinAge()+"세 이상, 만 "+dtoList.get(0).getDpstMaxAge()+"세 이하";
+        }
+
+        String dpstPeriod;
+        if (dtoList.get(0).getDpstPeriodType()==1){
+            dpstPeriod = dtoList.get(0).getPeriodMinMonth()+"개월 ~ "+dtoList.get(0).getPeriodMaxMonth() +"개월";
+        }else {
+            dpstPeriod = dtoList.get(0).getPeriodFixedMonth() + "";
+            int fixed = dtoList.get(0).getPeriodFixedMonth();
+            for (ProductDTO d : dtoList){
+                if (d.getPeriodFixedMonth() != fixed){
+                    dpstPeriod = dpstPeriod + ", " + d.getPeriodFixedMonth();
+                    fixed = d.getPeriodFixedMonth();
+                }
+            }
+            dpstPeriod = dpstPeriod + "개월";
+        }
+
+        String dpstPartWdrw;
+        if (dtoList.get(0).getDpstPartWdrwYn().equals("N")){
+            dpstPartWdrw = "불가능";
+        }else {
+            dpstPartWdrw = "최소" + dtoList.get(0).getWdrwMinMonth()+"개월 이상 예치된 계좌, 최대 "+dtoList.get(0).getWdrwMax()+"회";
+            String cur = dtoList.get(0).getAmtCurrency();
+            dpstPartWdrw = dpstPartWdrw + " (통화별 최소인출금액 : " + cur +" "+ dtoList.get(0).getAmtMin();
+            for (ProductDTO d : dtoList){
+                if (!d.getAmtCurrency().equals(cur)){
+                    dpstPartWdrw = dpstPartWdrw + ", " + d.getAmtCurrency() + " "+ d.getAmtMin();
+                    cur = d.getAmtCurrency();
+
+                }
+            }
+            dpstPartWdrw = dpstPartWdrw + ")";
+        }
+
+        String lcur = dtoList.get(0).getLmtCurrency();
+        String moneyLimit = "";
+        if (dtoList.get(0).getDpstMinYn().equals("Y") && dtoList.get(0).getDpstMaxYn().equals("Y")){
+            moneyLimit = "(최소 "+dtoList.get(0).getLmtMinAmt()+" "+lcur+", 최대 "+dtoList.get(0).getLmtMaxAmt()+" "+lcur;
+            for (ProductDTO d : dtoList){
+                if (!d.getLmtCurrency().equals(lcur)){
+                    lcur = d.getLmtCurrency();
+                    moneyLimit = moneyLimit +"/ 최소"+ d.getLmtMinAmt() + " "+lcur+ ", 최대 " + d.getLmtMaxAmt() + " " + lcur;
+                }
+            }
+            moneyLimit = moneyLimit + ")";
+        }else if (dtoList.get(0).getDpstMinYn().equals("Y")) {
+            moneyLimit = "최대 금액 없음, (최소 "+dtoList.get(0).getLmtMinAmt()+" "+lcur;
+            for (ProductDTO d : dtoList){
+                if (!d.getLmtCurrency().equals(lcur)){
+                    lcur = d.getLmtCurrency();
+                    moneyLimit = moneyLimit +"/ 최소"+ d.getLmtMinAmt() + " "+lcur;
+                }
+            }
+            moneyLimit = moneyLimit + ")";
+        }else if (dtoList.get(0).getDpstMaxYn().equals("Y")) {
+            moneyLimit = "최소 금액 없음, (최대 "+dtoList.get(0).getLmtMaxAmt()+" "+lcur;
+            for (ProductDTO d : dtoList){
+                if (!d.getLmtCurrency().equals(lcur)){
+                    lcur = d.getLmtCurrency();
+                    moneyLimit = moneyLimit +"/ 최대 " + d.getLmtMaxAmt() + " " + lcur;
+                }
+            }
+            moneyLimit = moneyLimit + ")";
+        }else {
+            moneyLimit = "없음";
+        }
+
+
+
+
+        return """
+        [예금상품 정보]
+        예금 이름 : %s
+        예금 개요 : %s
+        예금 타입 : %s
+        적용 통화 : %s
+        환율 적용 타입 : %s
+        최소/최대 금액 제한 : %s
+        가입 기간 : %s
+        상품 설명 : %s
+        분할 인출 : %s
+        나이 제한 : %s
+        자동 갱신 : %s
+        추가 납입 : %s
+        상품 개시일자 : %s
+        """.formatted(
+                dpstName,
+                dpstInfo,
+                dpstType,
+                dpstCurrency,
+                dpstRateType,
+                moneyLimit,
+                dpstPeriod,
+                dpstDescript,
+                dpstPartWdrw,
+                dpstAge,
+                dpstAutoRenewYn,
+                dpstAddPay,
+                dpstRegDt
+        );
+    }
+
+ */
+}
