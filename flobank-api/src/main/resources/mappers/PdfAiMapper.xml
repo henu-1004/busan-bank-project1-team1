@@ -6,7 +6,7 @@
 <mapper namespace="kr.co.api.flobankapi.mapper.PdfAiMapper">
 
     <!-- 1) Insert -->
-    <insert id="insertPdf" useGeneratedKeys="true" keyProperty="pdfId">
+    <insert id="insertPdf" parameterType="kr.co.api.flobankapi.dto.PdfAiDTO">
         INSERT INTO TB_PDF_AI (
             ORG_FILE_NAME,
             STORED_FILE_NAME,
@@ -18,7 +18,9 @@
                      #{filePath},
                      #{status}
                  )
+            RETURNING PDF_ID INTO #{pdfId}
     </insert>
+
 
     <!-- 2) 상태별 조회 -->
     <select id="findByStatus" resultType="kr.co.api.flobankapi.dto.PdfAiDTO">
