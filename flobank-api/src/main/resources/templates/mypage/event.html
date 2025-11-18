@@ -1,48 +1,57 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>출석이벤트</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>출석이벤트</title>
     <link rel="stylesheet" th:href="@{/css/mypage.css}">
     <link rel="stylesheet" th:href="@{/css/header.css}">
     <link rel="stylesheet" th:href="@{/css/footer.css}">
-
-    <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-    crossorigin="anonymous"
-    />
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous"/>
 </head>
 <body>
 <div th:replace="~{_template/_header.html}"></div>
 
-  <!--  출석 이벤트 본문 -->
-  <main>
+<main>
     <div class="eventpage-container">
-    <!-- 상단 배너 -->
-    <img src="/static/images/event1.png" alt="FlowBank 출석이벤트 배너" class="eventpage-banner">
 
-    <!-- 이벤트 설명 -->
-    <p class="eventpage-desc">
-    2주 연속 출석 시 <strong>환전 수수료 우대쿠폰</strong> 지급 🎁<br>
-    매일 출석할 때마다 <span class="eventpage-highlight">10%~100% 랜덤 쿠폰</span>의 기회!<br>
-    꾸준히 참여하고 <strong>최대 100% 환전 수수료 우대 쿠폰</strong>을 받아보세요 🐬
-    </p>
+        <div id="eventData"
+             style="display: none;"
+             th:data-join-date="${joinDate}"
+             th:data-attendance-list="${#strings.listJoin(attendanceList, ',')}"
+             th:data-message="${message}"
+             th:data-has-attended="${hasAttendedToday}"
+             th:data-is-goal-reached="${isGoalReached}"
+             th:data-has-coupon="${hasCoupon}"
 
-    <!-- 출석칸 -->
-    <div class="eventpage-grid" id="attendanceGrid">
-        <!-- JS에서 자동으로 14칸 생성 -->
+             th:data-coupon-url="@{/mypage/event/coupon}"
+
+             th:data-img-gray="@{/images/event3.png}"
+             th:data-img-color="@{/images/event2.png}">
+        </div>
+
+        <img th:src="@{/images/event1.png}" alt="FlowBank 출석이벤트 배너" class="eventpage-banner">
+
+        <p class="eventpage-desc">
+            2주 연속 출석 시 <strong>환전 수수료 우대쿠폰</strong> 지급 🎁<br>
+            매일 출석할 때마다 <span class="eventpage-highlight">10%~100% 랜덤 쿠폰</span>의 기회!<br>
+            꾸준히 참여하고 <strong>최대 100% 환전 수수료 우대 쿠폰</strong>을 받아보세요 🐬
+        </p>
+
+        <div class="eventpage-grid" id="attendanceGrid"></div>
+
+        <form id="checkInForm" th:action="@{/mypage/event/check-in}" method="post">
+            <button type="button" class="eventpage-btn" id="checkBtn"
+                    th:text="${hasAttendedToday ? '오늘 출석 완료' : '오늘 출석하기'}">
+                오늘 출석하기
+            </button>
+        </form>
     </div>
+</main>
 
-    <!-- 출석 버튼 -->
-    <button class="eventpage-btn" id="checkBtn">오늘 출석하기</button>
-    </div>
-  </main>
 <div th:replace="~{_template/_footer.html}"></div>
-<script src ="/static/js/event.js"></script>
+
+<script th:src="@{/js/event.js}"></script>
 
 </body>
 </html>
-

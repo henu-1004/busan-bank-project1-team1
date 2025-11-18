@@ -9,44 +9,66 @@
     <select id="findCustCodeByCustId" resultType="string" parameterType="string">
         SELECT cust_code
         FROM TB_CUST_INFO
-        WHERE cust_id = #{custId}
+        WHERE TRIM(cust_id) = TRIM(#{custId})
     </select>
 
-    <!-- 2) 고객코드 → 회원정보 조회 -->
     <select id="getMemberInfoByCustCode" resultType="kr.co.api.flobankapi.dto.MemberDTO">
         SELECT
         cust_code AS custCode,
         cust_id AS custId,
-        cust_pw AS custPw,
         cust_name AS custName,
-        cust_jumin AS custJumin,
-        cust_email AS custEmail,
-        cust_hp AS custHp,
-        cust_birth_dt AS custBirth,
-        cust_gen AS custGen,
-        cust_eng_name AS custEngName,
-        cust_reg_dt AS custRegDt,
-        cust_status AS custStatus,
-        cust_zip AS custZip,
-        cust_addr1 AS custAddr1,
-        cust_addr2 AS custAddr2,
-        cust_security_level AS custSecurityLevel,
-        cust_last_login_dt AS custLastLoginDt
+        cust_reg_dt AS custRegDt
         FROM TB_CUST_INFO
         WHERE cust_code = #{custCode}
     </select>
 
-    <!-- 3) 오늘 출석 여부 확인 -->
     <select id="checkTodayAttendance" resultType="int">
         SELECT COUNT(*)
-        FROM TB_ATTENDANCE
-        WHERE cust_code = #{custCode}
-        AND attend_date = #{attendDate}
+        FROM TB_EVENT_HIST
+        WHERE hist_cust_code = #{custCode}
+        AND hist_attend_dy = #{attendDate}
     </select>
 
-    <!-- 4) 출석 기록 저장 -->
     <insert id="insertAttendance">
-        INSERT INTO TB_ATTENDANCE (cust_code, attend_date)
-        VALUES (#{custCode}, #{attendDate})
+        INSERT INTO TB_EVENT_HIST (
+        hist_cust_code,
+        hist_attend_dy
+        ) VALUES (
+        #{custCode},
+        #{attendDate}
+        )
     </insert>
+
+
+
+    <select id="getAttendanceHistory" resultType="string" parameterType="string">
+        SELECT hist_attend_dy
+        FROM TB_EVENT_HIST
+        WHERE hist_cust_code = #{custCode}
+    </select>
+
+
+    <select id="hasCoupon" resultType="int">
+        SELECT COUNT(*)
+        FROM TB_COUPON
+        WHERE coup_cust_code = #{custCode}
+    </select>
+
+    <insert id="insertCoupon">
+        INSERT INTO TB_COUPON (
+        coup_cust_code,
+        coup_type,
+        coup_rate,
+        coup_issued_dy,
+        coup_status
+        ) VALUES (
+        #{custCode},
+        1,            #{coupRate},  TO_CHAR(SYSDATE, 'YYYYMMDD'),
+        1             )
+    </insert>
+
+
+
+
+
 </mapper>
