@@ -1,3 +1,5 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
 plugins {
     id 'java'
     id 'org.springframework.boot' version '3.5.7'
@@ -5,8 +7,20 @@ plugins {
 }
 
 group = 'kr.co.api'
-version = '0.0.1-SNAPSHOT'
+version = '0.0.2-SNAPSHOT'
 description = 'flobank-api'
+
+processResources {
+    filesMatching('application.yml') {
+        // 1. expand 대신 filter를 사용합니다.
+        // 2. ReplaceTokens는 기본적으로 @key@ 형식을 찾습니다.
+        filter(ReplaceTokens, tokens: [
+                // 3. 'version' 토큰(@version@)을 프로젝트 버전으로 교체합니다.
+                'version': project.version
+        ])
+        // 4. 이 필터는 ${OPENAI_API_KEY}를 무시하므로 에러가 발생하지 않습니다.
+    }
+}
 
 java {
     toolchain {
@@ -27,6 +41,9 @@ repositories {
 dependencies {
     // 1. HTTP 요청을 받기 위한 Web
     implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    // (DB 연결 에러 해결용)
+    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
 
     // 2. Integration 기본
     implementation 'org.springframework.boot:spring-boot-starter-integration'
@@ -64,6 +81,13 @@ dependencies {
 
     // 타임리프용 시큐리티 확장 라이브러리 (화면 처리용)
     implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
+
+    // 솔라피 라이브러리
+    implementation 'com.solapi:sdk:1.0.3'
+
+    // 메일 인증 관련
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-mail', version: '3.3.3'
+    implementation group: 'org.modelmapper', name: 'modelmapper', version: '3.2.1'
 }
 
 tasks.named('test') {

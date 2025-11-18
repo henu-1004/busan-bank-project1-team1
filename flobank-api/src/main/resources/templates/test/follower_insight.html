@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>플로뱅크 팔로워 리워드 허브</title>
+    <link rel="stylesheet" th:href="@{/css/index.css}">
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+    <link rel="stylesheet" th:href="@{/css/footer.css}">
+    <link rel="stylesheet" th:href="@{/css/test/creator_suite.css}">
+</head>
+<body>
+<div th:replace="~{_template/_header.html}"></div>
+
+<main class="page-wrapper">
+    <div class="container">
+        <section class="hero">
+            <h1 class="page-title">Follower Benefit Insight</h1>
+            <p class="page-description">
+                내가 팔로우하는 크리에이터를 통해 가입한 외환예금 · 적금 상품 현황을 한 번에 확인하세요.
+                추천 목표까지 남은 인원, 누가 가입했는지, 어떤 리워드가 열려 있는지도 실시간으로 안내됩니다.
+            </p>
+            <div class="hero-actions">
+                <span class="badge">#FollowerReward #페일블루</span>
+                <a class="link-button" th:href="@{/test/creator}">크리에이터 허브로 이동</a>
+                <a class="link-button" th:href="@{/test/events}">이벤트 혜택 확인</a>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">추천한 크리에이터 통계</h2>
+                    <p class="section-subtitle">내 팔로워 코드로 가입한 현황과 목표 대비 달성률</p>
+                </div>
+                <div class="section-actions">
+                    <span class="tag">Follower Dashboard</span>
+                    <a class="link-button" th:href="@{/mypage/account}">내 계좌 확인</a>
+                </div>
+            </div>
+            <div class="metric-grid">
+                <div class="metric-card">
+                    <span class="metric-label">이번 달 추천 성공</span>
+                    <span class="metric-value">12명</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-label">누적 추천</span>
+                    <span class="metric-value">38명</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-label">남은 목표 (50명)</span>
+                    <span class="metric-value">12명</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-label">이번 달 추가 우대금리</span>
+                    <span class="metric-value">+0.3%p</span>
+                </div>
+            </div>
+            <div class="goal-progress">
+                <div class="goal-meter" aria-hidden="true"><span style="width: 76%"></span></div>
+                <p class="section-subtitle">목표까지 12명 남았습니다. 3명 추가 가입 시 보너스 금리가 +0.1%p 더 적용됩니다.</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">팔로워 증가 추이</h2>
+                    <p class="section-subtitle">내가 추천한 상위 3개 크리에이터의 신규 팔로워 증가 그래프</p>
+                </div>
+                <div class="section-actions">
+                    <span class="tag">Growth Tracking</span>
+                    <a class="link-button" th:href="@{/test/creator}">크리에이터 성장 보기</a>
+                </div>
+            </div>
+            <div class="line-chart" role="img" aria-label="추천 크리에이터 팔로워 증가 그래프">
+                <svg viewBox="0 0 320 160">
+                    <g class="chart-axis">
+                        <line x1="0" y1="140" x2="320" y2="140"></line>
+                        <line x1="0" y1="100" x2="320" y2="100"></line>
+                        <line x1="0" y1="60" x2="320" y2="60"></line>
+                        <line x1="0" y1="20" x2="320" y2="20"></line>
+                        <text x="4" y="20">90K</text>
+                        <text x="4" y="60">60K</text>
+                        <text x="4" y="100">30K</text>
+                        <text x="4" y="140">10K</text>
+                    </g>
+                    <polyline class="youtube" points="12,126 74,110 136,94 198,78 260,64 312,50"></polyline>
+                    <polyline class="instagram" points="12,138 74,126 136,114 198,98 260,84 312,72"></polyline>
+                    <polyline class="tiktok" points="12,144 74,134 136,122 198,110 260,100 312,88"></polyline>
+                    <g class="youtube-point">
+                        <circle cx="12" cy="126"></circle>
+                        <circle cx="74" cy="110"></circle>
+                        <circle cx="136" cy="94"></circle>
+                        <circle cx="198" cy="78"></circle>
+                        <circle cx="260" cy="64"></circle>
+                        <circle cx="312" cy="50"></circle>
+                    </g>
+                    <g class="instagram-point">
+                        <circle cx="12" cy="138"></circle>
+                        <circle cx="74" cy="126"></circle>
+                        <circle cx="136" cy="114"></circle>
+                        <circle cx="198" cy="98"></circle>
+                        <circle cx="260" cy="84"></circle>
+                        <circle cx="312" cy="72"></circle>
+                    </g>
+                    <g class="tiktok-point">
+                        <circle cx="12" cy="144"></circle>
+                        <circle cx="74" cy="134"></circle>
+                        <circle cx="136" cy="122"></circle>
+                        <circle cx="198" cy="110"></circle>
+                        <circle cx="260" cy="100"></circle>
+                        <circle cx="312" cy="88"></circle>
+                    </g>
+                </svg>
+                <div class="chart-legend">
+                    <span><span class="legend-dot" style="background: var(--color-line-yt);"></span>Studio Mirae</span>
+                    <span><span class="legend-dot" style="background: var(--color-line-ig);"></span>WaveDiary</span>
+                    <span><span class="legend-dot" style="background: var(--color-line-tt);"></span>DailyBeat</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">추천 가입자 목록</h2>
+                    <p class="section-subtitle">어떤 팔로워가 어떤 상품에 가입했는지 확인하고 맞춤 소통을 이어가세요.</p>
+                </div>
+                <div class="section-actions">
+                    <span class="tag">실시간 동기화</span>
+                    <a class="link-button" th:href="@{/mypage/benefit}">리워드 내역 확인</a>
+                </div>
+            </div>
+            <div class="table-wrapper">
+                <table class="data-table">
+                    <thead>
+                    <tr>
+                        <th>팔로워</th>
+                        <th>가입 상품</th>
+                        <th>가입일</th>
+                        <th>추천 인센티브</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>parkwave</td>
+                        <td>글로벌 팔로워 외화예금</td>
+                        <td>2024-04-02</td>
+                        <td>+0.05%p 금리</td>
+                    </tr>
+                    <tr>
+                        <td>hello_yuna</td>
+                        <td>Creator 성장 적금</td>
+                        <td>2024-04-05</td>
+                        <td>Friend Pass 쿠폰</td>
+                    </tr>
+                    <tr>
+                        <td>mixbeat</td>
+                        <td>콘텐츠 크루 비상금통장</td>
+                        <td>2024-04-10</td>
+                        <td>환전 수수료 면제</td>
+                    </tr>
+                    <tr>
+                        <td>studioleo</td>
+                        <td>Creator 성장 적금</td>
+                        <td>2024-04-11</td>
+                        <td>+0.05%p 금리</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="cta-panel">
+                <div>
+                    <h3>추천 목표까지 함께 달려요</h3>
+                    <p>남은 12명의 추천 팔로워를 확보하면 추가 우대금리와 경품 응모권이 제공됩니다.
+                        이벤트 페이지에서 목표별 리워드를 확인하고, 초대 메시지를 발송해 보세요.</p>
+                </div>
+                <div class="cta-actions">
+                    <a class="cta-primary" th:href="@{/test/events}">이벤트 혜택 보기</a>
+                    <a class="cta-secondary" th:href="@{/customer/notice_list}">공지 확인</a>
+                </div>
+            </div>
+        </section>
+    </div>
+</main>
+
+<div th:replace="~{_template/_footer.html}"></div>
+</body>
+</html>

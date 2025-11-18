@@ -1,52 +1,70 @@
 server:
-    port: 8080
-    servlet:
-        context-path: /flobank
+  port: 8080
+  servlet:
+    context-path: /flobank
+
+app-version: @version@
+
 spring:
-    application:
-        name: flobank_api
+  application:
+    name: flobank_api
 
-    # ✅ 1. DB 접속 정보
-    datasource:
-      url: jdbc:oracle:thin:@(description=(retry_count=20)(retry_delay=3)(address=(protocol=tcps)(port=1522)(host=adb.ap-chuncheon-1.oraclecloud.com))(connect_data=(service_name=g9ab35e902b30b6_flobank_low.adb.oraclecloud.com))(security=(ssl_server_dn_match=yes)))
-      username: ADMIN
-      password: Flobank1234!!
-      driver-class-name: oracle.jdbc.OracleDriver
+  datasource:
+    url: jdbc:oracle:thin:@34.64.225.88:1521/XEPDB1
+    username: flobank
+    password: 1234
+    driver-class-name: oracle.jdbc.OracleDriver
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: alswnstl23@gmail.com
+    password: "nkel ifue pjnh hzyj"
+    properties:
+      mail:
+        smtp:
+          auth: true
+          timeout: 5000
+          starttls:
+            enable: true
+          ssl:
+            trust: smtp.gmail.com
 
 flobank:
-  ap: # 접속해야 할 flobank_ap (AP 서버) 정보
-    host: 34.22.80.47
-    port: 9090 # AP 서버와 약속한 TCP 포트
+  ap:
+    host: 34.64.225.88
+    port: 9090
   aes:
     secret: "01234567890123456789012345678901"
 
-# ✅ 2. MyBatis 설정
 mybatis:
-  # SQL 쿼리가 작성될 XML 매퍼 파일의 위치를 지정
   mapper-locations: classpath:mappers/**/*.xml
-  # DB의 snake_case 컬럼(ex: exchange_rate)을
-  # Java의 camelCase 프로퍼티(ex: exchangeRate)로 자동 매핑
   configuration:
     map-underscore-to-camel-case: true
 
 jwt:
-  secret: "v3rySecr3tKeyF0rFl0BankApiProjectMustBeLongerThan256Bits!!" # 256비트 이상 길이 필수
+  secret: "v3rySecr3tKeyF0rFl0BankApiProjectMustBeLongerThan256Bits!!"
 
 eximbank:
   api:
     base-url: "https://oapi.koreaexim.go.kr/site/program/financial/exchangeJSON"
-    auth-key: "LNyeb6x2OFLu289XSY1tokxFueROPpxI"   # API Key
+    auth-key: "LNyeb6x2OFLu289XSY1tokxFueROPpxI"
 
 openai:
   api-key: ${OPENAI_API_KEY}
   base-url: "https://api.openai.com/v1"
 
+solapi:
+  apiKey: NCSGTLVVAFB7GAHV
+  apiSecret: N7V7FAHACZ8KWKNQPQFUCGSDSWWL4K5E
+  phoneNumber: 01021098237
 
-
-
-#############################################
-  # 지울예정
 terms:
-  base-dir : C:/Users/GGG/Desktop/workspace
-#############################################
+  base-dir: C:/Users/GGG/Desktop/workspace
+
+
+pinecone:
+  api-key: "pcsk_4WFJGX_DNAQ7nLt7pD7aLSzixdEp4yfHLDF4itTupWn5Rf7L2ehoDdv7eoXkuk5584Kzyx"
+  index-host: https://bank-db-46fp8tb.svc.aped-4627-b74a.pinecone.io
+  index-name: bank-db
+

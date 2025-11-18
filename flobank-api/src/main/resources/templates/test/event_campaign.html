@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>플로뱅크 크리에이터 이벤트 플랜</title>
+    <link rel="stylesheet" th:href="@{/css/index.css}">
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+    <link rel="stylesheet" th:href="@{/css/footer.css}">
+
+    <link rel="stylesheet" th:href="@{/css/test/creator_suite.css}">
+</head>
+<body>
+<div th:replace="~{_template/_header.html}"></div>
+
+<main class="page-wrapper">
+    <div class="container">
+        <section class="hero">
+            <h1 class="page-title">Creator &amp; Follower Event Journey</h1>
+            <p class="page-description">
+                크리에이터가 목표 팔로워를 달성하면 플로뱅크와 함께 특별한 리워드 이벤트를 진행할 수 있어요.
+                추천 · 가입 데이터에 맞춰 경품 추첨, 팬미팅, 환전 수수료 면제 등 맞춤 캠페인을 구성해 보세요.
+            </p>
+            <div class="hero-actions">
+                <span class="badge">#EventJourney #페일블루</span>
+                <a class="link-button" th:href="@{/test/creator}">크리에이터 허브</a>
+                <a class="link-button" th:href="@{/test/followers}">팔로워 인사이트</a>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">이벤트 목표 및 혜택</h2>
+                    <p class="section-subtitle">팔로워 누적 목표에 따라 순차적으로 열리는 플로뱅크 제휴 혜택</p>
+                </div>
+                <div class="section-actions">
+                    <span class="tag">Campaign Designer</span>
+                    <a class="link-button" th:href="@{/customer/notice_list}">이벤트 공지</a>
+                </div>
+            </div>
+            <div class="event-grid">
+                <article class="event-card">
+                    <h4>1차 목표 · 팔로워 5만 명</h4>
+                    <p>Creator 성장 적금 우대금리 +0.2%p 및 추천 팔로워 전원 환전 수수료 1회 면제</p>
+                    <div class="tag-row">
+                        <span class="tag">우대금리</span>
+                        <span class="tag">환전 혜택</span>
+                    </div>
+                </article>
+                <article class="event-card">
+                    <h4>2차 목표 · 팔로워 8만 명</h4>
+                    <p>공동 라이브 팬미팅 개최 지원 + 글로벌 팔로워 외화예금 신규 가입자 굿즈 제공</p>
+                    <div class="tag-row">
+                        <span class="tag">팬미팅</span>
+                        <span class="tag">굿즈</span>
+                    </div>
+                </article>
+                <article class="event-card">
+                    <h4>3차 목표 · 팔로워 10만 명</h4>
+                    <p>플로뱅크 크리에이터 전용 캠프 참가권 및 추천 팔로워 대상 경품 추첨 (항공권/환전 바우처)</p>
+                    <div class="tag-row">
+                        <span class="tag">Creator Camp</span>
+                        <span class="tag">경품 추첨</span>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">캠페인 운영 플로우</h2>
+                    <p class="section-subtitle">추천 데이터 수집부터 경품 배송까지 한 번에 관리합니다.</p>
+                </div>
+                <div class="section-actions">
+                    <span class="tag">Workflow</span>
+                    <a class="link-button" th:href="@{/test/creator}">추천 현황 확인</a>
+                </div>
+            </div>
+            <div class="event-steps">
+                <div class="event-step">
+                    <strong>STEP 1 · 추천 데이터 수집</strong>
+                    <span>크리에이터 허브에서 채널 연동 후 추천/가입 현황을 자동 수집합니다.</span>
+                </div>
+                <div class="event-step">
+                    <strong>STEP 2 · 목표 달성 체크</strong>
+                    <span>팔로워 인사이트 페이지에서 목표 달성률과 남은 인원을 실시간으로 확인합니다.</span>
+                </div>
+                <div class="event-step">
+                    <strong>STEP 3 · 이벤트 확정 &amp; 안내</strong>
+                    <span>목표 달성 시 자동으로 이벤트 확정 알림을 전송하고, 참가 신청 폼을 오픈합니다.</span>
+                </div>
+                <div class="event-step">
+                    <strong>STEP 4 · 리워드 실행</strong>
+                    <span>플로뱅크가 경품 추첨, 팬미팅 지원, 환전 혜택 등 리워드를 실행합니다.</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">추천 현황 스냅샷</h2>
+                    <p class="section-subtitle">목표 달성률과 이벤트 초대 대기자 목록을 실시간으로 관리하세요.</p>
+                </div>
+                <div class="section-actions">
+                    <span class="tag">Snapshot</span>
+                    <a class="link-button" th:href="@{/test/followers}">팔로워 현황 보기</a>
+                </div>
+            </div>
+            <div class="highlight-panel">
+                <div class="highlight-box">
+                    <h4>목표 달성률</h4>
+                    <p>팔로워 10만 명 목표 대비 현재 82% 달성</p>
+                    <div class="goal-progress">
+                        <div class="goal-meter" aria-hidden="true"><span style="width: 82%"></span></div>
+                        <p class="section-subtitle">남은 18,200명의 팔로워 확보 시 3차 목표 이벤트가 개시됩니다.</p>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <h4>이벤트 초대 대기자</h4>
+                    <p>추천을 통해 가입한 팔로워 중 다음 차수 이벤트에 우선 초대될 명단입니다.</p>
+                    <ul class="referral-list">
+                        <li class="referral-item"><span>globe_nara</span><span>Creator 성장 적금</span></li>
+                        <li class="referral-item"><span>lensstory</span><span>글로벌 팔로워 외화예금</span></li>
+                        <li class="referral-item"><span>beatline</span><span>콘텐츠 크루 비상금통장</span></li>
+                        <li class="referral-item"><span>atelier_soo</span><span>Creator 성장 적금</span></li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="cta-panel">
+                <div>
+                    <h3>플로뱅크와 함께 하는 이벤트 파트너십</h3>
+                    <p>크리에이터·팔로워 데이터를 기반으로 맞춤 캠페인을 설계하고,
+                        금융 상품 혜택과 연계된 팬 경험을 완성해 보세요.</p>
+                </div>
+                <div class="cta-actions">
+                    <a class="cta-primary" th:href="@{/test/creator}">크리에이터 허브 이동</a>
+                    <a class="cta-secondary" th:href="@{/test/followers}">팔로워 인사이트 이동</a>
+                </div>
+            </div>
+        </section>
+    </div>
+</main>
+
+<div th:replace="~{_template/_footer.html}"></div>
+</body>
+</html>

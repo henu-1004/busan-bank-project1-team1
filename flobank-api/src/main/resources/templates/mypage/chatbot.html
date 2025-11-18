@@ -57,8 +57,7 @@
             <div class="bubble">
               <span class="meta">AI 외환 도우미 · 09:33</span>
               <p>
-                유학 목적 환전 고객님께는 <strong>스마트 환율 우대 프로그램</strong>을 제공하고 있습니다.<br>
-                1) 인터넷뱅킹 또는 모바일 앱에서 우대 신청 → 2) 출국 7일 전까지 신청 완료 → 3) 지정 영업점 방문 후 우대율 적용 환전이 가능합니다.
+                [[${response}]]
               </p>
               <div class="suggested-actions">
                 <button><i class="fa-solid fa-link"></i> 우대 신청 바로가기</button>
@@ -76,8 +75,10 @@
             <button>외화예금 금리</button>
           </div>
           <div class="input-row">
-            <input type="text" placeholder="질문을 입력하거나 우측 메뉴에서 선택하세요.">
-            <button class="send-btn"><i class="fa-solid fa-paper-plane"></i></button>
+              <form method="post">
+                  <input type="text" name="q" placeholder="질문을 입력하거나 우측 메뉴에서 선택하세요.">
+                  <button class="send-btn" type="submit"><i class="fa-solid fa-paper-plane"></i></button>
+              </form>
           </div>
           
         </div>

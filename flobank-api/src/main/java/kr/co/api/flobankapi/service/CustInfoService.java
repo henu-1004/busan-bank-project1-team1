@@ -32,12 +32,14 @@ public class CustInfoService {
         String endPw = passwordEncoder.encode(custInfoDTO.getCustPw());
         custInfoDTO.setCustPw(endPw);
 
-        // 주민번호, 전화번호 암호화 (encrypt : 암호화, decrypt : 복호화)
+        // 주민번호, 전화번호, 생년월일, 이메일 암호화 (encrypt : 암호화, decrypt : 복호화)
         String aesJumin = AesUtil.encrypt(custInfoDTO.getCustJumin());
         String aesHp = AesUtil.encrypt(custInfoDTO.getCustHp());
+        String aesEmail = AesUtil.encrypt(custInfoDTO.getCustEmail());
 
         custInfoDTO.setCustJumin(aesJumin);
         custInfoDTO.setCustHp(aesHp);
+        custInfoDTO.setCustEmail(aesEmail);
 
         memberMapper.registerCustInfo(custInfoDTO);
     }
@@ -77,4 +79,6 @@ public class CustInfoService {
         // 인증 성공
         return custInfoDTO;
     }
+
+
 }

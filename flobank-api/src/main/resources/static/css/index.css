@@ -496,6 +496,14 @@
   background: #fff;
 }
 
+.briefing-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
 .briefing-box h3 {
   font-size: 18px;
   font-weight: 700;
@@ -544,7 +552,7 @@
 
 .briefing-box .more {
   text-align: right;
-  margin-top: 10px;
+  margin-top: 0;
 }
 
 .briefing-box .more a {
@@ -567,4 +575,24 @@
   .briefing-box h3 {
     font-size: 1.1rem;
   }
+}
+/* 브리핑 모드 탭 */
+.briefing-tabs {
+    display: flex;
+    gap: 15px;
+}
+
+.briefing-tabs a {
+    padding: 8px 16px;
+    border-radius: 6px;
+    text-decoration: none;
+    background: #f1f1f1;
+    color: #333;
+    font-weight: 500;
+    transition: background 0.2s ease;
+}
+
+.briefing-tabs a.active {
+    background: #4A6FA5;
+    color: #fff;
 }

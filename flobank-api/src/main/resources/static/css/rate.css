@@ -540,3 +540,12 @@
     font-weight: 500;
 }
 
+
+
+.rate-notice-text {
+    color: #888;
+    font-size: 13px;
+    margin-top: -10px;
+    margin-bottom: 20px;
+    text-align: left;
+}
