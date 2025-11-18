@@ -27,8 +27,8 @@ public class MypageService {
         mypageMapper.insertAcct(custAcctDTO);
     }
 
-    public CustInfoDTO getCustInfo(String custId) { // 고객 정보 받아오기
-        CustInfoDTO custInfoDTO = memberMapper.findByIdCustInfo(custId);
+    public CustInfoDTO getCustInfo(String userCode) { // 고객 정보 받아오기
+        CustInfoDTO custInfoDTO = memberMapper.findByCodeCustInfo(userCode);
 
         String decHp = AesUtil.decrypt(custInfoDTO.getCustHp());
 

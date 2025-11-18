@@ -6,7 +6,8 @@ import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface MemberMapper {
-    CustInfoDTO findByIdCustInfo(String custId);
+    CustInfoDTO findByIdCustInfo(String userId);
+    CustInfoDTO findByCodeCustInfo(String userCode);
     void registerCustInfo(CustInfoDTO custInfoDTO);
     void insertLastLogin(String custId);
 }

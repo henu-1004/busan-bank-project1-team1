@@ -71,9 +71,9 @@ public class MypageController {
             return "redirect:/login";
         }
 
-        String userId = userDetails.getUsername();
-        log.info("userId = " + userId);
-        CustInfoDTO custInfoDTO = mypageService.getCustInfo(userId);
+        String userCode = userDetails.getUsername();
+        log.info("userCode = " + userCode);
+        CustInfoDTO custInfoDTO = mypageService.getCustInfo(userCode);
 
         // 보안 등급별 1회, 1일 이체한도 고시
         if(custInfoDTO.getCustSecurityLevel().equals(1)) {
@@ -126,9 +126,9 @@ public class MypageController {
     @GetMapping("/koAcctCheck")
     public String koAcctCheck(@AuthenticationPrincipal CustomUserDetails userDetails, RedirectAttributes redirectAttributes) {
 
-        String userId = userDetails.getUsername();
-        log.info("userId = " + userId);
-        CustInfoDTO custInfoDTO = mypageService.getCustInfo(userId);
+        String userCode = userDetails.getUsername();
+        log.info("userId = " + userCode);
+        CustInfoDTO custInfoDTO = mypageService.getCustInfo(userCode);
         if(mypageService.checkKoAcct(custInfoDTO.getCustCode())){
             return "redirect:/mypage/ko_account_open_1";
         }else {
@@ -141,9 +141,9 @@ public class MypageController {
 
     @GetMapping("/enAcctCheck")
     public String enAcctCheck(@AuthenticationPrincipal CustomUserDetails userDetails, RedirectAttributes redirectAttributes) {
-        String userId = userDetails.getUsername();
-        log.info("userId = " + userId);
-        CustInfoDTO custInfoDTO = mypageService.getCustInfo(userId);
+        String UserCode = userDetails.getUsername();
+        log.info("UserCode = " + UserCode);
+        CustInfoDTO custInfoDTO = mypageService.getCustInfo(UserCode);
         if(mypageService.checkCntKoAcct(custInfoDTO.getCustCode()) >= 1){
             return "redirect:/mypage/en_account_open_1";
         }else{
@@ -163,6 +163,8 @@ public class MypageController {
 
     @GetMapping("/en_account_open_2")
     public String en_account_open_2(@AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        String custCode = userDetails.getUsername();
 
         return "mypage/en_account_open_2";
     }
