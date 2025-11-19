@@ -5,14 +5,13 @@
 
 <mapper namespace="kr.co.api.flobankapi.mapper.MypageMapper" >
     <insert id="insertAcct" parameterType="kr.co.api.flobankapi.dto.CustAcctDTO">
-
-        INSERT INTO TB_CUST_ACCT(ACCT_PW, ACCT_REG_DT, ACCT_CUST_CODE, ACCT_FUND_SOURCE, ACCT_PURPOSE)
-        values(#{acctPw}, sysdate, #{acctCustCode}, #{acctFundSource}, #{acctPurpose})
+        INSERT INTO TB_CUST_ACCT(ACCT_PW, ACCT_REG_DT, ACCT_CUST_CODE, ACCT_FUND_SOURCE, ACCT_PURPOSE, ACCT_NAME)
+        values(#{acctPw}, sysdate, #{acctCustCode}, #{acctFundSource}, #{acctPurpose}, #{acctName})
     </insert>
 
     <insert id="insertFrgnAcct" parameterType="kr.co.api.flobankapi.dto.CustFrgnAcctDTO">
-        INSERT INTO TB_CUST_FRGN_ACCT(FRGN_ACCT_PW, FRGN_ACCT_REG_DT, FRGN_ACCT_CUST_ENG_NAME, FRGN_ACCT_CUST_CODE, FRGN_ACCT_FUND_SOURCE, FRGN_PURPOSE)
-        values(#{frgnAcctPw}, sysdate, #{frgnAcctCustEngName}, #{frgnAcctCustCode}, #{frgnAcctFundSource}, #{frgnPurpose})
+        INSERT INTO TB_CUST_FRGN_ACCT(FRGN_ACCT_PW, FRGN_ACCT_REG_DT, FRGN_ACCT_CUST_ENG_NAME, FRGN_ACCT_CUST_CODE, FRGN_ACCT_FUND_SOURCE, FRGN_PURPOSE, FRGN_ACCT_NAME)
+        values(#{frgnAcctPw}, sysdate, #{frgnAcctCustEngName}, #{frgnAcctCustCode}, #{frgnAcctFundSource}, #{frgnPurpose}, #{frgnAcctName})
     </insert>
 
     <select id="selectCustInfo">
@@ -83,4 +82,18 @@
         SET ACCT_BALANCE = ACCT_BALANCE + #{amount}
         WHERE ACCT_NO = #{acctNo}
     </update>
+
+    <select id="selectCntAcct">
+        SELECT count(*) FROM TB_CUST_ACCT
+        WHERE ACCT_CUST_CODE = #{custCode}
+    </select>
+    
+    <insert id="insertAllFrgnAcctBal" parameterType="java.util.List">
+        INSERT ALL
+        <foreach collection="list" item="item" separator=" ">
+            INTO TB_FRGN_ACCT_BALANCE(BAL_CURRENCY, BAL_REG_DT, BAL_FRGN_ACCT_NO)
+            VALUES (#{item.balCurrency}, sysdate, #{item.balFrgnAcctNo})
+        </foreach>
+        SELECT * FROM DUAL
+    </insert>
 </mapper>

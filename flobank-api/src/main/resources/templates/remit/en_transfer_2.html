@@ -64,7 +64,10 @@
       <div class="transfer1-form-group">
         <label class="transfer1-label">출금계좌</label>
         <select class="transfer1-select">
-          <option selected>플로뱅크 외화종합계좌 112-2188-1931-00</option>
+            <option selected th:text="${custFrgnAcctDTO.frgnAcctName}">외화 입출금통장1</option>
+            <th:block th:each="acct : ${custAcctDTOList}">
+                <option th:text="${acct.acctName}">원화 입출금통장n</option>
+            </th:block>
         </select>
       </div>
 
@@ -81,9 +84,22 @@
         </select>
       </div>
 
+        <!-- 계좌에 남아있는 잔액 -->
+        <div class="transfer1-form-group">
+            <label class="transfer1-label">송금가능금액</label>
+            <div class="transfer1-flex">
+                <input type="text" class="transfer1-input short">
+            </div>
+            <p class="transfer1-guide-text">※ 모든 금액은 선택한 통화 기준으로 표시됩니다.</p>
+        </div>
+
+        <p>※ 환율은 금일 한국수출입은행 1회차 고시환율로 적용됩니다.</p>
+
       <!-- 이체 금액 -->
       <div class="transfer1-form-group">
         <label class="transfer1-label">송금금액</label>
+          <span>입력된 송금 금액을 원화로</span>
+
         <div class="transfer1-flex">
           <input type="text" class="transfer1-input short" placeholder="금액 입력" id="transfer-amount">
           <div class="transfer1-btn-group">

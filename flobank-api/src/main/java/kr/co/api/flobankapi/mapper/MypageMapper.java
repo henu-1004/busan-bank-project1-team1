@@ -1,9 +1,6 @@
 package kr.co.api.flobankapi.mapper;
 
-import kr.co.api.flobankapi.dto.CustAcctDTO;
-import kr.co.api.flobankapi.dto.CustFrgnAcctDTO;
-import kr.co.api.flobankapi.dto.CustInfoDTO;
-import kr.co.api.flobankapi.dto.CustTranHistDTO;
+import kr.co.api.flobankapi.dto.*;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.time.LocalDate;
@@ -43,6 +40,12 @@ public interface MypageMapper {
 
     // 출금
     void updateMinusAcct(Integer amount, String acctNo);
+
+    // 원화 입출금 계좌 개수 확인
+    Integer selectCntAcct(String custCode);
+
+    // 외화 자식 계좌 생성
+    void insertAllFrgnAcctBal(List<FrgnAcctBalanceDTO> item);
 
     CustInfoDTO selectCustInfo(String custId);
     LocalDate selectCheckKoAcct(String custCode);
