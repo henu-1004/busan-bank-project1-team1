@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="ko"
-      th:replace="~{admin/admin_template :: admin_template('약관관리','약관 설정',~{::content})}">
+      th:replace="~{admin/admin_template :: admin_template('외화예금 상품 상세','외화예금 상품 상세',~{::content},~{::script})}">
 
 <th:block th:fragment="content">
+
 
     <!-- ===================================================== -->
     <!-- 1) 약관 등록 -->
@@ -12,7 +13,8 @@
 
         <form class="terms-form"
               method="post"
-              th:action="@{/admin/terms/register}">
+              th:action="@{/admin/terms/register}"
+              enctype="multipart/form-data">
 
 
             <!-- 카테고리 선택 -->
@@ -57,6 +59,7 @@
             <div class="terms-modal-group">
                 <h3>약관 파일 첨부 (선택)</h3>
                 <input type="file"
+                       name="file"
                        id="modalFile"
                        class="terms-input"
                        accept=".pdf,.doc,.docx">
@@ -71,55 +74,13 @@
     </section>
 
 
-
-    <!-- 테이블 -->
-    <!-- 테이블 -->
-    <div class="product-table-wrap">
-        <table class="product-table terms-table">
-            <thead>
-            <tr>
-                <th>약관 카테고리</th>   <!-- row.children[0] -->
-                <th>약관 제목</th>       <!-- row.children[1] -->
-                <th>버전</th>            <!-- row.children[2] -->
-                <th>등록일</th>          <!-- row.children[3] -->
-                <th>수정일</th>          <!-- row.children[4] -->
-                <th>관리</th>            <!-- row.children[5] -->
-            </tr>
-            </thead>
-
-            <tbody>
-            <tr th:each="t : ${termsList}">
-                <td th:text="${t.termCate} == 1 ? '회원가입' :
-                         ${t.termCate} == 2 ? '환전하기' :
-                         ${t.termCate} == 3 ? '외화송금' : '외환예금'"></td>
-
-                <td th:text="${t.termTitle}"></td>
-
-                <td th:text="'v' + ${t.latestVersion}"></td>
-
-                <td th:text="${t.termRegDy}"></td>
-                <td th:text="${t.latestRegDy}"></td>
-
-                <td class="terms-actions">
-                    <button class="terms-edit-btn">수정</button>
-
-                    <button class="terms-delete-btn"
-                            th:attr="data-cate=${t.termCate}, data-order=${t.termOrder}">
-                        삭제
-                    </button>
-                </td>
-            </tr>
-            </tbody>
-
-        </table>
-    </div>
     <!-- ===================================================== -->
     <!-- 2) 약관 현황 -->
     <!-- ===================================================== -->
     <section class="terms-section" id="termsListSection">
         <h2 class="product-title">약관 현황</h2>
 
-        <!-- 검색 Form -->
+        <!-- 검색 -->
         <form class="terms-search-area" method="get"
               th:action="@{/admin/terms#termsListSection}">
             <select name="type" class="terms-search-type">
@@ -134,13 +95,12 @@
                    placeholder="검색어를 입력하세요"
                    th:value="${keyword != null and keyword != 'null' ? keyword : ''}">
 
-
             <button type="submit" class="terms-search-btn">
                 <i class="fa-solid fa-search"></i>
             </button>
         </form>
 
-        <!-- 테이블 -->
+        <!-- 테이블 (올바른 위치) -->
         <div class="product-table-wrap">
             <table class="product-table terms-table">
                 <thead>
@@ -158,11 +118,11 @@
                 <tbody>
                 <tr th:each="t : ${termsList}">
                     <td th:text="${t.termCate == 1 ? '회원가입' :
-                      (t.termCate == 2 ? '환전하기' :
-                      (t.termCate == 3 ? '외화송금' :
-                      (t.termCate == 4 ? '외환예금' :
-                      (t.termCate == 5 ? '원화통장개설' :
-                      (t.termCate == 6 ? '외화통장개설' : '기타')))))}">
+                  (t.termCate == 2 ? '환전하기' :
+                  (t.termCate == 3 ? '외화송금' :
+                  (t.termCate == 4 ? '외환예금' :
+                  (t.termCate == 5 ? '원화통장개설' :
+                  (t.termCate == 6 ? '외화통장개설' : '기타')))))}">
                     </td>
 
                     <td th:text="${t.termOrder}"></td>
@@ -174,22 +134,17 @@
                     <td class="terms-actions">
                         <button type="button" class="terms-edit-btn"
                                 th:attr="data-cate=${t.termCate},
-                 data-order=${t.termOrder},
-                 data-title=${t.termTitle}">
+                                     data-order=${t.termOrder},
+                                     data-title=${t.termTitle}">
                             수정
                         </button>
-
-                        <button type="button" class="terms-delete-btn"
-                                th:attr="data-cate=${t.termCate}, data-order=${t.termOrder}">
-                            삭제
-                        </button>
-
-
                     </td>
                 </tr>
                 </tbody>
             </table>
         </div>
+
+
 
         <!-- 페이지네이션 -->
         <div class="pagination">
@@ -275,6 +230,12 @@
                     </div>
                 </div>
 
+                <!-- 제목 -->
+                <div class="terms-modal-group">
+                    <label>코멘트(특이사항)</label>
+                    <input type="text" id="modalVerMemo" class="terms-input">
+                </div>
+
                 <!-- 내용 수정 -->
                 <div class="terms-modal-group">
                     <label>약관 내용</label>
@@ -285,6 +246,13 @@
 
             </div>
 
+
+            </div>
+
+            <div class="terms-modal-footer">
+                <button class="terms-modal-cancel">취소</button>
+                <button class="terms-modal-save">저장하기</button>
+            </div>
 
 
             <div class="terms-modal-footer">

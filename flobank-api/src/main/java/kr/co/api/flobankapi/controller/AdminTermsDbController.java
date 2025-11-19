@@ -1,13 +1,16 @@
 package kr.co.api.flobankapi.controller;
 
+import kr.co.api.flobankapi.dto.TermsHistDTO;
 import kr.co.api.flobankapi.service.TermsDbService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -55,14 +58,18 @@ public class AdminTermsDbController {
     public String register(@RequestParam int cate,
                            @RequestParam String title,
                            @RequestParam String content,
+                           @RequestParam(required = false) MultipartFile file,
                            RedirectAttributes ra) {
 
-        service.createTerms(cate, title, content, "admin");
-        ra.addFlashAttribute("msg", "약관이 등록되었습니다.");
+        try {
+            service.createTerms(cate, title, content, "admin", file);
+            ra.addFlashAttribute("msg", "약관이 등록되었습니다.");
+        } catch (Exception e) {
+            ra.addFlashAttribute("msg", "약관 등록 실패: " + e.getMessage());
+        }
 
         return "redirect:/admin/terms";
     }
-
 
     /** 수정 처리 */
     @PostMapping("/update")
@@ -71,12 +78,13 @@ public class AdminTermsDbController {
                                       @RequestParam int order,
                                       @RequestParam String title,
                                       @RequestParam String content,
-                                      @RequestParam int currentVersion) {
+                                      @RequestParam int currentVersion,
+                                      @RequestParam(required = false) String verMemo) {
 
         Map<String, Object> result = new HashMap<>();
 
         try {
-            service.updateTerms(cate, order, title, content, currentVersion, "admin");
+            service.updateTerms(cate, order, title, content, currentVersion, "admin", verMemo);
             result.put("status", "OK");
         } catch (Exception e) {
             result.put("status", "ERROR");
@@ -87,15 +95,8 @@ public class AdminTermsDbController {
     }
 
 
-    /** 삭제 처리 */
-    @GetMapping("/delete")
-    public String delete(@RequestParam int cate,
-                         @RequestParam int order,
-                         RedirectAttributes ra) {
 
-        service.deleteTerms(cate, order);
-        ra.addFlashAttribute("msg", "약관이 삭제되었습니다.");
 
-        return "redirect:/admin/terms";
-    }
+
+
 }
