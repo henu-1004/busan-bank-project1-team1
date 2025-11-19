@@ -57,6 +57,9 @@ public class TermsDbService {
     public void createTerms(int cate, String title, String content,
                             String adminId, MultipartFile file) throws Exception {
 
+        log.info("📁 [DEBUG] pdfTermsPath = {}", filePathConfig.getPdfTermsPath());
+
+
         String today = LocalDate.now().format(FMT);
 
         // ★ term_order 생성
@@ -108,6 +111,13 @@ public class TermsDbService {
     private String saveTermsPdf(MultipartFile file) throws Exception {
 
         String basePath = filePathConfig.getPdfTermsPath(); // yml에서 가져옴
+
+        // ⭐ dev에서는 basePath가 없으면 skip
+        if (basePath == null || basePath.isBlank()) {
+            log.warn("⚠ 파일 업로드 경로가 설정되지 않음 → 파일 저장 스킵");
+            return null;
+        }
+
 
         // 폴더 없으면 생성
         Files.createDirectories(Paths.get(basePath));

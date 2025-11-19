@@ -1,4 +1,8 @@
+console.log("terms.js loaded!!!");
+
 document.addEventListener("DOMContentLoaded", () => {
+
+
 
     /* ============================================================
        요소 선택
@@ -170,4 +174,26 @@ document.addEventListener("DOMContentLoaded", () => {
         }, 50);
     });
 
+    /* ============================================================
+   🚀 등록하기 버튼 → form submit 실행   (<< 반드시 맨 마지막에 위치)
+============================================================ */
+    const submitBtn = document.getElementById("termsSubmitBtn");
+
+    if (submitBtn) {
+        console.log("🟢 submitBtn found!");
+        submitBtn.addEventListener("click", () => {
+            console.log("🟡 submitBtn clicked!");
+            document.querySelector(".terms-form").submit();
+        });
+    } else {
+        console.log("❌ submitBtn not found!");
+    }
+
+
+
+    console.log("✅ terms.js loaded!");
+
+
 });
+
+

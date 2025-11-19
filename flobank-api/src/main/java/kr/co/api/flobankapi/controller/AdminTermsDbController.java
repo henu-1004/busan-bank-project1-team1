@@ -65,11 +65,16 @@ public class AdminTermsDbController {
             service.createTerms(cate, title, content, "admin", file);
             ra.addFlashAttribute("msg", "약관이 등록되었습니다.");
         } catch (Exception e) {
-            ra.addFlashAttribute("msg", "약관 등록 실패: " + e.getMessage());
+            // 🔥 DB 에러 메시지는 절대 사용자에게 직접 노출 X
+            ra.addFlashAttribute("msg", "약관 등록 중 오류가 발생했습니다.");
+            // 필요하면 로그로만 출력
+            e.printStackTrace();
         }
 
         return "redirect:/admin/terms";
     }
+
+
 
     /** 수정 처리 */
     @PostMapping("/update")

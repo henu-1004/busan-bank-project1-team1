@@ -23,25 +23,25 @@
         INSERT INTO TB_TERMS_HIST(
             thist_term_cate,
             thist_term_order,
+            thist_file,
             thist_content,
             thist_version,
             thist_ver_memo,
             thist_admin_id,
-            thist_reg_dy,
-            thist_file
+            thist_reg_dy
         )
         VALUES(
                   #{thistTermCate},
                   #{thistTermOrder},
-                  #{thistContent},
+                  #{thistFile, jdbcType=VARCHAR},
+                  #{thistContent, jdbcType=CLOB},
                   #{thistVersion},
                   #{thistVerMemo},
                   #{thistAdminId},
-                  #{thistRegDy},
-                  #{thistFile}
-
+                  #{thistRegDy}
               )
     </insert>
+
 
     <!-- 전체 약관 목록 + 최신 버전 -->
     <select id="selectAllTermsWithLatestVersion"

@@ -65,12 +65,14 @@
                        accept=".pdf,.doc,.docx">
             </div>
 
-            <!-- 전송 -->
-            <div class="form-submit">
-                <button type="submit" class="btn-submit terms-submit">등록하기</button>
-            </div>
-
         </form>
+
+        <!-- 전송 -->
+        <button type="button" id="termsSubmitBtn" class="btn-submit terms-submit">
+            등록하기
+        </button>
+
+
     </section>
 
 
@@ -245,31 +247,24 @@
 
 
             </div>
-
-
-            </div>
-
-            <div class="terms-modal-footer">
-                <button class="terms-modal-cancel">취소</button>
-                <button class="terms-modal-save">저장하기</button>
-            </div>
-
-
             <div class="terms-modal-footer">
                 <button class="terms-modal-cancel">취소</button>
                 <button class="terms-modal-save">저장하기</button>
             </div>
 
         </div>
+
+
+
     </div>
 
 
 
 
-
     <script th:if="${msg != null}">
-        alert([[${msg}]]);
+        alert([[${msg}]]);   <!-- 그대로 써도 OK -->
     </script>
+
 
 
 </th:block>
