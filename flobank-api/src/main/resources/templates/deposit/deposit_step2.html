@@ -24,7 +24,7 @@
 
 
   <div class="step1-container">
-    <h2 class="step1-title">BNK 모아드림 외화적금</h2>
+    <h2 class="step1-title">[[${product.dpstName}]]</h2>
 
   
     <div class="step1-steps">
@@ -62,11 +62,15 @@
     <div id="krwFields">
       <div class="form-group">
         <label class="form-label">원화출금계좌번호</label>
-        <select class="form-select">
-          <option>104302-04-412952</option>
-          <option>104302-02-513489</option>
+        <select id="withdrawAccount" class="form-select">
+            <option>====== 계좌 선택 ======</option>
+            <option th:each="acct : ${accounts}"
+                    th:value="${acct.acctNo}"
+                    th:data-balance="${acct.acctBalance}"
+                    th:data-pw="${acct.acctPw}"
+            >[[${acct.acctNo}]]</option>
         </select>
-        <p class="form-hint">출금가능금액 0원</p>
+        <p id="balanceHint" class="form-hint"></p>
       </div>
 
       <div class="divider"></div>
@@ -81,12 +85,14 @@
     <div id="fxFields" class="hidden">
       <div class="form-group">
         <label class="form-label">외화출금계좌번호</label>
-        <select class="form-select">
-          <option>202040-11-300912 (USD)</option>
-          <option>202040-12-102300 (JPY)</option>
-          <option>202040-12-201520 (EUR)</option>
+        <select id="withdrawFrgnAccount" class="form-select">
+            <option>====== 계좌 선택 ======</option>
+            <option  th:each="tacct : ${frgnAccountBals}" th:value="${tacct.balNo}"
+                     th:data-balance="${tacct.balBalance}"
+                     th:data-currency="${tacct.balCurrency}"
+            >[[${frgnAccount.frgnAcctNo}]] ([[${tacct.balCurrency}]])</option>
         </select>
-        <p class="form-hint">출금가능금액 2,000 USD</p>
+        <p id="frgnBalanceHint" class="form-hint"></p>
       </div>
 
       <div class="divider"></div>
@@ -261,8 +267,9 @@
   </div>
 </main>
 
+<script th:src ="@{/js/deposit.js}"></script>
 <div th:replace="~{_template/_footer.html}"></div>
-<script src ="/static/js/deposit.js"></script>
+
 
 </body>
 </html>
