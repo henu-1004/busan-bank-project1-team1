@@ -25,6 +25,82 @@
     </select>
 
 
+    <resultMap id="ProductDetailMap" type="kr.co.api.flobankapi.dto.ProductDTO" autoMapping="true">
+
+        <id property="dpstId" column="DPST_ID"/>
+
+        <result property="wdrwMinMonth" column="WDRW_MIN_MONTH"/>
+        <result property="wdrwMax" column="WDRW_MAX"/>
+        <result property="amtCurrency" column="AMT_CURRENCY"/>
+        <result property="amtMin" column="AMT_MIN"/>
+
+        <collection property="periodList" ofType="kr.co.api.flobankapi.dto.ProductPeriodDTO">
+            <result property="minMonth" column="PERIOD_MIN_MONTH"/>
+            <result property="maxMonth" column="PERIOD_MAX_MONTH"/>
+            <result property="fixedMonth" column="PERIOD_FIXED_MONTH"/>
+        </collection>
+
+        <collection property="limits" ofType="kr.co.api.flobankapi.dto.ProductLimitDTO" autoMapping="true">
+            <id property="lmtCurrency" column="LMT_CURRENCY"/>
+            <result property="lmtMinAmt" column="LMT_MIN_AMT"/>
+            <result property="lmtMaxAmt" column="LMT_MAX_AMT"/>
+        </collection>
+
+    </resultMap>
+
+    <select id="findProductById" parameterType="string" resultMap="ProductDetailMap">
+        SELECT
+        I.DPST_ID,
+        I.DPST_NAME,
+        I.DPST_INFO,
+        I.DPST_TYPE,
+        I.DPST_CURRENCY,
+        I.DPST_RATE_TYPE,
+        I.DPST_MIN_YN,
+        I.DPST_MAX_YN,
+        I.DPST_STATUS,
+        I.DPST_DESCRIPT,
+        I.DPST_PERIOD_TYPE,
+        I.DPST_MIN_AGE,
+        I.DPST_MAX_AGE,
+        I.DPST_AUTO_RENEW_YN,
+        I.DPST_ADD_PAY_YN,
+        I.DPST_ADD_PAY_MAX,
+        I.DPST_PART_WDRW_YN,
+        I.DPST_REG_DT,
+        I.DPST_APP_NO,
+        I.DPST_APP_INSTITUTION,
+        I.DPST_APP_DY,
+        I.DPST_DELIB_NO,
+        I.DPST_DELIB_DY,
+        I.DPST_DELIB_START_DY,
+        I.DPST_INFO_PDF,
+
+        W.WDRW_MIN_MONTH,
+        W.WDRW_MAX,
+        WA.AMT_CURRENCY,
+        WA.AMT_MIN,
+
+        P.PERIOD_MIN_MONTH,
+        P.PERIOD_MAX_MONTH,
+        P.PERIOD_FIXED_MONTH,
+
+        L.LMT_CURRENCY,
+        L.LMT_MIN_AMT,
+        L.LMT_MAX_AMT
+
+        FROM TB_DPST_PROD_INFO I
+        -- 공백 문제 해결을 위한 TRIM 사용
+        LEFT JOIN TB_DPST_PROD_PERIOD P ON TRIM(I.DPST_ID) = TRIM(P.PERIOD_DPST_ID)
+        LEFT JOIN TB_DPST_PARTIAL_WDRW_INFO W ON TRIM(I.DPST_ID) = TRIM(W.WDRW_DPST_ID)
+        LEFT JOIN TB_DPST_PARTIAL_WDRW_AMT WA ON TRIM(I.DPST_ID) = TRIM(WA.AMT_DPST_ID)
+        LEFT JOIN TB_DPST_AMT_LMT L ON TRIM(I.DPST_ID) = TRIM(L.LMT_DPST_ID)
+
+        WHERE TRIM(I.DPST_ID) = TRIM(#{dpstId})
+    </select>
+
+
+
 
 
 

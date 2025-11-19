@@ -504,7 +504,7 @@
   margin-top: 50px;
 }
 
-.view-bottom button,
+.view-bottom .view-btn-primary,
 .view-bottom .view-btn-link {
   display: inline-block;
   padding: 12px 36px;
