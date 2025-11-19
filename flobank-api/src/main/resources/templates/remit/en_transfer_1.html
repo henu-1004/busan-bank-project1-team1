@@ -112,13 +112,13 @@
 
     <!-- 다음 버튼 -->
     <div class="transfer1-actions">
-      <a href="./en_transfer_2.html" class="transfer1-btn-next">다음</a>
+      <a th:href="@{/remit/en_transfer_2}" class="transfer1-btn-next">다음</a>
     </div>
   </div>
 </main>
 
 <div th:replace="~{_template/_footer.html}"></div>
-<script src ="/static/js/mypage.js"></script>
+<script th:src ="@{/js/mypage.js}"></script>
 
 </body>
 </html>

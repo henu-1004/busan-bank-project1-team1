@@ -284,4 +284,21 @@ public class MypageController {
         return "mypage/en_account_open_3";
     }
 
+    @GetMapping("/ko_transfer_1")
+    public String ko_transfer_1(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
+        return  "mypage/ko_transfer_1";
+    }
+
+    @GetMapping("/ko_transfer_2")
+    public String ko_transfer_2(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
+        return  "mypage/ko_transfer_2";
+    }
+
+    @GetMapping("/ko_transfer_3")
+    public String ko_transfer_3(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
+        return  "mypage/ko_transfer_3";
+    }
+
+
+
 }

@@ -12,4 +12,8 @@ public class PdfAiDTO {
     private String aiComment;
     private String status;
     private String errorMessage;
+
+    //추가
+    private String downloadUrl;
+
 }

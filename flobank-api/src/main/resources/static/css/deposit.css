@@ -189,17 +189,20 @@
 .list-join-btn {
   border: none;
   border-radius: 6px;
-  width: 90px;           /* 일정한 너비 유지 */
-  height: 36px;          /* 약간 더 높게 */
+  width: 90px;
+  height: 36px;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
   text-align: center;
-  line-height: 36px;     /* 글씨 세로 중앙정렬 */
+  line-height: 36px;
   transition: all 0.2s ease;
-  white-space: nowrap;   /* 글자 줄바꿈 방지 */
-  overflow: hidden;      /* 혹시 넘칠 경우 잘라내기 */
-  text-overflow: ellipsis; /* 긴 글씨는 말줄임 처리 */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-decoration: none;
+  display: inline-block;
+
 }
 
 /* 상세보기 버튼 */

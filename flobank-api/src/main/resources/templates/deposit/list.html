@@ -24,85 +24,40 @@
   <!-- 오른쪽 상품 목록 -->
   <section class="list-content">
     <div class="list-header">
-      <p>조회결과 <strong>[총 15건]</strong></p>
-    
+        <p>조회결과 <strong>[총 [[${count}]]건]</strong></p>
     </div>
 
     <!-- 상품 아이템 -->
-    <div class="list-item">
-      <div class="list-info">
-        <h4><a href="#" class="list-link">SOL트래블 외화예금</a></h4>
-        <p>총 21개국 통화로 자유롭게 전환 가능하며, 고객이 지정한 환율로 처리되는 입출금형 외화예금 상품입니다.</p>
-        <div class="list-tags">
-          <span>모바일</span>
-          <span>영업점</span>
-        </div>
-      </div>
-      <div class="list-actions">
-        <button class="list-detail-btn">상세보기</button>
-        <button class="list-join-btn">가입하기</button>
-      </div>
-    </div>
+      <div th:each="item : ${list}" class="list-item">
+          <div class="list-info">
+              <h4>
+                  <a th:text="${item.dpstName}"
+                     th:href="@{/deposit/detail/{id}(id=${item.dpstId})}"
+                     class="list-link">
+                  </a>
+              </h4>
 
-    <div class="list-item">
-      <div class="list-info">
-        <h4><a href="#" class="list-link">SOL트래블 외화예금</a></h4>
-        <p>총 21개국 통화로 자유롭게 전환 가능하며, 고객이 지정한 환율로 처리되는 입출금형 외화예금 상품입니다.</p>
-        <div class="list-tags">
-          <span>모바일</span>
-          <span>영업점</span>
-        </div>
-      </div>
-      <div class="list-actions">
-        <button class="list-detail-btn">상세보기</button>
-        <button class="list-join-btn">가입하기</button>
-      </div>
-    </div>
+              <p th:text="${item.dpstInfo}"></p>
 
-    <div class="list-item">
-      <div class="list-info">
-        <h4><a href="#" class="list-link">SOL트래블 외화예금</a></h4>
-        <p>총 21개국 통화로 자유롭게 전환 가능하며, 고객이 지정한 환율로 처리되는 입출금형 외화예금 상품입니다.</p>
-        <div class="list-tags">
-          <span>모바일</span>
-          <span>영업점</span>
-        </div>
-      </div>
-      <div class="list-actions">
-        <button class="list-detail-btn">상세보기</button>
-        <button class="list-join-btn">가입하기</button>
-      </div>
-    </div>
+              <div class="list-tags">
+                  <span>모바일</span>
+                  <span>영업점</span>
+              </div>
+          </div>
 
-    <div class="list-item">
-      <div class="list-info">
-        <h4><a href="#" class="list-link">외화 체인지업 예금</a></h4>
-        <p>총 21개국 통화로 자유롭게 전환 가능하며, 고객이 지정한 환율로 처리되는 입출금형 외화예금 상품입니다.</p>
-        <div class="list-tags">
-          <span>모바일</span>
-          <span>영업점</span>
-        </div>
-      </div>
-      <div class="list-actions">
-        <button class="list-detail-btn">상세보기</button>
-        <button class="list-join-btn">가입하기</button>
-      </div>
-    </div>
+          <div class="list-actions">
+              <a class="list-detail-btn"
+                 th:href="@{/deposit/view(id=${item.dpstId})}">
+                  상세보기
+              </a>
 
-    <div class="list-item">
-      <div class="list-info">
-        <h4><a href="#" class="list-link">외화 체인지업 예금</a></h4>
-        <p>총 21개국 통화로 자유롭게 전환 가능하며, 고객이 지정한 환율로 처리되는 입출금형 외화예금 상품입니다.</p>
-        <div class="list-tags">
-          <span>모바일</span>
-          <span>영업점</span>
-        </div>
+              <a class="list-join-btn"
+                 th:href="@{/deposit/deposit_step1(id=${item.dpstId})}">
+                  가입하기
+              </a>
+
+          </div>
       </div>
-      <div class="list-actions">
-        <button class="list-detail-btn">상세보기</button>
-        <button class="list-join-btn">가입하기</button>
-      </div>
-    </div>
 
 
 

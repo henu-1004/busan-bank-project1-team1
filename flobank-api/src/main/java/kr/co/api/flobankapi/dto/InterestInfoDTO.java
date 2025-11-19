@@ -9,6 +9,6 @@ import lombok.*;
 @AllArgsConstructor
 public class InterestInfoDTO {
     private String interestCurrency;
-    private String interestRate;
-    private String interestMonth;
+    private double interestRate;
+    private int interestMonth;
 }

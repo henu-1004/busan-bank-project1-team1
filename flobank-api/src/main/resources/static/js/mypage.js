@@ -333,4 +333,11 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     }
+
+
 });
+
+function setQuestion(text) {
+    document.getElementById('chatInput').value = text;
+
+}

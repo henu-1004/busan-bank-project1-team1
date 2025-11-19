@@ -63,12 +63,12 @@
             <button>환전 가능 통화</button>
             <button>해외송금 절차</button>
             <button>지정환율 알림</button>
-            <button>외화예금 금리</button>
+            <button type="button" onclick="setQuestion('플로뱅크 외화예금 금리 간단하게 정리해줘.')">외화예금 금리</button>
           </div>
           <div class="input-row">
-              <form method="post">'
+              <form method="post" class="input-form">
                   <input type="hidden" name="sessId" th:value="${sessId}">
-                  <input type="text" name="q" placeholder="질문을 입력하거나 우측 메뉴에서 선택하세요.">
+                  <input type="text" id="chatInput" name="q" placeholder="질문을 입력하거나 우측 메뉴에서 선택하세요.">
                   <button class="send-btn" type="submit"><i class="fa-solid fa-paper-plane"></i></button>
               </form>
           </div>
@@ -109,5 +109,6 @@
   </main>
 
 <div th:replace="~{_template/_footer.html}"></div>
+<script th:src="@{/js/mypage.js}"></script>
 </body>
 </html>

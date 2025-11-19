@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.api.flobankapi.mapper.DepositMapper">
+
+    <select id="findActiveProducts" resultType="kr.co.api.flobankapi.dto.ProductDTO">
+        SELECT
+        DPST_ID,
+        DPST_NAME,
+        DPST_INFO,
+        DPST_STATUS
+        FROM
+        TB_DPST_PROD_INFO
+        WHERE
+        DPST_STATUS = 3
+        ORDER BY DPST_REG_DT DESC
+    </select>
+
+    <select id="countActiveProducts" resultType="int">
+        SELECT COUNT(*)
+        FROM TB_DPST_PROD_INFO
+        WHERE DPST_STATUS = 3
+    </select>
+
+
+
+
+
+</mapper>

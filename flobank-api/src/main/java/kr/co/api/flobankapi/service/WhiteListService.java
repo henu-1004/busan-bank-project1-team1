@@ -48,8 +48,21 @@ public class WhiteListService {
 
     private String flobankInterest(List<InterestInfoDTO> dtoList) {
         StringBuilder sb = new StringBuilder();
+        String a = "";
+
         for (InterestInfoDTO interest : dtoList) {
-            String a = "플로뱅크 " + interest.getInterestCurrency() +" " + interest.getInterestMonth() + "개월 예치 금리 : " + interest.getInterestRate() + "\n";
+
+            if (interest.getInterestMonth()==0){
+                a = "플로뱅크 " + interest.getInterestCurrency() +" 1개월 미만 예치 금리 : 거주자 " + interest.getInterestRate() + "%\n";
+            }else if (interest.getInterestMonth()==1){
+                a = "플로뱅크 " + interest.getInterestCurrency() +" " + interest.getInterestMonth() + "개월 이상 3개월 미만 예치 금리 : 거주자 " + interest.getInterestRate() + "%\n";
+            }else if (interest.getInterestMonth()==3){
+                a = "플로뱅크 " + interest.getInterestCurrency() +" " + interest.getInterestMonth() + "개월 이상 6개월 미만 예치 금리 : 거주자 " + interest.getInterestRate() + "%\n";
+            }else if (interest.getInterestMonth()==6){
+                a = "플로뱅크 " + interest.getInterestCurrency() +" " + interest.getInterestMonth() + "개월 이상 12개월 미만 예치 금리 : 거주자 " + interest.getInterestRate() + "%\n";
+            }else {
+                a = "플로뱅크 " + interest.getInterestCurrency() +" " + interest.getInterestMonth() + "개월 이상 예치 금리 : 거주자 " + interest.getInterestRate() + "%\n";
+            }
             sb.append(a);
         }
 

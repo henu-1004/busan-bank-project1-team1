@@ -313,12 +313,13 @@
 
 .btn-transfer {
   border: none;
-  background: var(--sub-color);
-  color: #fff;
+  background: #2C5DE5;
+  color: white;
   padding: 6px 14px;
   border-radius: 6px;
   cursor: pointer;
   transition: background 0.3s ease;
+  text-decoration: none;  /* 밑줄 제거 */
 }
 
 /* 🔹 외화 보유 자산 - 3x2 카드 정렬 */
@@ -2046,8 +2047,15 @@ body {
   align-items: center;
 }
 
+.input-row .input-form{
+    flex: 1;
+    flex-direction: row;
+    justify-content: space-between;
+    display: flex;
+}
+
 .input-row input {
-  flex: 1;
+    width: 680px;
   padding: 14px 18px;
   border-radius: 12px;
   border: 1px solid #d0d7e6;
@@ -2063,7 +2071,7 @@ body {
   color: #fff;
   font-size: 18px;
   cursor: pointer;
-  display: flex;
+
   align-items: center;
   justify-content: center;
   transition: background 0.2s ease, transform 0.2s ease;
@@ -2168,7 +2176,7 @@ body {
   }
 
   .input-row {
-    flex-direction: column;
+    flex-direction: row;
     align-items: stretch;
   }
 
@@ -3228,4 +3236,17 @@ body.event-page {
 }
 .edit-btn:hover {
     color: #2C5DE5;
+}
+#detail {
+    color: black;           /* 검은색 글씨 */
+    text-decoration: none;  /* 밑줄 제거 */
+    font-size: 14px;        /* 폰트 크기 */
+    cursor: pointer;        /* 마우스 커서 모양 */
+    transition: color 0.2s; /* 색상 변경 시 부드럽게 전환 (선택사항) */
+    font-weight: 600;
+}
+
+/* 마우스를 올렸을 때(Hover) 스타일 */
+#detail:hover {
+    color: blue;            /* 파란색으로 변경 */
 }

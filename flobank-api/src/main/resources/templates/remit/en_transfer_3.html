@@ -115,8 +115,8 @@
     </section>
 
     <div class="transfer2-actions">
-      <a href="/index.html" class="transfer2-btn-sub">이전</a>
-      <a href="./ko_transfer_3.html" class="transfer2-btn-main">이체실행</a>
+        <a th:href="@{/remit/en_transfer_2}" class="transfer2-btn-sub">이전</a>
+        <a th:href="@{/remit/en_transfer_4}" class="transfer2-btn-main">이체실행</a>
     </div>
 
   </div>
@@ -125,7 +125,7 @@
 
 
 <div th:replace="~{_template/_footer.html}"></div>
-<script src ="/static/js/mypage.js"></script>
+<script th:src ="@{/js/mypage.js}"></script>
 
 </body>
 </html>
