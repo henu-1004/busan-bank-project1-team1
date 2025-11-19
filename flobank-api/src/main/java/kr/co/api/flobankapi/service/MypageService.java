@@ -3,12 +3,14 @@ package kr.co.api.flobankapi.service;
 import kr.co.api.flobankapi.dto.CustAcctDTO;
 import kr.co.api.flobankapi.dto.CustFrgnAcctDTO;
 import kr.co.api.flobankapi.dto.CustInfoDTO;
+import kr.co.api.flobankapi.dto.CustTranHistDTO;
 import kr.co.api.flobankapi.mapper.MemberMapper;
 import kr.co.api.flobankapi.mapper.MypageMapper;
 import kr.co.api.flobankapi.util.AesUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -61,6 +63,30 @@ public class MypageService {
     // 외화 계좌 이름 바꾸기
     public void modifyFrgnAcctName(String name, String acctNo) {
         mypageMapper.updateFrgnAcctName(name, acctNo);
+    }
+
+    // 계좌 단건 조회
+    public CustAcctDTO findCustAcct(String acctNo) {
+        return mypageMapper.selectCustAcct(acctNo);
+    }
+
+    // 이체 히스토리 삽입
+    public void saveTranHist(CustTranHistDTO custTranHistDTO) {
+        mypageMapper.insertTranHist(custTranHistDTO);
+    }
+
+    // 입금, 출금
+    @Transactional
+    public void modifyCustAcctBal(CustTranHistDTO custTranHistDTO){
+        Integer amount = custTranHistDTO.getTranAmount();
+        String acctNo = custTranHistDTO.getTranAcctNo();
+        mypageMapper.updateMinusAcct(amount, acctNo);
+
+        // 출금을 플로뱅크로 했다면
+        if("888".equals(custTranHistDTO.getTranRecBkCode())){
+            String recAcctNo = custTranHistDTO.getTranRecAcctNo();
+            mypageMapper.updatePlusAcct(amount, recAcctNo);
+        }
     }
 
     public CustInfoDTO getCustInfo(String userCode) { // 고객 정보 받아오기

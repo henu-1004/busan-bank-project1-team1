@@ -3243,3 +3243,14 @@ body.event-page {
 #detail:hover {
     color: blue;            /* 파란색으로 변경 */
 }
+
+.error-msg {
+    color: #e74c3c; /* 빨간색 */
+    font-size: 13px;
+    margin-top: 5px;
+    display: none; /* 기본적으로 숨김 */
+    font-weight: bold;
+}
+.input-error {
+    border-color: #e74c3c !important; /* 에러 시 테두리 빨간색 */
+}

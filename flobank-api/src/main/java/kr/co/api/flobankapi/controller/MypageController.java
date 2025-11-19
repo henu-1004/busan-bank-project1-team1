@@ -66,7 +66,6 @@ public class MypageController {
             }
             model.addAttribute("custFrgnAcctDTO",custFrgnAcctDTO);
         }
-
         return "mypage/main";
     }
 
@@ -284,18 +283,59 @@ public class MypageController {
         return "mypage/en_account_open_3";
     }
 
-    @GetMapping("/ko_transfer_1")
-    public String ko_transfer_1(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
+    @PostMapping("/ko_transfer_1")
+    public String ko_transfer_1(Model model, @RequestParam("acctNo") String acctNo) {
+
+        // 계좌 정보 보내기
+        CustAcctDTO custAcctDTO = mypageService.findCustAcct(acctNo);
+        model.addAttribute("custAcctDTO", custAcctDTO);
+
+        // 이체 정보 받을 객체 보내기
+        CustTranHistDTO custTranHistDTO = new CustTranHistDTO();
+            // 미리 설정할 거
+        custTranHistDTO.setTranType(2); // 출금 : 2
+        custTranHistDTO.setTranAcctNo(acctNo); // 계좌번호
+
+
+        model.addAttribute("custTranHistDTO", custTranHistDTO);
+
         return  "mypage/ko_transfer_1";
     }
 
-    @GetMapping("/ko_transfer_2")
-    public String ko_transfer_2(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
+    @PostMapping("/ko_transfer_2")
+    public String ko_transfer_2(Model model, @ModelAttribute CustTranHistDTO custTranHistDTO, @AuthenticationPrincipal CustomUserDetails userDetails) {
+        log.info("수정전 custTranHistDTO = " + custTranHistDTO);
+        if(custTranHistDTO.getTranCustName() == null || custTranHistDTO.getTranCustName().trim().isEmpty()){
+            custTranHistDTO.setTranCustName(userDetails.getCustName());
+        }
+        if(custTranHistDTO.getTranRecName() == null || custTranHistDTO.getTranRecName().trim().isEmpty()){
+            custTranHistDTO.setTranRecName(custTranHistDTO.getTranRecAcctNo());
+        }
+        log.info("수정후 custTranHistDTO = " + custTranHistDTO);
+
+        model.addAttribute("custTranHistDTO", custTranHistDTO);
+
         return  "mypage/ko_transfer_2";
     }
 
-    @GetMapping("/ko_transfer_3")
-    public String ko_transfer_3(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
+    @PostMapping("/ko_transfer_3")
+    public String ko_transfer_3(@AuthenticationPrincipal CustomUserDetails userDetails, @ModelAttribute CustTranHistDTO custTranHistDTO, Model model) {
+        // 전자서명 임시 승인 수정해야함
+        custTranHistDTO.setTranEsignYn("Y");
+
+        log.info("마지막 단계(ko_transfer_3): custTranHistDTO = " + custTranHistDTO);
+
+        if(custTranHistDTO.getTranEsignYn().equals("Y")) {
+            // 이체 내역 삽입
+            mypageService.saveTranHist(custTranHistDTO);
+
+            // 이체 내역 db에 반영
+            mypageService.modifyCustAcctBal(custTranHistDTO);
+            model.addAttribute("state", "정상");
+        }else {
+            model.addAttribute("state", "실패");
+        }
+
         return  "mypage/ko_transfer_3";
     }
 

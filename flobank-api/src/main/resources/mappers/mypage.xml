@@ -57,4 +57,30 @@
         SET FRGN_ACCT_NAME = #{acctName}
         WHERE FRGN_ACCT_NO = #{acctNo}
     </update>
+
+    <select id="selectCustAcct">
+        SELECT * FROM TB_CUST_ACCT
+        WHERE ACCT_NO = #{acctNo}
+    </select>
+    
+    <insert id="insertTranHist" parameterType="kr.co.api.flobankapi.dto.CustTranHistDTO">
+        INSERT INTO TB_CUST_TRAN_HIST(TRAN_ACCT_NO, TRAN_CUST_NAME, TRAN_TYPE,
+        TRAN_AMOUNT, TRAN_DT, TRAN_REC_ACCT_NO, TRAN_REC_NAME, TRAN_REC_BK_CODE,
+        TRAN_MEMO, TRAN_ESIGN_YN, TRAN_ESIGN_DT)
+        VALUES (#{tranAcctNo}, #{tranCustName}, #{tranType}, #{tranAmount},
+        sysdate, #{tranRecAcctNo}, #{tranRecName}, #{tranRecBkCode},
+        #{tranMemo}, #{tranEsignYn}, sysdate)
+    </insert>
+    
+    <update id="updateMinusAcct">
+        UPDATE TB_CUST_ACCT
+        SET ACCT_BALANCE = ACCT_BALANCE - #{amount}
+        WHERE ACCT_NO = #{acctNo}
+    </update>
+
+    <update id="updatePlusAcct">
+        UPDATE TB_CUST_ACCT
+        SET ACCT_BALANCE = ACCT_BALANCE + #{amount}
+        WHERE ACCT_NO = #{acctNo}
+    </update>
 </mapper>
