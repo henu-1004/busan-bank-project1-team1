@@ -313,12 +313,13 @@
 
 .btn-transfer {
   border: none;
-  background: var(--sub-color);
-  color: #fff;
+  background: #2C5DE5;
+  color: white;
   padding: 6px 14px;
   border-radius: 6px;
   cursor: pointer;
   transition: background 0.3s ease;
+  text-decoration: none;  /* 밑줄 제거 */
 }
 
 /* 🔹 외화 보유 자산 - 3x2 카드 정렬 */
@@ -3228,4 +3229,17 @@ body.event-page {
 }
 .edit-btn:hover {
     color: #2C5DE5;
+}
+#detail {
+    color: black;           /* 검은색 글씨 */
+    text-decoration: none;  /* 밑줄 제거 */
+    font-size: 14px;        /* 폰트 크기 */
+    cursor: pointer;        /* 마우스 커서 모양 */
+    transition: color 0.2s; /* 색상 변경 시 부드럽게 전환 (선택사항) */
+    font-weight: 600;
+}
+
+/* 마우스를 올렸을 때(Hover) 스타일 */
+#detail:hover {
+    color: blue;            /* 파란색으로 변경 */
 }

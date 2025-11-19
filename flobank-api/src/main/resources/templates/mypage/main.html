@@ -141,7 +141,7 @@
                         </td>
                         <td >
                             <!-- (외화 잔액은 상세 확인 버튼으로 대체) -->
-                            <a href="#" class="account-link" style="font-size: 14px;">상세 확인</a>
+                            <a href="#foreign-assets-check" id="detail">상세 확인</a>
                         </td>
                         <td>
                             <a th:href="@{/remit/en_transfer_1}" class="btn-transfer">이체</a>
@@ -242,7 +242,7 @@
         </div>
 
         <div class="foreign-assets">
-            <div class="foreign-header">
+            <div class="foreign-header" id="foreign-assets-check">
                 <h2>보유 외화 자산</h2>
             </div>
 
