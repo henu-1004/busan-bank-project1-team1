@@ -27,7 +27,8 @@
             thist_version,
             thist_ver_memo,
             thist_admin_id,
-            thist_reg_dy
+            thist_reg_dy,
+            thist_file
         )
         VALUES(
                   #{thistTermCate},
@@ -36,7 +37,9 @@
                   #{thistVersion},
                   #{thistVerMemo},
                   #{thistAdminId},
-                  #{thistRegDy}
+                  #{thistRegDy},
+                  #{thistFile}
+
               )
     </insert>
 

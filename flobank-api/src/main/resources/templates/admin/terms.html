@@ -13,7 +13,8 @@
 
         <form class="terms-form"
               method="post"
-              th:action="@{/admin/terms/register}">
+              th:action="@{/admin/terms/register}"
+              enctype="multipart/form-data">
 
 
             <!-- 카테고리 선택 -->
@@ -58,6 +59,7 @@
             <div class="terms-modal-group">
                 <h3>약관 파일 첨부 (선택)</h3>
                 <input type="file"
+                       name="file"
                        id="modalFile"
                        class="terms-input"
                        accept=".pdf,.doc,.docx">
@@ -230,7 +232,7 @@
 
                 <div class="terms-modal-group">
                     <label>코멘트(특이사항)</label>
-                    <input type="text" id="modalVerMemo" class="terms-input" disabled>
+                    <input type="text" id="modalVerMemo" class="terms-input">
                 </div>
 
                 <!-- 내용 수정 -->

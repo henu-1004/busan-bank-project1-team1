@@ -107,6 +107,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const title = editTitle.value.trim();
         const content = editContent.value.trim();
 
+        const verMemo = document.getElementById("modalVerMemo").value.trim();
+
         if (!title || !content) {
             alert("제목과 내용은 비울 수 없습니다.");
             return;
@@ -118,6 +120,7 @@ document.addEventListener("DOMContentLoaded", () => {
         formData.append("title", title);
         formData.append("content", content);
         formData.append("currentVersion", currentVersion);
+        formData.append("verMemo", verMemo);
 
         // 버튼 상태 변경
         saveBtn.disabled = true;
