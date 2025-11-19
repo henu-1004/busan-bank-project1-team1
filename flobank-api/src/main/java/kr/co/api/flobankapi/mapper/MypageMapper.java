@@ -25,6 +25,12 @@ public interface MypageMapper {
     // 고객 외환 계좌 확인
     CustFrgnAcctDTO selectFrgnAcct(String custCode);
 
+    // 원화 계좌명 수정
+    void updateAcctName(String acctName, String acctNo);
+
+    // 외화 계좌명 수정
+    void updateFrgnAcctName(String acctName, String acctNo);
+
     CustInfoDTO selectCustInfo(String custId);
     LocalDate selectCheckKoAcct(String custCode);
     int selectCheckCntKoAcct(String custCode);

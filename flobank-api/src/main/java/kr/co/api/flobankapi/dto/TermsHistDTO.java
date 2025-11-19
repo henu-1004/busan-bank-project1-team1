@@ -15,4 +15,6 @@ public class TermsHistDTO {
     private String thistVerMemo;
     private String thistAdminId;
     private String thistRegDy;
+
+    private String termTitle;
 }

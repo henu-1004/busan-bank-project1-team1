@@ -1,82 +1,128 @@
-/* ============================================================
-   약관 수정 모달
-============================================================ */
+document.addEventListener("DOMContentLoaded", () => {
 
-// 모달 요소
-const termsModal = document.getElementById("termsModal");
-const modalClose = document.querySelector(".terms-modal-close");
+    /* ============================================================
+       약관 수정 모달
+    ============================================================ */
 
-// 수정 버튼 클릭 이벤트
-document.querySelectorAll(".terms-edit-btn").forEach(btn => {
-    btn.addEventListener("click", (e) => {
+    const termsModal = document.getElementById("termsModal");
+    const modalClose = document.querySelector(".terms-modal-close");
 
-        // 🔹 클릭된 테이블 row 찾기
-        const row = e.target.closest("tr");
+    // 수정 버튼 이벤트
+    document.querySelectorAll(".terms-edit-btn").forEach((btn) => {
+        btn.addEventListener("click", async () => {
 
-        // 🔥 실제 데이터(row에서 가져오기)
-        const category = row.children[0].innerText;
-        const title = row.children[1].innerText;
-        const version = row.children[2].innerText;
-        const regDate = row.children[3].innerText;
-        const writer = "홍길동 관리자";  // 서버 연동 시 실제 작성자로 대체
+            const cate = btn.dataset.cate;
+            const order = btn.dataset.order;
 
-        // 🔥 모달에 값 삽입
-        document.getElementById("modalCategory").value = category;
-        document.getElementById("modalTitle").value = title;
-        document.getElementById("modalVersion").value = version;
-        document.getElementById("modalRegDate").value = regDate;
-        document.getElementById("modalWriter").value = writer;
-        document.getElementById("modalContent").value =
-            "여기에 약관 내용이 들어갑니다."; // 실제 내용 받아오면 교체
+            const res = await fetch(`/flobank/admin/terms/detail?cate=${cate}&order=${order}`);
+            const data = await res.json();
 
-        // 모달 열기
-        termsModal.style.display = "block";
+            document.getElementById("modalCategory").value = cate;
+            document.getElementById("modalTitle").value = data.title;
+            document.getElementById("modalVersion").value = data.version;
+            document.getElementById("modalRegDate").value = data.regDy;
+            document.getElementById("modalWriter").value = data.adminId;
+            document.getElementById("modalContent").value = data.content;
+
+            const saveBtn = document.querySelector(".terms-modal-save");
+            saveBtn.dataset.cate = cate;
+            saveBtn.dataset.order = order;
+            saveBtn.dataset.version = data.version;
+
+            termsModal.style.display = "block";
+        });
     });
-});
 
-// 모달 닫기
-modalClose.addEventListener("click", () => {
-    termsModal.style.display = "none";
-});
-
-// 바깥 클릭하면 닫기
-window.addEventListener("click", (e) => {
-    if (e.target === termsModal) {
+    modalClose.addEventListener("click", () => {
         termsModal.style.display = "none";
-    }
-});
+    });
 
-
-/* ============================================================
-   약관 삭제
-============================================================ */
-
-document.querySelectorAll(".terms-delete-btn").forEach(btn => {
-    btn.addEventListener("click", (e) => {
-
-        const row = e.target.closest("tr");
-
-        // 삭제 확인 팝업
-        const result = confirm("정말 삭제하시겠습니까?");
-
-        if (result) {
-
-            // 🔥 1) 화면에서 행 삭제
-            row.remove();
-
-            // 🔥 2) 서버 연동이 필요한 경우 (추후 사용)
-            /*
-            const termsId = row.dataset.id;
-            fetch(`/admin/terms/delete/${termsId}`, {
-                method: "DELETE"
-            }).then(res => {
-                if (res.ok) {
-                    row.remove();
-                } else {
-                    alert("삭제 실패");
-                }
-            });
-            */
+    window.addEventListener("click", (e) => {
+        if (e.target === termsModal) {
+            termsModal.style.display = "none";
         }
     });
+
+
+    /* ============================================================
+       저장하기 (JS 수정 필수 부분)
+    ============================================================ */
+    document.querySelector(".terms-modal-save").addEventListener("click", async () => {
+
+        const saveBtn = document.querySelector(".terms-modal-save");
+
+        const cate = saveBtn.dataset.cate;
+        const order = saveBtn.dataset.order;
+        const currentVersion = saveBtn.dataset.version;
+
+        const title = document.getElementById("modalTitle").value;
+        const content = document.getElementById("modalContent").value;
+
+        const formData = new URLSearchParams();
+        formData.append("cate", cate);
+        formData.append("order", order);
+        formData.append("title", title);
+        formData.append("content", content);
+        formData.append("currentVersion", currentVersion);
+
+        const res = await fetch("/flobank/admin/terms/update", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: formData,
+        });
+
+        const data = await res.json();
+
+        if (data.status === "OK") {
+            alert("약관이 수정되었습니다.");
+            location.reload();
+        } else {
+            alert("수정 실패: " + data.message);
+        }
+    });
+
+
+    /* ============================================================
+       약관 삭제
+    ============================================================ */
+    document.querySelectorAll(".terms-delete-btn").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+
+            const cate = btn.dataset.cate;
+            const order = btn.dataset.order;
+
+            if (!confirm("정말 삭제하시겠습니까?")) return;
+
+            const res = await fetch(`/flobank/admin/terms/delete?cate=${cate}&order=${order}`);
+
+            if (res.ok) {
+                alert("삭제되었습니다.");
+                location.reload();
+            } else {
+                alert("삭제 실패");
+            }
+        });
+    });
+
+
+    /* ============================================================
+       스크롤 위치 저장 & 복원
+    ============================================================ */
+    window.addEventListener("beforeunload", () => {
+        localStorage.setItem("terms_scroll", String(window.scrollY));
+    });
+
+    window.addEventListener("load", () => {
+        const saved = localStorage.getItem("terms_scroll");
+        if (!saved) return;
+
+        setTimeout(() => {
+            window.scrollTo({
+                top: parseInt(saved),
+                behavior: "instant",
+            });
+            localStorage.removeItem("terms_scroll");
+        }, 50);
+    });
+
 });

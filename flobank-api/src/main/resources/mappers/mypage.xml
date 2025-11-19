@@ -45,4 +45,16 @@
         SELECT * FROM TB_CUST_FRGN_ACCT
         WHERE FRGN_ACCT_CUST_CODE = #{custCode}
     </select>
+
+    <update id="updateAcctName">
+        UPDATE TB_CUST_ACCT
+        SET ACCT_NAME = #{acctName}
+        WHERE ACCT_NO = #{acctNo}
+    </update>
+
+    <update id="updateFrgnAcctName">
+        UPDATE TB_CUST_FRGN_ACCT
+        SET FRGN_ACCT_NAME = #{acctName}
+        WHERE FRGN_ACCT_NO = #{acctNo}
+    </update>
 </mapper>

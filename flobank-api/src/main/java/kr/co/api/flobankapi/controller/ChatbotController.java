@@ -52,6 +52,8 @@ public class ChatbotController {
     public String chatbot(Model model, String q, String sessId) {
         System.out.println("GPT API 호출 들어옴 = " + System.currentTimeMillis());
 
+        System.out.println(">>> OPENAI KEY CHECK = " + System.getenv("OPENAI_API_KEY"));
+
         ChatbotHistDTO qHistDTO = new ChatbotHistDTO();
         qHistDTO.setBotType(1);
         qHistDTO.setBotContent(q);

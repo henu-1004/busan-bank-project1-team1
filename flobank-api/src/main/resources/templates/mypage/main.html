@@ -67,7 +67,7 @@
             </div>
 
             <div class="account-body">
-                <table class="account-table">
+                <table class="account-table" id="accountListTable">
                     <!-- 테이블 헤더 -->
                     <thead>
                     <tr>
@@ -80,12 +80,33 @@
                     <tbody>
                     <!-- 1. 원화 계좌 목록 (List) 반복 -->
                     <tr th:each="acct : ${custAcctDTOList}">
-                        <td th:text="${acct.getAcctName()}">FLO 입출금통장1</td>
                         <td>
-                            <button class="account-link" th:text="${acct.getAcctNo()}">112-2188-1931-00</button>
+                            <!-- 인라인 수정을 위한 wrapper 추가 -->
+                            <div class="acct-name-wrapper">
+                                <span class="acct-name-display" th:text="${acct.acctName}">FLO 입출금통장1</span>
+                                <input type="text" class="acct-name-input" th:value="${acct.acctName}" style="display:none;" />
+
+                                <button class="edit-btn js-edit-name"
+                                        th:data-acct-no="${acct.acctNo}"
+                                        data-acct-type="KRW">
+                                    <i class="fa-solid fa-pen"></i>
+                                </button>
+                                <button class="edit-btn js-save-name"
+                                        th:data-acct-no="${acct.acctNo}"
+                                        data-acct-type="KRW" style="display:none;">
+                                    <i class="fa-solid fa-check"></i>
+                                </button>
+                                <button class="edit-btn js-cancel-name" style="display:none;">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </button>
+                            </div>
+                            <div class="acct-name-error" style="color: red; font-size: 12px; display: none;"></div>
+                        </td>
+                        <td>
+                            <button class="account-link" th:text="${acct.acctNo}">112-2188-1931-00</button>
                         </td>
                         <!-- #numbers.formatInteger로 콤마(,) 추가 -->
-                        <td th:text="|${#numbers.formatInteger(acct.getAcctBalance(), 0, 'COMMA')}원|">2,450,000원</td>
+                        <td th:text="|${#numbers.formatInteger(acct.acctBalance, 0, 'COMMA')}원|">2,450,000원</td>
                         <td>
                             <a th:href="@{/mypage/ko_transfer_1}" class="btn-transfer">이체</a>
                         </td>
@@ -93,11 +114,35 @@
 
                     <!-- 2. 외화 계좌 (단일 객체) 표시 (null이 아닐 경우) -->
                     <tr th:if="${custFrgnAcctDTO != null}">
-                        <td th:text="${custFrgnAcctDTO.getFrgnAcctName()}">FLO 외화통장</td>
                         <td>
-                            <button class="account-link" th:text="${custFrgnAcctDTO.getFrgnAcctNo()}">112-5566-1823-00</button>
+                            <!-- [수정] 인라인 수정을 위한 wrapper 추가 -->
+                            <div class="acct-name-wrapper">
+                                <span class="acct-name-display" th:text="${custFrgnAcctDTO.frgnAcctName}">FLO 외화통장</span>
+                                <input type="text" class="acct-name-input" th:value="${custFrgnAcctDTO.frgnAcctName}" style="display:none;" />
+
+                                <button class="edit-btn js-edit-name"
+                                        th:data-acct-no="${custFrgnAcctDTO.frgnAcctNo}"
+                                        data-acct-type="FRGN">
+                                    <i class="fa-solid fa-pen"></i>
+                                </button>
+                                <button class="edit-btn js-save-name"
+                                        th:data-acct-no="${custFrgnAcctDTO.frgnAcctNo}"
+                                        data-acct-type="FRGN" style="display:none;">
+                                    <i class="fa-solid fa-check"></i>
+                                </button>
+                                <button class="edit-btn js-cancel-name" style="display:none;">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </button>
+                            </div>
+                            <div class="acct-name-error" style="color: red; font-size: 12px; display: none;"></div>
                         </td>
-                        <td ><a>상세 확인</a></td>
+                        <td>
+                            <button class="account-link" th:text="${custFrgnAcctDTO.frgnAcctNo}">112-5566-1823-00</button>
+                        </td>
+                        <td >
+                            <!-- (외화 잔액은 상세 확인 버튼으로 대체) -->
+                            <a href="#foreign-assets-check" id="detail">상세 확인</a>
+                        </td>
                         <td>
                             <a th:href="@{/remit/en_transfer_1}" class="btn-transfer">이체</a>
                         </td>
@@ -197,7 +242,7 @@
         </div>
 
         <div class="foreign-assets">
-            <div class="foreign-header">
+            <div class="foreign-header" id="foreign-assets-check">
                 <h2>보유 외화 자산</h2>
             </div>
 

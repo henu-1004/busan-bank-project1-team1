@@ -58,13 +58,33 @@ jobs:
           --project=${{ secrets.GCP_PROJECT_ID }} \
           --zone=asia-northeast3-a
 
+    # 2-2.5. [복사] docker-compose.yml 파일을 bnk-api-server VM으로 복사
+    - name: bnk-api-server compose 파일 복사
+      run: |
+        gcloud beta compute scp flobank-api/docker-compose.yml \
+          bnk-api-server:/opt/flobank-api/docker-compose.yml \
+          --project=${{ secrets.GCP_PROJECT_ID }} \
+          --zone=asia-northeast3-a
+        
+
     # 2-3. [실행] bnk-api-server VM에 접속해 Docker Compose 재시작
     - name: bnk-api-server (flobank-api) 재시작 및 정리
       run: |
         gcloud beta compute ssh bnk-api-server \
           --project=${{ secrets.GCP_PROJECT_ID }} \
           --zone=asia-northeast3-a \
-          --command="sudo rm -rf /opt/flobank-api/app.jar && sudo mv /tmp/app.jar /opt/flobank-api/app.jar && cd /opt/flobank-api && OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} sudo docker-compose down && OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} sudo docker-compose build --no-cache && OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} sudo docker-compose up -d && sudo docker system prune -a -f"
+          --command="
+            sudo rm -rf /opt/flobank-api/app.jar && \
+            sudo mv /tmp/app.jar /opt/flobank-api/app.jar && \
+            cd /opt/flobank-api && \
+            # 1. .env 파일 생성 (여기에 API 키 저장)
+            echo 'OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}' | sudo tee .env > /dev/null && \
+            # 2. Docker Compose 실행 (자동으로 .env를 읽음)
+            sudo docker-compose down && \
+            sudo docker-compose build --no-cache && \
+            sudo docker-compose up -d && \
+            sudo docker system prune -a -f
+          "
 
     # 3-1. [빌드] GitHub Actions 실행기에서 flobank-ap 프로젝트를 빌드
     - name: bnk-ap-server (flobank-ap) 빌드

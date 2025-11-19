@@ -49,6 +49,10 @@ body {
   font-size: 20px;
   font-weight: 700;
 }
+.logo-link{
+    color: inherit;
+    text-decoration: none;
+}
 
 /* 사이드바 메뉴 */
 .sidebar nav ul {
@@ -123,6 +127,17 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
+}
+
+.profile-actions .home-btn {
+    display: inline-block;
+    font-size: 12px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    border: 1px solid #ddd;
+    text-decoration: none;
+    color: #333;
+    margin-bottom: 4px;
 }
 
 /* 관리자 이름 텍스트 */

@@ -31,7 +31,14 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // JWT 사용 시 CSRF 비활성화 가능 (쿠키 사용 시엔 켜는 게 좋지만, 지금은 복잡도 줄이기 위해 끔)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 세션 안 씀
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/member/login", "/member/register", "/css/**", "/js/**", "/images/**", "/mypage/chatbot", "/remit/info").permitAll()
+                        .requestMatchers("/",
+                                        "/member/login",
+                                        "/member/register",
+                                        "/css/**",
+                                        "/js/**", "/images/**",
+                                        "/mypage/chatbot",
+                                        "/remit/info"
+                        ).permitAll()
                         .requestMatchers("/mypage/**").authenticated() // 마이페이지는 로그인 필요
                         .requestMatchers("/remit/**").authenticated()
                         .requestMatchers("/exchange/step1").authenticated()

@@ -9,7 +9,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -48,21 +50,17 @@ public class TermsDbService {
 
         String today = LocalDate.now().format(FMT);
 
-        log.info("=== [약관 등록 시작] ===");
-        log.info("카테고리: {}, 제목: {}", cate, title);
+        // ★ term_order 직접 생성
+        Integer order = mapper.selectMaxOrderByCate(cate);
+        order = (order == null) ? 1 : order + 1;
 
         // MASTER INSERT
         TermsMasterDTO master = new TermsMasterDTO();
         master.setTermCate(cate);
+        master.setTermOrder(order);
         master.setTermTitle(title);
         master.setTermRegDy(today);
         mapper.insertTermsMaster(master);
-
-        log.info("[MASTER INSERT 완료]");
-
-        // 생성된 term_order 조회
-        Integer order = mapper.selectMaxOrderByCate(cate);
-        log.info("[ORDER 생성 완료] → {}", order);
 
         // HIST INSERT
         TermsHistDTO hist = new TermsHistDTO();
@@ -75,10 +73,8 @@ public class TermsDbService {
         hist.setThistRegDy(today);
 
         mapper.insertTermsHist(hist);
-
-        log.info("[HIST INSERT 완료]");
-        log.info("=== [약관 등록 종료] ===");
     }
+
 
     /** 수정 → HIST 새 버전 생성 */
     @Transactional
@@ -141,4 +137,65 @@ public class TermsDbService {
 
         log.info("[약관 동의 기록 완료]");
     }
+
+
+    public Map<String, Object> getTermsPage(int page, int pageSize) {
+
+        int start = (page - 1) * pageSize;
+
+        List<TermsMasterDTO> list = mapper.selectTermsPage(start, pageSize);
+        int totalCount = mapper.countTerms();
+
+        int totalPage = (int) Math.ceil(totalCount / (double) pageSize);
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("list", list);
+        result.put("totalPage", totalPage);
+
+        return result;
+    }
+
+    public Map<String, Object> getTermsPage(int page, int pageSize,
+                                            String type, String keyword) {
+
+        int start = (page - 1) * pageSize;
+
+        List<TermsMasterDTO> list =
+                mapper.selectTermsPageFiltered(start, pageSize, type, keyword);
+
+        int totalCount =
+                mapper.countTermsFiltered(type, keyword);
+
+        int totalPage = (int) Math.ceil(totalCount / (double) pageSize);
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("list", list);
+        result.put("totalPage", totalPage);
+
+        return result;
+    }
+
+
+    public Map<String, Object> getTermsDetail(int cate, int order) {
+
+        TermsMasterDTO master = mapper.selectMaster(cate, order);
+        TermsHistDTO latest = mapper.selectLatestHist(cate, order);
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("title", master.getTermTitle());
+        result.put("version", latest.getThistVersion());
+        result.put("regDy", latest.getThistRegDy());
+        result.put("adminId", latest.getThistAdminId());
+        result.put("content", latest.getThistContent());
+
+        return result;
+    }
+
+    public List<TermsHistDTO> getTermsByLocation(int termCate) {
+        log.info("[고객 약관 조회] cate={}", termCate);
+        List<TermsHistDTO> list = mapper.selectTermsByCate(termCate);
+        log.info("[고객 약관 조회] 총 {}건", list.size());
+        return list;
+    }
+
 }
