@@ -2606,4 +2606,8 @@ input[type="file"] {
     box-sizing: border-box;
 }
 
-
+/*약관 등록하기 버튼 오른쪽 정렬*/
+.terms-submit-wrap {
+    text-align: right;
+    margin-top: 20px;
+}
