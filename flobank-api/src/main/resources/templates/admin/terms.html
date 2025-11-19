@@ -72,47 +72,47 @@
 
 
 
-                <!-- 테이블 -->
-                <!-- 테이블 -->
-                <div class="product-table-wrap">
-                    <table class="product-table terms-table">
-                        <thead>
-                        <tr>
-                            <th>약관 카테고리</th>   <!-- row.children[0] -->
-                            <th>약관 제목</th>       <!-- row.children[1] -->
-                            <th>버전</th>            <!-- row.children[2] -->
-                            <th>등록일</th>          <!-- row.children[3] -->
-                            <th>수정일</th>          <!-- row.children[4] -->
-                            <th>관리</th>            <!-- row.children[5] -->
-                        </tr>
-                        </thead>
+    <!-- 테이블 -->
+    <!-- 테이블 -->
+    <div class="product-table-wrap">
+        <table class="product-table terms-table">
+            <thead>
+            <tr>
+                <th>약관 카테고리</th>   <!-- row.children[0] -->
+                <th>약관 제목</th>       <!-- row.children[1] -->
+                <th>버전</th>            <!-- row.children[2] -->
+                <th>등록일</th>          <!-- row.children[3] -->
+                <th>수정일</th>          <!-- row.children[4] -->
+                <th>관리</th>            <!-- row.children[5] -->
+            </tr>
+            </thead>
 
-                        <tbody>
-                        <tr th:each="t : ${termsList}">
-                            <td th:text="${t.termCate} == 1 ? '회원가입' :
+            <tbody>
+            <tr th:each="t : ${termsList}">
+                <td th:text="${t.termCate} == 1 ? '회원가입' :
                          ${t.termCate} == 2 ? '환전하기' :
                          ${t.termCate} == 3 ? '외화송금' : '외환예금'"></td>
 
-                            <td th:text="${t.termTitle}"></td>
+                <td th:text="${t.termTitle}"></td>
 
-                            <td th:text="'v' + ${t.latestVersion}"></td>
+                <td th:text="'v' + ${t.latestVersion}"></td>
 
-                            <td th:text="${t.termRegDy}"></td>
-                            <td th:text="${t.latestRegDy}"></td>
+                <td th:text="${t.termRegDy}"></td>
+                <td th:text="${t.latestRegDy}"></td>
 
-                            <td class="terms-actions">
-                                <button class="terms-edit-btn">수정</button>
+                <td class="terms-actions">
+                    <button class="terms-edit-btn">수정</button>
 
-                                <button class="terms-delete-btn"
-                                        th:attr="data-cate=${t.termCate}, data-order=${t.termOrder}">
-                                    삭제
-                                </button>
-                            </td>
-                        </tr>
-                        </tbody>
+                    <button class="terms-delete-btn"
+                            th:attr="data-cate=${t.termCate}, data-order=${t.termOrder}">
+                        삭제
+                    </button>
+                </td>
+            </tr>
+            </tbody>
 
-                    </table>
-                </div>
+        </table>
+    </div>
     <!-- ===================================================== -->
     <!-- 2) 약관 현황 -->
     <!-- ===================================================== -->
@@ -233,75 +233,75 @@
     </section>
 
 
-                <!-- ==========================
-                 🔹 약관 수정 모달
-            ========================== -->
-<div class="terms-modal" id="termsModal">
-    <div class="terms-modal-content">
+    <!-- ==========================
+     🔹 약관 수정 모달
+========================== -->
+    <div class="terms-modal" id="termsModal">
+        <div class="terms-modal-content">
 
-        <span class="terms-modal-close">&times;</span>
+            <span class="terms-modal-close">&times;</span>
 
-        <h2 class="terms-modal-title">약관 수정</h2>
+            <h2 class="terms-modal-title">약관 수정</h2>
 
-        <div class="terms-modal-body">
+            <div class="terms-modal-body">
 
-            <!-- 카테고리 -->
-            <div class="terms-modal-group">
-                <label>약관 카테고리</label>
-                <input type="text" id="modalCategory" class="terms-input" disabled>
-            </div>
-
-            <!-- 제목 -->
-            <div class="terms-modal-group">
-                <label>약관 제목</label>
-                <input type="text" id="modalTitle" class="terms-input" disabled>
-            </div>
-
-            <!-- 버전 / 등록일 / 등록자 -->
-            <div class="terms-modal-row">
+                <!-- 카테고리 -->
                 <div class="terms-modal-group">
-                    <label>버전</label>
-                    <input type="text" id="modalVersion" class="terms-input" disabled>
+                    <label>약관 카테고리</label>
+                    <input type="text" id="modalCategory" class="terms-input" disabled>
                 </div>
 
+                <!-- 제목 -->
                 <div class="terms-modal-group">
-                    <label>등록일</label>
-                    <input type="text" id="modalRegDate" class="terms-input" disabled>
+                    <label>약관 제목</label>
+                    <input type="text" id="modalTitle" class="terms-input" disabled>
                 </div>
 
-                <div class="terms-modal-group">
-                    <label>등록자</label>
-                    <input type="text" id="modalWriter" class="terms-input" disabled>
+                <!-- 버전 / 등록일 / 등록자 -->
+                <div class="terms-modal-row">
+                    <div class="terms-modal-group">
+                        <label>버전</label>
+                        <input type="text" id="modalVersion" class="terms-input" disabled>
+                    </div>
+
+                    <div class="terms-modal-group">
+                        <label>등록일</label>
+                        <input type="text" id="modalRegDate" class="terms-input" disabled>
+                    </div>
+
+                    <div class="terms-modal-group">
+                        <label>등록자</label>
+                        <input type="text" id="modalWriter" class="terms-input" disabled>
+                    </div>
                 </div>
+
+                <!-- 내용 수정 -->
+                <div class="terms-modal-group">
+                    <label>약관 내용</label>
+                    <textarea id="modalContent" class="terms-textarea" rows="8"></textarea>
+                </div>
+
+
+
             </div>
 
-            <!-- 내용 수정 -->
-            <div class="terms-modal-group">
-                <label>약관 내용</label>
-                <textarea id="modalContent" class="terms-textarea" rows="8"></textarea>
+
+
+            <div class="terms-modal-footer">
+                <button class="terms-modal-cancel">취소</button>
+                <button class="terms-modal-save">저장하기</button>
             </div>
-
-
 
         </div>
-
-
-
-        <div class="terms-modal-footer">
-            <button class="terms-modal-cancel">취소</button>
-            <button class="terms-modal-save">저장하기</button>
-        </div>
-
     </div>
-</div>
 
 
 
 
 
-<script th:if="${msg != null}">
-    alert([[${msg}]]);
-</script>
+    <script th:if="${msg != null}">
+        alert([[${msg}]]);
+    </script>
 
 
 </th:block>
@@ -311,4 +311,3 @@
 </th:block>
 
 </html>
-
