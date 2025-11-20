@@ -13,6 +13,7 @@ public interface DashboardMapper {
     // 오늘 거래 건수들
     int selectTodayWonTxCount();    //예금계좌 테이블
     int selectTodayFrgnRemtTxCount();   // 해외송금 테이블
+    int selectTodayExChangeTxCount();
 
 
     // 가입자 통계

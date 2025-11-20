@@ -4,12 +4,12 @@
 
 <mapper namespace="kr.co.api.flobankapi.mapper.admin.DashboardMapper">
 
-    <!-- 오늘 입출금 건수: TB_DPST_ACCT_DTL -->
+    <!-- 오늘 입출금 건수: TB_CUST_TRAN_HIST -->
     <select id="selectTodayWonTxCount" resultType="int">
         SELECT COUNT(*)
-        FROM TB_DPST_ACCT_DTL
-        WHERE dpst_tran_dt IS NOT NULL
-          AND TRUNC(dpst_tran_dt) = TRUNC(SYSDATE)
+        FROM TB_CUST_TRAN_HIST
+        WHERE tran_dt IS NOT NULL
+          AND TRUNC(tran_dt) = TRUNC(SYSDATE)
     </select>
 
     <!-- 오늘 외화송금 건수: TB_FRGN_REMT_TRAN -->

@@ -23,6 +23,9 @@ public class DashboardController {
     public String adminHome(Model model) {
 
         DashboardDTO stats = dashboardService.getStats();
+        if (stats == null) {
+            stats = new DashboardDTO();  // NPE 방지용
+        }
         model.addAttribute("stats", stats);
         model.addAttribute("baseTime", LocalDateTime.now());
         model.addAttribute("activeItem", "dashboard");

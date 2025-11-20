@@ -27,8 +27,13 @@
                     <span th:text="|(입출금,환전,외화송금) ${#temporals.format(baseTime, 'yyyy.MM.dd HH:mm:ss')} 기준)|"></span>
                 </h3>
                 <div class="admin-graph-box">
-                    <img th:src="@{/images/ex.png}" alt="오늘 거래 건수 그래프" />
+                    <canvas id="todayTxChart"></canvas>
                 </div>
+                <p style="color:red"
+                   th:if="${stats != null}"
+                   th:each="tx : ${stats.todayTxCounts}">
+                    [[${tx.type}]] : [[${tx.count}]]
+                </p>
             </article>
         </div>
     </section>
@@ -97,6 +102,44 @@
 </th:block>
 
 <th:block th:fragment="script">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script th:inline="javascript">
+        // DTO(List<TxCountDTO>) → JS 배열로 변환
+        const txLabels = [];
+        const txCounts = [];
+
+        /*[# th:each="tx : ${stats.todayTxCounts}"]*/
+        txLabels.push(/*[[${tx.type}]]*/);
+        txCounts.push(/*[[${tx.count}]]*/);
+        /*[/]*/
+
+        const todayTxCtx = document.getElementById('todayTxChart');
+
+        if (todayTxCtx) {
+            new Chart(todayTxCtx, {
+                type: 'bar',
+                data: {
+                    labels: txLabels,           // ["입출금","환전","외화송금", ...]
+                    datasets: [{
+                        label: '오늘 거래 건수(건)',
+                        data: txCounts          // [123, 45, 7, ...]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { stepSize: 1 }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
 
     <script>
         document.querySelectorAll('.admin-keyword-box span').forEach(el => {
