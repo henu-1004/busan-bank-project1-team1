@@ -72,11 +72,11 @@
           </tr>
           <tr>
             <th>수수료</th>
-            <td th:text="|${currencySymbol} (중계은행 수수료 포함)|">$10.00 (중계은행 수수료 포함)</td>
+            <td th:text="|${currencySymbol}${frgnRemtTranDTO.remtFee} (중계은행 수수료 포함)|">$10.00 (중계은행 수수료 포함)</td>
           </tr>
           <tr>
             <th>신청일시</th>
-            <td>2025-11-09 15:42:17</td>
+            <td th:text="${frgnRemtTranDTO.remtDt}">2025-11-09 15:42:17</td>
           </tr>
         </tbody>
       </table>
@@ -90,23 +90,23 @@
         <tbody>
           <tr>
             <th>수취국가</th>
-            <td>미국 (USA)</td>
+            <td th:text="${frgnRemtTranDTO.remtCountry}">미국 (USA)</td>
           </tr>
           <tr>
             <th>수취인(영문 이름)</th>
-            <td>JOHN DOE</td>
+            <td th:text="${frgnRemtTranDTO.getRemtRecName()}">JOHN DOE</td>
           </tr>
           <tr>
             <th>수취인 주소</th>
-            <td>1234 MAIN ST, LOS ANGELES, CALIFORNIA, 90001</td>
+            <td th:text="|${frgnRemtTranDTO.remtAddr}, ${frgnRemtTranDTO.remtCity}, ${frgnRemtTranDTO.remtState}|">1234 MAIN ST, LOS ANGELES, CALIFORNIA, 90001</td>
           </tr>
           <tr>
             <th>은행코드 (ACH Routing No)</th>
-            <td>026009593</td>
+            <td th:text="${frgnRemtTranDTO.remtRecBkCode}">026009593</td>
           </tr>
           <tr>
             <th>계좌번호 (Account No)</th>
-            <td>1234567890</td>
+            <td th:text="${frgnRemtTranDTO.remtRecAccNo}">1234567890</td>
           </tr>
         </tbody>
       </table>
@@ -116,7 +116,18 @@
 
     <div class="transfer2-actions">
         <a th:href="@{/remit/en_transfer_2}" class="transfer2-btn-sub">이전</a>
-        <a th:href="@{/remit/en_transfer_4}" class="transfer2-btn-main">이체실행</a>
+        <form th:action="@{/remit/en_transfer_4}" method="post" th:object="${frgnRemtTranDTO}" style="display:inline;">
+
+            <input type="hidden" th:field="*{remtAcctNo}">      <input type="hidden" th:field="*{remtCurrency}">    <input type="hidden" th:field="*{remtAmount}">      <input type="hidden" th:field="*{remtFee}">         <input type="hidden" th:field="*{remtDt}">          <input type="hidden" th:field="*{remtCountry}">
+            <input type="hidden" th:field="*{remtRecName}">
+            <input type="hidden" th:field="*{remtAddr}">
+            <input type="hidden" th:field="*{remtCity}">
+            <input type="hidden" th:field="*{remtState}">
+            <input type="hidden" th:field="*{remtRecBkCode}">
+            <input type="hidden" th:field="*{remtRecAccNo}">
+
+            <button type="submit" class="transfer2-btn-main">이체실행</button>
+        </form>
     </div>
 
   </div>

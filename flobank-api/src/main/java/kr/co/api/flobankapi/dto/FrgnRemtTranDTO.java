@@ -11,14 +11,14 @@ public class FrgnRemtTranDTO {
     long remtNo;
     String remtAcctNo;
     String remtCustName;
-    Integer remtAmount;
+    double remtAmount;
     String remtDt;
     String remtRecAccNo;
     String remtRecName;
     String remtRecBkCode;
     String remtCurrency;
     double remtAppliedRate;
-    Integer remtFee;
+    double remtFee;
     int remtStatus;
     String remtAddr;
     String remtCity;

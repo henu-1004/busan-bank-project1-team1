@@ -149,7 +149,13 @@
                             <a href="#foreign-assets-check" id="detail">상세 확인</a>
                         </td>
                         <td>
-                            <a th:href="@{/remit/en_transfer_1(acctNo=${custFrgnAcctDTO.frgnAcctNo})}" class="btn-transfer">이체</a>
+                            <a th:href="@{/remit/en_transfer_1}" class="btn-transfer">이체</a>
+                            <!--
+                            <form th:action="@{/remit/en_transfer_1}" method="post">
+                                <input type="hidden" name="acctNo" th:value="${custFrgnAcctDTO.frgnAcctNo}">
+                                <button type="submit" class="btn-transfer">이체</button>
+                            </form>
+                            -->
                         </td>
                     </tr>
 

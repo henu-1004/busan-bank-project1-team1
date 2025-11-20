@@ -3,6 +3,7 @@ package kr.co.api.flobankapi.service;
 import kr.co.api.flobankapi.dto.CustFrgnAcctDTO;
 import kr.co.api.flobankapi.dto.FrgnAcctBalanceDTO;
 import kr.co.api.flobankapi.dto.FrgnRemtTranDTO;
+import kr.co.api.flobankapi.mapper.MypageMapper;
 import kr.co.api.flobankapi.mapper.RemitMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,11 +15,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class RemitService {
     private final RemitMapper remitMapper;
+    private final MypageMapper mypageMapper;
 
-    public void saveFrgnRemtTran(FrgnRemtTranDTO frgnRemtTranDTO) {
-        remitMapper.insertFrgnRemtTran(frgnRemtTranDTO);
-    }
-
+    // 외화 이체
     @Transactional
     public boolean saveFrgnTran(FrgnRemtTranDTO frgnRemtTranDTO){
         try {
@@ -26,8 +25,15 @@ public class RemitService {
             remitMapper.insertFrgnRemtTran(frgnRemtTranDTO);
 
             // 계좌 잔액 처리
+            if(frgnRemtTranDTO.getRemtAcctNo().contains("-10-")){
+                Integer bal = Math.toIntExact(Math.round(frgnRemtTranDTO.getRemtAmount()));
+                mypageMapper.updateMinusAcct(bal, frgnRemtTranDTO.getRemtAcctNo());
+            } else {
+                remitMapper.updateMinusBal(frgnRemtTranDTO.getRemtAmount(), frgnRemtTranDTO.getRemtAcctNo());
+            }
 
         }catch (Exception e){
+            e.printStackTrace();
             return false;
         }
 

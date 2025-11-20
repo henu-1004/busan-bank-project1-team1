@@ -204,6 +204,8 @@ public class MypageController {
 
     }
 
+
+
     @GetMapping("/en_account_open_1")
     public String en_account_open_1(Model model) {
 

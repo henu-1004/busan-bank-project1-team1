@@ -9,6 +9,6 @@ import org.apache.ibatis.annotations.Mapper;
 public interface RemitMapper {
     void insertFrgnRemtTran(FrgnRemtTranDTO frgnRemtTranDTO);
 
-    void updateMinusBal(Integer amount, String cur, String acctNo);
+    void updateMinusBal(double amount, String acctNo);
     CustFrgnAcctDTO selectParAcctNo(String balNo);
 }
