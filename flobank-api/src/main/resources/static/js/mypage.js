@@ -494,3 +494,69 @@ function submitTransferForm() {
 
     form.submit();
 }
+
+////////////////////////////////////////////////////////////////////////////
+// 1️⃣2️⃣ [수정됨] 국가별 라벨 단순 변경 (추가 필드 제거)
+////////////////////////////////////////////////////////////////////////////
+
+const countrySettings = {
+    'USA': {
+        bankLabel: '은행코드 (ACH Routing No)',
+        bankPlace: '9자리 숫자',
+        acctLabel: '계좌번호 (Account No)',
+        acctPlace: '예: 1234567890'
+    },
+    'JPN': {
+        bankLabel: 'SWIFT BIC',
+        bankPlace: '영문+숫자 8~11자리',
+        acctLabel: '계좌번호 (Account No)',
+        acctPlace: '예: 1234567'
+    },
+    'DEU': { // 유럽
+        bankLabel: 'SWIFT BIC',
+        bankPlace: '영문+숫자 8~11자리',
+        acctLabel: 'IBAN Code',
+        acctPlace: '국가코드 포함 전체'
+    },
+    'CHN': {
+        bankLabel: 'CNAPS Code',
+        bankPlace: '12자리 숫자',
+        acctLabel: '계좌번호 (Account No)',
+        acctPlace: '예: 621483...'
+    },
+    'AUS': {
+        bankLabel: 'BSB Code',
+        bankPlace: '6자리 숫자',
+        acctLabel: '계좌번호 (Account No)',
+        acctPlace: '최대 9자리 숫자'
+    },
+    'GBR': {
+        bankLabel: 'Sort Code',
+        bankPlace: '6자리 숫자 (예: 20-00-00)',
+        acctLabel: '계좌번호 (Account No)',
+        acctPlace: '8자리 숫자'
+    }
+};
+
+function updateReceiverForm() {
+    const countrySelect = document.getElementById('country-select');
+    if (!countrySelect) return;
+
+    const selectedCountry = countrySelect.value;
+    const settings = countrySettings[selectedCountry];
+
+    if (settings) {
+        document.getElementById('label-bank-code').textContent = settings.bankLabel;
+        document.getElementById('input-bank-code').placeholder = settings.bankPlace;
+        document.getElementById('label-account-no').textContent = settings.acctLabel;
+        document.getElementById('input-account-no').placeholder = settings.acctPlace;
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const countrySelect = document.getElementById('country-select');
+    if(countrySelect) {
+        countrySelect.addEventListener('change', updateReceiverForm);
+        updateReceiverForm(); // 초기화
+    }
+});

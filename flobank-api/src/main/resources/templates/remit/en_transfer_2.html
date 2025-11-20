@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>외화 계좌이체 2</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>외화 계좌이체 2</title>
     <link rel="stylesheet" th:href="@{/css/mypage.css}">
     <link rel="stylesheet" th:href="@{/css/header.css}">
     <link rel="stylesheet" th:href="@{/css/footer.css}">
-  
+
 
     <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-    crossorigin="anonymous"
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+            crossorigin="anonymous"
     />
 
 </head>
@@ -144,13 +144,13 @@
 
                 <div class="transfer1-form-group">
                     <label class="transfer1-label">수취국가</label>
-                    <select class="transfer1-select">
-                        <option>미국 (USA)</option>
-                        <option>일본 (Japan)</option>
-                        <option>독일 (Germany)</option>
-                        <option>중국 (China)</option>
-                        <option>영국 (UK)</option>
-                        <option>호주 (Australia)</option>
+                    <select class="transfer1-select" id="country-select" name="remtCountry">
+                        <option value="USA">미국 (USA)</option>
+                        <option value="JPN">일본 (Japan)</option>
+                        <option value="DEU">독일 (Germany/Europe)</option>
+                        <option value="CHN">중국 (China)</option>
+                        <option value="GBR">영국 (UK)</option>
+                        <option value="AUS">호주 (Australia)</option>
                     </select>
                 </div>
 
@@ -181,13 +181,13 @@
                 </div>
 
                 <div class="transfer1-form-group">
-                    <label class="transfer1-label">은행코드 (ACH Routing No)</label>
-                    <input type="text" class="transfer1-input" placeholder="예: 026009593" name="remtRecBkCode">
+                    <label class="transfer1-label" id="label-bank-code">은행코드 (ACH Routing No)</label>
+                    <input type="text" class="transfer1-input" id="input-bank-code" placeholder="예: 026009593" name="remtRecBkCode">
                 </div>
 
                 <div class="transfer1-form-group">
-                    <label class="transfer1-label">계좌번호 (Account No)</label>
-                    <input type="text" class="transfer1-input" placeholder="예: 1234567890" name="remtRecAccNo">
+                    <label class="transfer1-label" id="label-account-no">계좌번호 (Account No)</label>
+                    <input type="text" class="transfer1-input" id="input-account-no" placeholder="예: 1234567890" name="remtRecAccNo">
                 </div>
             </section>
 
@@ -205,4 +205,3 @@
 
 </body>
 </html>
-
