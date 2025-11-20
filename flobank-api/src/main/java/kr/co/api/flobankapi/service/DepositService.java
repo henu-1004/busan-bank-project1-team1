@@ -87,6 +87,7 @@ public class DepositService {
 
     public String getTermsFileByTitle(String productName) {
         return depositMapper.findTermsFileByTitle(productName);
+    }
 
     public List<FrgnAcctBalanceDTO> getFrgnAcctBalList(String balFrgnAcctNo) {
         return depositMapper.getFrgnAcctBalList(balFrgnAcctNo);
