@@ -32,11 +32,11 @@ public class TranslationService {
         // Redis 캐시 조회
         String cached = redisTemplate.opsForValue().get(cacheKey);
         if (cached != null) {
-            System.out.println("Redis Cache Hit!");
+//            System.out.println("Redis Cache Hit!");
             return cached;
         }
 
-        System.out.println(" DeepL API 호출...");
+//        System.out.println(" DeepL API 호출...");
 
         // ------------------ [수정 시작] ------------------
 

@@ -6,7 +6,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Controller
@@ -64,9 +67,17 @@ public class DepositController {
 
 
     @GetMapping("/view")
-    public String view(Model model){
-        model.addAttribute("activeItem","product");
+    public String view(@RequestParam("dpstId") String dpstId, Model model) {
+        ProductDTO product = depositService.getProduct(dpstId);
+        LocalDate delibDate = LocalDate.parse(product.getDpstDelibDy(), DateTimeFormatter.ofPattern("yyyyMMdd"));
+        LocalDate startDate = LocalDate.parse(product.getDpstDelibStartDy(), DateTimeFormatter.ofPattern("yyyyMMdd"));
+        model.addAttribute("product", product);
+        model.addAttribute("delibDate", delibDate);
+        model.addAttribute("startDate", startDate);
+
         return "deposit/view";
     }
+
+
 
 }

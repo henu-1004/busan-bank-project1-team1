@@ -11,4 +11,8 @@ public interface DepositMapper {
     List<ProductDTO> findActiveProducts();
 
     int countActiveProducts();
+
+    ProductDTO findProductById(String dpstId);
+
+
 }
