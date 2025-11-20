@@ -5,7 +5,7 @@
     <file type="web" url="file://$PROJECT_DIR$/flobank-ap" />
     <file type="web" url="file://$PROJECT_DIR$/flobank-api" />
   </component>
-  <component name="ProjectRootManager">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_25" project-jdk-name="ms-21" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
 </project>

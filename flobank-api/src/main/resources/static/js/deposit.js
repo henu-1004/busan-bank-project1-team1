@@ -68,4 +68,59 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
+
+    const select = document.getElementById("withdrawAccount");
+    const balanceHint = document.getElementById("balanceHint");
+
+    if (select){
+        select.addEventListener("change", () => {
+            const selectedOption = select.options[select.selectedIndex];
+            const balance = selectedOption.getAttribute("data-balance") || "0";
+            console.log("선택 변경됨");
+            console.log("선택된 balance = ", selectedOption.getAttribute("data-balance"));
+
+            const formattedBalance = Number(balance).toLocaleString()
+            balanceHint.textContent = `출금가능금액 ${formattedBalance}원`;
+        });
+    }
+
+    const frgnSelect = document.getElementById("withdrawFrgnAccount");
+    const frgnBalanceHint = document.getElementById("frgnBalanceHint");
+
+    if (frgnSelect){
+        frgnSelect.addEventListener("change", () => {
+            const fselectedOption = frgnSelect.options[frgnSelect.selectedIndex];
+            const fbalance = fselectedOption.getAttribute("data-balance") || "0";
+            const fcurrency = fselectedOption.getAttribute("data-currency");
+
+            const fformattedBalance = Number(fbalance).toLocaleString()
+            frgnBalanceHint.textContent = `출금가능금액 ${fformattedBalance} ${fcurrency}`;
+        });
+    }
+
+
+    const curSelect = document.getElementById("curSelect");
+    const amountInput = document.querySelector("#lmtAmtInput .form-input");
+
+    if (curSelect && amountInput) {
+        curSelect.addEventListener("change", () => {
+            const opt = curSelect.options[curSelect.selectedIndex];
+
+            const curName = opt.getAttribute("data-curName");
+            const curCode = opt.getAttribute("data-curCode");
+            const minAmount = opt.getAttribute("data-minAmount");
+            const maxAmount = opt.getAttribute("data-maxAmount");
+
+            if (minAmount && !isNaN(minAmount) && maxAmount && !isNaN(maxAmount)) {
+                amountInput.placeholder = `${Number(minAmount).toLocaleString()}${curCode} 이상, ${Number(maxAmount).toLocaleString()}${curCode} 미만`;
+            } else if (minAmount && !isNaN(minAmount)) {
+                amountInput.placeholder = `${Number(minAmount).toLocaleString()}${curCode} 이상`;
+            } else if (maxAmount && !isNaN(maxAmount)) {
+                amountInput.placeholder = `${Number(maxAmount).toLocaleString()}${curCode} 미만`;
+            } else {
+                amountInput.placeholder = `${curName} 금액 입력`;
+            }
+        });
+    }
+
 });

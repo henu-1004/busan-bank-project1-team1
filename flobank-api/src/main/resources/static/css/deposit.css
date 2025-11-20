@@ -1302,7 +1302,7 @@
 
 /* 짧은 입력 필드 */
 .form-input.short {
-  max-width: 180px;
+  max-width: 220px;
   text-align: right;
 }
 .form-input.tiny {
@@ -1766,4 +1766,20 @@
 .language-menu li:hover {
   background-color: #f2f4ff;
   color: #2C5DE5;
+}
+
+.prod-amt-container{
+    background-color: #eaeaea;
+    border-radius: 5px;
+    width: 647px;
+    padding: 30px 25px;
+}
+
+.prod-amt-left{
+    text-align: start;
+    width: 400px;
+}
+.prod-amt-right{
+    text-align: end;
+
 }

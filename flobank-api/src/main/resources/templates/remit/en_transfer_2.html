@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>외화 계좌이체 2</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>외화 계좌이체 2</title>
     <link rel="stylesheet" th:href="@{/css/mypage.css}">
     <link rel="stylesheet" th:href="@{/css/header.css}">
     <link rel="stylesheet" th:href="@{/css/footer.css}">
-  
+
 
     <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-    crossorigin="anonymous"
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+            crossorigin="anonymous"
     />
 
 </head>
@@ -20,175 +20,184 @@
 <div th:replace="~{_template/_header.html}"></div>
 
 <main class="transfer1-container">
-  <!-- 단계 표시 -->
-  <div class="transfer1-steps">
-    <div class="transfer1-step">
-      <span class="num">1</span>
-      <span class="text">약관동의</span>
-    </div>
-    <div class="transfer1-step active">
-      <span class="num">2</span>
-      <span class="text">정보입력</span>
-    </div>
-    <div class="transfer1-step">
-      <span class="num">3</span>
-      <span class="text">이체확인</span>
-    </div>
-    <div class="transfer1-step">
-      <span class="num">4</span>
-      <span class="text">이체완료</span>
-    </div>
-  </div>
-
-  <div class="transfer1-box">
-
-    <!-- 제목 -->
-    <h2 class="transfer1-title">외화계좌 이체</h2>
-
-    <!-- 안내문 -->
-    <div class="transfer1-info-box">
-      <p>
-        • 외화이체는 선택하신 통화(USD, JPY, EUR 등) 기준으로 처리됩니다.<br>
-        • 각 통화별 환율은 실시간으로 적용되며, 거래 시점의 환율에 따라 금액이 달라질 수 있습니다.<br>
-        • 수취국가 및 은행에 따라 중개은행 수수료가 발생할 수 있습니다.<br>
-        • 외환거래법 및 국제금융 규정을 준수하여 주시기 바랍니다.<br>
-        • 타인 계좌로 송금 시, 계좌정보와 수취인명을 반드시 확인해주세요.
-      </p>
+    <div class="transfer1-steps">
+        <div class="transfer1-step">
+            <span class="num">1</span>
+            <span class="text">약관동의</span>
+        </div>
+        <div class="transfer1-step active">
+            <span class="num">2</span>
+            <span class="text">정보입력</span>
+        </div>
+        <div class="transfer1-step">
+            <span class="num">3</span>
+            <span class="text">이체확인</span>
+        </div>
+        <div class="transfer1-step">
+            <span class="num">4</span>
+            <span class="text">이체완료</span>
+        </div>
     </div>
 
-    <!-- 출금정보 -->
-    <section class="transfer1-section">
-      <h3 class="transfer1-subtitle">출금정보</h3>
+    <div class="transfer1-box">
 
-      <!-- 출금계좌 -->
-      <div class="transfer1-form-group">
-        <label class="transfer1-label">출금계좌</label>
-        <select class="transfer1-select">
-            <option selected th:text="${custFrgnAcctDTO.frgnAcctName}">외화 입출금통장1</option>
-            <th:block th:each="acct : ${custAcctDTOList}">
-                <option th:text="${acct.acctName}">원화 입출금통장n</option>
-            </th:block>
-        </select>
-      </div>
+        <h2 class="transfer1-title">외화계좌 이체</h2>
 
-      <!-- 송금 통화 선택 -->
-      <div class="transfer1-form-group">
-        <label class="transfer1-label">송금통화</label>
-        <select class="transfer1-select" id="currency-select">
-          <option value="USD">미국 달러 (USD)</option>
-          <option value="JPY">일본 엔화 (JPY)</option>
-          <option value="EUR">유럽 유로 (EUR)</option>
-          <option value="CNY">중국 위안화 (CNY)</option>
-          <option value="GBP">영국 파운드 (GBP)</option>
-          <option value="AUD">호주 달러 (AUD)</option>
-        </select>
-      </div>
+        <div class="transfer1-info-box">
+            <p>
+                • 외화이체는 선택하신 통화(USD, JPY, EUR 등) 기준으로 처리됩니다.<br>
+                • 각 통화별 환율은 실시간으로 적용되며, 거래 시점의 환율에 따라 금액이 달라질 수 있습니다.<br>
+                • 수취국가 및 은행에 따라 중개은행 수수료가 발생할 수 있습니다.<br>
+                • 외환거래법 및 국제금융 규정을 준수하여 주시기 바랍니다.<br>
+                • 타인 계좌로 송금 시, 계좌정보와 수취인명을 반드시 확인해주세요.
+            </p>
+        </div>
 
-        <!-- 계좌에 남아있는 잔액 -->
-        <div class="transfer1-form-group">
-            <label class="transfer1-label">송금가능금액</label>
-            <div class="transfer1-flex">
-                <input type="text" class="transfer1-input short">
+        <form action="/remit/en_transfer_3" method="post" id="transferForm">
+
+            <input type="hidden" name="remtAppliedRate" id="hidden-applied-rate">
+            <input type="hidden" name="remtAmount" id="hidden-remt-amount">
+
+
+            <section class="transfer1-section">
+                <h3 class="transfer1-subtitle">출금정보</h3>
+
+                <div class="transfer1-form-group">
+                    <label class="transfer1-label">출금계좌</label>
+                    <select class="transfer1-select" id="account-select" name="remtAcctNo">
+
+                        <option selected
+                                th:value="${custFrgnAcctDTO.frgnAcctNo}"
+                                data-type="FRGN"
+                                th:text="${custFrgnAcctDTO.frgnAcctName}"
+
+                                th:data-balance-usd="${currencyAcctBal['USD']}"
+                                th:data-balance-jpy="${currencyAcctBal['JPY']}"
+                                th:data-balance-eur="${currencyAcctBal['EUR']}"
+                                th:data-balance-cny="${currencyAcctBal['CNH']}"
+                                th:data-balance-gbp="${currencyAcctBal['GBP']}"
+                                th:data-balance-aud="${currencyAcctBal['AUD']}"
+                        >
+                            외화 입출금통장1
+                        </option>
+
+                        <th:block th:each="acct : ${custAcctDTOList}">
+                            <option th:value="${acct.acctNo}"
+                                    th:text="${acct.acctName} + ' (잔액: ' + ${#numbers.formatInteger(acct.acctBalance, 0, 'COMMA')} + '원)'"
+                                    data-type="KRW"
+                                    th:data-balance="${acct.acctBalance}">원화 입출금통장n</option>
+                        </th:block>
+                    </select>
+                </div>
+
+                <div class="transfer1-form-group">
+                    <label class="transfer1-label">송금통화</label>
+                    <select class="transfer1-select" id="transfer-currency-select" name="remtCurrency">
+                        <option value="USD">미국 달러 (USD)</option>
+                        <option value="JPY">일본 엔화 (JPY)</option>
+                        <option value="EUR">유럽 유로 (EUR)</option>
+                        <option value="CNH">중국 위안화 (CNH)</option>
+                        <option value="GBP">영국 파운드 (GBP)</option>
+                        <option value="AUD">호주 달러 (AUD)</option>
+                    </select>
+                </div>
+
+                <div class="transfer1-form-group">
+                    <label class="transfer1-label">송금가능금액</label>
+                    <div class="transfer1-flex">
+                        <input type="text" class="transfer1-input short" id="transferable-amount" readonly>
+                        <span id="currency-unit" style="margin-left: 10px; line-height: 50px;">USD</span>
+                    </div>
+                    <p class="transfer1-guide-text">※ 모든 금액은 선택한 통화 기준으로 표시됩니다.</p>
+                </div>
+
+                <p>※ 환율은 금일 한국수출입은행 1회차 고시환율로 적용됩니다.</p>
+
+                <div class="transfer1-form-group">
+                    <label class="transfer1-label">송금금액</label>
+                    <span id="krw-equivalent" style="font-weight: bold; color: #4A6FA5;">입력된 송금 금액을 원화로</span>
+
+                    <div class="transfer1-flex">
+                        <input type="text" class="transfer1-input short" placeholder="금액 입력" id="transfer-amount">
+                        <div class="transfer1-btn-group">
+                            <button type="button">100</button>
+                            <button type="button">500</button>
+                            <button type="button">1000</button>
+                            <button type="button">5000</button>
+                            <button type="button">전액</button>
+                        </div>
+                    </div>
+                    <p id="limit-warning" class="transfer1-guide-text" style="color: #E53935; display: none; font-weight: bold;">
+                        ※ 송금 가능 금액을 초과할 수 없습니다.
+                    </p>
+                    <p class="transfer1-guide-text">※ 모든 금액은 선택한 통화 기준으로 표시됩니다.</p>
+                </div>
+
+                <div class="transfer1-form-group">
+                    <label class="transfer1-label">내통장표시</label>
+                    <input type="text" class="transfer1-input" placeholder="메모 입력(선택)">
+                </div>
+            </section>
+
+            <section class="transfer1-section">
+                <h3 class="transfer1-subtitle">수취인 정보</h3>
+
+                <div class="transfer1-form-group">
+                    <label class="transfer1-label">수취국가</label>
+                    <select class="transfer1-select" id="country-select" name="remtCountry">
+                        <option value="USA">미국 (USA)</option>
+                        <option value="JPN">일본 (Japan)</option>
+                        <option value="DEU">독일 (Germany/Europe)</option>
+                        <option value="CHN">중국 (China)</option>
+                        <option value="GBR">영국 (UK)</option>
+                        <option value="AUS">호주 (Australia)</option>
+                    </select>
+                </div>
+
+                <div class="transfer1-form-group">
+                    <label class="transfer1-label">수취인 (영문 이름)</label>
+                    <input type="text" class="transfer1-input" placeholder="예: JOHN DOE" name="remtRecName">
+                </div>
+
+                <div class="transfer1-form-group">
+                    <label class="transfer1-label">수취인 주소</label>
+                    <input type="text" class="transfer1-input" placeholder="상세주소 (예: 1234 MAIN ST)" name="remtAddr">
+                </div>
+
+                <div class="transfer1-flex-row">
+                    <div class="transfer1-form-group half">
+                        <label class="transfer1-label">도시 (City)</label>
+                        <input type="text" class="transfer1-input" placeholder="예: LOS ANGELES" name="remtCity">
+                    </div>
+                    <div class="transfer1-form-group half">
+                        <label class="transfer1-label">주 / 도 (State / Province)</label>
+                        <input type="text" class="transfer1-input" placeholder="예: CALIFORNIA" name="remtState">
+                    </div>
+                </div>
+
+                <div class="transfer1-form-group">
+                    <label class="transfer1-label">우편번호 (ZIP / Postal Code)</label>
+                    <input type="text" class="transfer1-input" placeholder="예: 90001">
+                </div>
+
+                <div class="transfer1-form-group">
+                    <label class="transfer1-label" id="label-bank-code">은행코드 (ACH Routing No)</label>
+                    <input type="text" class="transfer1-input" id="input-bank-code" placeholder="예: 026009593" name="remtRecBkCode">
+                </div>
+
+                <div class="transfer1-form-group">
+                    <label class="transfer1-label" id="label-account-no">계좌번호 (Account No)</label>
+                    <input type="text" class="transfer1-input" id="input-account-no" placeholder="예: 1234567890" name="remtRecAccNo">
+                </div>
+            </section>
+
+            <div class="transfer2-actions">
+                <a th:href="@{/remit/en_transfer_1}" class="transfer2-btn-sub">이전</a>
+
+                <button type="button" class="transfer2-btn-main" onclick="submitTransferForm()">다음</button>
             </div>
-            <p class="transfer1-guide-text">※ 모든 금액은 선택한 통화 기준으로 표시됩니다.</p>
-        </div>
 
-        <p>※ 환율은 금일 한국수출입은행 1회차 고시환율로 적용됩니다.</p>
-
-      <!-- 이체 금액 -->
-      <div class="transfer1-form-group">
-        <label class="transfer1-label">송금금액</label>
-          <span>입력된 송금 금액을 원화로</span>
-
-        <div class="transfer1-flex">
-          <input type="text" class="transfer1-input short" placeholder="금액 입력" id="transfer-amount">
-          <div class="transfer1-btn-group">
-            <button type="button">100</button>
-            <button type="button">500</button>
-            <button type="button">1000</button>
-            <button type="button">5000</button>
-            <button type="button">전액</button>
-          </div>
-        </div>
-        <p class="transfer1-guide-text">※ 모든 금액은 선택한 통화 기준으로 표시됩니다.</p>
-      </div>
-
-      <!-- 내통장 표시 -->
-      <div class="transfer1-form-group">
-        <label class="transfer1-label">내통장표시</label>
-        <input type="text" class="transfer1-input" placeholder="메모 입력(선택)">
-      </div>
-    </section>
-
-    <!-- 수취인 정보 -->
-        <section class="transfer1-section">
-        <h3 class="transfer1-subtitle">수취인 정보</h3>
-
-        <!-- 수취국가 -->
-        <div class="transfer1-form-group">
-            <label class="transfer1-label">수취국가</label>
-            <select class="transfer1-select">
-            <option>미국 (USA)</option>
-            <option>일본 (Japan)</option>
-            <option>독일 (Germany)</option>
-            <option>중국 (China)</option>
-            <option>영국 (UK)</option>
-            <option>호주 (Australia)</option>
-            </select>
-        </div>
-
-        <!-- 수취인 이름 -->
-        <div class="transfer1-form-group">
-            <label class="transfer1-label">수취인 (영문 이름)</label>
-            <input type="text" class="transfer1-input" placeholder="예: JOHN DOE">
-        </div>
-
-        <!-- 수취인 주소 -->
-        <div class="transfer1-form-group">
-            <label class="transfer1-label">수취인 주소</label>
-            <input type="text" class="transfer1-input" placeholder="상세주소 (예: 1234 MAIN ST)">
-        </div>
-
-        <div class="transfer1-flex-row">
-            <div class="transfer1-form-group half">
-            <label class="transfer1-label">도시 (City)</label>
-            <input type="text" class="transfer1-input" placeholder="예: LOS ANGELES">
-            </div>
-            <div class="transfer1-form-group half">
-            <label class="transfer1-label">주 / 도 (State / Province)</label>
-            <input type="text" class="transfer1-input" placeholder="예: CALIFORNIA">
-            </div>
-        </div>
-
-        <div class="transfer1-form-group">
-            <label class="transfer1-label">우편번호 (ZIP / Postal Code)</label>
-            <input type="text" class="transfer1-input" placeholder="예: 90001">
-        </div>
-
-        <!-- 계좌정보 -->
-        <div class="transfer1-form-group">
-            <label class="transfer1-label">은행코드 (ACH Routing No)</label>
-            <input type="text" class="transfer1-input" placeholder="예: 026009593">
-        </div>
-
-        <div class="transfer1-form-group">
-            <label class="transfer1-label">계좌번호 (Account No)</label>
-            <input type="text" class="transfer1-input" placeholder="예: 1234567890">
-        </div>
-        </section>
-
-    
-
-      </div>
-    </section>
-
-    <!-- 다음 버튼 -->
-    <div class="transfer2-actions">
-      <a th:href="@{/remit/en_transfer_1}" class="transfer2-btn-sub">이전</a>
-      <a th:href="@{/remit/en_transfer_3}" class="transfer2-btn-main">다음</a>
-    </div>
-
-  </div>
+        </form> </div>
 </main>
 
 <div th:replace="~{_template/_footer.html}"></div>
@@ -196,4 +205,3 @@
 
 </body>
 </html>
-

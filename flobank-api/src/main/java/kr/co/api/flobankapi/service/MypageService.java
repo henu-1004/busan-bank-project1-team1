@@ -52,7 +52,7 @@ public class MypageService {
         // 생성된 외화 부모 계좌 들고오기
         CustFrgnAcctDTO frgnAcctDTO = mypageMapper.selectFrgnAcct(custFrgnAcctDTO.getFrgnAcctCustCode());
         // 자식 통장 만들기
-        String[] currency = {"USD", "JPY", "EUR", "CNY", "GBP", "AUD"};
+        String[] currency = {"USD", "JPY", "EUR", "CNH", "GBP", "AUD"};
         List<FrgnAcctBalanceDTO> frgnAcctBalanceList = new ArrayList<>();
         for(String c : currency){
             FrgnAcctBalanceDTO frgnAcctBalance = new FrgnAcctBalanceDTO();
@@ -115,6 +115,11 @@ public class MypageService {
 
         // 이체 내역 삽입
         mypageMapper.insertTranHist(custTranHistDTO);
+    }
+
+    // 외화 자식 계좌 조회
+    public List<FrgnAcctBalanceDTO> getAllFrgnAcctBal(String frgnAcctNo) {
+        return mypageMapper.selectAllFrgnAcctBal(frgnAcctNo);
     }
 
     public CustInfoDTO getCustInfo(String userCode) { // 고객 정보 받아오기

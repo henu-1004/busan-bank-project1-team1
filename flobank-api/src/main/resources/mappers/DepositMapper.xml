@@ -5,6 +5,79 @@
 
 <mapper namespace="kr.co.api.flobankapi.mapper.DepositMapper">
 
+
+
+
+    <select id="selectDpstProduct" resultType="kr.co.api.flobankapi.dto.ProductDTO">
+        select * from TB_DPST_PROD_INFO
+        WHERE dpst_id=#{dpstId}
+    </select>
+
+    <select id="limitOfDpst" resultType="kr.co.api.flobankapi.dto.ProductLimitDTO">
+        SELECT * FROM tb_dpst_amt_lmt
+        WHERE LMT_DPST_ID = #{dpstId}
+    </select>
+
+    <select id="dpstMinMaxPeriod" resultType="kr.co.api.flobankapi.dto.ProductPeriodDTO">
+        SELECT PERIOD_MIN_MONTH as minMonth, period_max_month as maxMonth FROM TB_DPST_PROD_PERIOD
+        WHERE period_dpst_id=#{dpstId}
+    </select>
+
+    <select id="dpstFixedPeriods" resultType="kr.co.api.flobankapi.dto.ProductPeriodDTO">
+        SELECT PERIOD_FIXED_MONTH as fixedMonth FROM TB_DPST_PROD_PERIOD
+        WHERE period_dpst_id=#{dpstId}
+    </select>
+
+    <select id="getDpstWdrwInfo" resultType="kr.co.api.flobankapi.dto.ProductWithdrawRuleDTO">
+        SELECT
+        wdrw_min_month AS minMonths,
+        wdrw_max AS maxCount,
+        wdrw_dpst_id AS dpstId
+        FROM TB_DPST_PARTIAL_WDRW_INFO
+        WHERE wdrw_dpst_id = #{dpstId}
+    </select>
+
+
+    <select id="getDpstAmtList" resultType="kr.co.api.flobankapi.dto.ProductWithdrawAmtDTO">
+        SELECT
+        amt_currency AS currency,
+        amt_min AS minAmt,
+        amt_dpst_id AS dpstId
+        FROM TB_DPST_PARTIAL_WDRW_AMT
+        WHERE amt_dpst_id = #{dpstId}
+    </select>
+
+    <select id="getKRWAccts" resultType="kr.co.api.flobankapi.dto.CustAcctDTO">
+        SELECT acct_no, acct_pw, acct_balance from tb_cust_acct
+        where acct_cust_code=#{acctCustCode} AND acct_status=1
+    </select>
+
+    <select id="getFrgnAcct" resultType="kr.co.api.flobankapi.dto.CustFrgnAcctDTO">
+        SELECT frgn_acct_no, frgn_acct_pw
+        from tb_cust_frgn_acct
+        where frgn_acct_cust_code=#{frgnAcctCustCode} AND frgn_acct_status=1
+    </select>
+
+    <select id="getFrgnAcctBalList" resultType="kr.co.api.flobankapi.dto.FrgnAcctBalanceDTO">
+        SELECT * FROM TB_FRGN_ACCT_BALANCE
+        WHERE BAL_FRGN_ACCT_NO = #{balFrgnAcctNo}
+    </select>
+
+    <select id="getAllCurrencies" resultType="kr.co.api.flobankapi.dto.CurrencyInfoDTO">
+        select * from TB_CURRENCY_INFO
+    </select>
+
+    <select id="getCurrency" resultType="kr.co.api.flobankapi.dto.CurrencyInfoDTO">
+        select * from TB_CURRENCY_INFO
+        where cur_code=#{curCode}
+    </select>
+
+
+
+
+
+
+
     <select id="findActiveProducts" resultType="kr.co.api.flobankapi.dto.ProductDTO">
         SELECT
         DPST_ID,
@@ -100,6 +173,7 @@
 
 
 
+
     <select id="findTermsFileByTitle" parameterType="string" resultType="string">
         SELECT THIST_FILE
         FROM (
@@ -113,6 +187,7 @@
         )
         WHERE ROWNUM = 1
     </select>
+
 
 
 </mapper>

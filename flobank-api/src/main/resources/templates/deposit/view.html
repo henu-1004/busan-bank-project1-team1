@@ -487,17 +487,213 @@
             </p>
 
         </div>
+      </div>
+
+
+    <!-- 🔹 금리안내 탭 내용 -->
+    <div class="view-content">
+      <dl class="view-detail">
+        <dt>외화정기예금금리 [추후에 크롤링한거 가져오기]</dt>
+        <dd class="rate-date">※ 2025.11.11 12:58:34 기준</dd>
+      </dl>
+
+      <!-- 🔹 외화정기예금 금리표 -->
+      <div class="table-wrap">
+        <table class="tbl-basic">
+          <thead>
+            <tr>
+              <th>통화</th>
+              <th>1개월이상</th>
+              <th>2개월이상</th>
+              <th>3개월이상</th>
+              <th>6개월이상</th>
+              <th>9개월이상</th>
+              <th>12개월이상</th>
+              <th>24개월이상</th>
+              <th>36개월이상</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>미국 (USD)</td>
+              <td>3.2990</td>
+              <td>3.3066</td>
+              <td>3.2541</td>
+              <td>3.0840</td>
+              <td>3.0138</td>
+              <td>2.7836</td>
+              <td>2.6906</td>
+              <td>2.6073</td>
+            </tr>
+            <tr>
+              <td>일본 (JPY)</td>
+              <td>0.0000</td>
+              <td>0.0000</td>
+              <td>0.0000</td>
+              <td>0.0000</td>
+              <td>0.0000</td>
+              <td>0.0000</td>
+              <td>0.0000</td>
+              <td>0.0000</td>
+            </tr>
+            <tr>
+              <td>유럽 (EUR)</td>
+              <td>0.7349</td>
+              <td>0.8189</td>
+              <td>0.9845</td>
+              <td>1.1483</td>
+              <td>1.0978</td>
+              <td>1.0978</td>
+              <td>1.0978</td>
+              <td>1.0978</td>
+            </tr>
+            <tr>
+              <td>중국 (CNH)</td>
+              <td>0.0000</td>
+              <td>0.0000</td>
+              <td>0.0000</td>
+              <td>0.0000</td>
+              <td>0.0000</td>
+              <td>0.0000</td>
+              <td>0.0000</td>
+              <td>0.0000</td>
+            </tr>
+            <tr>
+              <td>영국 (GBP)</td>
+              <td>3.1376</td>
+              <td>3.0666</td>
+              <td>2.9457</td>
+              <td>2.8242</td>
+              <td>2.7345</td>
+              <td>2.4748</td>
+              <td>2.4868</td>
+              <td>2.4417</td>
+            </tr>
+            <tr>
+              <td>호주 (AUD)</td>
+              <td>2.5866</td>
+              <td>2.6254</td>
+              <td>2.6519</td>
+              <td>2.7497</td>
+              <td>2.8574</td>
+              <td>2.9752</td>
+              <td>2.9752</td>
+              <td>2.9752</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
 
 
 
+        <dl class="view-detail">
+          <dt>이자지급방식</dt>
+          <dd>만기일시지급식</dd>
+        </dl>
 
+      
 
+        <dl class="view-detail">
+          <dt>적용환율</dt>
+          <dd>
+            외화예금을 원화로 입금(신규 입금 포함)하는 경우, 은행이 영업점에 고시한 입금 시점의 대고객 전신환매도율(송금 보내실 때 환율)을 적용합니다.<br>
+            (자동이체의 경우 자동이체일자의 1회차 전신환매도율 적용)<br><br>
+            외화예금의 원금 및 이자를 원화로 지급할 때는 은행이 영업점에 고시한 지급 시점의 대고객 전신환매입율(송금 받으실 때 환율)을 적용합니다.
+          </dd>
+        </dl>
 
+      <!-- ✅ 중도해지금리 테이블 -->
+        <h3 class="view-subtitle">중도해지금리</h3>
+        <p class="view-note">
+          가입일 또는 최종 자동연장일 당시 고시한 이 상품의 중도해지금리 적용 (2025.11.07 기준, 세금공제 전)
+        </p>
 
-        <div class="view-bottom">
-            <a class="view-btn-primary" th:href="@{/deposit/deposit_step1(dpstId=${product.dpstId})}">
-                <span>가입하기</span>
+        <table class="view-rate-table">
+          <thead>
+            <tr>
+              <th>예치기간</th>
+              <th>적용금리</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>가입 기간의 10% 미만 </td>
+              <td>가입시점 기본금리 × 10% × 경과일수 / 계약일수 (단, 최저금리는 연 0.10%)</td>
+            </tr>
+            <tr>
+              <td>가입 기간의 10% 이상 ~<br>가입 기간의 30% 미만</td>
+              <td>가입시점 기본금리 × 30% × 경과일수 / 계약일수 (단, 최저금리는 연 0.30%)</td>
+            </tr>
+            <tr>
+              <td>가입 기간의 30% 이상 ~<br> 가입 기간의 50% 미만</td>
+              <td>가입시점 기본금리 × 50% × 경과일수 / 계약일수 (단, 최저금리는 연 0.50%)</td>
+            </tr>
+            <tr>
+              <td>가입 기간의 50% 이상 ~<br> 가입 기간의 70% 미만</td>
+              <td>가입시점 기본금리 × 70% × 경과일수 / 계약일수 (단, 최저금리는 연 0.50%)</td>
+            </tr>
+            <tr>
+              <td>가입 기간의 70% 이상 ~<br> 가입 기간의 80% 미만</td>
+              <td>가입시점 기본금리 × 80% × 경과일수 / 계약일수 (단, 최저금리는 연 0.50%)</td>
+            </tr>
+            <tr>
+              <td>가입 기간의 80% 이상 ~<br> 가입 기간의 90% 미만</td>
+              <td>가입시점 기본금리 × 90% × 경과일수 / 계약일수 (단, 최저금리는 연 0.50%)</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!--  만기후금리 테이블 -->
+        <h3 class="view-subtitle">만기후금리</h3>
+        <p class="view-note">
+          가입일 또는 최종 자동연장일 당시 고시한 이 상품의 만기후금리 적용 (2025.11.07 기준, 세금공제 전)<br>
+          <small>※ 만기 후 경과기간 구간별로 만기후금리는 자동 적용됨</small>
+        </p>
+
+        <table class="view-rate-table">
+          <thead>
+            <tr>
+              <th>만기 후 경과기간</th>
+              <th>적용금리</th>
+           </tr> 
+          </thead>
+          <tbody>
+            <tr>
+              <td>1개월 이내</td>
+              <td>가입(또는 자동연장)시점 기본금리 × 50%</td>
+            </tr>
+            <tr>
+              <td>1개월 초과 3개월 이내</td>
+              <td>가입(또는 자동연장)시점 기본금리 × 30%</td>
+            </tr>
+            <tr>
+              <td>3개월 초과</td>
+              <td>연 0.20%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+            <!-- 🔹 상품약관 탭 내용 -->
+      <div class="view-content">
+        <ul class="view-terms-list">
+          <li>
+            <a href="#" target="_blank">
+              <span>예금거래기본약관</span>
+              <i class="fa-solid fa-angle-right"></i>
+            </a>
+          </li>
+          <li>
+            <a href="#" target="_blank">
+              <span>외화예금거래기본약관</span>
+              <i class="fa-solid fa-angle-right"></i>
+            </a>
+          </li>
+          <li>
+            <a href="#" target="_blank">
+              <span>BNK모아드림외화적금 상품 설명서</span>
+              <i class="fa-solid fa-angle-right"></i>
             </a>
 
             <a th:href="@{/deposit/list}" class="view-btn-link">

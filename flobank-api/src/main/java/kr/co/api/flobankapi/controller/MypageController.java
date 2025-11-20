@@ -304,14 +304,20 @@ public class MypageController {
     public String ko_transfer_3(@AuthenticationPrincipal CustomUserDetails userDetails, @ModelAttribute CustTranHistDTO custTranHistDTO, Model model) {
         // 전자서명 임시 승인 수정해야함
         custTranHistDTO.setTranEsignYn("Y");
-
+        CustAcctDTO custAcctDTO = new  CustAcctDTO();
         log.info("마지막 단계(ko_transfer_3): custTranHistDTO = " + custTranHistDTO);
 
         if(custTranHistDTO.getTranEsignYn().equals("Y")) {
             // 이체 내역 db에 반영
             mypageService.modifyCustAcctBal(custTranHistDTO);
+            model.addAttribute("custTranHistDTO", custTranHistDTO);
+            custAcctDTO = mypageService.findCustAcct(custTranHistDTO.getTranAcctNo());
+            model.addAttribute("custAcctDTO", custAcctDTO);
             model.addAttribute("state", "정상");
         }else {
+            model.addAttribute("custTranHistDTO", custTranHistDTO);
+            custAcctDTO = mypageService.findCustAcct(custTranHistDTO.getTranAcctNo());
+            model.addAttribute("custAcctDTO", custAcctDTO);
             model.addAttribute("state", "실패");
         }
 

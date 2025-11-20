@@ -44,7 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // 임시로 AI 초안 내용 지정 (백엔드 연동 전)
       const aiDraft =
-        "AI가 생성한 예시 답변입니다.\n환전 가능한 통화는 USD, JPY, EUR, CNY 등이며, 지점별 취급 통화가 상이할 수 있습니다.";
+        "AI가 생성한 예시 답변입니다.\n환전 가능한 통화는 USD, JPY, EUR, CNH 등이며, 지점별 취급 통화가 상이할 수 있습니다.";
 
       questionText.textContent = question;
       aiAnswer.textContent = aiDraft;

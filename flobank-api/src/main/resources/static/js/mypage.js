@@ -1,7 +1,8 @@
 ////////////////////////////////////////////////////////////////////////////
-// mypage.js — 통합버전 (원화 + 외화, 외화는 USD 고정)
+// mypage.js — 통합버전 (금액 버튼 기능 추가됨)
 ////////////////////////////////////////////////////////////////////////////
-let isPhoneVerified = false; // [수정] 'ko'와 'en'이 공용으로 사용할 전역 변수
+let isPhoneVerified = false; // 'ko'와 'en'이 공용으로 사용할 전역 변수
+let currentExchangeRate = 0; // 전역 변수로 환율 관리 (폼 전송 시 사용)
 
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -32,7 +33,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const onceLimitInput = document.querySelectorAll(".open2-limit-input")[1];
 
     if (dayLimitBtn && onceLimitBtn && !document.getElementById("currency-select")) {
-        // 💡 원화 전용 페이지에서만 실행
         dayLimitBtn.addEventListener("click", () => {
             dayLimitInput.value = "500,000,000";
         });
@@ -52,26 +52,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const guideTexts = document.querySelectorAll(".open2-guide-text");
 
     if (currencySelect && dailyLimit && onceLimit) {
-        const usdLimits = {
-            daily: "50,000",
-            once: "10,000",
-            min: "100"
-        };
+        const usdLimits = { daily: "50,000", once: "10,000", min: "100" };
 
-        // ✅ USD 기준으로만 설정
         const applyUsdLimits = () => {
             dailyLimit.value = usdLimits.daily;
             onceLimit.value = usdLimits.once;
             currencyLabels.forEach(label => (label.textContent = "USD"));
-
-            if (guideTexts.length >= 2) {
-                // (수정) 이체 한도 input이 readonly가 되면서 guide text가 필요 없어졌지만, 로직은 유지합니다.
-                // guideTexts[0].textContent = `최소 ${usdLimits.min} USD ~ 최대 ${usdLimits.daily} USD 이내 수정 가능`;
-                // guideTexts[1].textContent = `최소 ${usdLimits.min} USD ~ 최대 ${usdLimits.once} USD 이내`;
-            }
         };
 
-        // (수정) 외화 계좌개설 2단계에서는 이체 한도 input이 readonly이므로 '최대' 버튼 로직이 필요 없습니다.
         applyUsdLimits();
         currencySelect.addEventListener("change", () => {
             applyUsdLimits();
@@ -79,30 +67,22 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     ////////////////////////////////////////////////////////////////////////////
-    // 5️⃣ [수정됨] '계좌 개설 2단계' (원화/외화) 공용 휴대폰 인증
+    // 5️⃣ '계좌 개설 2단계' (원화/외화) 공용 휴대폰 인증
     ////////////////////////////////////////////////////////////////////////////
-
-    // 1. HTML에서 수정한 '공용 class'로 요소를 정확히 선택합니다.
     const btnSendSms_Acct = document.querySelector('.js-btn-send-code');
     const btnVerifySms_Acct = document.querySelector('.js-btn-verify-code');
     const inputSmsCode_Acct = document.querySelector('.js-verify-code-input');
-
-    // 2. data-phone-number 속성을 가진 <main> 태그를 찾습니다.
     const mainContainer = document.querySelector('.open2-account-container[data-phone-number]');
 
-    // 3. 이 요소들이 모두 존재하는 페이지에서만 (ko_account_open_2, en_account_open_2) 이 로직을 실행
     if (btnSendSms_Acct && btnVerifySms_Acct && inputSmsCode_Acct && mainContainer) {
-
-        // 4. HTML의 data 속성에 저장된 '원본 휴대폰 번호'를 가져옵니다.
         const unmaskedPhoneNumber = mainContainer.dataset.phoneNumber;
 
         if (!unmaskedPhoneNumber) {
-            console.error("휴대폰 번호를 찾을 수 없습니다. (data-phone-number)");
+            console.error("휴대폰 번호를 찾을 수 없습니다.");
             alert("오류: 고객 정보를 불러오지 못했습니다. 다시 시도해주세요.");
             return;
         }
 
-        // [인증요청] 버튼 클릭
         btnSendSms_Acct.addEventListener('click', async function (e) {
             e.preventDefault();
             btnSendSms_Acct.disabled = true;
@@ -117,7 +97,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 btnVerifySms_Acct.style.display = 'inline-block';
                 inputSmsCode_Acct.focus();
                 btnSendSms_Acct.textContent = '재전송';
-
             } catch (err) {
                 console.error('SMS Send Error:', err);
                 alert(`SMS 전송 중 오류 발생: ${err.message}`);
@@ -126,7 +105,6 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
 
-        // [확인] 버튼 클릭
         btnVerifySms_Acct.addEventListener('click', async function (e) {
             e.preventDefault();
             const code = inputSmsCode_Acct.value.trim();
@@ -141,8 +119,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 if (isValid) {
                     alert('휴대폰 인증 완료!');
-                    isPhoneVerified = true; // [중요] 전역 변수 true로 설정
-
+                    isPhoneVerified = true;
                     inputSmsCode_Acct.readOnly = true;
                     btnSendSms_Acct.disabled = true;
                     btnVerifySms_Acct.disabled = true;
@@ -160,7 +137,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     ////////////////////////////////////////////////////////////////////////////
-    // 6️⃣ '원화 계좌 개설 2단계' - 계좌 비밀번호 일치 확인 (ko_account_open_2 전용)
+    // 6️⃣ '원화 계좌 개설 2단계' - 계좌 비밀번호 일치 확인
     ////////////////////////////////////////////////////////////////////////////
     const acctPwInput = document.getElementById('acctPw');
     const acctPwConfirmInput = document.getElementById('acctPwConfirm');
@@ -172,7 +149,6 @@ document.addEventListener("DOMContentLoaded", () => {
             const confirmPw = acctPwConfirmInput.value;
             if (confirmPw === '') { pwMatchMsg.textContent = ''; return; }
 
-            // (숫자 4자리 검증 추가)
             const numPattern = /^\d{4}$/;
             if (pw.length > 0 && !numPattern.test(pw)) {
                 pwMatchMsg.textContent = '비밀번호는 숫자 4자리여야 합니다.';
@@ -193,7 +169,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     ////////////////////////////////////////////////////////////////////////////
-    // 7️⃣ '원화 계좌 개설 2단계' - 폼 제출(완료) 시 유효성 검사 (ko_account_open_2 전용)
+    // 7️⃣ '원화 계좌 개설 2단계' - 폼 제출 유효성 검사
     ////////////////////////////////////////////////////////////////////////////
     const koAccountForm = document.getElementById('koAccountOpenForm');
     if (koAccountForm) {
@@ -237,23 +213,17 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     ////////////////////////////////////////////////////////////////////////////
-    // 8️⃣ '외화 계좌 개설 2단계' - 계좌 비밀번호 일치 확인 (en_account_open_2 전용)
+    // 8️⃣ '외화 계좌 개설 2단계' - 계좌 비밀번호 일치 확인
     ////////////////////////////////////////////////////////////////////////////
-
     const enAcctPwInput = document.getElementById('enAcctPw');
     const enAcctPwConfirmInput = document.getElementById('enAcctPwConfirm');
     const enPwMatchMsg = document.getElementById('enPwMatchMessage');
 
     if (enAcctPwInput && enAcctPwConfirmInput && enPwMatchMsg) {
-
         function checkEnAcctPasswordMatch() {
             const pw = enAcctPwInput.value;
             const confirmPw = enAcctPwConfirmInput.value;
-
-            if (confirmPw === '') {
-                enPwMatchMsg.textContent = '';
-                return;
-            }
+            if (confirmPw === '') { enPwMatchMsg.textContent = ''; return; }
 
             const numPattern = /^\d{4}$/;
             if (pw.length > 0 && !numPattern.test(pw)) {
@@ -275,56 +245,40 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     ////////////////////////////////////////////////////////////////////////////
-    // 9️⃣ [수정됨] '외화 계좌 개설 2단계' - 폼 제출(완료) 시 유효성 검사 (en_account_open_2 전용)
+    // 9️⃣ '외화 계좌 개설 2단계' - 폼 제출 유효성 검사
     ////////////////////////////////////////////////////////////////////////////
-
     const enAccountForm = document.getElementById('enAccountOpenForm');
-
     if (enAccountForm) {
         enAccountForm.addEventListener('submit', function(e) {
-
-            // 2. 검증에 사용할 요소들 선택
             const pw = enAcctPwInput ? enAcctPwInput.value : "";
             const pwConfirm = enAcctPwConfirmInput ? enAcctPwConfirmInput.value : "";
-
-            // [추가] '거래 목적'과 '자금 출처' select 요소 선택
-            // (HTML의 id="cddPurpose", id="cddSource"를 사용합니다)
             const purposeSelect_en = document.getElementById('cddPurpose');
             const sourceSelect_en = document.getElementById('cddSource');
 
-            // 검사 1: 휴대폰 인증 여부
             if (isPhoneVerified === false) {
                 e.preventDefault();
                 alert('휴대폰 인증을 완료해주세요.');
                 document.querySelector('.open2-verify-section').scrollIntoView({ behavior: 'smooth' });
                 return;
             }
-
-            // [추가] 검사 2: 거래 목적 선택 여부
             if (purposeSelect_en && purposeSelect_en.value === "") {
                 e.preventDefault();
                 alert('거래 목적을 선택해주세요.');
-                purposeSelect_en.focus(); // 해당 select로 포커스 이동
+                purposeSelect_en.focus();
                 return;
             }
-
-            // [추가] 검사 3: 자금 출처 선택 여부
             if (sourceSelect_en && sourceSelect_en.value === "") {
                 e.preventDefault();
                 alert('자금 출처를 선택해주세요.');
                 sourceSelect_en.focus();
                 return;
             }
-
-            // 검사 4: 비밀번호 입력 여부 (4자리)
             if (pw.length < 4 || !/^\d{4}$/.test(pw)) {
                 e.preventDefault();
                 alert('계좌 비밀번호 4자리를 정확히 입력해주세요.');
                 if (enAcctPwInput) enAcctPwInput.focus();
                 return;
             }
-
-            // 검사 5: 비밀번호 일치 여부
             if (pw !== pwConfirm) {
                 e.preventDefault();
                 alert('계좌 비밀번호가 일치하지 않습니다.');
@@ -334,10 +288,275 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    ////////////////////////////////////////////////////////////////////////////
+    // 🔟 [최종 수정] 실시간 환율 계산, 한도 체크, 원화 환산, 금액 버튼
+    ////////////////////////////////////////////////////////////////////////////
+    const accountSelect = document.getElementById('account-select');
+    const transferCurrencySelect = document.getElementById('transfer-currency-select');
+    const amountInput = document.getElementById('transferable-amount'); // 송금 가능 금액 (readonly)
+    const currencyUnit = document.getElementById('currency-unit');
+    const userTransferInput = document.getElementById('transfer-amount'); // 사용자가 입력하는 곳
+    const limitWarning = document.getElementById('limit-warning');        // 경고 메시지
+    const krwEquivalentSpan = document.getElementById('krw-equivalent');  // 원화 환산 텍스트
 
-});
+    // 송금 페이지 요소가 모두 있을 때만 실행
+    if (accountSelect && transferCurrencySelect && amountInput && currencyUnit && userTransferInput) {
+
+        const today = "20251114"; // 테스트용 날짜 (운영 시 로직 변경 필요)
+
+        // 1. 환율 정보 가져오기 및 초기화 함수
+        function updateTransferableAmount() {
+            const selectedOption = accountSelect.options[accountSelect.selectedIndex];
+            const accountType = selectedOption.getAttribute('data-type');
+            const targetCurrency = transferCurrencySelect.value;
+
+            // 단위 표시 업데이트
+            currencyUnit.textContent = targetCurrency;
+
+            // 외화 계좌(FRGN)라면 잔액을 미리 세팅
+            if (accountType === 'FRGN') {
+                const balanceAttr = selectedOption.getAttribute(`data-balance-${targetCurrency.toLowerCase()}`);
+                const frgnBalance = balanceAttr ? parseFloat(balanceAttr) : 0;
+                amountInput.value = frgnBalance.toLocaleString(undefined, {minimumFractionDigits: 2});
+            }
+
+            // 환율 API 호출
+            fetch(`/flobank/rate/data?date=${today}`)
+                .then(response => response.json())
+                .then(data => {
+                    const rateInfo = data.find(item => {
+                        if (targetCurrency === 'JPY' || targetCurrency === 'IDR') {
+                            return item.cur_unit.startsWith(targetCurrency);
+                        }
+                        return item.cur_unit === targetCurrency;
+                    });
+
+                    if (rateInfo) {
+                        let rate = parseFloat(rateInfo.deal_bas_r.replace(/,/g, ''));
+                        if (rateInfo.cur_unit.includes('(100)')) {
+                            rate = rate / 100;
+                        }
+
+                        currentExchangeRate = rate; // 전역 변수 저장
+
+                        // 원화 계좌(KRW) 계산
+                        if (accountType === 'KRW') {
+                            const balanceAttr = selectedOption.getAttribute('data-balance');
+                            const balance = balanceAttr ? parseFloat(balanceAttr) : 0;
+                            const transferable = Math.floor((balance / rate) * 100) / 100;
+                            amountInput.value = transferable.toLocaleString(undefined, {minimumFractionDigits: 2});
+                        }
+                        updateKrwPreview();
+                    } else {
+                        amountInput.value = "환율 정보 없음";
+                        currentExchangeRate = 0;
+                        krwEquivalentSpan.textContent = "환율 정보가 없어 계산할 수 없습니다.";
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    amountInput.value = "오류 발생";
+                });
+        }
+
+        // 2. 사용자 입력 시 이벤트 (한도체크, 원화환산)
+        userTransferInput.addEventListener('input', function() {
+            const inputVal = parseFloat(this.value.replace(/,/g, '')) || 0;
+            const maxVal = parseFloat(amountInput.value.replace(/,/g, '')) || 0;
+
+            if (inputVal > maxVal) {
+                limitWarning.style.display = 'block';
+                this.value = maxVal.toLocaleString(undefined, {minimumFractionDigits: 2});
+            } else {
+                limitWarning.style.display = 'none';
+            }
+            updateKrwPreview();
+        });
+
+        // [추가됨] 3. 금액 버튼 (100, 500... 전액) 클릭 이벤트 처리
+        const amountBtns = document.querySelectorAll('.transfer1-btn-group button');
+        amountBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const btnText = btn.textContent;
+                // 현재 송금 가능 최대 금액
+                const maxVal = parseFloat(amountInput.value.replace(/,/g, '')) || 0;
+                // 현재 입력된 금액 (없으면 0)
+                let currentVal = parseFloat(userTransferInput.value.replace(/,/g, '')) || 0;
+                let newVal = 0;
+
+                if (btnText === '전액') {
+                    // 전액 버튼: 최대 한도로 설정
+                    newVal = maxVal;
+                } else {
+                    // 숫자 버튼: 현재 값에 더하기 (누적)
+                    newVal = currentVal + parseFloat(btnText);
+                }
+
+                // 한도 초과 시 최대값으로 고정
+                if (newVal > maxVal) {
+                    newVal = maxVal;
+                }
+
+                // 값 반영 (콤마 포맷 적용)
+                userTransferInput.value = newVal.toLocaleString();
+
+                // [중요] 값이 변경되었으므로 'input' 이벤트를 발생시켜 원화 환산 및 경고 로직 실행
+                userTransferInput.dispatchEvent(new Event('input'));
+            });
+        });
+
+        // 4. 원화 환산 표시 함수
+        function updateKrwPreview() {
+            const inputVal = parseFloat(userTransferInput.value.replace(/,/g, '')) || 0;
+            if (currentExchangeRate > 0) {
+                const krwVal = Math.floor(inputVal * currentExchangeRate);
+                krwEquivalentSpan.textContent = `예상 원화 금액: 약 ${krwVal.toLocaleString()} 원`;
+            } else {
+                krwEquivalentSpan.textContent = "입력된 송금 금액을 원화로";
+            }
+        }
+
+        // 이벤트 리스너 등록
+        accountSelect.addEventListener('change', () => {
+            userTransferInput.value = '';
+            limitWarning.style.display = 'none';
+            updateTransferableAmount();
+        });
+        transferCurrencySelect.addEventListener('change', () => {
+            userTransferInput.value = '';
+            limitWarning.style.display = 'none';
+            updateTransferableAmount();
+        });
+
+        // 초기 실행
+        updateTransferableAmount();
+    }
+
+}); // DOMContentLoaded 끝
+
+////////////////////////////////////////////////////////////////////////////
+// 1️⃣1️⃣ 공통 유틸 함수 (전역 스코프)
+////////////////////////////////////////////////////////////////////////////
 
 function setQuestion(text) {
-    document.getElementById('chatInput').value = text;
-
+    const chatInput = document.getElementById('chatInput');
+    if(chatInput) chatInput.value = text;
 }
+
+// 폼 전송 전 데이터 정제 및 필수 입력값 검증 함수
+function submitTransferForm() {
+    const form = document.getElementById('transferForm');
+    if (!form) return;
+
+    const visibleAmount = document.getElementById('transfer-amount');
+    const cleanAmount = visibleAmount.value.replace(/,/g, '');
+
+    const hiddenAmountInput = document.getElementById('hidden-remt-amount');
+    if (hiddenAmountInput) hiddenAmountInput.value = cleanAmount;
+
+    const hiddenRateInput = document.getElementById('hidden-applied-rate');
+    if (hiddenRateInput) {
+        hiddenRateInput.value = (typeof currentExchangeRate !== 'undefined' && currentExchangeRate > 0)
+            ? currentExchangeRate : 0;
+    }
+
+    // 필수값 검증
+    if (!cleanAmount || isNaN(cleanAmount) || parseFloat(cleanAmount) <= 0) {
+        alert("송금할 금액을 입력해주세요.");
+        visibleAmount.focus();
+        visibleAmount.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+    }
+
+    const recName = document.querySelector('input[name="remtRecName"]');
+    if (recName && !recName.value.trim()) {
+        alert("수취인 성명(영문)을 입력해주세요.");
+        recName.focus();
+        recName.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+    }
+
+    const recBkCode = document.querySelector('input[name="remtRecBkCode"]');
+    if (recBkCode && !recBkCode.value.trim()) {
+        alert("은행 코드(Routing No)를 입력해주세요.");
+        recBkCode.focus();
+        recBkCode.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+    }
+
+    const recAccNo = document.querySelector('input[name="remtRecAccNo"]');
+    if (recAccNo && !recAccNo.value.trim()) {
+        alert("수취인 계좌번호를 입력해주세요.");
+        recAccNo.focus();
+        recAccNo.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+    }
+
+    form.submit();
+}
+
+////////////////////////////////////////////////////////////////////////////
+// 1️⃣2️⃣ [수정됨] 국가별 라벨 단순 변경 (추가 필드 제거)
+////////////////////////////////////////////////////////////////////////////
+
+const countrySettings = {
+    'USA': {
+        bankLabel: '은행코드 (ACH Routing No)',
+        bankPlace: '9자리 숫자',
+        acctLabel: '계좌번호 (Account No)',
+        acctPlace: '예: 1234567890'
+    },
+    'JPN': {
+        bankLabel: 'SWIFT BIC',
+        bankPlace: '영문+숫자 8~11자리',
+        acctLabel: '계좌번호 (Account No)',
+        acctPlace: '예: 1234567'
+    },
+    'DEU': { // 유럽
+        bankLabel: 'SWIFT BIC',
+        bankPlace: '영문+숫자 8~11자리',
+        acctLabel: 'IBAN Code',
+        acctPlace: '국가코드 포함 전체'
+    },
+    'CHN': {
+        bankLabel: 'CNAPS Code',
+        bankPlace: '12자리 숫자',
+        acctLabel: '계좌번호 (Account No)',
+        acctPlace: '예: 621483...'
+    },
+    'AUS': {
+        bankLabel: 'BSB Code',
+        bankPlace: '6자리 숫자',
+        acctLabel: '계좌번호 (Account No)',
+        acctPlace: '최대 9자리 숫자'
+    },
+    'GBR': {
+        bankLabel: 'Sort Code',
+        bankPlace: '6자리 숫자 (예: 20-00-00)',
+        acctLabel: '계좌번호 (Account No)',
+        acctPlace: '8자리 숫자'
+    }
+};
+
+function updateReceiverForm() {
+    const countrySelect = document.getElementById('country-select');
+    if (!countrySelect) return;
+
+    const selectedCountry = countrySelect.value;
+    const settings = countrySettings[selectedCountry];
+
+    if (settings) {
+        document.getElementById('label-bank-code').textContent = settings.bankLabel;
+        document.getElementById('input-bank-code').placeholder = settings.bankPlace;
+        document.getElementById('label-account-no').textContent = settings.acctLabel;
+        document.getElementById('input-account-no').placeholder = settings.acctPlace;
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const countrySelect = document.getElementById('country-select');
+    if(countrySelect) {
+        countrySelect.addEventListener('change', updateReceiverForm);
+        updateReceiverForm(); // 초기화
+    }
+});
