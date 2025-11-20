@@ -61,12 +61,12 @@
         </thead>
         <tbody>
           <tr>
-            <td>333-3333-3333-3333<br><span class="sub">OOO</span></td>
-            <td>333-3333-3333-3333<br><span class="sub">OOO</span></td>
-            <td>OOO</td>
-            <td>10,000</td>
+            <td th:text="${custTranHistDTO.tranAcctNo}">333-3333-3333-3333<br><span class="sub">OOO</span></td>
+            <td th:text="${custTranHistDTO.tranRecAcctNo}">333-3333-3333-3333<br><span class="sub">OOO</span></td>
+            <td th:text="${custTranHistDTO.tranRecName}">OOO</td>
+            <td th:text="${custTranHistDTO.tranAmount}">10,000</td>
             <td>0<br><span class="sub">우대수수료</span></td>
-            <td>34,197</td>
+            <td th:text="${custAcctDTO.acctBalance}">34,197</td>
             <td><span class="transfer3-success" th:text="${state}">정상/실패</span></td>
           </tr>
         </tbody>
