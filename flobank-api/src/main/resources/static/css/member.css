@@ -1,3 +1,10 @@
+/*
+* 날짜 : 2025/11/20
+* 이름 : 김대현
+* 내용 : member/terms 페이지에 다음으로 밑에 밑줄 없애기
+* */
+
+
 /* ////////////////////////////////////////////////////////////////////// */
 /* 로그인 페이지 
 /* ////////////////////////////////////////////////////////////////////// */
@@ -989,4 +996,22 @@
 .language-menu li:hover {
   background-color: #f2f4ff;
   color: #2C5DE5;
+}
+
+
+/*member/terms 페이지에 다음으로 밑에 밑줄 없애기*/
+.btn-next {
+    text-decoration: none !important;
+}
+
+
+/* 모든 약관 PRE 공통 처리 */
+.terms-box pre,
+.step1-input pre,
+.member-terms pre {
+    white-space: pre-wrap !important;       /* 강제 줄바꿈 */
+    word-wrap: break-word !important;       /* 긴 단어도 줄바꿈 */
+    overflow-x: auto;                        /* 필요한 경우 가로 스크롤 */
+    max-width: 100%;
+    box-sizing: border-box;
 }

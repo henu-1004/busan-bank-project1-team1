@@ -1,3 +1,11 @@
+<!--
+* 날짜 : 2025/11/20
+* 이름 : 김대현
+* 내용 : 약관 동의관련 수정
+-->
+
+
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -54,34 +62,18 @@
 
     <!-- 약관 동의 영역 -->
     <section class="step1-section">
-      <!-- 약관 1 -->
-      <div class="step1-form-group">
-        <label class="step1-label">외환거래기본약관 (필수)</label>
-        <div class="step1-input readonly">
-          제1조(목적) 본 약관은 고객과 OO은행 간의 외환거래에 관한 기본사항을 규정함을 목적으로 합니다.<br><br>
-          제2조(적용범위) 이 약관은 외환 관련 예금, 송금, 환전 등 거래에 적용됩니다.<br><br>
-          제3조(고객확인) 은행은 「외국환거래법」에 따라 고객확인 절차를 수행합니다.<br><br>
-          제4조(환율적용) 적용환율은 거래시점의 실시간 기준환율을 적용합니다.<br><br>
-          제5조(분쟁해결) 분쟁 발생 시 금융감독원 분쟁조정 절차에 따릅니다.<br><br>
-          (이하 생략)
-        </div>
-        <div class="step1-check">
-          <input type="checkbox" class="term-check"> 위 약관에 동의합니다.
-        </div>
-      </div>
 
-      <!-- 약관 2 -->
-      <div class="step1-form-group">
-        <label class="step1-label">예금자보호법 관련 설명 (필수)</label>
+        <div class="step1-form-group" th:each="t, stat : ${termsList}">
+            <label class="step1-label" th:text="|${t.termTitle} (필수)|">약관 제목</label>
+
         <div class="step1-input readonly">
-          본 환전 서비스는 예금자보호법에 따라 보호되지 않는 금융거래입니다.<br><br>
-          외환거래는 환율 변동에 따라 원화금액 손실이 발생할 수 있으며,<br>
-          이는 예금자보호법의 보호대상에 포함되지 않습니다.<br><br>
-          고객은 관련 법규 및 거래 위험을 충분히 이해한 후 서비스를 이용해야 합니다.<br><br>
-          (이하 생략)
+            <pre th:text="${t.thistContent}"></pre>
         </div>
+
         <div class="step1-check">
-          <input type="checkbox" class="term-check"> 위 약관에 동의합니다.
+            <input type="checkbox" class="term-check"
+                   th:id="|exchange-term${stat.index}|"
+                   th:attr="data-cate=${t.termCate}, data-order=${t.termOrder}"> 위 약관에 동의합니다.
         </div>
       </div>
 

@@ -790,3 +790,12 @@
   background-color: #f2f4ff;
   color: #2C5DE5;
 }
+
+
+.step1-input pre {
+    white-space: pre-wrap;       /* 줄바꿈 자동 적용 */
+    word-wrap: break-word;       /* 긴 단어도 줄바꿈 */
+    overflow-x: auto;            /* 필요하면 가로스크롤 */
+    max-width: 100%;             /* 컨테이너 넘치지 않게 */
+    box-sizing: border-box;
+}

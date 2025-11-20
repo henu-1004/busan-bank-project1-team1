@@ -108,27 +108,38 @@
     <!-- 고객 약관 조회: 카테고리별 최신 버전 약관 리스트 -->
     <select id="selectTermsByCate"
             parameterType="int"
-            resultType="kr.co.api.flobankapi.dto.TermsDTO">
+            resultType="kr.co.api.flobankapi.dto.TermsHistDTO">
 
-        SELECT
-            m.term_cate      AS termCate,
-            m.term_order     AS termOrder,
-            m.term_title     AS termTitle,
-            h.thist_content  AS termContent
-        FROM TB_TERMS_MASTER m
-                 JOIN TB_TERMS_HIST h
-                      ON h.thist_term_cate  = m.term_cate
-                          AND h.thist_term_order = m.term_order
-        WHERE m.term_cate = #{cate}
-          AND h.thist_version = (
-            SELECT MAX(h2.thist_version)
-            FROM TB_TERMS_HIST h2
-            WHERE h2.thist_term_cate  = m.term_cate
-              AND h2.thist_term_order = m.term_order
-        )
-        ORDER BY m.term_order
+        SELECT *
+        FROM (
+                 SELECT
+                     m.term_cate     AS termCate,
+                     m.term_order    AS termOrder,
+                     m.term_title    AS termTitle,
 
+                     h.thist_term_order AS thistTermOrder,
+                     h.thist_content    AS thistContent,
+                     h.thist_version    AS thistVersion,
+                     h.thist_reg_dy     AS thistRegDy,
+                     h.thist_file       AS thistFile,
+
+                     ROW_NUMBER() OVER (
+                PARTITION BY m.term_order
+                ORDER BY h.thist_version DESC, h.thist_reg_dy DESC, h.thist_no DESC
+            ) AS rn
+                 FROM TB_TERMS_MASTER m
+                          JOIN TB_TERMS_HIST h
+                               ON h.thist_term_cate = m.term_cate
+                                   AND h.thist_term_order = m.term_order
+                 WHERE m.term_cate = #{cate}
+             )
+        WHERE rn = 1
+        ORDER BY termOrder
     </select>
+
+
+
+
 
 
     <select id="selectTermsPage" resultType="kr.co.api.flobankapi.dto.TermsMasterDTO">

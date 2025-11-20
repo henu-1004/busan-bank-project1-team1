@@ -1,3 +1,9 @@
+/*
+ * 날짜 : 2025/11/20
+ * 이름 : 김대현
+ * 내용 : 디비 불러오기 수정
+ * */
+
 package kr.co.api.flobankapi.service;
 
 import kr.co.api.flobankapi.dto.*;
@@ -85,26 +91,36 @@ public class TermsDbService {
             log.info("[PDF 저장 완료] {}", savedFilePath);
         }
 
-        /* ============================================================
-            HIST INSERT
-        ============================================================ */
+          /* ============================================================
+        - DB에 혹시 기존 버전이 있다면(테스트 데이터 등),
+          그 중 가장 최신 버전을 기준으로 +1 해서 새 버전 저장
+    ============================================================ */
+
+        TermsHistDTO latest = mapper.selectLatestHist(cate, order);
+        int newVersion = (latest == null ? 1 : latest.getThistVersion() + 1);
+        log.info("[HIST 버전 계산] cate={}, order={}, latestVer={}, newVer={}",
+                cate, order,
+                latest == null ? null : latest.getThistVersion(),
+                newVersion);
+
+    /* ============================================================
+        HIST INSERT
+    ============================================================ */
         TermsHistDTO hist = new TermsHistDTO();
         hist.setThistTermCate(cate);
         hist.setThistTermOrder(order);
         hist.setThistContent(content);
-        hist.setThistVersion(1);
+        hist.setThistVersion(newVersion);
         hist.setThistVerMemo("초기 등록");
         hist.setThistAdminId(adminId);
         hist.setThistRegDy(today);
-
-        hist.setThistFile(savedFilePath);         // ⭐ 저장된 파일 경로 HIST에 기록
+        hist.setThistFile(savedFilePath);
 
         mapper.insertTermsHist(hist);
 
-        log.info("[HIST v1 등록 완료] file={}", savedFilePath);
+        log.info("[HIST 신규 등록 완료] cate={}, order={}, version={}, file={}",
+                cate, order, newVersion, savedFilePath);
     }
-
-
 
     // PDF 저장
 
@@ -165,19 +181,31 @@ public class TermsDbService {
         master.setTermTitle(title);
         mapper.updateTermsMaster(master);
 
+    /* ============================================================
+        🔥 DB 기준 최신 버전 조회 후 +1
+        - currentVersion 파라미터는 이제 '참고용'이 되고,
+          실제 저장되는 버전은 DB에 있는 최신 값 기반으로 계산
+    ============================================================ */
+        TermsHistDTO latest = mapper.selectLatestHist(cate, order);
+        int newVersion = (latest == null ? 1 : latest.getThistVersion() + 1);
+        log.info("[HIST 수정 버전 계산] cate={}, order={}, dbLatestVer={}, newVer={}",
+                cate, order,
+                latest == null ? null : latest.getThistVersion(),
+                newVersion);
+
         // HIST 새 버전 INSERT
         TermsHistDTO hist = new TermsHistDTO();
         hist.setThistTermCate(cate);
         hist.setThistTermOrder(order);
         hist.setThistContent(content);
-        hist.setThistVersion(currentVersion + 1);
+        hist.setThistVersion(newVersion);
         hist.setThistVerMemo(verMemo != null && !verMemo.isEmpty() ? verMemo : "내용 수정");
         hist.setThistAdminId(adminId);
         hist.setThistRegDy(LocalDate.now().format(FMT));
 
         mapper.insertTermsHist(hist);
 
-        log.info("[HIST NEW VERSION INSERT 완료] → 신규버전={}", currentVersion + 1);
+        log.info("[HIST NEW VERSION INSERT 완료] → 신규버전={}", newVersion);
     }
 
 
@@ -269,9 +297,16 @@ public class TermsDbService {
     }
 
 
-
+    // import kr.co.api.flobankapi.dto.TermsHistDTO; 이미 위에 있으니 그대로 둬도 됨
     public List<TermsHistDTO> getTermsByLocation(int termCate) {
+
+        // Mapper에서 이미 "카테고리별 최신버전 1개"만 가져오도록 쿼리가 짜져 있으므로
+        // 추가로 중복 제거할 필요 없이 그대로 반환
         return mapper.selectTermsByCate(termCate);
     }
+
+
+
+
 
 }

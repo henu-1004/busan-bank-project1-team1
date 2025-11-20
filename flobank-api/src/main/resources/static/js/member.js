@@ -1,3 +1,9 @@
+/*
+* 날짜 : 2025/11/20
+* 이름 : 김대현
+* 내용 : 약관 동의관련 수정
+* */
+
 let isIdChecked = false;     // 아이디 중복 확인 여부
 let isEmailVerified = false; // 이메일 인증 여부
 let isPhoneVerified = false; // 휴대폰 인증 여부
@@ -26,6 +32,21 @@ document.addEventListener("DOMContentLoaded", () => {
                 agreeAll.checked = allChecked;
             });
         });
+
+        /*   "다음으로" 버튼 클릭 막기 추가  */
+        const nextBtn = document.querySelector('.btn-next');
+
+        if (nextBtn) {
+            nextBtn.addEventListener('click', function(e) {
+                if (!agreeAll.checked) {
+                    e.preventDefault();
+                    alert('모든 약관에 동의하셔야 다음 단계로 이동할 수 있습니다.');
+                }
+            });
+        }
+
+
+
     }
 
 
