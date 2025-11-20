@@ -1,13 +1,33 @@
 package kr.co.api.flobankapi.controller;
 
+import kr.co.api.flobankapi.service.ExchangeService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.math.BigDecimal;
 
 @Controller
 @RequestMapping("/exchange")
+@RequiredArgsConstructor
 public class ExchangeController {
+
+    private final ExchangeService exchangeService;
+
+    // 환전하기
+    @ResponseBody
+    @GetMapping("/calculate")
+    public BigDecimal calculateExchange(@RequestParam String date,
+                                        @RequestParam String currency,
+                                        @RequestParam BigDecimal amount) {
+        // 예: 20231025 날짜의 USD 환율로 1,000,000원을 환전
+        return exchangeService.calculateExchange(date, currency, amount);
+    }
+
     @GetMapping("/benefit")
     public String benefit(Model model){
         model.addAttribute("activeItem","benefit");
