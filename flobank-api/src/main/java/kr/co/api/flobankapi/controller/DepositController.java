@@ -6,6 +6,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -64,9 +65,12 @@ public class DepositController {
 
 
     @GetMapping("/view")
-    public String view(Model model){
-        model.addAttribute("activeItem","product");
+    public String view(@RequestParam("dpstId") String dpstId, Model model) {
+        ProductDTO product = depositService.getProduct(dpstId);
+        model.addAttribute("product", product);
         return "deposit/view";
     }
+
+
 
 }

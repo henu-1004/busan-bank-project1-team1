@@ -32,7 +32,7 @@
           <div class="list-info">
               <h4>
                   <a th:text="${item.dpstName}"
-                     th:href="@{/deposit/detail/{id}(id=${item.dpstId})}"
+                     th:href="@{/deposit/view(dpstId=${item.dpstId})}"
                      class="list-link">
                   </a>
               </h4>
@@ -47,15 +47,14 @@
 
           <div class="list-actions">
               <a class="list-detail-btn"
-                 th:href="@{/deposit/view(id=${item.dpstId})}">
+                 th:href="@{/deposit/view(dpstId=${item.dpstId})}">
                   상세보기
               </a>
 
               <a class="list-join-btn"
-                 th:href="@{/deposit/deposit_step1(id=${item.dpstId})}">
+                 th:href="@{/deposit/deposit_step1(dpstId=${item.dpstId})}">
                   가입하기
               </a>
-
           </div>
       </div>
 

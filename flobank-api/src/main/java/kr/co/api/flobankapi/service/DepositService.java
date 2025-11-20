@@ -20,5 +20,12 @@ public class DepositService {
     public int getActiveProductCount() {
         return depositMapper.countActiveProducts();
     }
+
+    public ProductDTO getProduct(String dpstId) {
+        return depositMapper.findProductById(dpstId);
+    }
+
+
+
 }
 

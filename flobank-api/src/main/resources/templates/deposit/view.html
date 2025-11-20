@@ -1,362 +1,474 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>외화 예금 상품 view</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>외화 예금 상품 상세</title>
     <link rel="stylesheet" th:href="@{/css/deposit.css}">
     <link rel="stylesheet" th:href="@{/css/header.css}">
     <link rel="stylesheet" th:href="@{/css/footer.css}">
 
-    <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-    crossorigin="anonymous"
-    />
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous"/>
 </head>
 <body>
 <div th:replace="~{_template/_header.html}"></div>
- <!-- ✅ 메인 콘텐츠 -->
+
 <main class="view-main">
 
-    <div th:replace="~{/_side.html}"></div>
+    <div th:replace="~{deposit/_side.html}"></div>
 
     <section class="view-container">
 
-  <div class="view-header">
-    <div class="view-image">
-      <img src="/static/images/character8.png" alt="외화 예금 아이콘">
+        <div class="view-header">
+            <div class="view-image">
+                <img th:src="@{/images/character8.png}" alt="외화 예금 아이콘">
+            </div>
+
+            <div class="view-textbox">
+                <h2 th:text="${product.dpstName}">상품명</h2>
+
+                <p class="view-summary" th:utext="${product.dpstInfo}">상품 요약 설명</p>
+
+                <div class="view-summary-info">
+
+                    <div class="view-info-item">
+                        <span class="view-info-label">가입대상</span>
+
+                        <span class="view-info-value" th:if="${product.dpstMinAge != null and product.dpstMinAge > 0}">
+
+                            <span th:if="${product.dpstMaxAge != null and product.dpstMaxAge > 0}"
+                                  th:text="|만 ${product.dpstMinAge}세 ~ 만 ${product.dpstMaxAge}세|">
+                            </span>
+
+                            <span th:if="${product.dpstMaxAge == null or product.dpstMaxAge == 0}"
+                                  th:text="|만 ${product.dpstMinAge}세 이상|">
+                            </span>
+                        </span>
+
+                        <span class="view-info-value"
+                              th:if="${product.dpstMinAge == null or product.dpstMinAge == 0}">
+                            제한 없음
+                        </span>
+                    </div>
+
+                    <div class="view-info-item">
+                        <span class="view-info-label">가입기간</span>
+                        <span class="view-info-value">
+               <span th:if="${product.periodList == null or product.periodList.isEmpty()}">
+                   기간 정보 없음
+               </span>
+
+               <th:block th:each="period, stat : ${product.periodList}">
+                   <th:block th:if="${product.dpstPeriodType == 1}">
+                       <span th:if="${period.minMonth != null and period.maxMonth != null and period.maxMonth > 0}"
+                             th:text="|${period.minMonth}개월 ~ ${period.maxMonth}개월|"></span>
+                       <span th:if="${period.minMonth != null and (period.maxMonth == null or period.maxMonth == 0)}"
+                             th:text="|${period.minMonth}개월 이상|"></span>
+                   </th:block>
+
+                   <th:block th:if="${product.dpstPeriodType == 2}">
+                       <span th:if="${period.fixedMonth != null and period.fixedMonth > 0}"
+                             th:text="|${period.fixedMonth}개월|"></span>
+                   </th:block>
+
+                   <span th:if="${!stat.last}">, </span>
+               </th:block>
+            </span>
+                    </div>
+
+                    <div class="view-info-item">
+                        <span class="view-info-label">가입금액</span>
+
+                        <div class="view-info-value" style="display: flex; flex-direction: column; gap: 6px;">
+
+                            <th:block th:if="${product.limits != null and !product.limits.isEmpty()}">
+                                <div th:each="limit : ${product.limits}" style="display: flex; align-items: center;">
+                    <span style="width: 90px; display: inline-block; font-weight: 700; color: #22304E;">
+                        <span th:text="${limit.lmtCurrency}">USD</span>
+                        <span th:switch="${limit.lmtCurrency}" style="font-weight: 400; color: #777; font-size: 0.9em;">
+                            <span th:case="'USD'">($)</span>
+                            <span th:case="'JPY'">(¥)</span>
+                            <span th:case="'EUR'">(€)</span>
+                            <span th:case="'GBP'">(£)</span>
+                            <span th:case="'CNY'">(¥)</span>
+                            <span th:case="'AUD'">($)</span>
+                        </span>
+                    </span>
+                                    <span style="color: #333;">
+                        <span th:text="${#numbers.formatInteger(limit.lmtMinAmt, 1, 'COMMA')}">1,000</span>
+                        <span th:if="${limit.lmtMaxAmt != null and limit.lmtMaxAmt > 0}"
+                              th:text="| ~ ${#numbers.formatInteger(limit.lmtMaxAmt, 1, 'COMMA')}|">
+                        </span>
+                    </span>
+                                </div>
+                            </th:block>
+
+                            <div th:if="${product.limits == null or product.limits.isEmpty()}" style="color: #333;">
+                                제한 없음
+                            </div>
+                        </div>
+                    </div>
+
+                </div> </div> </div> <div class="view-tabs">
+        <button class="view-tab active" onclick="openTab(event, 'tab1')">상품안내</button>
+        <button class="view-tab" onclick="openTab(event, 'tab2')">금리안내</button>
+        <button class="view-tab" onclick="openTab(event, 'tab3')">상품약관</button>
     </div>
 
-    <!-- ✅ 수정된 view-textbox -->
-    <div class="view-textbox">
-      <h2>BNK모아드림외화적금</h2>
-      <p class="view-summary">
-        월단위 만기지정 가능한 적립식 외화예금<br>
-        금액, 적립횟수 제한없이 정기 및 자유적립 가능
-      </p>
 
-      <div class="view-summary-info">
-        <div class="view-info-item">
-          <span class="view-info-label">가입대상</span>
-          <span class="view-info-value">제한 없음</span>
+        <div id="tab1" class="view-details view-content active">
+
+            <dl class="view-detail" th:if="${product.dpstDescript != null}">
+                <dt>특징</dt>
+                <dd th:utext="${product.dpstDescript}">상품 설명</dd>
+            </dl>
+
+            <dl class="view-detail">
+                <dt>가입 대상</dt>
+                <dd>
+          <span th:if="${(product.dpstMinAge == null or product.dpstMinAge == 0) and (product.dpstMaxAge == null or product.dpstMaxAge == 0)}">
+              제한 없음
+          </span>
+                    <span th:if="${product.dpstMinAge != null and product.dpstMinAge > 0 and (product.dpstMaxAge == null or product.dpstMaxAge == 0)}"
+                          th:text="|만 ${product.dpstMinAge}세 이상|">
+          </span>
+                    <span th:if="${product.dpstMinAge != null and product.dpstMinAge > 0 and product.dpstMaxAge != null and product.dpstMaxAge > 0}"
+                          th:text="|만 ${product.dpstMinAge}세 ~ 만 ${product.dpstMaxAge}세 이상|">
+          </span>
+                </dd>
+            </dl>
+
+            <dl class="view-detail">
+                <dt>예금 유형</dt>
+                <dd th:text="${product.dpstType == 1 ? '거치식 예금' : (product.dpstType == 2 ? '자유 적립식' : '기타')}">
+                </dd>
+            </dl>
+
+            <dl class="view-detail">
+                <dt>가입 가능 통화</dt>
+                <dd>
+          <span th:each="cur, stat : ${#strings.arraySplit(product.dpstCurrency, ',')}">
+              <span th:text="${cur}"></span>
+              <span th:if="${!stat.last}">, </span>
+          </span>
+                </dd>
+            </dl>
+
+            <dl class="view-detail">
+                <dt>예금액</dt>
+                <dd>
+                    <div style="display: flex; flex-direction: column; gap: 4px;">
+
+                        <th:block th:if="${product.limits != null and !product.limits.isEmpty()}">
+                            <div th:each="limit : ${product.limits}">
+
+                                    <span style="font-weight: 600; color: #22304E;"
+                                          th:text="${limit.lmtCurrency}">USD</span>
+
+                                                <span th:switch="${limit.lmtCurrency}" style="color: #666; margin-right: 4px;">
+                                        <span th:case="'USD'">($)</span>
+                                        <span th:case="'JPY'">(¥)</span>
+                                        <span th:case="'EUR'">(€)</span>
+                                        <span th:case="'GBP'">(£)</span>
+                                        <span th:case="'CNY'">(¥)</span>
+                                        <span th:case="'AUD'">(A$)</span>
+                                    </span>
+
+                                        <span th:text="${#numbers.formatInteger(limit.lmtMinAmt, 1, 'COMMA')}"></span>
+
+                                        <span th:if="${limit.lmtMaxAmt != null and limit.lmtMaxAmt > 0}"
+                                              th:text="| ~ ${#numbers.formatInteger(limit.lmtMaxAmt, 1, 'COMMA')}|">
+                                        </span>
+                                    </div>
+                                </th:block>
+
+                        <span th:if="${product.limits == null or product.limits.isEmpty()}">제한 없음</span>
+                    </div>
+                </dd>
+            </dl>
+            <dl class="view-detail">
+                <dt>추가납입</dt>
+                <dd>
+                    <th:block th:if="${product.dpstAddPayYn == 'Y'}">
+                        <div style="font-weight: 700; color: #2C5DE5; margin-bottom: 4px;">
+                            가능
+                        </div>
+                        <div style="font-size: 14px; color: #666;">
+                            신규 포함 최대 <strong th:text="${product.dpstAddPayMax}" style="color: #222;"></strong>회
+                        </div>
+                    </th:block>
+
+                    <th:block th:if="${product.dpstAddPayYn == 'N'}">
+                        <div style="color: #d12a2a; font-weight: 700;">불가능</div>
+                    </th:block>
+                </dd>
+            </dl>
+
+            <dl class="view-detail">
+                <dt>예금 가입 기간</dt>
+                <dd>
+                  <span th:if="${product.periodList == null or product.periodList.isEmpty()}">
+                      별도 제한 없음
+                  </span>
+
+                    <th:block th:each="period, stat : ${product.periodList}">
+                        <th:block th:if="${product.dpstPeriodType == 1}">
+                             <span th:if="${period.minMonth != null and period.maxMonth != null and period.maxMonth > 0}"
+                        th:text="|${period.minMonth}개월 이상 ~ ${period.maxMonth}개월 이하|"></span>
+                            <span th:if="${period.minMonth != null and (period.maxMonth == null or period.maxMonth == 0)}"
+                                  th:text="|${period.minMonth}개월 이상|"></span>
+                        </th:block>
+
+                        <th:block th:if="${product.dpstPeriodType == 2}">
+                  <span th:if="${period.fixedMonth != null and period.fixedMonth > 0}"
+                        th:text="|${period.fixedMonth}개월|"></span>
+                        </th:block>
+
+                        <span th:if="${!stat.last}">, </span>
+                    </th:block>
+                </dd>
+            </dl>
+
+            <dl class="view-detail" th:if="${product.dpstPartWdrwYn == 'Y'}">
+                <dt>일부 출금</dt>
+                <dd>
+                    ・ 대상 계좌: 가입일로부터 <span th:text="${product.wdrwMinMonth}"></span>개월 이상 지난 계좌<br>
+                    ・ 가능 횟수: 최대 <span th:text="${product.wdrwMax}"></span>회<br>
+                    ・ 최소 출금금액: <span th:text="${product.amtCurrency}"></span>
+                    <span th:text="${#numbers.formatInteger(product.amtMin, 3, 'COMMA')}"></span> 이상<br>
+                </dd>
+            </dl>
+
+            <dl class="view-detail">
+                <dt>가입할 수 있는 곳</dt>
+                <dd>FLOBANK 웹사이트 및 모바일 앱</dd>
+            </dl>
+            <dl class="view-detail">
+                <dt>이자 받는 방법</dt>
+                <dd>만기 시 한 번에 지급 (만기일시지급식)</dd>
+            </dl>
+            <dl class="view-detail">
+                <dt>세제 혜택</dt>
+                <dd>없음</dd>
+            </dl>
+
+            <div class="view-protection">
+                <img th:src="@{/images/deposit.png}" alt="예금자보호 로고">
+                <p>
+                    이 예금은 <strong>예금자보호법</strong>에 따라 원금과 소정의 이자를 합하여
+                    <strong>1인당 “1억원까지”</strong> (본 은행의 여타 보호상품과 합산) 보호됩니다.
+                </p>
+            </div>
         </div>
-        <div class="view-info-item">
-          <span class="view-info-label">가입기간</span>
-          <span class="view-info-value">12개월</span>
-        </div>
-        <div class="view-info-item">
-          <span class="view-info-label">가입금액</span>
-          <span class="view-info-value">USD 1,000 이상</span>
-        </div>
-      </div>
-    </div>
-  </div>
+        <div id="tab2" class="view-content">
+            <dl class="view-detail">
+                <dt>외화정기예금금리</dt>
+                <dd class="rate-date">※ 2025.11.19 기준 (세전, 연 %)</dd>
+            </dl>
+
+            <!-- 외화정기예금 금리표 -->
+
+            <div class="table-wrap">
+
+                <table class="tbl-basic">
+
+                    <thead>
+
+                    <tr>
+
+                        <th>통화</th>
+
+                        <th>1개월이상</th>
+
+                        <th>2개월이상</th>
+
+                        <th>3개월이상</th>
+
+                        <th>6개월이상</th>
+
+                        <th>9개월이상</th>
+
+                        <th>12개월이상</th>
+
+                        <th>24개월이상</th>
+
+                        <th>36개월이상</th>
+
+                    </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                    <tr>
+
+                        <td>미국 (USD)</td>
+
+                        <td>3.2990</td>
+
+                        <td>3.3066</td>
+
+                        <td>3.2541</td>
+
+                        <td>3.0840</td>
+
+                        <td>3.0138</td>
+
+                        <td>2.7836</td>
+
+                        <td>2.6906</td>
+
+                        <td>2.6073</td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td>일본 (JPY)</td>
+
+                        <td>0.0000</td>
+
+                        <td>0.0000</td>
+
+                        <td>0.0000</td>
+
+                        <td>0.0000</td>
+
+                        <td>0.0000</td>
+
+                        <td>0.0000</td>
+
+                        <td>0.0000</td>
+
+                        <td>0.0000</td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td>유럽 (EUR)</td>
+
+                        <td>0.7349</td>
+
+                        <td>0.8189</td>
+
+                        <td>0.9845</td>
+
+                        <td>1.1483</td>
+
+                        <td>1.0978</td>
+
+                        <td>1.0978</td>
+
+                        <td>1.0978</td>
+
+                        <td>1.0978</td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td>중국 (CNY)</td>
+
+                        <td>0.0000</td>
+
+                        <td>0.0000</td>
+
+                        <td>0.0000</td>
+
+                        <td>0.0000</td>
+
+                        <td>0.0000</td>
+
+                        <td>0.0000</td>
+
+                        <td>0.0000</td>
+
+                        <td>0.0000</td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td>영국 (GBP)</td>
+
+                        <td>3.1376</td>
+
+                        <td>3.0666</td>
+
+                        <td>2.9457</td>
+
+                        <td>2.8242</td>
+
+                        <td>2.7345</td>
+
+                        <td>2.4748</td>
+
+                        <td>2.4868</td>
+
+                        <td>2.4417</td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td>호주 (AUD)</td>
+
+                        <td>2.5866</td>
+
+                        <td>2.6254</td>
+
+                        <td>2.6519</td>
+
+                        <td>2.7497</td>
+
+                        <td>2.8574</td>
+
+                        <td>2.9752</td>
+
+                        <td>2.9752</td>
+
+                        <td>2.9752</td>
+
+                    </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
 
 
-      <!-- 🔹 탭 버튼 -->
-      <div class="view-tabs">
-        <button class="view-tab active">상품안내</button>
-        <button class="view-tab">금리안내</button>
-        <button class="view-tab">상품약관</button>
-      </div>
-
-      <!-- 🔹 상품안내 내용 -->
-      <div class="view-details view-content active">
-        <dl class="view-detail">
-          <dt>특징</dt>
-          <dd>
-            ・ 1개월 단위로 금리가 올라가는 계단식 금리 구조<br>
-            ・ 일부 출금도 가능
-          </dd>
-        </dl>
-
-        <dl class="view-detail">
-          <dt>가입 대상</dt>
-          <dd>제한 없음</dd>
-        </dl>
-
-        <dl class="view-detail">
-          <dt>예금 유형</dt>
-          <dd>외화거치식예금</dd>
-        </dl>
-
-        <dl class="view-detail">
-          <dt>가입 가능 통화</dt>
-          <dd>USD(미국 달러), JPY(일본 엔), EUR(유럽 유로)</dd>
-        </dl>
-
-        <dl class="view-detail">
-          <dt>예금액</dt>
-          <dd>USD 1,000 / JPY 100,000 / EUR 1,000 이상</dd>
-        </dl>
-
-        <dl class="view-detail">
-          <dt>예금 가입 기간</dt>
-          <dd>12개월</dd>
-        </dl>
-
-        <dl class="view-detail">
-          <dt>일부 출금</dt>
-          <dd>
-            ・ 대상 계좌: 가입일로부터 1개월 이상 지난 계좌<br>
-            ・ 가능 횟수: 최대 3회(만기 해지 포함)<br>
-            ・ 최소 출금금액: USD 100, JPY 10,000, EUR 100 이상<br>
-            ※ 통화별 예금액 이상의 잔액이 계좌에 남아있어야 합니다.
-          </dd>
-        </dl>
-
-        <dl class="view-detail">
-          <dt>가입할 수 있는 곳</dt>
-          <dd>FLOBANK 웹사이트(정적 기능구현 XXX)</dd>
-        </dl>
-
-        <dl class="view-detail">
-          <dt>이자 받는 방법</dt>
-          <dd>만기 시 한 번에 (월 이자 단리식)-(정적 기능구현 XXX)</dd>
-        </dl>
-
-        <dl class="view-detail">
-          <dt>세제 혜택</dt>
-          <dd>없음(정적 기능구현 XXX)</dd>
-        </dl>
-
-      
-
-        <!-- ✅ 예금자보호 안내 -->
-        <div class="view-protection">
-          <img src="/static/images/deposit.png" alt="예금자보호 로고">
-          <p>
-            이 예금은 <strong>예금자보호법</strong>에 따라 원금과 소정의 이자를 합하여 
-            <strong>1인당 “1억원까지”</strong> (본 은행의 여타 보호상품과 합산) 보호됩니다.
-          </p>
-        </div>
-      </div>
-
-
-    <!-- 🔹 금리안내 탭 내용 -->
-    <div class="view-content">
-      <dl class="view-detail">
-        <dt>외화정기예금금리 [추후에 크롤링한거 가져오기]</dt>
-        <dd class="rate-date">※ 2025.11.11 12:58:34 기준</dd>
-      </dl>
-
-      <!-- 🔹 외화정기예금 금리표 -->
-      <div class="table-wrap">
-        <table class="tbl-basic">
-          <thead>
-            <tr>
-              <th>통화</th>
-              <th>1개월이상</th>
-              <th>2개월이상</th>
-              <th>3개월이상</th>
-              <th>6개월이상</th>
-              <th>9개월이상</th>
-              <th>12개월이상</th>
-              <th>24개월이상</th>
-              <th>36개월이상</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>미국 (USD)</td>
-              <td>3.2990</td>
-              <td>3.3066</td>
-              <td>3.2541</td>
-              <td>3.0840</td>
-              <td>3.0138</td>
-              <td>2.7836</td>
-              <td>2.6906</td>
-              <td>2.6073</td>
-            </tr>
-            <tr>
-              <td>일본 (JPY)</td>
-              <td>0.0000</td>
-              <td>0.0000</td>
-              <td>0.0000</td>
-              <td>0.0000</td>
-              <td>0.0000</td>
-              <td>0.0000</td>
-              <td>0.0000</td>
-              <td>0.0000</td>
-            </tr>
-            <tr>
-              <td>유럽 (EUR)</td>
-              <td>0.7349</td>
-              <td>0.8189</td>
-              <td>0.9845</td>
-              <td>1.1483</td>
-              <td>1.0978</td>
-              <td>1.0978</td>
-              <td>1.0978</td>
-              <td>1.0978</td>
-            </tr>
-            <tr>
-              <td>중국 (CNY)</td>
-              <td>0.0000</td>
-              <td>0.0000</td>
-              <td>0.0000</td>
-              <td>0.0000</td>
-              <td>0.0000</td>
-              <td>0.0000</td>
-              <td>0.0000</td>
-              <td>0.0000</td>
-            </tr>
-            <tr>
-              <td>영국 (GBP)</td>
-              <td>3.1376</td>
-              <td>3.0666</td>
-              <td>2.9457</td>
-              <td>2.8242</td>
-              <td>2.7345</td>
-              <td>2.4748</td>
-              <td>2.4868</td>
-              <td>2.4417</td>
-            </tr>
-            <tr>
-              <td>호주 (AUD)</td>
-              <td>2.5866</td>
-              <td>2.6254</td>
-              <td>2.6519</td>
-              <td>2.7497</td>
-              <td>2.8574</td>
-              <td>2.9752</td>
-              <td>2.9752</td>
-              <td>2.9752</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-
-
-
-        <dl class="view-detail">
-          <dt>이자지급방식</dt>
-          <dd>만기일시지급식</dd>
-        </dl>
-
-      
-
-        <dl class="view-detail">
-          <dt>적용환율</dt>
-          <dd>
-            외화예금을 원화로 입금(신규 입금 포함)하는 경우, 은행이 영업점에 고시한 입금 시점의 대고객 전신환매도율(송금 보내실 때 환율)을 적용합니다.<br>
-            (자동이체의 경우 자동이체일자의 1회차 전신환매도율 적용)<br><br>
-            외화예금의 원금 및 이자를 원화로 지급할 때는 은행이 영업점에 고시한 지급 시점의 대고객 전신환매입율(송금 받으실 때 환율)을 적용합니다.
-          </dd>
-        </dl>
-
-      <!-- ✅ 중도해지금리 테이블 -->
-        <h3 class="view-subtitle">중도해지금리</h3>
-        <p class="view-note">
-          가입일 또는 최종 자동연장일 당시 고시한 이 상품의 중도해지금리 적용 (2025.11.07 기준, 세금공제 전)
-        </p>
-
-        <table class="view-rate-table">
-          <thead>
-            <tr>
-              <th>예치기간</th>
-              <th>적용금리</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>가입 기간의 10% 미만 </td>
-              <td>가입시점 기본금리 × 10% × 경과일수 / 계약일수 (단, 최저금리는 연 0.10%)</td>
-            </tr>
-            <tr>
-              <td>가입 기간의 10% 이상 ~<br>가입 기간의 30% 미만</td>
-              <td>가입시점 기본금리 × 30% × 경과일수 / 계약일수 (단, 최저금리는 연 0.30%)</td>
-            </tr>
-            <tr>
-              <td>가입 기간의 30% 이상 ~<br> 가입 기간의 50% 미만</td>
-              <td>가입시점 기본금리 × 50% × 경과일수 / 계약일수 (단, 최저금리는 연 0.50%)</td>
-            </tr>
-            <tr>
-              <td>가입 기간의 50% 이상 ~<br> 가입 기간의 70% 미만</td>
-              <td>가입시점 기본금리 × 70% × 경과일수 / 계약일수 (단, 최저금리는 연 0.50%)</td>
-            </tr>
-            <tr>
-              <td>가입 기간의 70% 이상 ~<br> 가입 기간의 80% 미만</td>
-              <td>가입시점 기본금리 × 80% × 경과일수 / 계약일수 (단, 최저금리는 연 0.50%)</td>
-            </tr>
-            <tr>
-              <td>가입 기간의 80% 이상 ~<br> 가입 기간의 90% 미만</td>
-              <td>가입시점 기본금리 × 90% × 경과일수 / 계약일수 (단, 최저금리는 연 0.50%)</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <!--  만기후금리 테이블 -->
-        <h3 class="view-subtitle">만기후금리</h3>
-        <p class="view-note">
-          가입일 또는 최종 자동연장일 당시 고시한 이 상품의 만기후금리 적용 (2025.11.07 기준, 세금공제 전)<br>
-          <small>※ 만기 후 경과기간 구간별로 만기후금리는 자동 적용됨</small>
-        </p>
-
-        <table class="view-rate-table">
-          <thead>
-            <tr>
-              <th>만기 후 경과기간</th>
-              <th>적용금리</th>
-           </tr> 
-          </thead>
-          <tbody>
-            <tr>
-              <td>1개월 이내</td>
-              <td>가입(또는 자동연장)시점 기본금리 × 50%</td>
-            </tr>
-            <tr>
-              <td>1개월 초과 3개월 이내</td>
-              <td>가입(또는 자동연장)시점 기본금리 × 30%</td>
-            </tr>
-            <tr>
-              <td>3개월 초과</td>
-              <td>연 0.20%</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-            <!-- 🔹 상품약관 탭 내용 -->
-      <div class="view-content">
+        </div> <div id="tab3" class="view-content">
         <ul class="view-terms-list">
-          <li>
-            <a href="#" target="_blank">
-              <span>예금거래기본약관</span>
-              <i class="fa-solid fa-angle-right"></i>
-            </a>
-          </li>
-          <li>
-            <a href="#" target="_blank">
-              <span>외화예금거래기본약관</span>
-              <i class="fa-solid fa-angle-right"></i>
-            </a>
-          </li>
-          <li>
-            <a href="#" target="_blank">
-              <span>BNK모아드림외화적금 상품 설명서</span>
-              <i class="fa-solid fa-angle-right"></i>
-            </a>
-          </li>
+            <li>
+                <a href="#" target="_blank">
+                    <span>예금거래기본약관</span>
+                    <i class="fa-solid fa-angle-right"></i>
+                </a>
+            </li>
+            <li>
+                <a href="#" target="_blank">
+                    <span>외화예금거래기본약관</span>
+                    <i class="fa-solid fa-angle-right"></i>
+                </a>
+            </li>
         </ul>
-      </div>
+    </div>
+        <div class="view-bottom">
+            <a class="view-btn-primary" th:href="@{/deposit/deposit_step1(dpstId=${product.dpstId})}">
+                <span>가입하기</span>
+            </a>
 
+            <a th:href="@{/deposit/list}" class="view-btn-link">
+                <span>목록</span>
+            </a>
+        </div>
 
-      <!-- 하단 버튼 -->
-      <div class="view-bottom">
-        <button class="view-btn-primary">가입하기</button>
-        <a href="/deposit/list.html" class="view-btn-link">목록</a>
-      </div>
     </section>
-  </main>
+</main>
 
 <div th:replace="~{_template/_footer.html}"></div>
-<script src ="/static/js/deposit.js"></script>
-
-
+<script th:src="@{/js/deposit.js}"></script>
 </body>
 </html>
-

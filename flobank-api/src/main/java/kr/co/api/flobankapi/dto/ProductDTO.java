@@ -41,19 +41,22 @@ public class ProductDTO {
     private List<ProductLimitDTO> limits;
 
     // 분할인출
-    private int wdrwMinMonth;
-    private int wdrwMax;
+    private Integer wdrwMinMonth;
+    private Integer wdrwMax;
     private String amtCurrency;
-    private int amtMin;
+    private Integer amtMin;
 
     // 예치 기간
-    private int periodMinMonth;
-    private int periodMaxMonth;
-    private int periodFixedMonth;
+    private Integer periodMinMonth;
+    private Integer periodMaxMonth;
+    private Integer periodFixedMonth;
 
     // 가입 금액 제한
     private String lmtCurrency;
-    private int lmtMinAmt;
-    private int lmtMaxAmt;
+    private Integer lmtMinAmt;
+    private Integer lmtMaxAmt;
+
+
+    private List<ProductPeriodDTO> periodList;
 
 }
