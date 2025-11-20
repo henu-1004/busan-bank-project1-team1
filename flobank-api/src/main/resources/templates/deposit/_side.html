@@ -2,7 +2,14 @@
 <aside class="list-sidebar">
     <h3 class="list-title">외화예금</h3>
     <ul class="list-category">
-        <li th:class="${activeItem == 'product'} ? 'active' : ''"><a href="#">외화예금상품</a></li>
-        <li th:class="${activeItem == 'info'} ? 'active' : ''"><a href="#">외화예금안내</a></li>
+
+        <li th:class="${activeItem == 'product'} ? 'active' : ''">
+            <a th:href="@{/deposit/list}">외화예금상품</a>
+        </li>
+
+        <li th:class="${activeItem == 'info'} ? 'active' : ''">
+            <a th:href="@{/deposit/info}">외화예금안내</a>
+        </li>
+
     </ul>
 </aside>

@@ -14,5 +14,6 @@ public interface DepositMapper {
 
     ProductDTO findProductById(String dpstId);
 
+    String findTermsFileByTitle(String productName);
 
 }

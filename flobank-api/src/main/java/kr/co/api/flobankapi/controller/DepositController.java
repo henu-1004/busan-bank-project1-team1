@@ -58,6 +58,7 @@ public class DepositController {
 
         List<ProductDTO> list = depositService.getActiveProducts();
         int count = depositService.getActiveProductCount();
+        model.addAttribute("activeItem", "product");
 
         model.addAttribute("list", list);
         model.addAttribute("count", count);
@@ -69,11 +70,16 @@ public class DepositController {
     @GetMapping("/view")
     public String view(@RequestParam("dpstId") String dpstId, Model model) {
         ProductDTO product = depositService.getProduct(dpstId);
+
+        String termsFilePath = depositService.getTermsFileByTitle(product.getDpstName());
+
         LocalDate delibDate = LocalDate.parse(product.getDpstDelibDy(), DateTimeFormatter.ofPattern("yyyyMMdd"));
         LocalDate startDate = LocalDate.parse(product.getDpstDelibStartDy(), DateTimeFormatter.ofPattern("yyyyMMdd"));
         model.addAttribute("product", product);
+        model.addAttribute("activeItem", "product");
         model.addAttribute("delibDate", delibDate);
         model.addAttribute("startDate", startDate);
+        model.addAttribute("termsFilePath", termsFilePath);
 
         return "deposit/view";
     }
