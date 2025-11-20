@@ -71,7 +71,7 @@ public class ProductController {
     @PostMapping("/register")
     public String registerProduct(
             ProductDTO dto,
-            @RequestParam(value = "dpstInfoPdf", required = false) MultipartFile dpstInfoPdf,
+            @RequestParam(value = "pdfFile", required = false) MultipartFile pdfFile,
 
             @RequestParam(value = "dpstCurrency", required = false) String[] currencies,
             @RequestParam("ageLimit") String ageLimit,
@@ -209,7 +209,7 @@ public class ProductController {
     /* -----------------------------
        최종 저장
     ------------------------------ */
-        productService.insertProduct(dto, limits, periods, wdrwInfo, withdrawAmts, dpstInfoPdf);
+        productService.insertProduct(dto, limits, periods, wdrwInfo, withdrawAmts, pdfFile);
 
         return "redirect:/admin/products";
     }

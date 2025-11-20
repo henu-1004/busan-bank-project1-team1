@@ -48,7 +48,7 @@
         #{dpstAddPayMax, jdbcType=INTEGER},
         #{dpstPartWdrwYn},
         #{dpstRegDt},
-        #{dpstInfoPdf}
+        #{dpstInfoPdf, jdbcType=VARCHAR}
         )
     </insert>
 

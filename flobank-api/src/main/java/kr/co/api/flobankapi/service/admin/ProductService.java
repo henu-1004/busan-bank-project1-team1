@@ -26,10 +26,16 @@ public class ProductService {
                               ProductWithdrawRuleDTO wdrwInfo,
                               List<ProductWithdrawAmtDTO> withdrawAmts,
                               MultipartFile pdfFile) throws Exception {
+        dto.setDpstInfoPdf(null);
+
         if (pdfFile != null && !pdfFile.isEmpty()) {
-            String savedPath = saveProductPdf(pdfFile); // 아래 만든 메서드 호출
-            dto.setDpstInfoPdf(savedPath); // DTO에 경로 세팅 ("/uploads/products/...")
+            // 여기서 경로를 생성해서 다시 집어넣음
+            String savedPath = saveProductPdf(pdfFile);
+            dto.setDpstInfoPdf(savedPath);
         }
+
+        // 2. DB 저장 (이제 null 아니면 경로만 들어감)
+        productMapper.insertProduct(dto);
 
 
             // 1) 기본 상품 INSERT
@@ -93,37 +99,44 @@ public class ProductService {
 
     private String saveProductPdf(MultipartFile file) throws Exception {
 
-        // yml에서 경로 가져오기 (/app/uploads/pdf_products)
+        // 1. yml에 적힌 경로 그대로 가져옴 ("/app/uploads/products" 등)
         String basePath = filePathConfig.getPdfProductsPath();
 
+        // 경로 설정이 비어있으면 에러 방지용 처리
         if (basePath == null || basePath.isBlank()) {
-            return null;
+            throw new Exception("파일 업로드 경로(pdf-products-path)가 설정되지 않았습니다.");
         }
 
-        // 원본 파일명 정제 (특수문자 제거 등)
+        // 2. 원본 파일명 정제
         String original = file.getOriginalFilename();
-        String safeName = StringUtils.cleanPath(original).replaceAll("[^a-zA-Z0-9._-]", "_");
+        String safeName = StringUtils.cleanPath(original);
 
-        // 유니크 파일명 생성 (UUID)
+        // 3. 파일명 중복 방지 (UUID)
         String storedName = UUID.randomUUID() + "_" + safeName;
 
-        // 저장할 파일 객체 생성
-        File dest = new File(basePath, storedName);
+        // 4. 저장할 폴더 객체 생성 (경로는 basePath 그대로 사용)
+        File folder = new File(basePath);
 
-        // 절대 경로로 변환 (도커/리눅스 환경 호환성 확보)
+
+        if (!folder.exists()) {
+            boolean created = folder.mkdirs();
+            if (!created) {
+                // 로컬 윈도우의 권한 문제나 경로 문제일 수 있음
+            }
+        }
+
+        // 5. 파일 객체 생성
+        File dest = new File(folder, storedName);
+
+
         if (!dest.isAbsolute()) {
             dest = dest.getAbsoluteFile();
         }
 
-        // 폴더 없으면 생성
-        if (!dest.getParentFile().exists()) {
-            dest.getParentFile().mkdirs();
-        }
 
-        // 파일 저장
         file.transferTo(dest);
 
-        // DB에 저장할 웹 접근 경로 리턴
+
         return "/uploads/products/" + storedName;
     }
 
