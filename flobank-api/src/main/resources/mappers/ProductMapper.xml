@@ -190,6 +190,19 @@
 
 
 
+    <select id="findTermsFileByTitle" parameterType="string" resultType="string">
+        SELECT THIST_FILE
+        FROM (
+        SELECT H.THIST_FILE
+        FROM TB_TERMS_HIST H
+        INNER JOIN TB_TERMS_MASTER M
+        ON H.THIST_TERM_CATE = M.TERM_CATE
+        AND H.THIST_TERM_ORDER = M.TERM_ORDER
+        WHERE M.TERM_TITLE = #{productName}
+        ORDER BY H.THIST_VERSION DESC
+        )
+        WHERE ROWNUM = 1
+    </select>
 
 
 

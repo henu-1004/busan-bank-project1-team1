@@ -99,6 +99,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
+
     const curSelect = document.getElementById("curSelect");
     const amountInput = document.querySelector("#lmtAmtInput .form-input");
 
@@ -119,6 +120,100 @@ document.addEventListener("DOMContentLoaded", () => {
                 amountInput.placeholder = `${Number(maxAmount).toLocaleString()}${curCode} 미만`;
             } else {
                 amountInput.placeholder = `${curName} 금액 입력`;
+            }
+        });
+    }
+
+
+    const calcBtn = document.getElementById("calcBtn");
+    if (calcBtn) {
+      calcBtn.addEventListener("click", async () => {
+        const curS = document.getElementById("curSelect");
+        const curSelected = curS.options[curS.selectedIndex];
+        const currencyCode = curSelected.value;
+        const foreignAmountInput = document.getElementById("foreignAmount");
+        const foreignAmount = document.getElementById("foreignAmount").value;
+
+        if (!foreignAmount || isNaN(foreignAmount)) {
+            alert("외화 금액을 올바르게 입력해 주세요.");
+            foreignAmountInput.value = "";
+            foreignAmountInput.focus();
+            return;
+        }
+
+        const minAmount = Number(curSelected.getAttribute("data-minAmount"));
+        const maxAmount = Number(curSelected.getAttribute("data-maxAmount"));
+
+        // 입력값 숫자 체크
+        if (!foreignAmount || isNaN(foreignAmount)) {
+            alert("금액을 숫자로 입력해 주세요.");
+            return;
+        }
+
+        const amt = Number(foreignAmount);
+
+        // 🔥 범위 검사
+        if ((minAmount && amt < minAmount) || (maxAmount && amt >= maxAmount)) {
+            alert(`입력 가능 금액은 ${minAmount.toLocaleString()}${currencyCode} 이상 ${
+                maxAmount ? maxAmount.toLocaleString() + currencyCode + " 미만" : ""
+            }입니다.`);
+            foreignAmountInput.value = "";
+            foreignAmountInput.focus();
+            return;
+        }
+
+        try {
+            const res = await fetch("/flobank/deposit/calc", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    amount: foreignAmount,
+                    currency : currencyCode
+                })
+            });
+
+
+            const data = await res.json();  // 백엔드 반환값
+            updateTable(data, foreignAmount);              // 값 반영
+
+        } catch (e) {
+            console.error(e);
+            alert("계산 중 오류가 발생했습니다.");
+        }
+      });
+    }
+
+    function numberFormat(value) {
+        if (value === null || value === undefined) return "0";
+        return Number(value).toLocaleString("ko-KR");
+    }
+
+    function updateTable(data, foreignAmount) {
+        const table = document.getElementById("calcResultTable");
+        const cells = table.querySelectorAll(".prod-amt-right");
+
+        cells[0].textContent = numberFormat(data.baseRate) + " 원";
+        cells[1].textContent = numberFormat(data.appliedRate) + " 원";
+        cells[2].textContent = data.prefRate + "%";
+        cells[3].textContent = numberFormat(Number(data.spreadHalfPref) * Number(foreignAmount)) + " 원";
+        cells[4].textContent = numberFormat(data.krwAmount) + " 원";
+
+        // 테이블 표시
+        table.style.display = "table";
+    }
+
+    const periodInput = document.getElementById("periodInput");
+
+    if (periodInput) {
+        periodInput.addEventListener("change", () => {
+            const min = Number(periodInput.dataset.min);
+            const max = Number(periodInput.dataset.max);
+            const value = Number(periodInput.value);
+
+            if (value < min || value > max) {
+                alert(`가입 가능한 기간은 ${min}개월 이상 ${max}개월 이하입니다.`);
+                periodInput.value = ""; // 입력값 초기화
+                periodInput.focus();    // 다시 입력하도록 포커스 이동
             }
         });
     }

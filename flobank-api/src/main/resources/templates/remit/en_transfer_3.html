@@ -60,19 +60,19 @@
         <tbody>
           <tr>
             <th>출금계좌</th>
-            <td>플로뱅크 외화종합계좌 112-2188-1931-00</td>
+            <td th:text="|${custFrgnAcctDTO.frgnAcctName} ${custFrgnAcctDTO.frgnAcctNo}|">플로뱅크 외화종합계좌 112-2188-1931-00</td>
           </tr>
           <tr>
             <th>송금통화</th>
-            <td>USD (미국 달러)</td>
+            <td th:text="|${frgnRemtTranDTO.remtCurrency} ${currency}|">USD (미국 달러)</td>
           </tr>
           <tr>
             <th>송금금액</th>
-            <td>$1,000.00</td>
+              <td th:text="|${currencySymbol}${#numbers.formatInteger(frgnRemtTranDTO.remtAmount, 0, 'COMMA')}|">$1,000</td>
           </tr>
           <tr>
             <th>수수료</th>
-            <td>$10.00 (중계은행 수수료 포함)</td>
+            <td th:text="|${currencySymbol} (중계은행 수수료 포함)|">$10.00 (중계은행 수수료 포함)</td>
           </tr>
           <tr>
             <th>신청일시</th>

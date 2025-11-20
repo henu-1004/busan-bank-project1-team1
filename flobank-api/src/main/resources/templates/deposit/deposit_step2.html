@@ -63,7 +63,7 @@
       <div class="form-group">
         <label class="form-label">원화출금계좌번호</label>
         <select id="withdrawAccount" name="custAcctNo" class="form-select">
-            <option>====== 계좌 선택 ======</option>
+            <option selected disabled>======== 계좌 선택 ========</option>
             <option th:each="acct : ${accounts}"
                     th:value="${acct.acctNo}"
                     th:data-balance="${acct.acctBalance}"
@@ -86,7 +86,7 @@
       <div class="form-group">
         <label class="form-label">외화출금계좌번호</label>
         <select name="frgnAcctNo" class="form-select">
-            <option>====== 계좌 선택 ======</option>
+            <option selected disabled>======== 계좌 선택 ========</option>
             <option th:if="${frgnAccount}" th:value="${frgnAccount.frgnAcctNo}">[[${frgnAccount.frgnAcctNo}]]</option>
         </select>
         <!-- <p id="frgnBalanceHint" class="form-hint"></p> -->
@@ -104,6 +104,7 @@
       <div class="form-group">
         <label class="form-label">출금통화선택</label>
         <select id="withdrawFrgnAccount" name="balNo" class="form-select short">
+            <option selected disabled>======== 통화 선택 ========</option>
             <option  th:each="tacct : ${frgnAccountBals}"
                      th:if="${product.dpstCurrencyList.contains(tacct.balCurrency)}"
                      th:value="${tacct.balNo}"
@@ -124,6 +125,7 @@
     <div class="form-group">
       <label class="form-label">신규통화종류</label>
       <select id="curSelect" class="form-select">
+          <option selected disabled>======== 통화 선택 ========</option>
         <option th:each="cur : ${product.dpstCurrencyDtoList}"
             th:value="${cur.curCode}"
                 th:data-curCode="${cur.curCode}"
@@ -142,13 +144,11 @@
         <i class="fa-regular fa-circle-question" title="입금할 신규 금액을 입력하세요."></i>
       </label>
       <div id="lmtAmtInput" class="amount-input">
-        <input type="text" placeholder="" class="form-input short">
-
-          <button style="background-color: #1f2d3d; color: white; width: 140px; font-weight: bold; display: block" class="form-input tiny">예상금액확인</button>
-
+        <input type="text" id="foreignAmount" placeholder="" class="form-input short">
+          <button id="calcBtn" style="background-color: #1f2d3d; color: white; width: 140px; font-weight: bold; display: block" class="form-input tiny">예상금액확인</button>
       </div>
         <br>
-        <table class="prod-amt-container">
+        <table id="calcResultTable" class="prod-amt-container" style="display: none;">
             <tr>
                 <td class="prod-amt-left">
                     송금보내실때환율
@@ -202,13 +202,18 @@
     <div class="form-group">
       <label class="form-label">가입월수</label>
       <div class="term-select">
-        <select class="form-select short">
-          <option>1</option>
-          <option>3</option>
-          <option>6</option>
-          <option>12</option>
+        <select th:if="${product.dpstPeriodType==2}" class="form-select short">
+          <option th:each="period : ${product.periodFixedMonthList}" th:value="${period}">[[${period}]]</option>
         </select>
-        <span>월</span>
+          <input type="text" th:if="${product.dpstPeriodType==1}"
+                 id="periodInput"
+                 th:placeholder="${product.periodMinMonth + ' ~ ' + product.periodMaxMonth}"
+                 class="form-input short"
+                 th:data-min="${product.periodMinMonth}"
+                 th:data-max="${product.periodMaxMonth}">
+        <span>개월</span>
+
+
       </div>
     </div>
   </div>
@@ -216,8 +221,8 @@
   <div class="divider"></div>
 
   <!-- 3️⃣ 만기자동연장신청 -->
-  <div class="form-block">
-    <h3 class="step2-subtitle">만기자동연장신청</h3>
+  <div class="form-block" th:if="${product.getDpstAutoRenewYn().equals('Y')}">
+    <h3 class="step2-subtitle" >만기자동연장신청</h3>
 
     <div class="form-group">
 
@@ -241,10 +246,12 @@
       </div>
 
     </div>
+      <div class="divider"></div>
   </div>
 
 
 <!--  자동해지신청 여부 -->
+    <!--
 <div class="form-block">
   <h3 class="step2-subtitle">자동해지신청 여부</h3>
 
@@ -259,13 +266,7 @@
     </p>
   </div>
 </div>
-
-
-
-
-
-
-  <div class="divider"></div>
+-->
 
   <!-- 4️⃣ 정기예금 비밀번호 및 상품서류 수령방법 -->
   <div class="form-block">

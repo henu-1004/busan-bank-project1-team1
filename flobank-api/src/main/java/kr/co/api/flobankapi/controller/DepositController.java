@@ -8,10 +8,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.HashMap;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -60,6 +60,24 @@ public class DepositController {
 
         return "deposit/deposit_step2";
     }
+
+    @PostMapping("/calc")
+    @ResponseBody
+    public DepositExchangeDTO calc(@RequestBody Map<String, String> req) {
+        System.out.println("⚡ POST /deposit/calc 호출됨!");
+
+        String currency = req.get("currency");
+        DepositExchangeDTO exDTO = depositService.exchangeCalc(currency);
+        BigDecimal bdAmt = new BigDecimal(req.get("amount"));
+        BigDecimal krwAmt = bdAmt.multiply(exDTO.getAppliedRate())
+                .setScale(0, RoundingMode.FLOOR);
+
+        exDTO.setKrwAmount(krwAmt);
+
+
+        return exDTO;
+    }
+
     @GetMapping("/deposit_step3")
     public String deposit_step3(Model model, @RequestParam String dpstId){
         model.addAttribute("activeItem","product");
@@ -84,6 +102,7 @@ public class DepositController {
 
         List<ProductDTO> list = depositService.getActiveProducts();
         int count = depositService.getActiveProductCount();
+        model.addAttribute("activeItem", "product");
 
         model.addAttribute("list", list);
         model.addAttribute("count", count);
@@ -94,11 +113,16 @@ public class DepositController {
     @GetMapping("/view")
     public String view(@RequestParam("dpstId") String dpstId, Model model) {
         ProductDTO product = depositService.getProduct(dpstId);
+
+        String termsFilePath = depositService.getTermsFileByTitle(product.getDpstName());
+
         LocalDate delibDate = LocalDate.parse(product.getDpstDelibDy(), DateTimeFormatter.ofPattern("yyyyMMdd"));
         LocalDate startDate = LocalDate.parse(product.getDpstDelibStartDy(), DateTimeFormatter.ofPattern("yyyyMMdd"));
         model.addAttribute("product", product);
+        model.addAttribute("activeItem", "product");
         model.addAttribute("delibDate", delibDate);
         model.addAttribute("startDate", startDate);
+        model.addAttribute("termsFilePath", termsFilePath);
 
         return "deposit/view";
     }

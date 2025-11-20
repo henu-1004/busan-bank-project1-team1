@@ -136,12 +136,14 @@ public class WhiteListService {
             dpstPartWdrw = "불가능";
         }else {
             dpstPartWdrw = "최소" + dtoList.get(0).getWdrwMinMonth()+"개월 이상 예치된 계좌, 최대 "+dtoList.get(0).getWdrwMax()+"회";
-            String cur = dtoList.get(0).getAmtCurrency();
-            dpstPartWdrw = dpstPartWdrw + " (통화별 최소인출금액 : " + cur +" "+ dtoList.get(0).getAmtMin();
-            for (ProductDTO d : dtoList){
-                if (!d.getAmtCurrency().equals(cur)){
-                    dpstPartWdrw = dpstPartWdrw + ", " + d.getAmtCurrency() + " "+ d.getAmtMin();
-                    cur = d.getAmtCurrency();
+            if (dtoList.get(0).getAmtCurrency() != null){
+                String cur = dtoList.get(0).getAmtCurrency();
+                dpstPartWdrw = dpstPartWdrw + " (통화별 최소인출금액 : " + cur +" "+ dtoList.get(0).getAmtMin();
+                for (ProductDTO d : dtoList){
+                    if (!d.getAmtCurrency().equals(cur)){
+                        dpstPartWdrw = dpstPartWdrw + ", " + d.getAmtCurrency() + " "+ d.getAmtMin();
+                        cur = d.getAmtCurrency();
+                    }
                 }
             }
             dpstPartWdrw = dpstPartWdrw + ")";

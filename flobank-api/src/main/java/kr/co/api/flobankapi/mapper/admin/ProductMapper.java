@@ -52,6 +52,9 @@ public interface ProductMapper {
     // 매일 밤 12시 상품 업데이트
     void updateStatusToOpened();
 
+    // 상품명으로 최신 약관 파일 경로 가져오기
+    String getTermsFileByTitle(String productName);
+
 
 
 }

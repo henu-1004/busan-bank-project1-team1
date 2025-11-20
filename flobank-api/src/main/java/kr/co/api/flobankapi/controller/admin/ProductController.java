@@ -53,11 +53,15 @@ public class ProductController {
         // 최소/최대 가입액 제한
         List<ProductLimitDTO> limits = productService.getLimits(dpstId);
 
+        String termsFilePath = productService.getTermsFileByName(product.getDpstName());
+
+
         model.addAttribute("product", product);
         model.addAttribute("periods", periods);
         model.addAttribute("withdrawRule", wdrwRule);
         model.addAttribute("withdrawAmts", wdrwAmts);
         model.addAttribute("limits", limits);
+        model.addAttribute("termsFilePath", termsFilePath);
 
         return "admin/products_view";
     }

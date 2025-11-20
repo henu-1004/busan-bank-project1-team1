@@ -26,4 +26,5 @@ public class FrgnRemtTranDTO {
     String remtApproveNo;
     String remtEsignYn;
     String remtEsignDt;
+    String remtCountry;
 }

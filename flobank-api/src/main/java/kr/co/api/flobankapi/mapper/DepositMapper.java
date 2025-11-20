@@ -14,6 +14,7 @@ public interface DepositMapper {
 
     ProductDTO findProductById(String dpstId);
 
+    String findTermsFileByTitle(String productName);
 
     public ProductDTO selectDpstProduct(String dpstId);
     public List<ProductLimitDTO> limitOfDpst(String dpstId);
@@ -26,4 +27,5 @@ public interface DepositMapper {
     public List<FrgnAcctBalanceDTO> getFrgnAcctBalList(String balFrgnAcctNo);
     public List<CurrencyInfoDTO> getAllCurrencies();
     public CurrencyInfoDTO getCurrency(String curCode);
+    public int getPrefRate(String currency);
 }

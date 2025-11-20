@@ -407,19 +407,47 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
 
+        // [추가 함수] 통화 변경 시 외화 계좌번호(Value) 업데이트
+        function updateFrgnAccountNumber() {
+            const selectedOption = accountSelect.options[accountSelect.selectedIndex];
+            const accountType = selectedOption.getAttribute('data-type'); // FRGN or KRW
+
+            // 외화 계좌(FRGN)가 선택된 상태일 때만 동작
+            if (accountType === 'FRGN') {
+                // 선택된 통화 (예: USD, JPY)
+                const targetCurrency = transferCurrencySelect.value.toLowerCase();
+
+                // HTML data 속성에서 해당 통화의 자식 계좌번호(balNo) 가져오기
+                // 예: th:data-account-usd="..." 의 값을 읽음
+                const childAcctNo = selectedOption.getAttribute(`data-account-${targetCurrency}`);
+
+                if (childAcctNo) {
+                    // ★ 핵심: 실제 전송될 option의 value를 자식 계좌번호로 변경
+                    selectedOption.value = childAcctNo;
+                    // (선택사항) 디버깅용 로그
+                    // console.log(`송금 계좌번호 변경됨: ${childAcctNo} (${targetCurrency})`);
+                }
+            }
+        }
+
         // 이벤트 리스너 등록
         accountSelect.addEventListener('change', () => {
             userTransferInput.value = '';
             limitWarning.style.display = 'none';
+
+            updateFrgnAccountNumber(); // [추가] 계좌가 바뀌어도 현재 통화에 맞춰 계좌번호 세팅
             updateTransferableAmount();
         });
         transferCurrencySelect.addEventListener('change', () => {
             userTransferInput.value = '';
             limitWarning.style.display = 'none';
-            updateTransferableAmount();
+
+            updateFrgnAccountNumber(); // [추가] 계좌번호 먼저 업데이트
+            updateTransferableAmount(); // 그 다음 잔액/환율 업데이트
         });
 
-        // 초기 실행
+        // 초기 실행 시에도 적용
+        updateFrgnAccountNumber();
         updateTransferableAmount();
     }
 
@@ -439,9 +467,52 @@ function submitTransferForm() {
     const form = document.getElementById('transferForm');
     if (!form) return;
 
+    // ==========================================
+    // 1. 유효성 검사 (Validation) - 먼저 실행!
+    // ==========================================
+
+    // 송금 금액 확인
     const visibleAmount = document.getElementById('transfer-amount');
     const cleanAmount = visibleAmount.value.replace(/,/g, '');
+    if (!cleanAmount || isNaN(cleanAmount) || parseFloat(cleanAmount) <= 0) {
+        alert("송금할 금액을 입력해주세요.");
+        visibleAmount.focus();
+        visibleAmount.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+    }
 
+    // 수취인 이름 확인
+    const recName = document.querySelector('input[name="remtRecName"]');
+    if (recName && !recName.value.trim()) {
+        alert("수취인 성명(영문)을 입력해주세요.");
+        recName.focus();
+        recName.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+    }
+
+    // 은행 코드 확인
+    const recBkCode = document.querySelector('input[name="remtRecBkCode"]');
+    if (recBkCode && !recBkCode.value.trim()) {
+        alert("은행 코드를 입력해주세요.");
+        recBkCode.focus();
+        recBkCode.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+    }
+
+    // 계좌번호 확인
+    const recAccNo = document.querySelector('input[name="remtRecAccNo"]');
+    if (recAccNo && !recAccNo.value.trim()) {
+        alert("수취인 계좌번호를 입력해주세요.");
+        recAccNo.focus();
+        recAccNo.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+    }
+
+    // ==========================================
+    // 2. 데이터 정제 및 조합 (검사 통과 후 실행)
+    // ==========================================
+
+    // (1) 금액 및 환율 히든 필드 설정
     const hiddenAmountInput = document.getElementById('hidden-remt-amount');
     if (hiddenAmountInput) hiddenAmountInput.value = cleanAmount;
 
@@ -451,38 +522,19 @@ function submitTransferForm() {
             ? currentExchangeRate : 0;
     }
 
-    // 필수값 검증
-    if (!cleanAmount || isNaN(cleanAmount) || parseFloat(cleanAmount) <= 0) {
-        alert("송금할 금액을 입력해주세요.");
-        visibleAmount.focus();
-        visibleAmount.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        return;
+    // (2) 우편번호 + 주소 병합 (요청하신 포맷: [우편번호] 주소)
+    const zipInput = document.getElementById('input-zip-code');
+    const addrInput = document.querySelector('input[name="remtAddr"]');
+
+    if (zipInput && addrInput && zipInput.value.trim() !== "") {
+        // 기존 값이 중복되지 않게 초기화(혹시 모를 중복 방지)하거나, 입력된 값 그대로 사용
+        // 포맷 변경: "609" + "47336" -> "[47336] 609"
+        addrInput.value = `[${zipInput.value.trim()}] ${addrInput.value.trim()}`;
     }
 
-    const recName = document.querySelector('input[name="remtRecName"]');
-    if (recName && !recName.value.trim()) {
-        alert("수취인 성명(영문)을 입력해주세요.");
-        recName.focus();
-        recName.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        return;
-    }
-
-    const recBkCode = document.querySelector('input[name="remtRecBkCode"]');
-    if (recBkCode && !recBkCode.value.trim()) {
-        alert("은행 코드(Routing No)를 입력해주세요.");
-        recBkCode.focus();
-        recBkCode.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        return;
-    }
-
-    const recAccNo = document.querySelector('input[name="remtRecAccNo"]');
-    if (recAccNo && !recAccNo.value.trim()) {
-        alert("수취인 계좌번호를 입력해주세요.");
-        recAccNo.focus();
-        recAccNo.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        return;
-    }
-
+    // ==========================================
+    // 3. 폼 제출
+    // ==========================================
     form.submit();
 }
 

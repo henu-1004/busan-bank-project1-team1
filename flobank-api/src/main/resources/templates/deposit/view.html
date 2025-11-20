@@ -442,7 +442,10 @@
         </div> <div id="tab3" class="view-content">
         <ul class="view-terms-list">
             <li>
-                <a th:href="@{${product.dpstInfoPdf}}" target="_blank">
+                <a th:href="@{${termsFilePath != null ? termsFilePath : '#'}}"
+                   th:target="${termsFilePath != null ? '_blank' : '_self'}"
+                   class="btn-link">
+
                     <span>상품별적용약관동의</span>
                     <i class="fa-solid fa-angle-right"></i>
                 </a>
