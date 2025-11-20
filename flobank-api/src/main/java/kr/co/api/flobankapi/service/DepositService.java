@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 public class DepositService {
-
     private final DepositMapper depositMapper;
 
     public List<ProductDTO> getActiveProducts() {
@@ -24,13 +23,20 @@ public class DepositService {
     }
     public ProductDTO selectDpstProduct(String dpstId) {
         ProductDTO productDTO = depositMapper.selectDpstProduct(dpstId);
-
+        
         // 적용 가능 통화 목록
         List<String> currencyList = Arrays.stream(productDTO.getDpstCurrency().split(","))
                 .map(String::trim)       // 공백 제거
                 .filter(s -> !s.isEmpty()) // 빈 문자열 제거
                 .collect(Collectors.toList());
+        List<CurrencyInfoDTO> curDtoList = new ArrayList<>();
+
+        for (String currency : currencyList) {
+            CurrencyInfoDTO curDto = depositMapper.getCurrency(currency);
+            curDtoList.add(curDto);
+        }
         productDTO.setDpstCurrencyList(currencyList);
+        productDTO.setDpstCurrencyDtoList(curDtoList);
 
         // 통화별 가입 금액 제한
         if (productDTO.getDpstMinYn().equals("Y") || productDTO.getDpstMaxYn().equals("Y")) {
@@ -76,7 +82,6 @@ public class DepositService {
     public CustFrgnAcctDTO getFrgnAcct(String frgnAcctCustCode) {
         return depositMapper.getFrgnAcct(frgnAcctCustCode);
     }
-
 
     public List<FrgnAcctBalanceDTO> getFrgnAcctBalList(String balFrgnAcctNo) {
         return depositMapper.getFrgnAcctBalList(balFrgnAcctNo);

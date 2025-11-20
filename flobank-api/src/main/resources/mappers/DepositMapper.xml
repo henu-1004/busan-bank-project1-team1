@@ -63,6 +63,15 @@
         WHERE BAL_FRGN_ACCT_NO = #{balFrgnAcctNo}
     </select>
 
+    <select id="getAllCurrencies" resultType="kr.co.api.flobankapi.dto.CurrencyInfoDTO">
+        select * from TB_CURRENCY_INFO
+    </select>
+
+    <select id="getCurrency" resultType="kr.co.api.flobankapi.dto.CurrencyInfoDTO">
+        select * from TB_CURRENCY_INFO
+        where cur_code=#{curCode}
+    </select>
+
 
 
 

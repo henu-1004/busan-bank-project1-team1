@@ -24,5 +24,6 @@ public interface DepositMapper {
     public List<CustAcctDTO> getKRWAccts(String acctCustCode);
     public CustFrgnAcctDTO getFrgnAcct(String frgnAcctCustCode);
     public List<FrgnAcctBalanceDTO> getFrgnAcctBalList(String balFrgnAcctNo);
-
+    public List<CurrencyInfoDTO> getAllCurrencies();
+    public CurrencyInfoDTO getCurrency(String curCode);
 }

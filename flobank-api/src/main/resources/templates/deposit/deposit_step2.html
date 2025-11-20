@@ -62,7 +62,7 @@
     <div id="krwFields">
       <div class="form-group">
         <label class="form-label">원화출금계좌번호</label>
-        <select id="withdrawAccount" class="form-select">
+        <select id="withdrawAccount" name="custAcctNo" class="form-select">
             <option>====== 계좌 선택 ======</option>
             <option th:each="acct : ${accounts}"
                     th:value="${acct.acctNo}"
@@ -77,7 +77,7 @@
 
       <div class="form-group">
         <label class="form-label">원화출금계좌비밀번호</label>
-        <input type="password" maxlength="4" placeholder="비밀번호 4자리" class="form-input short">
+        <input type="password" name="acctPw" maxlength="4" placeholder="비밀번호 4자리" class="form-input short">
       </div>
     </div>
 
@@ -85,32 +85,32 @@
     <div id="fxFields" class="hidden">
       <div class="form-group">
         <label class="form-label">외화출금계좌번호</label>
-        <select id="withdrawFrgnAccount" class="form-select">
+        <select name="frgnAcctNo" class="form-select">
             <option>====== 계좌 선택 ======</option>
-            <option  th:each="tacct : ${frgnAccountBals}" th:value="${tacct.balNo}"
-                     th:data-balance="${tacct.balBalance}"
-                     th:data-currency="${tacct.balCurrency}"
-            >[[${frgnAccount.frgnAcctNo}]] ([[${tacct.balCurrency}]])</option>
+            <option th:if="${frgnAccount}" th:value="${frgnAccount.frgnAcctNo}">[[${frgnAccount.frgnAcctNo}]]</option>
         </select>
-        <p id="frgnBalanceHint" class="form-hint"></p>
+        <!-- <p id="frgnBalanceHint" class="form-hint"></p> -->
       </div>
 
       <div class="divider"></div>
 
       <div class="form-group">
         <label class="form-label">외화출금계좌비밀번호</label>
-        <input type="password" maxlength="4" placeholder="비밀번호 4자리" class="form-input short">
+        <input type="password" name="frgnAcctPw" maxlength="4" placeholder="비밀번호 4자리" class="form-input short">
       </div>
 
       <div class="divider"></div>
 
       <div class="form-group">
         <label class="form-label">출금통화선택</label>
-        <select class="form-select short">
-          <option>USD (미국 달러)</option>
-          <option>JPY (일본 엔화)</option>
-          <option>EUR (유로)</option>
+        <select id="withdrawFrgnAccount" name="balNo" class="form-select short">
+            <option  th:each="tacct : ${frgnAccountBals}"
+                     th:if="${product.dpstCurrencyList.contains(tacct.balCurrency)}"
+                     th:value="${tacct.balNo}"
+                     th:data-balance="${tacct.balBalance}"
+                     th:data-currency="${tacct.balCurrency}">[[${tacct.balCurrency}]]</option>
         </select>
+          <p id="frgnBalanceHint" class="form-hint">
       </div>
     </div>
   </div>
@@ -123,11 +123,15 @@
 
     <div class="form-group">
       <label class="form-label">신규통화종류</label>
-      <select class="form-select">
-        <option>USD (미국 달러)</option>
-        <option>JPY (일본 엔화)</option>
-        <option>EUR (유로)</option>
-        <option>CNH (중국 위안)</option>
+      <select id="curSelect" class="form-select">
+        <option th:each="cur : ${product.dpstCurrencyDtoList}"
+            th:value="${cur.curCode}"
+                th:data-curCode="${cur.curCode}"
+                th:data-curName="${cur.curName}"
+                th:data-minAmount="${limitMinMap[cur.curCode]}"
+                th:data-maxAmount="${limitMaxMap[cur.curCode]}"
+        >
+        [[${cur.curCode}]] ([[${cur.curName}]])</option>
       </select>
     </div>
 
@@ -137,14 +141,60 @@
       <label class="form-label">신규금액 
         <i class="fa-regular fa-circle-question" title="입금할 신규 금액을 입력하세요."></i>
       </label>
-      <div class="amount-input">
-        <input type="text" placeholder="1,000달러 이상" class="form-input short">
-        <span class="amount-divider">.</span>
-        <input type="text" maxlength="2" placeholder="00" class="form-input tiny">
-        <span class="form-hint-inline">
-          <i class="fa-regular fa-circle-info"></i> 소수점 이하 두자리까지
-        </span>
+      <div id="lmtAmtInput" class="amount-input">
+        <input type="text" placeholder="" class="form-input short">
+
+          <button style="background-color: #1f2d3d; color: white; width: 140px; font-weight: bold; display: block" class="form-input tiny">예상금액확인</button>
+
       </div>
+        <br>
+        <table class="prod-amt-container">
+            <tr>
+                <td class="prod-amt-left">
+                    송금보내실때환율
+                </td>
+                <td class="prod-amt-right">
+                    1482 원
+                </td>
+            </tr>
+            <tr>
+                <td class="prod-amt-left">
+                    우대적용환율
+                </td>
+                <td class="prod-amt-right">
+                    1482 원
+                </td>
+            </tr>
+            <tr>
+                <td class="prod-amt-left">
+                    우대율
+                </td>
+                <td class="prod-amt-right">
+                    70%
+                </td>
+            </tr>
+            <tr>
+                <td class="prod-amt-left">
+                    우대받는금액
+                </td>
+                <td class="prod-amt-right">
+                    62 원
+                </td>
+            </tr>
+            <tr>
+                <td class="prod-amt-left">
+                    예상원화금액
+                </td>
+                <td class="prod-amt-right" style="color: #ef0909; font-weight: bold">
+                    1482 원
+                </td>
+            </tr>
+            <tr>
+                <td class="prod-amt-left" colspan="2" style="color: gray">
+                    상기 예상금액은 실제 가입 시점의 환율 변동에 따라 달라질 수 있습니다.(수수료 미포함)
+                </td>
+            </tr>
+        </table>
     </div>
 
     <div class="divider"></div>

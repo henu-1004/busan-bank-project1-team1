@@ -40,6 +40,7 @@ public class ProductDTO {
     // 통화코드별 한도금액
     private List<ProductLimitDTO> limits;
     // 통화코드 목록
+    private List<CurrencyInfoDTO> dpstCurrencyDtoList;
     private List<String> dpstCurrencyList;
 
     // 분할인출

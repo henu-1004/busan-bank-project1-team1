@@ -98,4 +98,29 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+
+    const curSelect = document.getElementById("curSelect");
+    const amountInput = document.querySelector("#lmtAmtInput .form-input");
+
+    if (curSelect && amountInput) {
+        curSelect.addEventListener("change", () => {
+            const opt = curSelect.options[curSelect.selectedIndex];
+
+            const curName = opt.getAttribute("data-curName");
+            const curCode = opt.getAttribute("data-curCode");
+            const minAmount = opt.getAttribute("data-minAmount");
+            const maxAmount = opt.getAttribute("data-maxAmount");
+
+            if (minAmount && !isNaN(minAmount) && maxAmount && !isNaN(maxAmount)) {
+                amountInput.placeholder = `${Number(minAmount).toLocaleString()}${curCode} 이상, ${Number(maxAmount).toLocaleString()}${curCode} 미만`;
+            } else if (minAmount && !isNaN(minAmount)) {
+                amountInput.placeholder = `${Number(minAmount).toLocaleString()}${curCode} 이상`;
+            } else if (maxAmount && !isNaN(maxAmount)) {
+                amountInput.placeholder = `${Number(maxAmount).toLocaleString()}${curCode} 미만`;
+            } else {
+                amountInput.placeholder = `${curName} 금액 입력`;
+            }
+        });
+    }
+
 });
