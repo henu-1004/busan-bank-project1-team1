@@ -1,9 +1,15 @@
+/*
+* 날짜 : 2025/11/20
+* 이름 : 김대현
+* 내용 : 약관 동의관련 수정
+* */
 /////////////////////////////////////////////////////////////
 // 환전 약관 동의 (step1)
 /////////////////////////////////////////////////////////////
 document.addEventListener("DOMContentLoaded", () => {
   const agreeAll = document.getElementById("agreeAll");
   const termChecks = document.querySelectorAll(".term-check");
+  const nextBtn = document.querySelector(".step1-btn-next");
 
   if (agreeAll && termChecks.length > 0) {
     agreeAll.addEventListener("change", () => {
@@ -17,6 +23,22 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
   }
+
+    /////////////////////////////////////////////////////////////
+    //  "다음 버튼 제어 코드" 삽입
+    /////////////////////////////////////////////////////////////
+
+    if (nextBtn) {
+        nextBtn.addEventListener("click", e => {
+            if (!agreeAll.checked) {
+                e.preventDefault();
+                alert("모든 약관에 동의해야 다음 단계로 진행할 수 있습니다.");
+                return;
+            }
+
+            window.location.href = "/exchange/step2";
+        });
+    }
 
   /////////////////////////////////////////////////////////////
   // 환전 예상 금액 확인 (step2)

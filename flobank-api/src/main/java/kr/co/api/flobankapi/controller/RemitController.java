@@ -1,3 +1,11 @@
+/*
+ * 날짜 : 2025/11/20
+ * 이름 : 김대현
+ * 내용 : 디비 불러오기 수정
+ * */
+
+
+
 package kr.co.api.flobankapi.controller;
 
 import kr.co.api.flobankapi.dto.CustAcctDTO;
@@ -17,6 +25,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import kr.co.api.flobankapi.service.TermsDbService;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -30,10 +39,18 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class RemitController {
     private final MypageService mypageService;
+    private final TermsDbService termsDbService;
+
     private final RemitService remitService;
 
     @GetMapping("/en_transfer_1")
     public String en_transfer_1(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
+
+        int termLocation = 3; // 3번: 외화송금
+
+        model.addAttribute("termsList",
+                termsDbService.getTermsByLocation(termLocation)
+        );
 
 
         return  "remit/en_transfer_1";

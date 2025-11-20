@@ -1,3 +1,10 @@
+<!--
+* 날짜 : 2025/11/20
+* 이름 : 김대현
+* 내용 : 약관 동의관련 수정
+-->
+
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -48,77 +55,48 @@
     </p>
 
     <!-- 약관 그룹 -->
-    <section class="terms-group">
-      <!-- 1️⃣ 서비스 이용 약관 -->
-      <div class="terms-box">
-        <p class="terms-title">외화계좌이체 서비스 이용 약관</p>
-        <div class="terms-content">
-          본 약관은 고객이 플로뱅크 외화계좌이체 서비스를 이용함에 있어 필요한 사항을 규정합니다.<br><br>
-          ① 고객은 이체 시 수취은행, 수취계좌번호, 금액, 통화 등을 정확히 입력해야 하며, 입력 오류로 인한 책임은 고객에게 있습니다.<br>
-          ② 외화계좌이체는 당행 및 제휴은행의 외환거래 기준을 따르며, 환율 변동에 따라 송금액이 조정될 수 있습니다.<br>
-          ③ 은행은 외환거래법 및 관련 규정에 따라 필요한 정보를 고객으로부터 요청할 수 있습니다.<br>
-          ④ 서비스 이용 시 발생하는 수수료는 별도의 고지 없이 변경될 수 있습니다.
-        </div>
-        <div class="terms-check">
-          <label class="custom-check">
-            <input type="checkbox" class="term-check">
-            <span class="checkmark"></span> 위 약관에 동의합니다.
-          </label>
-        </div>
-      </div>
+      <section class="terms-group">
+          <div class="terms-box" th:each="t, stat : ${termsList}">
+              <p class="terms-title" th:text="${t.termTitle}"></p>
 
-      <!-- 2️⃣ 개인정보 수집 및 이용동의 -->
-      <div class="terms-box">
-        <p class="terms-title">개인정보 수집 및 이용 동의</p>
-        <div class="terms-content">
-          플로뱅크는 외화계좌이체 서비스 제공을 위해 아래와 같은 개인정보를 수집·이용합니다.<br><br>
-          - 수집 항목: 성명, 계좌번호, 연락처, 송금 및 수취인 정보 등<br>
-          - 이용 목적: 외화 송금 이체 처리 및 본인 확인<br>
-          - 보유 기간: 관계법령에 따른 보존 기간 후 파기<br><br>
-          이용자는 위 내용에 대해 동의를 거부할 수 있으나, 동의하지 않을 경우 서비스 이용이 제한될 수 있습니다.
-        </div>
-        <div class="terms-check">
-          <label class="custom-check">
-            <input type="checkbox" class="term-check">
-            <span class="checkmark"></span> 위 약관에 동의합니다.
-          </label>
-        </div>
-      </div>
+              <div class="terms-content">
+                  <pre th:text="${t.termContent}"></pre>
+              </div>
 
-      <!-- 3️⃣ 외환거래 관련 유의사항 -->
-      <div class="terms-box">
-        <p class="terms-title">외환거래 관련 유의사항</p>
-        <div class="terms-content">
-          외화 송금은 국제 금융망을 통해 처리되므로, 중계은행의 절차에 따라 수수료가 부과될 수 있습니다.<br><br>
-          또한, 거래 목적에 따라 외환신고가 필요할 수 있으며, 해당 사항은 고객이 직접 확인해야 합니다.<br>
-          불법 외환거래로 판단될 경우, 관련 법령에 따라 송금이 제한되거나 취소될 수 있습니다.
-        </div>
-        <div class="terms-check">
-          <label class="custom-check">
-            <input type="checkbox" class="term-check">
-            <span class="checkmark"></span> 위 약관에 동의합니다.
-          </label>
-        </div>
-      </div>
+              <div class="terms-check">
+                  <label class="custom-check">
+                      <input type="checkbox" class="term-check"
+                             th:id="|remit-term${stat.index}|"
+                             th:attr="data-cate=${t.termCate}, data-order=${t.termOrder}">
+                      <span class="checkmark"></span> 위 약관에 동의합니다.
+                  </label>
+              </div>
+          </div>
 
-      <!-- 전체 동의 -->
-      <div class="terms-all">
-        <label class="custom-check">
-          <input type="checkbox" id="agreeAll">
-          <span class="checkmark"></span> 전체 약관에 동의합니다.
-        </label>
-      </div>
-    </section>
+          <!-- 전체 동의 -->
+          <div class="terms-all">
+              <label class="custom-check">
+                  <input type="checkbox" id="agreeAll">
+                  <span class="checkmark"></span> 전체 약관에 동의합니다.
+              </label>
+          </div>
+      </section>
+
 
     <!-- 다음 버튼 -->
-    <div class="transfer1-actions">
-      <a th:href="@{/remit/en_transfer_2}" class="transfer1-btn-next">다음</a>
-    </div>
+      <div class="terms-actions">
+          <a th:href="@{/mypage/en_account_open_2}">
+
+          <button class="btn-next">다음</button>
+          </a>
+      </div>
+
+
   </div>
 </main>
 
 <div th:replace="~{_template/_footer.html}"></div>
-<script th:src ="@{/js/mypage.js}"></script>
+<script th:src="@{/js/remit.js}"></script>
 
 </body>
 </html>

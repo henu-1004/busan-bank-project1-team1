@@ -1,3 +1,10 @@
+/*
+ * 날짜 : 2025/11/20
+ * 이름 : 김대현
+ * 내용 : 디비 불러오기 수정
+ * */
+
+
 package kr.co.api.flobankapi.controller;
 
 // 1. 필요한 클래스 임포트
@@ -20,6 +27,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.HttpServletBean;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes; // 2. RedirectAttributes 임포트
+import kr.co.api.flobankapi.service.TermsDbService;
 
 import java.util.Map;
 
@@ -32,9 +40,20 @@ public class MemberController {
     private final CustInfoService custInfoService;
     private final JwtTokenProvider jwtTokenProvider;
     private final EmailService emailService;
+    private final TermsDbService termsDbService;
 
+
+    //회원가입 약관 불러오기
     @GetMapping("/terms")
-    public String termsPage() {
+    public String termsPage(Model model) {
+        int termLocation = 1; // 1번: 회원가입
+
+        model.addAttribute("termsList",
+                termsDbService.getTermsByLocation(termLocation)
+        );
+
+        log.info("termsList size = {}", termsDbService.getTermsByLocation(1).size());
+
         return "member/terms";
     }
 

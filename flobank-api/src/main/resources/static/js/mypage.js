@@ -1,3 +1,10 @@
+/*
+* 날짜 : 2025/11/20
+* 이름 : 김대현
+* 내용 : 약관 동의관련 수정
+* */
+
+
 ////////////////////////////////////////////////////////////////////////////
 // mypage.js — 통합버전 (금액 버튼 기능 추가됨)
 ////////////////////////////////////////////////////////////////////////////
@@ -6,23 +13,7 @@ let currentExchangeRate = 0; // 전역 변수로 환율 관리 (폼 전송 시 �
 
 document.addEventListener("DOMContentLoaded", () => {
 
-    ////////////////////////////////////////////////////////////////////////////
-    // 2️⃣ 계좌개설 약관 전체 동의
-    ////////////////////////////////////////////////////////////////////////////
-    const agreeAll = document.getElementById("agreeAll");
-    const checks = document.querySelectorAll(".term-check");
 
-    if (agreeAll && checks.length > 0) {
-        agreeAll.addEventListener("change", () => {
-            checks.forEach(chk => (chk.checked = agreeAll.checked));
-        });
-
-        checks.forEach(chk => {
-            chk.addEventListener("change", () => {
-                agreeAll.checked = [...checks].every(c => c.checked);
-            });
-        });
-    }
 
     ////////////////////////////////////////////////////////////////////////////
     // 3️⃣ 원화 계좌 한도 설정 (원화 페이지 전용)

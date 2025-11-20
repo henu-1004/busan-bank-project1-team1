@@ -1,3 +1,10 @@
+/*
+* 날짜 : 2025/11/20
+* 이름 : 김대현
+* 내용 : 디비 불러오기 수정
+* */
+
+
 package kr.co.api.flobankapi.controller;
 
 import kr.co.api.flobankapi.service.ExchangeService;
@@ -8,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import kr.co.api.flobankapi.service.TermsDbService;
 
 import java.math.BigDecimal;
 
@@ -17,6 +25,8 @@ import java.math.BigDecimal;
 public class ExchangeController {
 
     private final ExchangeService exchangeService;
+    private final TermsDbService termsDbService;
+
 
     // 환전하기
     @ResponseBody
@@ -52,8 +62,15 @@ public class ExchangeController {
         return "exchange/info3";
     }
 
+    //환전하기 약관 불러오기
     @GetMapping("/step1")
-    public String step1(){
+    public String step1(Model model){
+        int termLocation = 2; // 2번: 환전하기
+
+        model.addAttribute("termsList",
+                termsDbService.getTermsByLocation(termLocation)
+        );
+
         return "exchange/step1";
     }
 

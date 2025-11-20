@@ -1,3 +1,9 @@
+<!--
+* 날짜 : 2025/11/20
+* 이름 : 김대현
+* 내용 : 약관 동의관련 수정
+-->
+
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -22,109 +28,41 @@
   <h2>이용 약관 동의</h2>
   <p class="terms-desc">서비스 이용을 위해 아래 약관을 확인하시고 동의해주세요.</p>
 
-  <!-- 약관 1 -->
-  <div class="terms-box">
-    <h3>[필수] 전자금융거래 기본약관</h3>
-    <div class="terms-content">
-      <p>
-        OO은행은 고객의 개인정보를 관련 법령에 따라 안전하게 처리합니다.<br><br>
-        수집항목: 성명, 연락처, 계좌정보, 로그인 정보 등<br>
-        이용목적: 본인 확인, 거래이력 관리, 고객 서비스 제공<br>
-        보유기간: 관계법령에 의한 보존기간까지<br><br>
-        ... (이하 동의서 전문)
-        OO은행은 고객의 개인정보를 관련 법령에 따라 안전하게 처리합니다.<br><br>
-        수집항목: 성명, 연락처, 계좌정보, 로그인 정보 등<br>
-        이용목적: 본인 확인, 거래이력 관리, 고객 서비스 제공<br>
-        보유기간: 관계법령에 의한 보존기간까지<br><br>
-        OO은행은 고객의 개인정보를 관련 법령에 따라 안전하게 처리합니다.<br><br>
-        수집항목: 성명, 연락처, 계좌정보, 로그인 정보 등<br>
-        이용목적: 본인 확인, 거래이력 관리, 고객 서비스 제공<br>
-        보유기간: 관계법령에 의한 보존기간까지<br><br>
-        ... (이하 동의서 전문)
-        OO은행은 고객의 개인정보를 관련 법령에 따라 안전하게 처리합니다.<br><br>
-        수집항목: 성명, 연락처, 계좌정보, 로그인 정보 등<br>
-        이용목적: 본인 확인, 거래이력 관리, 고객 서비스 제공<br>
-        보유기간: 관계법령에 의한 보존기간까지<br><br>
-      </p>
-    </div>
-    <div class="terms-check">
-      <input type="checkbox" id="term1">
-      <label for="term1">위 약관에 동의합니다.</label>
-    </div>
-  </div>
+    <section class="terms-group">
 
-  <!-- 약관 2 -->
-  <div class="terms-box">
-    <h3>[필수] 전자금융서비스 이용약관</h3>
-    <div class="terms-content">
-      <p>
-        OO은행은 고객의 개인정보를 관련 법령에 따라 안전하게 처리합니다.<br><br>
-        수집항목: 성명, 연락처, 계좌정보, 로그인 정보 등<br>
-        이용목적: 본인 확인, 거래이력 관리, 고객 서비스 제공<br>
-        보유기간: 관계법령에 의한 보존기간까지<br><br>
-        ... (이하 동의서 전문)
-        OO은행은 고객의 개인정보를 관련 법령에 따라 안전하게 처리합니다.<br><br>
-        수집항목: 성명, 연락처, 계좌정보, 로그인 정보 등<br>
-        이용목적: 본인 확인, 거래이력 관리, 고객 서비스 제공<br>
-        보유기간: 관계법령에 의한 보존기간까지<br><br>
-        OO은행은 고객의 개인정보를 관련 법령에 따라 안전하게 처리합니다.<br><br>
-        수집항목: 성명, 연락처, 계좌정보, 로그인 정보 등<br>
-        이용목적: 본인 확인, 거래이력 관리, 고객 서비스 제공<br>
-        보유기간: 관계법령에 의한 보존기간까지<br><br>
-        ... (이하 동의서 전문)
-        OO은행은 고객의 개인정보를 관련 법령에 따라 안전하게 처리합니다.<br><br>
-        수집항목: 성명, 연락처, 계좌정보, 로그인 정보 등<br>
-        이용목적: 본인 확인, 거래이력 관리, 고객 서비스 제공<br>
-        보유기간: 관계법령에 의한 보존기간까지<br><br>
-      </p>
-    </div>
-    <div class="terms-check">
-      <input type="checkbox" id="term2">
-      <label for="term2">위 약관에 동의합니다.</label>
-    </div>
-  </div>
+        <div th:each="t, stat : ${termsList}" class="terms-box">
 
-  <!-- 약관 3 -->
-  <div class="terms-box">
-    <h3>[필수] 개인(신용)정보 수집·이용 동의서 (온라인고객 신규가입)</h3>
-    <div class="terms-content">
-      <p>
-        OO은행은 고객의 개인정보를 관련 법령에 따라 안전하게 처리합니다.<br><br>
-        수집항목: 성명, 연락처, 계좌정보, 로그인 정보 등<br>
-        이용목적: 본인 확인, 거래이력 관리, 고객 서비스 제공<br>
-        보유기간: 관계법령에 의한 보존기간까지<br><br>
-        ... (이하 동의서 전문)
-        OO은행은 고객의 개인정보를 관련 법령에 따라 안전하게 처리합니다.<br><br>
-        수집항목: 성명, 연락처, 계좌정보, 로그인 정보 등<br>
-        이용목적: 본인 확인, 거래이력 관리, 고객 서비스 제공<br>
-        보유기간: 관계법령에 의한 보존기간까지<br><br>
-        OO은행은 고객의 개인정보를 관련 법령에 따라 안전하게 처리합니다.<br><br>
-        수집항목: 성명, 연락처, 계좌정보, 로그인 정보 등<br>
-        이용목적: 본인 확인, 거래이력 관리, 고객 서비스 제공<br>
-        보유기간: 관계법령에 의한 보존기간까지<br><br>
-        ... (이하 동의서 전문)
-        OO은행은 고객의 개인정보를 관련 법령에 따라 안전하게 처리합니다.<br><br>
-        수집항목: 성명, 연락처, 계좌정보, 로그인 정보 등<br>
-        이용목적: 본인 확인, 거래이력 관리, 고객 서비스 제공<br>
-        보유기간: 관계법령에 의한 보존기간까지<br><br>
-      </p>
-    </div>
-    <div class="terms-check">
-      <input type="checkbox" id="term3">
-      <label for="term3">위 약관에 동의합니다.</label>
-    </div>
-  </div>
+            <h3 th:text="|[필수] ${t.termTitle}|"></h3>
 
-  <!-- 전체 동의 -->
-  <div class="terms-all">
-    <input type="checkbox" id="agreeAll">
-    <label for="agreeAll"><strong>모든 약관에 동의합니다.</strong></label>
-  </div>
+            <div class="terms-content">
+                <pre th:text="${t.thistContent}"></pre>
+            </div>
 
-  <!-- 다음으로 버튼 -->
-  <div class="terms-actions">
-  <a th:href="@{/member/register}" class="btn-next">다음으로</a>
-  </div>
+            <div class="terms-check">
+                <input type="checkbox" class="term-check"
+                       th:id="|term${stat.index}|"
+                       th:attr="data-cate=${t.termCate}, data-order=${t.termOrder}">
+                <label th:for="|term${stat.index}|">위 약관에 동의합니다.</label>
+            </div>
+
+        </div>
+
+        <!-- 전체 동의 -->
+        <div class="terms-all">
+            <input type="checkbox" id="agreeAll">
+            <label for="agreeAll"><strong>모든 약관에 동의합니다.</strong></label>
+        </div>
+
+        <!-- 다음 버튼 -->
+        <div class="terms-actions">
+            <a th:href="@{/member/register}" class="btn-next">다음으로</a>
+        </div>
+
+    </section>
+
+
+
+
 </main>
 
 <div th:replace="~{_template/_footer.html}"></div>
