@@ -25,15 +25,6 @@ public class AdminController {
     private final BoardService boardService;
     private final FaqService faqService;
 
-
-
-    /** 관리자 대시보드 */
-    @GetMapping("/index")
-    public String index(Model model) {
-        model.addAttribute("activeItem", "dashboard");
-        return "admin/index";
-    }
-
     /** 목록 */
     @GetMapping("/member")
     public String member(@RequestParam(defaultValue = "1") int page,
