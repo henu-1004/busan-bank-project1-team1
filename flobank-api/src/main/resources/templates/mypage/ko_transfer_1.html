@@ -18,116 +18,117 @@
 <body>
 <div th:replace="~{_template/_header.html}"></div>
 <main class="transfer1-container">
-    <!-- 단계 표시 -->
-    <div class="transfer1-steps">
-    <div class="transfer1-step active">
-        <span class="num">1</span>
-        <span class="text">정보입력</span>
-    </div>
-    <div class="transfer1-step">
-        <span class="num">2</span>
-        <span class="text">이체확인</span>
-    </div>
-    <div class="transfer1-step">
-        <span class="num">3</span>
-        <span class="text">이체완료</span>
-    </div>
-    </div>
-
-  <div class="transfer1-box">
-
-    <!-- 제목 -->
-    <h2 class="transfer1-title">계좌 이체</h2>
-
-    <!-- 안내문 -->
-    <div class="transfer1-info-box">
-      <p>
-        • 즉시이체는 최대 5건까지 동시에 처리 가능하며 이체 수수료가 면제됩니다.<br>
-        • 오픈뱅킹 서비스 가입자는 등록된 금융기관 계좌를 출금계좌로 선택하여 이체할 수 있습니다.<br>
-        • 예금이체는 은행 업무시간 중에만 가능합니다.<br>
-        • 자주쓰는 이체정보를 등록하여 더욱 편리하게 이용하실 수 있습니다.<br>
-        • 타인 계좌로 이체 시 계좌번호와 수취인명을 반드시 확인해주세요.
-      </p>
-    </div>
-
-    <!-- 출금정보 -->
-    <section class="transfer1-section">
-      <h3 class="transfer1-subtitle">출금정보</h3>
-
-      <div class="transfer1-form-group">
-    <label class="transfer1-label">출금계좌</label>
-    <input type="text" class="transfer1-input readonly" 
-            value="부산은행 112-2188-1931-00 (잔액 4,419,197원)" readonly>
-    </div>
-      <div class="transfer1-form-group">
-        <label class="transfer1-label">이체금액</label>
-        <div class="transfer1-flex">
-          <input type="text" class="transfer1-input short" placeholder="금액 입력">
-          <div class="transfer1-btn-group">
-            <button>10만</button>
-            <button>30만</button>
-            <button>50만</button>
-            <button>100만</button>
-            <button>전액</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="transfer1-form-group">
-        <label class="transfer1-label">내통장표시</label>
-        <input type="text" class="transfer1-input" placeholder="자주쓰는문구">
-      </div>
-    </section>
-
-    <!-- 입금정보 -->
-    <section class="transfer1-section">
-      <h3 class="transfer1-subtitle">입금정보</h3>
-
-      <div class="transfer1-form-group">
-        <label class="transfer1-label">입금은행</label>
-        <select class="transfer1-select">
-          <option>부산은행</option>
-          <option>국민은행</option>
-          <option>우리은행</option>
-          <option>신한은행</option>
-          <option>플로은행</option>
-        </select>
-      </div>
-
-      <div class="transfer1-form-group">
-        <label class="transfer1-label">입금계좌번호</label>
-        <input type="text" class="transfer1-input" placeholder="계좌번호 입력">
-      </div>
-
-      <div class="transfer1-form-group">
-        <label class="transfer1-label">받는분 통장표시</label>
-        <input type="text" class="transfer1-input" placeholder="자주쓰는문구">
-      </div>
-    </section>
-
-    <!-- 선택입력정보 -->
-    <section class="transfer1-section">
-      <h3 class="transfer1-subtitle">선택입력정보</h3>
-
-      <div class="transfer1-flex-row">
-        <div class="transfer1-form-group half">
-          <label class="transfer1-label">내용조회메모</label>
-          <input type="text" class="transfer1-input" placeholder="내통장 메모 입력">
+    <div class="transfer1-box">
+        <h2 class="transfer1-title">계좌 이체</h2>
+        <!-- 안내문 -->
+        <div class="transfer1-info-box">
+            <p>
+                • 즉시이체는 최대 5건까지 동시에 처리 가능하며 이체 수수료가 면제됩니다.<br>
+                • 오픈뱅킹 서비스 가입자는 등록된 금융기관 계좌를 출금계좌로 선택하여 이체할 수 있습니다.<br>
+                • 예금이체는 은행 업무시간 중에만 가능합니다.<br>
+                • 자주쓰는 이체정보를 등록하여 더욱 편리하게 이용하실 수 있습니다.<br>
+                • 타인 계좌로 이체 시 계좌번호와 수취인명을 반드시 확인해주세요.
+            </p>
         </div>
 
-      </div>
-    </section>
+        <form id="transferForm" th:action="@{/mypage/ko_transfer_2}" th:object="${custTranHistDTO}" method="post">
+            <input type="hidden" id="accountBalance" th:value="${custAcctDTO.acctBalance}">
+            <input type="hidden" th:field="*{tranType}">
+            <input type="hidden" th:field="*{tranAcctNo}">
 
-    <!-- 버튼 -->
-    <div class="transfer1-actions">
-      <button class="transfer1-btn-next">다음</button>
+            <section class="transfer1-section">
+                <h3 class="transfer1-subtitle">출금정보</h3>
+
+                <div class="transfer1-form-group">
+                    <label class="transfer1-label">출금계좌</label>
+
+                    <input type="text" class="transfer1-input readonly"
+                           th:value="|플로은행 ${custAcctDTO.acctNo} (잔액 ${#numbers.formatInteger(custAcctDTO.acctBalance, 0, 'COMMA')}원)|"
+                           readonly>
+                </div>
+
+                <div class="transfer1-form-group">
+                    <label class="transfer1-label">이체금액</label>
+                    <div class="transfer1-flex">
+
+                        <!--
+                           1. type="number" -> type="text" (콤마 표시를 위해)
+                           2. onkeyup 이벤트 추가 (입력 시 콤마 자동 생성)
+                        -->
+                        <input type="text" id="tranAmount" class="transfer1-input short"
+                               placeholder="금액 입력" onkeyup="inputNumberFormat(this)">
+
+                        <!-- 실제 서버로 전송될 숫자 값 (Hidden) -->
+                        <input type="hidden" id="hiddenTranAmount" th:field="*{tranAmount}">
+
+                        <div class="transfer1-btn-group">
+                            <button type="button" onclick="addAmount(10000)">1만</button>
+                            <button type="button" onclick="addAmount(50000)">5만</button>
+                            <button type="button" onclick="addAmount(100000)">10만</button>
+                            <button type="button" onclick="addAmount(1000000)">100만</button>
+                            <button type="button"
+                                    th:onclick="|setFullAmount(${custAcctDTO.acctBalance})|">
+                                전액
+                            </button>
+                        </div>
+                    </div>
+                    <div id="tranAmountError" class="error-msg">이체 금액을 입력해주세요.</div>
+                </div>
+
+                <div class="transfer1-form-group">
+                    <label class="transfer1-label">내통장표시</label>
+                    <input type="text" th:field="*{tranRecName}" class="transfer1-input" placeholder="자주쓰는문구">
+                </div>
+            </section>
+
+            <section class="transfer1-section">
+                <h3 class="transfer1-subtitle">입금정보</h3>
+
+                <div class="transfer1-form-group">
+                    <label class="transfer1-label">입금은행</label>
+                    <select th:field="*{tranRecBkCode}" class="transfer1-select">
+                        <option value="032">부산은행</option>
+                        <option value="004">국민은행</option>
+                        <option value="020">우리은행</option>
+                        <option value="088">신한은행</option>
+                        <option value="888">플로은행</option>
+                    </select>
+                </div>
+
+                <div class="transfer1-form-group">
+                    <label class="transfer1-label">입금계좌번호</label>
+                    <input type="text" id="tranRecAcctNo" th:field="*{tranRecAcctNo}" class="transfer1-input" placeholder="계좌번호 입력">
+                    <div id="tranRecAcctNoError" class="error-msg">입금 계좌번호를 입력해주세요.</div>
+                </div>
+
+                <div class="transfer1-form-group">
+                    <label class="transfer1-label">받는분 통장표시</label>
+                    <input type="text" th:field="*{tranCustName}" class="transfer1-input" placeholder="입력 안 하면 예금주명 표시">
+                </div>
+            </section>
+
+            <!-- 선택입력정보 -->
+            <section class="transfer1-section">
+                <h3 class="transfer1-subtitle">선택입력정보</h3>
+
+                <div class="transfer1-flex-row">
+                    <div class="transfer1-form-group half">
+                        <label class="transfer1-label">내용조회메모</label>
+                        <input type="text" class="transfer1-input" th:field="*{tranMemo}" placeholder="내통장 메모 입력">
+                    </div>
+
+                </div>
+            </section>
+
+            <div class="transfer1-actions">
+                <button type="submit" class="transfer1-btn-next">다음</button>
+            </div>
+        </form>
     </div>
-
-  </div>
 </main>
 
 <div th:replace="~{_template/_footer.html}"></div>
-
+<script th:src="@{/js/tran.js}"></script>
 </body>
 </html>
 

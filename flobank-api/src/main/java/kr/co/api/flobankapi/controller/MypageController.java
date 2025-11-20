@@ -40,32 +40,13 @@ public class MypageController {
 
     @GetMapping({"/main","/"})
     public String mypage(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
+
         String userCode = userDetails.getUsername();
         List<CustAcctDTO> custAcctDTOList = mypageService.findAllAcct(userCode);
         CustFrgnAcctDTO  custFrgnAcctDTO = mypageService.findFrgnAcct(userCode);
 
-        if(!custAcctDTOList.isEmpty()){
-            // 원화 입출금 통장 이름 설정
-            int i = 1;
-            for(CustAcctDTO custAcctDTO : custAcctDTOList){
-                if (custAcctDTO.getAcctName() == null){
-                    String name = "FLO 입출금통장" + i++;
-                    custAcctDTO.setAcctName(name);
-                }else{
-                    i++;
-                }
-
-            }
-            model.addAttribute("custAcctDTOList",custAcctDTOList);
-        }
-        if(custFrgnAcctDTO != null){
-            // 외화 입출금 통장 이름 설정
-            if (custFrgnAcctDTO.getFrgnAcctName() == null){
-                String name = "FLO 외화통장";
-                custFrgnAcctDTO.setFrgnAcctName(name);
-            }
-            model.addAttribute("custFrgnAcctDTO",custFrgnAcctDTO);
-        }
+        model.addAttribute("custAcctDTOList",custAcctDTOList);
+        model.addAttribute("custFrgnAcctDTO",custFrgnAcctDTO);
 
         return "mypage/main";
     }
@@ -282,6 +263,65 @@ public class MypageController {
     public String en_account_open_3() {
 
         return "mypage/en_account_open_3";
+    }
+
+    @PostMapping("/ko_transfer_1")
+    public String ko_transfer_1(Model model, @RequestParam("acctNo") String acctNo) {
+
+        // 계좌 정보 보내기
+        CustAcctDTO custAcctDTO = mypageService.findCustAcct(acctNo);
+        model.addAttribute("custAcctDTO", custAcctDTO);
+
+        // 이체 정보 받을 객체 보내기
+        CustTranHistDTO custTranHistDTO = new CustTranHistDTO();
+            // 미리 설정할 거
+        custTranHistDTO.setTranType(2); // 출금 : 2
+        custTranHistDTO.setTranAcctNo(acctNo); // 계좌번호
+
+
+        model.addAttribute("custTranHistDTO", custTranHistDTO);
+
+        return  "mypage/ko_transfer_1";
+    }
+
+    @PostMapping("/ko_transfer_2")
+    public String ko_transfer_2(Model model, @ModelAttribute CustTranHistDTO custTranHistDTO, @AuthenticationPrincipal CustomUserDetails userDetails) {
+        log.info("수정전 custTranHistDTO = " + custTranHistDTO);
+        if(custTranHistDTO.getTranCustName() == null || custTranHistDTO.getTranCustName().trim().isEmpty()){
+            custTranHistDTO.setTranCustName(userDetails.getCustName());
+        }
+        if(custTranHistDTO.getTranRecName() == null || custTranHistDTO.getTranRecName().trim().isEmpty()){
+            custTranHistDTO.setTranRecName(custTranHistDTO.getTranRecAcctNo());
+        }
+        log.info("수정후 custTranHistDTO = " + custTranHistDTO);
+
+        model.addAttribute("custTranHistDTO", custTranHistDTO);
+
+        return  "mypage/ko_transfer_2";
+    }
+
+    @PostMapping("/ko_transfer_3")
+    public String ko_transfer_3(@AuthenticationPrincipal CustomUserDetails userDetails, @ModelAttribute CustTranHistDTO custTranHistDTO, Model model) {
+        // 전자서명 임시 승인 수정해야함
+        custTranHistDTO.setTranEsignYn("Y");
+        CustAcctDTO custAcctDTO = new  CustAcctDTO();
+        log.info("마지막 단계(ko_transfer_3): custTranHistDTO = " + custTranHistDTO);
+
+        if(custTranHistDTO.getTranEsignYn().equals("Y")) {
+            // 이체 내역 db에 반영
+            mypageService.modifyCustAcctBal(custTranHistDTO);
+            model.addAttribute("custTranHistDTO", custTranHistDTO);
+            custAcctDTO = mypageService.findCustAcct(custTranHistDTO.getTranAcctNo());
+            model.addAttribute("custAcctDTO", custAcctDTO);
+            model.addAttribute("state", "정상");
+        }else {
+            model.addAttribute("custTranHistDTO", custTranHistDTO);
+            custAcctDTO = mypageService.findCustAcct(custTranHistDTO.getTranAcctNo());
+            model.addAttribute("custAcctDTO", custAcctDTO);
+            model.addAttribute("state", "실패");
+        }
+
+        return  "mypage/ko_transfer_3";
     }
 
 

@@ -1,0 +1,88 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.api.flobankapi.mapper.admin.DashboardMapper">
+
+    <!-- 오늘 입출금 건수: TB_CUST_TRAN_HIST -->
+    <select id="selectTodayWonTxCount" resultType="int">
+        SELECT COUNT(*)
+        FROM TB_CUST_TRAN_HIST
+        WHERE tran_dt IS NOT NULL
+          AND TRUNC(tran_dt) = TRUNC(SYSDATE)
+    </select>
+
+    <!-- 오늘 외화송금 건수: TB_FRGN_REMT_TRAN -->
+    <select id="selectTodayFrgnRemtTxCount" resultType="int">
+        SELECT COUNT(*)
+        FROM TB_FRGN_REMT_TRAN
+        WHERE remt_status = 1
+          AND remt_dt IS NOT NULL
+          AND TRUNC(remt_dt) = TRUNC(SYSDATE)
+    </select>
+
+    <!-- 일별 가입자 수 -->
+    <select id="selectDailyJoinStats"
+            resultType="kr.co.api.flobankapi.dto.admin.dashboard.JoinStatsDTO">
+        SELECT TO_CHAR(cust_reg_dt, 'YYYY-MM-DD') AS label,
+        COUNT(*) AS count
+        FROM TB_CUST_INFO
+        WHERE cust_reg_dt >= TRUNC(SYSDATE) - 6  <!-- 최근 7일 -->
+        GROUP BY TO_CHAR(cust_reg_dt, 'YYYY-MM-DD')
+        ORDER BY label
+    </select>
+
+<!--    <select id="selectWeeklyJoinStats"-->
+<!--            resultType="kr.co.api.flobankapi.dto.admin.dashboard.JoinStatsDTO">-->
+<!--        SELECT TO_CHAR(cust_reg_dt, 'YYYY-MM-DD') AS label,-->
+<!--        COUNT(*) AS count-->
+<!--        FROM TB_CUST_INFO-->
+<!--        WHERE cust_reg_dt >= TRUNC(SYSDATE) - 6  &lt;!&ndash; 일단 복사 &ndash;&gt;-->
+<!--        GROUP BY TO_CHAR(cust_reg_dt, 'YYYY-MM-DD')-->
+<!--        ORDER BY label-->
+<!--    </select>-->
+
+<!--    <select id="selectMonthlyJoinStats"-->
+<!--            resultType="kr.co.api.flobankapi.dto.admin.dashboard.JoinStatsDTO">-->
+<!--        SELECT TO_CHAR(cust_reg_dt, 'YYYY-MM-DD') AS label,-->
+<!--        COUNT(*) AS count-->
+<!--        FROM TB_CUST_INFO-->
+<!--        WHERE cust_reg_dt >= TRUNC(SYSDATE) - 6  &lt;!&ndash; 일단 복사 &ndash;&gt;-->
+<!--        GROUP BY TO_CHAR(cust_reg_dt, 'YYYY-MM-DD')-->
+<!--        ORDER BY label-->
+<!--    </select>-->
+
+    <!-- 연령대 분포 -->
+    <select id="selectAgeDist"
+            resultType="kr.co.api.flobankapi.dto.admin.dashboard.AgeBandDTO">
+        SELECT age_band AS ageBand,
+               COUNT(*)  AS count
+        FROM (
+            SELECT CASE
+            WHEN age BETWEEN 10 AND 19 THEN '10대'
+            WHEN age BETWEEN 20 AND 29 THEN '20대'
+            WHEN age BETWEEN 30 AND 39 THEN '30대'
+            WHEN age BETWEEN 40 AND 49 THEN '40대'
+            ELSE '기타'
+            END AS age_band
+            FROM (
+            SELECT FLOOR(MONTHS_BETWEEN(SYSDATE, cust_birth_dt) / 12) AS age
+            FROM TB_CUST_INFO
+            WHERE cust_birth_dt IS NOT NULL
+            )
+            )
+        GROUP BY age_band
+        ORDER BY age_band
+    </select>
+
+    <!-- 성별 분포 -->
+    <select id="selectGenderDist"
+            resultType="kr.co.api.flobankapi.dto.admin.dashboard.GenderStatsDTO">
+        SELECT cust_gen AS gender,
+               COUNT(*)  AS count
+        FROM TB_CUST_INFO
+        WHERE cust_gen IS NOT NULL
+        GROUP BY cust_gen
+    </select>
+
+</mapper>

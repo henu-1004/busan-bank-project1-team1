@@ -1,130 +1,157 @@
 package kr.co.api.flobankapi.service.admin;
 
+import kr.co.api.flobankapi.config.FilePathConfig;
 import kr.co.api.flobankapi.dto.*;
 import kr.co.api.flobankapi.mapper.admin.ProductMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.util.*;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class ProductService {
 
     private final ProductMapper productMapper;
+    private final FilePathConfig filePathConfig;
 
+    /**
+     * 상품 등록 (파일 업로드 포함)
+     */
     @Transactional
     public void insertProduct(ProductDTO dto,
                               List<ProductLimitDTO> limits,
                               List<ProductPeriodDTO> periods,
                               ProductWithdrawRuleDTO wdrwInfo,
-                              List<ProductWithdrawAmtDTO> withdrawAmts) {
+                              List<ProductWithdrawAmtDTO> withdrawAmts,
+                              MultipartFile pdfFile) throws Exception {
 
-            // 1) 기본 상품 INSERT
-            productMapper.insertProduct(dto);
-            String dpstId = dto.getDpstId();
+        // 1. 파일 업로드 처리
+        dto.setDpstInfoPdf(null); // 초기화
 
+        if (pdfFile != null && !pdfFile.isEmpty()) {
+            String savedPath = saveProductPdf(pdfFile);
+            dto.setDpstInfoPdf(savedPath);
+        }
 
-            // 2) 최소/최대 금액 정리
-            if (limits != null && !limits.isEmpty()) {
-                List<ProductLimitDTO> clean = new ArrayList<>();
-                Set<String> seen = new HashSet<>();
+        // 2. 상품 기본 정보 DB 저장 (여기서 dpstId 생성됨)
+        productMapper.insertProduct(dto);
+        String dpstId = dto.getDpstId();
 
-                for (ProductLimitDTO l : limits) {
-                    if (l.getLmtCurrency() == null || l.getLmtCurrency().trim().isEmpty()) continue;
-                    if (seen.add(l.getLmtCurrency())) clean.add(l);
-                }
-
-                limits = clean;
+        // 3. 한도 설정 (중복 제거 후 저장)
+        if (limits != null && !limits.isEmpty()) {
+            List<ProductLimitDTO> clean = new ArrayList<>();
+            Set<String> seen = new HashSet<>();
+            for (ProductLimitDTO l : limits) {
+                if (l.getLmtCurrency() == null || l.getLmtCurrency().trim().isEmpty()) continue;
+                if (seen.add(l.getLmtCurrency())) clean.add(l);
             }
 
-
-            // 3) 최소/최대 금액 INSERT
-            if (dto.getDpstType() == 1 && limits != null && !limits.isEmpty()) {
-
+            // 거치식(1)이고 한도 데이터가 있을 때만 저장
+            if (dto.getDpstType() == 1 && !clean.isEmpty()) {
                 Map<String, Object> map = new HashMap<>();
                 map.put("dpstId", dpstId);
-                map.put("limits", limits);
-
+                map.put("limits", clean);
                 productMapper.insertProductLimits(map);
-            }
-
-
-            // 4) 가입기간 INSERT
-            if (periods != null && !periods.isEmpty()) {
-
-                Map<String, Object> map2 = new HashMap<>();
-                map2.put("dpstId", dpstId);
-                map2.put("list", periods);
-
-                productMapper.insertProductPeriods(map2);
-            }
-
-
-            // 5) 분할 인출 규정 INSERT
-            if (wdrwInfo != null) {
-                wdrwInfo.setDpstId(dpstId);
-                productMapper.insertWithdrawalRule(wdrwInfo);
-            }
-
-
-            // 6) 통화별 최소 출금금액 INSERT
-            if (withdrawAmts != null && !withdrawAmts.isEmpty()) {
-
-                Map<String, Object> map3 = new HashMap<>();
-                map3.put("dpstId", dpstId);
-                map3.put("list", withdrawAmts);
-
-                productMapper.insertWithdrawalAmounts(map3);
             }
         }
 
+        // 4. 가입기간 저장
+        if (periods != null && !periods.isEmpty()) {
+            Map<String, Object> map2 = new HashMap<>();
+            map2.put("dpstId", dpstId);
+            map2.put("list", periods);
+            productMapper.insertProductPeriods(map2);
+        }
 
+        // 5. 분할 인출 규정 저장
+        if (wdrwInfo != null) {
+            wdrwInfo.setDpstId(dpstId);
+            productMapper.insertWithdrawalRule(wdrwInfo);
+        }
+
+        // 6. 통화별 최소 출금금액 저장
+        if (withdrawAmts != null && !withdrawAmts.isEmpty()) {
+            Map<String, Object> map3 = new HashMap<>();
+            map3.put("dpstId", dpstId);
+            map3.put("list", withdrawAmts);
+            productMapper.insertWithdrawalAmounts(map3);
+        }
+    }
+
+    /**
+     * 파일 저장 로직 (내부용)
+     */
+    private String saveProductPdf(MultipartFile file) throws Exception {
+
+        String basePath = filePathConfig.getPdfProductsPath();
+
+        // yml 설정이 없을 경우 비상용 경로
+        if (basePath == null || basePath.isBlank()) {
+            basePath = "C:/app/uploads/pdf_products";
+        }
+
+        String original = file.getOriginalFilename();
+        String safeName = StringUtils.cleanPath(original);
+        String storedName = UUID.randomUUID() + "_" + safeName;
+
+        File folder = new File(basePath);
+        if (!folder.exists()) {
+            folder.mkdirs(); // 폴더가 없으면 강제 생성
+        }
+
+        File dest = new File(folder, storedName);
+        if (!dest.isAbsolute()) {
+            dest = dest.getAbsoluteFile();
+        }
+
+        file.transferTo(dest);
+
+        return "/uploads/products/" + storedName;
+    }
+
+    // --- 조회 메서드들 ---
 
     public List<ProductDTO> getProductsByStatus(int status) {
         return productMapper.getProductsByStatus(status);
     }
 
-
     public void updateStatus(String dpstId, int status) {
         productMapper.updateStatus(dpstId, status);
     }
-
 
     public ProductDTO getProductById(String dpstId) {
         return productMapper.getProductById(dpstId);
     }
 
-
-
     public List<ProductPeriodDTO> getPeriods(String dpstId) {
         return productMapper.getPeriods(dpstId);
     }
-
 
     public ProductWithdrawRuleDTO getWithdrawRule(String dpstId) {
         return productMapper.getWithdrawRule(dpstId);
     }
 
-
     public List<ProductWithdrawAmtDTO> getWithdrawAmts(String dpstId) {
         return productMapper.getWithdrawAmts(dpstId);
     }
-
 
     public List<ProductLimitDTO> getLimits(String dpstId) {
         return productMapper.getLimits(dpstId);
     }
 
-
-    // 상품 자동 업데이트
     public void updateOpenedProducts() {
         productMapper.updateStatusToOpened();
     }
 
-
-
-
-
+    // 관리자용 약관 파일 확인 메서드
+    public String getTermsFileByName(String productName) {
+        return productMapper.getTermsFileByTitle(productName);
+    }
 }

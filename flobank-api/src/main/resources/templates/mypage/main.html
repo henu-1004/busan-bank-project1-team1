@@ -103,12 +103,17 @@
                             <div class="acct-name-error" style="color: red; font-size: 12px; display: none;"></div>
                         </td>
                         <td>
-                            <button class="account-link" th:text="${acct.acctNo}">112-2188-1931-00</button>
+                            <button class="account-link" th:text="${acct.acctNo}">계좌번호</button>
                         </td>
                         <!-- #numbers.formatInteger로 콤마(,) 추가 -->
-                        <td th:text="|${#numbers.formatInteger(acct.acctBalance, 0, 'COMMA')}원|">2,450,000원</td>
+                        <td th:text="|${#numbers.formatInteger(acct.acctBalance, 0, 'COMMA')}원|">잔액</td>
                         <td>
-                            <a th:href="@{/mypage/ko_transfer_1}" class="btn-transfer">이체</a>
+                            <form th:action="@{/mypage/ko_transfer_1}" method="post" style="display: inline;">
+
+                                <input type="hidden" name="acctNo" th:value="${acct.acctNo}">
+
+                                <button type="submit" class="btn-transfer" style="cursor: pointer;">이체</button>
+                            </form>
                         </td>
                     </tr>
 
@@ -137,14 +142,14 @@
                             <div class="acct-name-error" style="color: red; font-size: 12px; display: none;"></div>
                         </td>
                         <td>
-                            <button class="account-link" th:text="${custFrgnAcctDTO.frgnAcctNo}">112-5566-1823-00</button>
+                            <button class="account-link" th:text="${custFrgnAcctDTO.frgnAcctNo}">외화계좌번호</button>
                         </td>
                         <td >
                             <!-- (외화 잔액은 상세 확인 버튼으로 대체) -->
                             <a href="#foreign-assets-check" id="detail">상세 확인</a>
                         </td>
                         <td>
-                            <a th:href="@{/remit/en_transfer_1}" class="btn-transfer">이체</a>
+                            <a th:href="@{/remit/en_transfer_1(acctNo=${custFrgnAcctDTO.frgnAcctNo})}" class="btn-transfer">이체</a>
                         </td>
                     </tr>
 
@@ -267,7 +272,7 @@
 
                 <div class="currency-card">
                     <i class="fa-solid fa-yen-sign"></i>
-                    <p>중국 위안화 (CNY)</p>
+                    <p>중국 위안화 (CNH)</p>
                     <strong>¥8,350.00</strong>
                 </div>
 

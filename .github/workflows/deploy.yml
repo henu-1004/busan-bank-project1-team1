@@ -73,7 +73,18 @@ jobs:
         gcloud beta compute ssh bnk-api-server \
           --project=${{ secrets.GCP_PROJECT_ID }} \
           --zone=asia-northeast3-a \
-          --command="sudo rm -rf /opt/flobank-api/app.jar && sudo mv /tmp/app.jar /opt/flobank-api/app.jar && cd /opt/flobank-api && OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} sudo docker-compose down && OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} sudo docker-compose build --no-cache && OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }} sudo docker-compose up -d && sudo docker system prune -a -f"
+          --command="
+            sudo rm -rf /opt/flobank-api/app.jar && \
+            sudo mv /tmp/app.jar /opt/flobank-api/app.jar && \
+            cd /opt/flobank-api && \
+            # 1. .env 파일 생성 (여기에 API 키 저장)
+            echo 'OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}' | sudo tee .env > /dev/null && \
+            # 2. Docker Compose 실행 (자동으로 .env를 읽음)
+            sudo docker-compose down && \
+            sudo docker-compose build --no-cache && \
+            sudo docker-compose up -d && \
+            sudo docker system prune -a -f
+          "
 
     # 3-1. [빌드] GitHub Actions 실행기에서 flobank-ap 프로젝트를 빌드
     - name: bnk-ap-server (flobank-ap) 빌드

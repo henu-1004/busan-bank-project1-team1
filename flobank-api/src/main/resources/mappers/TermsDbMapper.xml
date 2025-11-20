@@ -23,6 +23,7 @@
         INSERT INTO TB_TERMS_HIST(
             thist_term_cate,
             thist_term_order,
+            thist_file,
             thist_content,
             thist_version,
             thist_ver_memo,
@@ -32,13 +33,15 @@
         VALUES(
                   #{thistTermCate},
                   #{thistTermOrder},
-                  #{thistContent},
+                  #{thistFile, jdbcType=VARCHAR},
+                  #{thistContent, jdbcType=CLOB},
                   #{thistVersion},
                   #{thistVerMemo},
                   #{thistAdminId},
                   #{thistRegDy}
               )
     </insert>
+
 
     <!-- 전체 약관 목록 + 최신 버전 -->
     <select id="selectAllTermsWithLatestVersion"
@@ -84,19 +87,6 @@
           AND term_order = #{termOrder}
     </update>
 
-    <!-- MASTER 삭제 -->
-    <delete id="deleteTerms">
-        DELETE FROM TB_TERMS_MASTER
-        WHERE term_cate = #{cate}
-          AND term_order = #{order}
-    </delete>
-
-    <!-- HIST 삭제 -->
-    <delete id="deleteTermsHist">
-        DELETE FROM TB_TERMS_HIST
-        WHERE thist_term_cate = #{cate}
-          AND thist_term_order = #{order}
-    </delete>
 
     <!-- 고객 약관 동의 기록 저장 -->
     <insert id="saveAgreeHist">
@@ -229,7 +219,6 @@
         WHERE term_cate = #{cate}
           AND term_order = #{order}
     </select>
-
 
 
 

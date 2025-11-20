@@ -31,23 +31,11 @@ public interface TermsDbMapper {
     // MASTER 수정
     void updateTermsMaster(TermsMasterDTO dto);
 
-    // MASTER 삭제
-    void deleteTerms(
-            @Param("cate") int cate,
-            @Param("order") int order
-    );
-
-    // HIST 삭제
-    void deleteTermsHist(
-            @Param("cate") int cate,
-            @Param("order") int order
-    );
 
     // 고객 약관 동의 저장
     void saveAgreeHist(TermsAgreeDTO dto);
 
 
-    /** ★★★★★ 여기 2개가 없어서 오류 난 것 ★★★★★ */
     List<TermsMasterDTO> selectTermsPage(
             @Param("start") int start,
             @Param("pageSize") int pageSize

@@ -2,16 +2,19 @@ package kr.co.api.flobankapi.service;
 
 import kr.co.api.flobankapi.dto.*;
 import kr.co.api.flobankapi.mapper.TermsDbMapper;
+import kr.co.api.flobankapi.config.FilePathConfig; // ⭐ 추가
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.util.StringUtils;                // ⭐ 추가
 
+import java.io.File;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.nio.file.*;                               // ⭐ 추가
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +23,9 @@ public class TermsDbService {
 
     private final TermsDbMapper mapper;
     private final DateTimeFormatter FMT = DateTimeFormatter.ofPattern("yyyyMMdd");
+
+    private final FilePathConfig filePathConfig;      // ⭐ 추가됨
+
 
     /** 전체 약관 목록 조회 */
     public List<TermsMasterDTO> getAllTerms() {
@@ -44,13 +50,20 @@ public class TermsDbService {
         return dto;
     }
 
-    /** 약관 신규 등록 (MASTER + HIST v1) */
+
+    /** =====================================================================================
+     약관 신규 등록 (MASTER + HIST v1 + 파일 업로드)
+     ===================================================================================== */
     @Transactional
-    public void createTerms(int cate, String title, String content, String adminId) {
+    public void createTerms(int cate, String title, String content,
+                            String adminId, MultipartFile file) throws Exception {
+
+        log.info("📁 [DEBUG] pdfTermsPath = {}", filePathConfig.getPdfTermsPath());
+
 
         String today = LocalDate.now().format(FMT);
 
-        // ★ term_order 직접 생성
+        // ★ term_order 생성
         Integer order = mapper.selectMaxOrderByCate(cate);
         order = (order == null) ? 1 : order + 1;
 
@@ -62,7 +75,19 @@ public class TermsDbService {
         master.setTermRegDy(today);
         mapper.insertTermsMaster(master);
 
-        // HIST INSERT
+        /* ============================================================
+            ⭐ 파일 업로드 처리
+        ============================================================ */
+        String savedFilePath = null;
+
+        if (file != null && !file.isEmpty()) {
+            savedFilePath = saveTermsPdf(file);    // ⭐ 파일 저장 실행
+            log.info("[PDF 저장 완료] {}", savedFilePath);
+        }
+
+        /* ============================================================
+            HIST INSERT
+        ============================================================ */
         TermsHistDTO hist = new TermsHistDTO();
         hist.setThistTermCate(cate);
         hist.setThistTermOrder(order);
@@ -72,75 +97,104 @@ public class TermsDbService {
         hist.setThistAdminId(adminId);
         hist.setThistRegDy(today);
 
+        hist.setThistFile(savedFilePath);         // ⭐ 저장된 파일 경로 HIST에 기록
+
         mapper.insertTermsHist(hist);
+
+        log.info("[HIST v1 등록 완료] file={}", savedFilePath);
     }
 
 
-    /** 수정 → HIST 새 버전 생성 */
+
+    // PDF 저장
+
+    private String saveTermsPdf(MultipartFile file) throws Exception {
+        String basePath = filePathConfig.getPdfTermsPath(); // 예: /app/uploads/terms
+
+        if (basePath == null || basePath.isBlank()) {
+            log.warn("⚠ 파일 업로드 경로가 설정되지 않음 → 파일 저장 스킵");
+            return null;
+        }
+
+        // 1. 원본 파일명 정리 (특수문자 제거 등)
+        String original = file.getOriginalFilename();
+        String safeName = StringUtils.cleanPath(original).replaceAll("[^a-zA-Z0-9._-]", "_");
+
+        // 2. 유니크 파일명 생성
+        String stored = UUID.randomUUID() + "_" + safeName;
+
+        // 3. 저장할 파일 객체 생성
+        // Paths.get(...).toFile() 대신 new File(...)을 사용하여 제어합니다.
+        File dest = new File(basePath, stored);
+
+        if (!dest.isAbsolute()) {
+            dest = dest.getAbsoluteFile();
+        }
+
+        log.info(" 실제 저장 시도 경로: {}", dest.getPath());
+
+        //  [핵심] 저장하려는 '그 파일'의 부모 폴더가 없으면 생성
+        if (!dest.getParentFile().exists()) {
+            dest.getParentFile().mkdirs();
+        }
+
+        // 4. 파일 저장
+        file.transferTo(dest);
+
+        // 5. 브라우저 접근용 URL 반환
+        return "/uploads/terms/" + stored;
+    }
+
+
+
+    /** =====================================================================================
+     약관 수정 → HIST 새 버전 생성
+     ===================================================================================== */
     @Transactional
     public void updateTerms(int cate, int order, String title,
-                            String content, int currentVersion, String adminId) {
+                            String content, int currentVersion, String adminId, String verMemo) {
 
         log.info("=== [약관 수정 시작] ===");
-        log.info("카테고리={}, 순번={}, 현재버전={}, 새로운제목={}",
+        log.info("cate={}, order={}, currentVersion={}, newTitle={}",
                 cate, order, currentVersion, title);
 
-        // MASTER 수정
+        // MASTER title 수정
         TermsMasterDTO master = new TermsMasterDTO();
         master.setTermCate(cate);
         master.setTermOrder(order);
         master.setTermTitle(title);
         mapper.updateTermsMaster(master);
-        log.info("[MASTER UPDATE 완료]");
 
-        // HIST 새 버전 추가
+        // HIST 새 버전 INSERT
         TermsHistDTO hist = new TermsHistDTO();
         hist.setThistTermCate(cate);
         hist.setThistTermOrder(order);
         hist.setThistContent(content);
         hist.setThistVersion(currentVersion + 1);
-        hist.setThistVerMemo("내용 수정");
+        hist.setThistVerMemo(verMemo != null && !verMemo.isEmpty() ? verMemo : "내용 수정");
         hist.setThistAdminId(adminId);
         hist.setThistRegDy(LocalDate.now().format(FMT));
 
         mapper.insertTermsHist(hist);
 
         log.info("[HIST NEW VERSION INSERT 완료] → 신규버전={}", currentVersion + 1);
-        log.info("=== [약관 수정 종료] ===");
     }
 
-    /** 삭제 (MASTER + HIST 전체 삭제) */
-    @Transactional
-    public void deleteTerms(int cate, int order) {
 
-        log.warn("=== [약관 삭제 시작] cate={}, order={} ===", cate, order);
-
-        mapper.deleteTermsHist(cate, order);
-        log.warn("[HIST 삭제 완료]");
-
-        mapper.deleteTerms(cate, order);
-        log.warn("[MASTER 삭제 완료]");
-
-        log.warn("=== [약관 삭제 종료] ===");
-    }
 
     /** 고객 약관 동의 기록 */
     public void saveAgree(String custCode, int cate, int order) {
-        log.info("[약관 동의 기록] cust={}, cate={}, order={}", custCode, cate, order);
-
         TermsAgreeDTO dto = new TermsAgreeDTO();
         dto.setAgreeCustCode(custCode);
         dto.setAgreeTermCate(cate);
         dto.setAgreeTermOrder(order);
 
         mapper.saveAgreeHist(dto);
-
-        log.info("[약관 동의 기록 완료]");
     }
 
 
-    public Map<String, Object> getTermsPage(int page, int pageSize) {
 
+    public Map<String, Object> getTermsPage(int page, int pageSize) {
         int start = (page - 1) * pageSize;
 
         List<TermsMasterDTO> list = mapper.selectTermsPage(start, pageSize);
@@ -154,6 +208,7 @@ public class TermsDbService {
 
         return result;
     }
+
 
     public Map<String, Object> getTermsPage(int page, int pageSize,
                                             String type, String keyword) {
@@ -178,24 +233,45 @@ public class TermsDbService {
 
     public Map<String, Object> getTermsDetail(int cate, int order) {
 
+        Map<String, Object> result = new HashMap<>();
+
         TermsMasterDTO master = mapper.selectMaster(cate, order);
         TermsHistDTO latest = mapper.selectLatestHist(cate, order);
 
-        Map<String, Object> result = new HashMap<>();
+        if (master == null) {
+            result.put("title", "제목 없음");
+            result.put("version", 0);
+            result.put("regDy", "-");
+            result.put("adminId", "-");
+            result.put("content", "");
+            result.put("verMemo", "-");
+            return result;
+        }
+
         result.put("title", master.getTermTitle());
-        result.put("version", latest.getThistVersion());
-        result.put("regDy", latest.getThistRegDy());
-        result.put("adminId", latest.getThistAdminId());
-        result.put("content", latest.getThistContent());
+
+        if (latest == null) {
+            result.put("version", 1);
+            result.put("regDy", master.getTermRegDy());
+            result.put("adminId", "관리자");
+            result.put("content", "");
+            result.put("verMemo", "-");
+        } else {
+            result.put("version", latest.getThistVersion());
+            result.put("regDy", latest.getThistRegDy());
+            result.put("adminId", latest.getThistAdminId());
+            result.put("content", latest.getThistContent());
+            result.put("verMemo", latest.getThistVerMemo());
+            result.put("file", latest.getThistFile());     // ⭐ 파일도 포함
+        }
 
         return result;
     }
 
+
+
     public List<TermsHistDTO> getTermsByLocation(int termCate) {
-        log.info("[고객 약관 조회] cate={}", termCate);
-        List<TermsHistDTO> list = mapper.selectTermsByCate(termCate);
-        log.info("[고객 약관 조회] 총 {}건", list.size());
-        return list;
+        return mapper.selectTermsByCate(termCate);
     }
 
 }

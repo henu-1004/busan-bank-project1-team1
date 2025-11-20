@@ -7,7 +7,7 @@ plugins {
 }
 
 group = 'kr.co.api'
-version = '0.0.3-SNAPSHOT'
+version = '0.0.5-SNAPSHOT'
 description = 'flobank-api'
 
 processResources {
@@ -92,6 +92,9 @@ dependencies {
     // Redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    //Spring Boot WebFlux 의존성 추가 WebClient사용 위함
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
 
 }
 

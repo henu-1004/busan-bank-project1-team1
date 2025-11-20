@@ -39,21 +39,31 @@ public class ProductDTO {
 
     // 통화코드별 한도금액
     private List<ProductLimitDTO> limits;
+    // 통화코드 목록
+    private List<CurrencyInfoDTO> dpstCurrencyDtoList;
+    private List<String> dpstCurrencyList;
 
     // 분할인출
-    private int wdrwMinMonth;
-    private int wdrwMax;
+    private Integer wdrwMinMonth;
+    private Integer wdrwMax;
     private String amtCurrency;
-    private int amtMin;
+    private Integer amtMin;
+    // 통화코드별 분할인출 최소금액
+    private List<ProductWithdrawAmtDTO> withdrawMinAmtList;
 
     // 예치 기간
-    private int periodMinMonth;
-    private int periodMaxMonth;
-    private int periodFixedMonth;
+    private Integer periodMinMonth;
+    private Integer periodMaxMonth;
+    private Integer periodFixedMonth;
+    // 고정 기간 목록
+    private List<Integer> periodFixedMonthList;
 
     // 가입 금액 제한
     private String lmtCurrency;
-    private int lmtMinAmt;
-    private int lmtMaxAmt;
+    private Integer lmtMinAmt;
+    private Integer lmtMaxAmt;
+
+
+    private List<ProductPeriodDTO> periodList;
 
 }

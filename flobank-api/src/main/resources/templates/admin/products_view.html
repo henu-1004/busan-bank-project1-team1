@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="ko"
-      th:replace="~{admin/admin_template :: admin_template('외화예금 상품 상세','외화예금 상품 상세',~{::body})}">
-<body>
+      th:replace="~{admin/admin_template :: admin_template('외화예금 상품 상세', '외화예금 상품 상세', ~{::content}, ~{})}">
+<th:block th:fragment="content">
 
 <section class="product-view">
 
@@ -186,6 +186,36 @@
                 </td>
             </tr>
 
+            <tr>
+                <th>상품설명서</th>
+                <td>
+                    <a th:if="${product.dpstInfoPdf != null}"
+                       th:href="@{${product.dpstInfoPdf}}"
+                       class="btn-link"
+                       target="_blank">
+                        <i class="fa-solid fa-file-pdf"></i> 다운로드
+                    </a>
+                    <span th:unless="${product.dpstInfoPdf != null}" class="text-gray">
+                        파일 없음
+                    </span>
+                </td>
+            </tr>
+
+            <tr>
+                <th>약관 파일</th>
+                <td>
+                    <a th:if="${termsFilePath != null}"
+                       th:href="@{${termsFilePath}}"
+                       class="btn-link"
+                       target="_blank">
+                        <i class="fa-solid fa-file-contract"></i> 약관 보기
+                    </a>
+                    <span th:unless="${termsFilePath != null}" class="text-gray">
+                        연결된 약관 없음
+                    </span>
+                </td>
+            </tr>
+
 
 
             </tbody>
@@ -201,10 +231,6 @@
 
             <tr><th>상품등록번호(공시승인)</th>
                 <td th:text="${product.dpstAppNo}"></td>
-            </tr>
-
-            <tr><th>공시승인기관</th>
-                <td th:text="${product.dpstAppInstitution}"></td>
             </tr>
 
             <tr><th>공시승인일자</th>
@@ -267,6 +293,6 @@
 
     </div>
 </section>
+</th:block>
 
-</body>
 </html>

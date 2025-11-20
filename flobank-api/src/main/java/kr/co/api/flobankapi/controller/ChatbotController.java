@@ -52,6 +52,8 @@ public class ChatbotController {
     public String chatbot(Model model, String q, String sessId) {
         System.out.println("GPT API 호출 들어옴 = " + System.currentTimeMillis());
 
+        System.out.println(">>> OPENAI KEY CHECK = " + System.getenv("OPENAI_API_KEY"));
+
         ChatbotHistDTO qHistDTO = new ChatbotHistDTO();
         qHistDTO.setBotType(1);
         qHistDTO.setBotContent(q);
@@ -64,25 +66,26 @@ public class ChatbotController {
             String type = typeClassifier.detectTypeByGPT(q);
             System.out.println("=== 자동 분류된 TYPE = " + type);
 
-            // 질문 임베딩
-            List<Double> qEmbedding = embeddingService.embedText(q);
-            log.info(">>> 벡터 : " + qEmbedding);
-
-            // Pinecone search
-            var results = pineconeService.search(
-                    qEmbedding,
-                    10,          // topK
-                    "fx-interest",       // namespace 전체 검색
-                    type,       // GPT가 판별한 문서 타입 (null 가능)
-                    0        // 최소 유사도 컷
-            );
-
-            // 검색된 문서로 문맥 텍스트 구성
             StringBuilder contextBuilder = new StringBuilder();
-            for (SearchResDTO r : results) {
-                Map<String, Object> meta = r.getMetadata();
-                if (meta.containsKey("content")) {
-                    contextBuilder.append(meta.get("content")).append("\n\n");
+            if (type != null && !type.equals("null")) {
+                // 질문 임베딩
+                List<Double> qEmbedding = embeddingService.embedText(q);
+
+                // Pinecone search
+                var results = pineconeService.search(
+                        qEmbedding,
+                        10,          // topK
+                        "fx-interest",       // namespace 전체 검색
+                        type,       // GPT가 판별한 문서 타입 (null 가능)
+                        0        // 최소 유사도 컷
+                );
+
+                // 검색된 문서로 문맥 텍스트 구성
+                for (SearchResDTO r : results) {
+                    Map<String, Object> meta = r.getMetadata();
+                    if (meta != null && meta.containsKey("content")) {
+                        contextBuilder.append(meta.get("content")).append("\n\n");
+                    }
                 }
             }
 
@@ -102,9 +105,11 @@ public class ChatbotController {
             // GPT 호출 (문맥 + 질문)
             String response = chatGPTService.ask(q, context);
 
-            response = response.replace("\r\n", "\n");
-            response = response.replace("\n", "<br/>");
-            response = response.replace("<br>", "<br/>");
+            if (response != null) {
+                response = response.replace("\r\n", "\n");
+                response = response.replace("\n", "<br/>");
+                response = response.replace("<br>", "<br/>");
+            }
 
 
             ChatbotHistDTO aHistDTO = new ChatbotHistDTO();

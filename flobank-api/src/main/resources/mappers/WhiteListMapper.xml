@@ -95,7 +95,7 @@
     </resultMap>
 
     <select id="interestInfo" resultMap="InterestResultMap">
-        select * from TB_INTEREST_INFO
+        select * from TB_INTEREST_INFO order by INTEREST_CURRENCY, INTEREST_MONTH asc
     </select>
 
 

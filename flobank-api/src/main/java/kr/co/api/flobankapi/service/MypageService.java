@@ -1,17 +1,17 @@
 package kr.co.api.flobankapi.service;
 
-import kr.co.api.flobankapi.dto.CustAcctDTO;
-import kr.co.api.flobankapi.dto.CustFrgnAcctDTO;
-import kr.co.api.flobankapi.dto.CustInfoDTO;
+import kr.co.api.flobankapi.dto.*;
 import kr.co.api.flobankapi.mapper.MemberMapper;
 import kr.co.api.flobankapi.mapper.MypageMapper;
 import kr.co.api.flobankapi.util.AesUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -26,16 +26,43 @@ public class MypageService {
         String endPw = passwordEncoder.encode(custAcctDTO.getAcctPw());
         custAcctDTO.setAcctPw(endPw);
 
+        // 이미 있는 입출금통장 개수 들고오기
+        int cnt = findCntAcct(custAcctDTO.getAcctCustCode());
+
+        // 기본 이름 설정("FLO 입출금통장 + (n+1)")
+        custAcctDTO.setAcctName("FLO 입출금통장" + (cnt + 1));
+
         mypageMapper.insertAcct(custAcctDTO);
     }
 
     // 외화 입출금계좌 생성
+    @Transactional
     public void saveFrgnAcct(CustFrgnAcctDTO custFrgnAcctDTO) {
+
         // 계좌 비밀번호 암호화 = > 단방향
         String endPw = passwordEncoder.encode(custFrgnAcctDTO.getFrgnAcctPw());
         custFrgnAcctDTO.setFrgnAcctPw(endPw);
 
+        // 기본 외화 통장 이름 설정
+        String name = "FLO 외화통장";
+        custFrgnAcctDTO.setFrgnAcctName(name);
+
         mypageMapper.insertFrgnAcct(custFrgnAcctDTO);
+
+        // 생성된 외화 부모 계좌 들고오기
+        CustFrgnAcctDTO frgnAcctDTO = mypageMapper.selectFrgnAcct(custFrgnAcctDTO.getFrgnAcctCustCode());
+        // 자식 통장 만들기
+        String[] currency = {"USD", "JPY", "EUR", "CNH", "GBP", "AUD"};
+        List<FrgnAcctBalanceDTO> frgnAcctBalanceList = new ArrayList<>();
+        for(String c : currency){
+            FrgnAcctBalanceDTO frgnAcctBalance = new FrgnAcctBalanceDTO();
+            frgnAcctBalance.setBalCurrency(c);
+            frgnAcctBalance.setBalFrgnAcctNo(frgnAcctDTO.getFrgnAcctNo());
+
+            frgnAcctBalanceList.add(frgnAcctBalance);
+        }
+        mypageMapper.insertAllFrgnAcctBal(frgnAcctBalanceList);
+
     }
 
     // 외화 입출금 통장 이미 있는지 확인
@@ -61,6 +88,38 @@ public class MypageService {
     // 외화 계좌 이름 바꾸기
     public void modifyFrgnAcctName(String name, String acctNo) {
         mypageMapper.updateFrgnAcctName(name, acctNo);
+    }
+
+    // 계좌 단건 조회
+    public CustAcctDTO findCustAcct(String acctNo) {
+        return mypageMapper.selectCustAcct(acctNo);
+    }
+
+    // 원화 입출금 계좌 개수 확인
+    public Integer findCntAcct(String custCode) {
+        return  mypageMapper.selectCntAcct(custCode);
+    }
+
+    // 입금, 출금
+    @Transactional
+    public void modifyCustAcctBal(CustTranHistDTO custTranHistDTO){
+        Integer amount = custTranHistDTO.getTranAmount();
+        String acctNo = custTranHistDTO.getTranAcctNo();
+        mypageMapper.updateMinusAcct(amount, acctNo);
+
+        // 출금을 플로뱅크로 했다면
+        if("888".equals(custTranHistDTO.getTranRecBkCode())){
+            String recAcctNo = custTranHistDTO.getTranRecAcctNo();
+            mypageMapper.updatePlusAcct(amount, recAcctNo);
+        }
+
+        // 이체 내역 삽입
+        mypageMapper.insertTranHist(custTranHistDTO);
+    }
+
+    // 외화 자식 계좌 조회
+    public List<FrgnAcctBalanceDTO> getAllFrgnAcctBal(String frgnAcctNo) {
+        return mypageMapper.selectAllFrgnAcctBal(frgnAcctNo);
     }
 
     public CustInfoDTO getCustInfo(String userCode) { // 고객 정보 받아오기

@@ -1,62 +1,122 @@
+console.log("terms.js loaded!!!");
+
 document.addEventListener("DOMContentLoaded", () => {
 
-    /* ============================================================
-       약관 수정 모달
-    ============================================================ */
 
+
+    /* ============================================================
+       요소 선택
+    ============================================================ */
     const termsModal = document.getElementById("termsModal");
     const modalClose = document.querySelector(".terms-modal-close");
+    const modalCancel = document.querySelector(".terms-modal-cancel");
+    const saveBtn = document.querySelector(".terms-modal-save");
 
-    // 수정 버튼 이벤트
+    const editTitle = document.getElementById("modalTitle");
+    const editContent = document.getElementById("modalContent");
+
+    /* ============================================================
+       카테고리 라벨 변환
+    ============================================================ */
+    const categoryLabel = (cate) => {
+        const mapper = {
+            1: "회원가입",
+            2: "환전하기",
+            3: "외화송금",
+            4: "외환예금",
+            5: "원화통장개설",
+            6: "외화통장개설",
+        };
+        return mapper[cate] || "기타";
+    };
+
+    /* ============================================================
+       모달 닫기
+    ============================================================ */
+    const closeModal = () => {
+        termsModal.style.display = "none";
+    };
+
+    modalClose.addEventListener("click", closeModal);
+    modalCancel.addEventListener("click", closeModal);
+
+    window.addEventListener("click", (e) => {
+        if (e.target === termsModal) closeModal();
+    });
+
+    /* ============================================================
+       수정 버튼 클릭 → 모달 열기 + 데이터 로딩
+    ============================================================ */
     document.querySelectorAll(".terms-edit-btn").forEach((btn) => {
-        btn.addEventListener("click", async () => {
+        btn.addEventListener("click", async (e) => {
+            e.stopPropagation();
 
             const cate = btn.dataset.cate;
             const order = btn.dataset.order;
 
-            const res = await fetch(`/flobank/admin/terms/detail?cate=${cate}&order=${order}`);
-            const data = await res.json();
+            if (!cate || !order) {
+                alert("선택한 약관 정보가 올바르지 않습니다.");
+                return;
+            }
 
-            document.getElementById("modalCategory").value = cate;
-            document.getElementById("modalTitle").value = data.title;
-            document.getElementById("modalVersion").value = data.version;
-            document.getElementById("modalRegDate").value = data.regDy;
-            document.getElementById("modalWriter").value = data.adminId;
-            document.getElementById("modalContent").value = data.content;
+            try {
+                const res = await fetch(`/flobank/admin/terms/detail?cate=${cate}&order=${order}`);
 
-            const saveBtn = document.querySelector(".terms-modal-save");
-            saveBtn.dataset.cate = cate;
-            saveBtn.dataset.order = order;
-            saveBtn.dataset.version = data.version;
+                if (!res.ok) {
+                    throw new Error("약관 정보를 불러오지 못했습니다.");
+                }
 
-            termsModal.style.display = "block";
+                const data = await res.json();
+
+                // HTML input에 값 채우기
+                editTitle.value = data.title;
+                editContent.value = data.content;
+
+                document.getElementById("modalCategory").value = categoryLabel(cate);
+                document.getElementById("modalVersion").value = "v" + data.version;
+                document.getElementById("modalRegDate").value = data.regDy;
+                document.getElementById("modalWriter").value = data.adminId;
+                document.getElementById("modalVerMemo").value = data.verMemo ?? "";
+
+
+
+                // 저장 버튼에 정보 저장
+                saveBtn.dataset.cate = cate;
+                saveBtn.dataset.order = order;
+                saveBtn.dataset.version = data.version;
+
+                // 모달 오픈
+                termsModal.style.display = "block";
+
+            } catch (err) {
+                alert(err.message);
+            }
         });
     });
 
-    modalClose.addEventListener("click", () => {
-        termsModal.style.display = "none";
-    });
-
-    window.addEventListener("click", (e) => {
-        if (e.target === termsModal) {
-            termsModal.style.display = "none";
-        }
-    });
-
-
     /* ============================================================
-       저장하기 (JS 수정 필수 부분)
+       저장하기 버튼 → 새 버전 생성(update)
     ============================================================ */
-    document.querySelector(".terms-modal-save").addEventListener("click", async () => {
-
-        const saveBtn = document.querySelector(".terms-modal-save");
+    saveBtn.addEventListener("click", async () => {
 
         const cate = saveBtn.dataset.cate;
         const order = saveBtn.dataset.order;
         const currentVersion = saveBtn.dataset.version;
 
-        const title = document.getElementById("modalTitle").value;
-        const content = document.getElementById("modalContent").value;
+        if (!cate || !order) {
+            alert("수정할 약관을 먼저 선택해주세요.");
+            return;
+        }
+
+        const title = editTitle.value.trim();
+        const content = editContent.value.trim();
+
+        const verMemo = document.getElementById("modalVerMemo").value.trim();
+
+        if (!title || !content) {
+            alert("제목과 내용은 비울 수 없습니다.");
+            return;
+        }
 
         const formData = new URLSearchParams();
         formData.append("cate", cate);
@@ -64,46 +124,35 @@ document.addEventListener("DOMContentLoaded", () => {
         formData.append("title", title);
         formData.append("content", content);
         formData.append("currentVersion", currentVersion);
+        formData.append("verMemo", verMemo);
 
-        const res = await fetch("/flobank/admin/terms/update", {
-            method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: formData,
-        });
+        // 버튼 상태 변경
+        saveBtn.disabled = true;
+        const originalLabel = saveBtn.textContent;
+        saveBtn.textContent = "저장 중...";
 
-        const data = await res.json();
+        try {
+            const res = await fetch(`/flobank/admin/terms/update`, {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: formData,
+            });
 
-        if (data.status === "OK") {
-            alert("약관이 수정되었습니다.");
-            location.reload();
-        } else {
-            alert("수정 실패: " + data.message);
-        }
-    });
+            const data = await res.json();
 
-
-    /* ============================================================
-       약관 삭제
-    ============================================================ */
-    document.querySelectorAll(".terms-delete-btn").forEach((btn) => {
-        btn.addEventListener("click", async () => {
-
-            const cate = btn.dataset.cate;
-            const order = btn.dataset.order;
-
-            if (!confirm("정말 삭제하시겠습니까?")) return;
-
-            const res = await fetch(`/flobank/admin/terms/delete?cate=${cate}&order=${order}`);
-
-            if (res.ok) {
-                alert("삭제되었습니다.");
+            if (data.status === "OK") {
+                alert("약관이 수정되었습니다.");
                 location.reload();
             } else {
-                alert("삭제 실패");
+                throw new Error(data.message || "수정에 실패했습니다.");
             }
-        });
+        } catch (err) {
+            alert(err.message);
+        } finally {
+            saveBtn.disabled = false;
+            saveBtn.textContent = originalLabel;
+        }
     });
-
 
     /* ============================================================
        스크롤 위치 저장 & 복원
@@ -125,4 +174,26 @@ document.addEventListener("DOMContentLoaded", () => {
         }, 50);
     });
 
+    /* ============================================================
+   🚀 등록하기 버튼 → form submit 실행   (<< 반드시 맨 마지막에 위치)
+============================================================ */
+    const submitBtn = document.getElementById("termsSubmitBtn");
+
+    if (submitBtn) {
+        console.log("🟢 submitBtn found!");
+        submitBtn.addEventListener("click", () => {
+            console.log("🟡 submitBtn clicked!");
+            document.querySelector(".terms-form").submit();
+        });
+    } else {
+        console.log("❌ submitBtn not found!");
+    }
+
+
+
+    console.log("✅ terms.js loaded!");
+
+
 });
+
+

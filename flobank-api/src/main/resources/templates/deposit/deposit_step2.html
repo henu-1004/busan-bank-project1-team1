@@ -24,7 +24,7 @@
 
 
   <div class="step1-container">
-    <h2 class="step1-title">BNK 모아드림 외화적금</h2>
+    <h2 class="step1-title">[[${product.dpstName}]]</h2>
 
   
     <div class="step1-steps">
@@ -62,18 +62,22 @@
     <div id="krwFields">
       <div class="form-group">
         <label class="form-label">원화출금계좌번호</label>
-        <select class="form-select">
-          <option>104302-04-412952</option>
-          <option>104302-02-513489</option>
+        <select id="withdrawAccount" name="custAcctNo" class="form-select">
+            <option selected disabled>======== 계좌 선택 ========</option>
+            <option th:each="acct : ${accounts}"
+                    th:value="${acct.acctNo}"
+                    th:data-balance="${acct.acctBalance}"
+                    th:data-pw="${acct.acctPw}"
+            >[[${acct.acctNo}]]</option>
         </select>
-        <p class="form-hint">출금가능금액 0원</p>
+        <p id="balanceHint" class="form-hint"></p>
       </div>
 
       <div class="divider"></div>
 
       <div class="form-group">
         <label class="form-label">원화출금계좌비밀번호</label>
-        <input type="password" maxlength="4" placeholder="비밀번호 4자리" class="form-input short">
+        <input type="password" name="acctPw" maxlength="4" placeholder="비밀번호 4자리" class="form-input short">
       </div>
     </div>
 
@@ -81,30 +85,33 @@
     <div id="fxFields" class="hidden">
       <div class="form-group">
         <label class="form-label">외화출금계좌번호</label>
-        <select class="form-select">
-          <option>202040-11-300912 (USD)</option>
-          <option>202040-12-102300 (JPY)</option>
-          <option>202040-12-201520 (EUR)</option>
+        <select name="frgnAcctNo" class="form-select">
+            <option selected disabled>======== 계좌 선택 ========</option>
+            <option th:if="${frgnAccount}" th:value="${frgnAccount.frgnAcctNo}">[[${frgnAccount.frgnAcctNo}]]</option>
         </select>
-        <p class="form-hint">출금가능금액 2,000 USD</p>
+        <!-- <p id="frgnBalanceHint" class="form-hint"></p> -->
       </div>
 
       <div class="divider"></div>
 
       <div class="form-group">
         <label class="form-label">외화출금계좌비밀번호</label>
-        <input type="password" maxlength="4" placeholder="비밀번호 4자리" class="form-input short">
+        <input type="password" name="frgnAcctPw" maxlength="4" placeholder="비밀번호 4자리" class="form-input short">
       </div>
 
       <div class="divider"></div>
 
       <div class="form-group">
         <label class="form-label">출금통화선택</label>
-        <select class="form-select short">
-          <option>USD (미국 달러)</option>
-          <option>JPY (일본 엔화)</option>
-          <option>EUR (유로)</option>
+        <select id="withdrawFrgnAccount" name="balNo" class="form-select short">
+            <option selected disabled>======== 통화 선택 ========</option>
+            <option  th:each="tacct : ${frgnAccountBals}"
+                     th:if="${product.dpstCurrencyList.contains(tacct.balCurrency)}"
+                     th:value="${tacct.balNo}"
+                     th:data-balance="${tacct.balBalance}"
+                     th:data-currency="${tacct.balCurrency}">[[${tacct.balCurrency}]]</option>
         </select>
+          <p id="frgnBalanceHint" class="form-hint">
       </div>
     </div>
   </div>
@@ -117,11 +124,16 @@
 
     <div class="form-group">
       <label class="form-label">신규통화종류</label>
-      <select class="form-select">
-        <option>USD (미국 달러)</option>
-        <option>JPY (일본 엔화)</option>
-        <option>EUR (유로)</option>
-        <option>CNY (중국 위안)</option>
+      <select id="curSelect" class="form-select">
+          <option selected disabled>======== 통화 선택 ========</option>
+        <option th:each="cur : ${product.dpstCurrencyDtoList}"
+            th:value="${cur.curCode}"
+                th:data-curCode="${cur.curCode}"
+                th:data-curName="${cur.curName}"
+                th:data-minAmount="${limitMinMap[cur.curCode]}"
+                th:data-maxAmount="${limitMaxMap[cur.curCode]}"
+        >
+        [[${cur.curCode}]] ([[${cur.curName}]])</option>
       </select>
     </div>
 
@@ -131,14 +143,58 @@
       <label class="form-label">신규금액 
         <i class="fa-regular fa-circle-question" title="입금할 신규 금액을 입력하세요."></i>
       </label>
-      <div class="amount-input">
-        <input type="text" placeholder="1,000달러 이상" class="form-input short">
-        <span class="amount-divider">.</span>
-        <input type="text" maxlength="2" placeholder="00" class="form-input tiny">
-        <span class="form-hint-inline">
-          <i class="fa-regular fa-circle-info"></i> 소수점 이하 두자리까지
-        </span>
+      <div id="lmtAmtInput" class="amount-input">
+        <input type="text" id="foreignAmount" placeholder="" class="form-input short">
+          <button id="calcBtn" style="background-color: #1f2d3d; color: white; width: 140px; font-weight: bold; display: block" class="form-input tiny">예상금액확인</button>
       </div>
+        <br>
+        <table id="calcResultTable" class="prod-amt-container" style="display: none;">
+            <tr>
+                <td class="prod-amt-left">
+                    송금보내실때환율
+                </td>
+                <td class="prod-amt-right">
+                    1482 원
+                </td>
+            </tr>
+            <tr>
+                <td class="prod-amt-left">
+                    우대적용환율
+                </td>
+                <td class="prod-amt-right">
+                    1482 원
+                </td>
+            </tr>
+            <tr>
+                <td class="prod-amt-left">
+                    우대율
+                </td>
+                <td class="prod-amt-right">
+                    70%
+                </td>
+            </tr>
+            <tr>
+                <td class="prod-amt-left">
+                    우대받는금액
+                </td>
+                <td class="prod-amt-right">
+                    62 원
+                </td>
+            </tr>
+            <tr>
+                <td class="prod-amt-left">
+                    예상원화금액
+                </td>
+                <td class="prod-amt-right" style="color: #ef0909; font-weight: bold">
+                    1482 원
+                </td>
+            </tr>
+            <tr>
+                <td class="prod-amt-left" colspan="2" style="color: gray">
+                    상기 예상금액은 실제 가입 시점의 환율 변동에 따라 달라질 수 있습니다.(수수료 미포함)
+                </td>
+            </tr>
+        </table>
     </div>
 
     <div class="divider"></div>
@@ -146,13 +202,18 @@
     <div class="form-group">
       <label class="form-label">가입월수</label>
       <div class="term-select">
-        <select class="form-select short">
-          <option>1</option>
-          <option>3</option>
-          <option>6</option>
-          <option>12</option>
+        <select th:if="${product.dpstPeriodType==2}" class="form-select short">
+          <option th:each="period : ${product.periodFixedMonthList}" th:value="${period}">[[${period}]]</option>
         </select>
-        <span>월</span>
+          <input type="text" th:if="${product.dpstPeriodType==1}"
+                 id="periodInput"
+                 th:placeholder="${product.periodMinMonth + ' ~ ' + product.periodMaxMonth}"
+                 class="form-input short"
+                 th:data-min="${product.periodMinMonth}"
+                 th:data-max="${product.periodMaxMonth}">
+        <span>개월</span>
+
+
       </div>
     </div>
   </div>
@@ -160,8 +221,8 @@
   <div class="divider"></div>
 
   <!-- 3️⃣ 만기자동연장신청 -->
-  <div class="form-block">
-    <h3 class="step2-subtitle">만기자동연장신청</h3>
+  <div class="form-block" th:if="${product.getDpstAutoRenewYn().equals('Y')}">
+    <h3 class="step2-subtitle" >만기자동연장신청</h3>
 
     <div class="form-group">
 
@@ -185,10 +246,12 @@
       </div>
 
     </div>
+      <div class="divider"></div>
   </div>
 
 
 <!--  자동해지신청 여부 -->
+    <!--
 <div class="form-block">
   <h3 class="step2-subtitle">자동해지신청 여부</h3>
 
@@ -203,13 +266,7 @@
     </p>
   </div>
 </div>
-
-
-
-
-
-
-  <div class="divider"></div>
+-->
 
   <!-- 4️⃣ 정기예금 비밀번호 및 상품서류 수령방법 -->
   <div class="form-block">
@@ -261,8 +318,9 @@
   </div>
 </main>
 
+<script th:src ="@{/js/deposit.js}"></script>
 <div th:replace="~{_template/_footer.html}"></div>
-<script src ="/static/js/deposit.js"></script>
+
 
 </body>
 </html>

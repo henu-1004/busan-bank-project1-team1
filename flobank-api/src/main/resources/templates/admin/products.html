@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="ko"
-      th:insert="~{admin/admin_template :: admin_template('외화예금 관리','외화예금 관리',~{::body})}">
-<body>
+      th:replace="~{admin/admin_template :: admin_template('외화예금 관리','외화예금 관리',~{::content},~{::script})}">
+
+<th:block th:fragment="content">
 
 <!-- 외화예금 상품 전체 컨테이너 -->
 <div class="product-container">
@@ -12,78 +13,51 @@
 
         <form id="foreignDepositForm"
               th:action="@{/admin/products/register}"
-              method="post">
+              method="post"
+              enctype="multipart/form-data">
 
-            <!-- ==========================
-                 📌 PDF AI 분석 UI 영역
-            =========================== -->
             <div class="form-section">
                 <h3>상품설명서 AI 분석 준비</h3>
-
-                <!-- PDF 업로드 -->
                 <div class="form-group">
                     <label for="dpstInfoPdfUpload">PDF 파일 선택</label>
-
                     <div class="pdf-upload-controls">
                         <input type="file" id="dpstInfoPdfUpload" accept=".pdf" />
                         <button type="button" id="btnPdfUpload" class="btn-secondary">업로드</button>
                     </div>
-
                     <small class="helper-text">업로드 후 AI 분석 결과를 기다려 주세요.</small>
                 </div>
-
-                <!-- PDF 목록 -->
                 <div class="pdf-list">
                     <div class="pdf-list-header">
                         <span>업로드된 PDF 목록</span>
                         <span class="status-legend">상태: wait / done / used</span>
                     </div>
-
-                    <div class="pdf-list-body" id="pdfListBody">
-                        <!-- JS로 목록이 채워집니다 -->
-                    </div>
+                    <div class="pdf-list-body" id="pdfListBody"></div>
                 </div>
-
-                <!-- done 상태만 선택 가능한 드롭다운 -->
                 <div class="form-group">
                     <label for="pdfSelector">AI 분석 완료 PDF 선택 (done만 선택 가능)</label>
                     <select id="pdfSelector" name="donePdf" class="pdf-select">
                         <option value="">선택하세요</option>
-                        <!-- JS에서 done만 option 생성 예정 -->
                     </select>
                 </div>
-
-                <!-- AI 코멘트 박스 -->
                 <div class="ai-comment-box">
                     <div class="ai-comment-header">
                         <h4>AI 분석 코멘트</h4>
                         <span class="ai-comment-status">AI 분석 코멘트 표시 예정</span>
                     </div>
-                    <p class="ai-comment-placeholder">
-                        AI 분석이 완료되면 생성된 코멘트가 이 영역에 표시됩니다.
-                    </p>
+                    <p class="ai-comment-placeholder">AI 분석이 완료되면 생성된 코멘트가 이 영역에 표시됩니다.</p>
                 </div>
             </div>
 
-
-
-
-            <!-- ==============================
-                 📌 기본정보
-            =============================== -->
             <div class="form-section">
                 <h3>기본정보</h3>
-
                 <div class="form-group">
                     <label for="dpstName">상품명</label>
                     <input type="text" id="dpstName" name="dpstName" placeholder="상품명을 입력하세요" required />
                 </div>
-
                 <div class="form-group">
                     <label for="dpstInfo">상품 한 줄 설명</label>
                     <input type="text" id="dpstInfo" name="dpstInfo" placeholder="간단한 설명을 입력하세요" />
                 </div>
-
                 <div class="form-group">
                     <label>예금 유형</label>
                     <div class="radio-group">
@@ -93,13 +67,8 @@
                 </div>
             </div>
 
-
-            <!-- ==============================
-                 📌 통화 및 금액 설정
-            =============================== -->
             <div class="form-section">
                 <h3>통화 및 금액 설정</h3>
-
                 <div class="form-group">
                     <label>가능한 통화</label>
                     <div class="checkbox-group">
@@ -107,14 +76,12 @@
                         <label><input type="checkbox" name="dpstCurrency" value="JPY" /> JPY(일본 엔화)</label>
                         <label><input type="checkbox" name="dpstCurrency" value="EUR" /> EUR(유로화)</label>
                         <label><input type="checkbox" name="dpstCurrency" value="GBP" /> GBP(영국 파운드)</label>
-                        <label><input type="checkbox" name="dpstCurrency" value="CNY" /> CNY(중국 위안)</label>
+                        <label><input type="checkbox" name="dpstCurrency" value="CNH" /> CNH(중국 위안)</label>
                         <label><input type="checkbox" name="dpstCurrency" value="AUD" /> AUD(호주 달러)</label>
                     </div>
                 </div>
-
                 <div class="conditional deposit-type" data-type="1">
                     <div id="currencyAmountContainer"></div>
-
                     <div class="form-group">
                         <label>추가납입 가능 여부</label>
                         <div class="radio-group">
@@ -122,20 +89,15 @@
                             <label><input type="radio" name="dpstAddPayYn" value="N" checked /> 불가능</label>
                         </div>
                     </div>
-
                     <div class="conditional extra-deposit">
                         <div class="form-group">
-                            <label>신규 포함 최대 납입 회수</label>
+                            <label>신규 포함 최대 납입 횟수</label>
                             <input type="number" name="dpstAddPayMax" placeholder="예: 3" />
                         </div>
                     </div>
                 </div>
             </div>
 
-
-            <!-- ==============================
-                 📌 환율 적용 기준
-            =============================== -->
             <div class="form-section">
                 <h3>환율 적용 기준</h3>
                 <div class="radio-group">
@@ -144,18 +106,12 @@
                 </div>
             </div>
 
-
-            <!-- ==============================
-                 📌 상품 정보
-            =============================== -->
             <div class="form-section">
                 <h3>상품 정보</h3>
-
                 <div class="form-group">
                     <label for="dpstDescript">상품 개요</label>
                     <textarea id="dpstDescript" name="dpstDescript" rows="3" placeholder="상품 특징 및 안내를 입력하세요"></textarea>
                 </div>
-
                 <div class="form-group">
                     <label>상품 가입기간 유형</label>
                     <div class="radio-group">
@@ -163,7 +119,6 @@
                         <label><input type="radio" name="dpstPeriodType" value="2" /> 고정형</label>
                     </div>
                 </div>
-
                 <div class="conditional join-type" data-type="1">
                     <div class="form-inline">
                         <label>최소 가입월수</label>
@@ -174,7 +129,6 @@
                         <input type="number" name="maxMonths" placeholder="예: 36" /> 개월
                     </div>
                 </div>
-
                 <div class="conditional join-type" data-type="2">
                     <div class="form-group">
                         <label>가입 가능한 개월수</label>
@@ -183,18 +137,12 @@
                 </div>
             </div>
 
-
-            <!-- ==============================
-                 📌 가입 대상
-            =============================== -->
             <div class="form-section">
                 <h3>가입 대상</h3>
-
                 <div class="radio-group">
                     <label><input type="radio" name="ageLimit" value="none" checked /> 제한 없음</label>
                     <label><input type="radio" name="ageLimit" value="yes" /> 제한 있음</label>
                 </div>
-
                 <div class="conditional age-limit">
                     <div class="form-inline">
                         <label>최소 나이</label>
@@ -207,45 +155,31 @@
                 </div>
             </div>
 
-
-            <!-- ==============================
-                 📌 분할 인출
-            =============================== -->
             <div class="form-section">
                 <h3>분할 인출 설정</h3>
-
                 <div class="radio-group">
                     <label><input type="radio" name="dpstPartWdrwYn" value="Y" /> 가능</label>
                     <label><input type="radio" name="dpstPartWdrwYn" value="N" checked /> 불가능</label>
                 </div>
-
                 <div class="conditional partial-withdrawal">
                     <div class="form-group">
                         <label>가능 시점 (가입 후)</label>
                         <input type="number" name="withdrawAfterMonths" placeholder="예: 6" /> 개월 이후
                     </div>
-
                     <div class="form-group">
                         <label>최대 인출 가능 횟수</label>
                         <input type="number" name="withdrawCount" placeholder="예: 3회" />
                     </div>
-
                     <div id="withdrawCurrencyContainer"></div>
                 </div>
             </div>
 
-
-            <!-- ==============================
-                 📌 자동연장
-            =============================== -->
             <div class="form-section">
                 <h3>자동연장 설정</h3>
-
                 <div class="radio-group">
                     <label><input type="radio" name="dpstAutoRenewYn" value="Y" /> 가능</label>
                     <label><input type="radio" name="dpstAutoRenewYn" value="N" checked /> 불가능</label>
                 </div>
-
                 <div class="conditional auto-renew">
                     <div class="form-group">
                         <label>연장 기간 선택</label>
@@ -260,42 +194,29 @@
                 </div>
             </div>
 
-
-            <!-- ==============================
-                 📌 상품 설명서 첨부 (최종본)
-            =============================== -->
             <div class="form-section">
                 <h3>상품설명서 첨부</h3>
                 <div class="form-group">
-                    <input type="file" name="dpstInfoPdf" accept=".pdf,.doc,.docx" />
+                    <input type="file" name="pdfFile" accept=".pdf,.doc,.docx" />
                 </div>
             </div>
 
-
-            <!-- ==============================
-                 📌 상품 개시일
-            =============================== -->
             <div class="form-section">
                 <h3>상품 개시일자</h3>
-
                 <div class="form-group">
                     <label for="dpstRegDt">개시일자 선택</label>
                     <input type="date" id="dpstRegDt" name="dpstRegDt" required />
                 </div>
             </div>
 
-
             <div class="form-submit">
                 <button type="submit" class="btn-submit">등록하기</button>
             </div>
 
-        </form>
-    </section>
+        </form> </section>
 
 
-    <!-- ==============================
-         📌 상품 관리(아래는 그대로 유지)
-    =============================== -->
+
     <section class="product-card">
 
         <h2 class="product-title">외화예금 상품 관리</h2>
@@ -389,6 +310,9 @@
     </section>
 
 </div>
+</th:block>
+
+<th:block th:fragment="script">
 
 <!-- ==========================
      📌 PDF 업로드 & 목록 조회 JS
@@ -469,5 +393,5 @@
 <script th:src="@{/js/product1.js}"></script>
 <script th:src="@{/js/product2.js}"></script>
 
-</body>
+</th:block>
 </html>

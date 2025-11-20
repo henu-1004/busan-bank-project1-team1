@@ -20,7 +20,7 @@ public class QTypeClassifierService {
 
         String systemPrompt =
                 "사용자 질문이 요구하는 문서 유형을 판단해라.\n" +
-                "금리는 interest, 예금은 product\n" +
+                "부산은행 금리는 interest, 예금은 product\n" +
                         "반드시 아래 중 하나만 출력한다:\n" +
                         "- Interest\n" +
                         "- ProductInfo\n" +
