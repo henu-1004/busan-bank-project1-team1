@@ -78,7 +78,7 @@ document.addEventListener("DOMContentLoaded", () => {
         USD: 1470.59,
         JPY: 9.62,
         EUR: 1600.12,
-        CNY: 203.14
+        CNH: 203.14
       };
 
       const rate = rates[currency];

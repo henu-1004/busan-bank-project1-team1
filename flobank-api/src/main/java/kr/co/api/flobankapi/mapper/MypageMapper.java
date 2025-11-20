@@ -47,6 +47,9 @@ public interface MypageMapper {
     // 외화 자식 계좌 생성
     void insertAllFrgnAcctBal(List<FrgnAcctBalanceDTO> item);
 
+    // 외화 자식 계좌 조회
+    List<FrgnAcctBalanceDTO> selectAllFrgnAcctBal(String frgnAcctNo);
+
     CustInfoDTO selectCustInfo(String custId);
     LocalDate selectCheckKoAcct(String custCode);
     int selectCheckCntKoAcct(String custCode);
