@@ -53,11 +53,10 @@
             </p>
         </div>
 
-        <form action="/remit/en_transfer_3" method="post" id="transferForm">
+        <form th:action="@{/remit/en_transfer_3}" method="post" id="transferForm">
 
             <input type="hidden" name="remtAppliedRate" id="hidden-applied-rate">
             <input type="hidden" name="remtAmount" id="hidden-remt-amount">
-
 
             <section class="transfer1-section">
                 <h3 class="transfer1-subtitle">출금정보</h3>
@@ -71,10 +70,18 @@
                                 data-type="FRGN"
                                 th:text="${custFrgnAcctDTO.frgnAcctName}"
 
+                                id="frgn-account-option"
+
+                                th:data-account-usd="${currencyAcctNo['USD']}"
+                                th:data-account-jpy="${currencyAcctNo['JPY']}"
+                                th:data-account-eur="${currencyAcctNo['EUR']}"
+                                th:data-account-cnh="${currencyAcctNo['CNH']}" th:data-account-gbp="${currencyAcctNo['GBP']}"
+                                th:data-account-aud="${currencyAcctNo['AUD']}"
+
                                 th:data-balance-usd="${currencyAcctBal['USD']}"
                                 th:data-balance-jpy="${currencyAcctBal['JPY']}"
                                 th:data-balance-eur="${currencyAcctBal['EUR']}"
-                                th:data-balance-cny="${currencyAcctBal['CNH']}"
+                                th:data-balance-cnh="${currencyAcctBal['CNH']}"
                                 th:data-balance-gbp="${currencyAcctBal['GBP']}"
                                 th:data-balance-aud="${currencyAcctBal['AUD']}"
                         >
@@ -140,7 +147,10 @@
             </section>
 
             <section class="transfer1-section">
-                <h3 class="transfer1-subtitle">수취인 정보</h3>
+                <h3 class="transfer1-subtitle">
+                    수취인 정보
+                    <span class="subtitle-warning">※ 수취인 정보가 정확하지 않으면 송금이 반환됩니다.</span>
+                </h3>
 
                 <div class="transfer1-form-group">
                     <label class="transfer1-label">수취국가</label>
@@ -177,7 +187,7 @@
 
                 <div class="transfer1-form-group">
                     <label class="transfer1-label">우편번호 (ZIP / Postal Code)</label>
-                    <input type="text" class="transfer1-input" placeholder="예: 90001">
+                    <input type="text" class="transfer1-input" id="input-zip-code" placeholder="예: 90001">
                 </div>
 
                 <div class="transfer1-form-group">
