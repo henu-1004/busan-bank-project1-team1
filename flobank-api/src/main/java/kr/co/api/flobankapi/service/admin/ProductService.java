@@ -22,7 +22,7 @@ public class ProductService {
     private final FilePathConfig filePathConfig;
 
     /**
-     * 상품 등록 (관리자용)
+     * 상품 등록 (파일 업로드 포함)
      */
     @Transactional
     public void insertProduct(ProductDTO dto,
@@ -32,15 +32,15 @@ public class ProductService {
                               List<ProductWithdrawAmtDTO> withdrawAmts,
                               MultipartFile pdfFile) throws Exception {
 
-        // 1. 파일 업로드 처리 (DTO에 이름 잘못 들어가는 것 방지)
-        dto.setDpstInfoPdf(null);
+        // 1. 파일 업로드 처리
+        dto.setDpstInfoPdf(null); // 초기화
 
         if (pdfFile != null && !pdfFile.isEmpty()) {
             String savedPath = saveProductPdf(pdfFile);
             dto.setDpstInfoPdf(savedPath);
         }
 
-        // 2. 기본 상품 정보 저장 (여기서 dpstId 생성됨)
+        // 2. 상품 기본 정보 DB 저장 (여기서 dpstId 생성됨)
         productMapper.insertProduct(dto);
         String dpstId = dto.getDpstId();
 
@@ -53,6 +53,7 @@ public class ProductService {
                 if (seen.add(l.getLmtCurrency())) clean.add(l);
             }
 
+            // 거치식(1)이고 한도 데이터가 있을 때만 저장
             if (dto.getDpstType() == 1 && !clean.isEmpty()) {
                 Map<String, Object> map = new HashMap<>();
                 map.put("dpstId", dpstId);
@@ -88,10 +89,12 @@ public class ProductService {
      * 파일 저장 로직 (내부용)
      */
     private String saveProductPdf(MultipartFile file) throws Exception {
+
         String basePath = filePathConfig.getPdfProductsPath();
 
+        // yml 설정이 없을 경우 비상용 경로
         if (basePath == null || basePath.isBlank()) {
-            basePath = "C:/app/uploads/pdf_products"; // 비상용 로컬 경로
+            basePath = "C:/app/uploads/pdf_products";
         }
 
         String original = file.getOriginalFilename();
@@ -100,7 +103,7 @@ public class ProductService {
 
         File folder = new File(basePath);
         if (!folder.exists()) {
-            folder.mkdirs(); // 폴더 없으면 생성
+            folder.mkdirs(); // 폴더가 없으면 강제 생성
         }
 
         File dest = new File(folder, storedName);
@@ -147,8 +150,7 @@ public class ProductService {
         productMapper.updateStatusToOpened();
     }
 
-
-
+    // 관리자용 약관 파일 확인 메서드
     public String getTermsFileByName(String productName) {
         return productMapper.getTermsFileByTitle(productName);
     }
