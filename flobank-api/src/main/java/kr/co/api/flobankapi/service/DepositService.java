@@ -1,5 +1,7 @@
 package kr.co.api.flobankapi.service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.api.flobankapi.dto.*;
 import kr.co.api.flobankapi.mapper.DepositMapper;
 import kr.co.api.flobankapi.mapper.admin.ProductMapper;
@@ -7,6 +9,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -17,6 +22,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class DepositService {
     private final DepositMapper depositMapper;
+    private final RateService rateService;
+    private final ObjectMapper objectMapper;
 
     public List<ProductDTO> getActiveProducts() {
         return depositMapper.findActiveProducts();
