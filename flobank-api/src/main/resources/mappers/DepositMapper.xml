@@ -26,6 +26,7 @@
     <select id="dpstFixedPeriods" resultType="kr.co.api.flobankapi.dto.ProductPeriodDTO">
         SELECT PERIOD_FIXED_MONTH as fixedMonth FROM TB_DPST_PROD_PERIOD
         WHERE period_dpst_id=#{dpstId}
+        order by PERIOD_FIXED_MONTH asc
     </select>
 
     <select id="getDpstWdrwInfo" resultType="kr.co.api.flobankapi.dto.ProductWithdrawRuleDTO">
@@ -73,7 +74,10 @@
     </select>
 
 
-
+    <select id="getPrefRate" resultType="int">
+        select pref_rate from TB_PREF_RATE_INFO
+        where pref_currency=#{currency}
+    </select>
 
 
 

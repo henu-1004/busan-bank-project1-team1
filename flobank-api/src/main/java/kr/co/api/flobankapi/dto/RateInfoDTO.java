@@ -18,4 +18,10 @@ public class RateInfoDTO {
 
     @JsonProperty("bkpr")
     private String bkpr;       // 장부가격
+
+    @JsonProperty("ttb")
+    private String ttb; // 송금 받을 때
+
+    @JsonProperty("tts")
+    private String tts; // 송금 보낼 때
 }

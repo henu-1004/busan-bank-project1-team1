@@ -27,4 +27,5 @@ public interface DepositMapper {
     public List<FrgnAcctBalanceDTO> getFrgnAcctBalList(String balFrgnAcctNo);
     public List<CurrencyInfoDTO> getAllCurrencies();
     public CurrencyInfoDTO getCurrency(String curCode);
+    public int getPrefRate(String currency);
 }
