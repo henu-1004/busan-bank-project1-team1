@@ -9,5 +9,6 @@ import org.springframework.context.annotation.Configuration;
 @Data
 public class FilePathConfig {
     private String pdfTermsPath;
+    private String pdfProductsPath;
 }
 

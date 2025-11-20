@@ -14,8 +14,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        // 📌 /pdf_ai/** 로 들어오는 URL을
-        //     /app/uploads/pdf_ai/ 폴더와 매핑
+
         registry.addResourceHandler("/pdf_ai/**")
                 .addResourceLocations("file:/app/uploads/pdf_ai/");
 
@@ -31,8 +30,15 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
 
 
+        // 상품설명서 pdf
+        String productPath = filePathConfig.getPdfProductsPath(); // /app/uploads/pdf_products
+        String productLocation = Paths.get(productPath).toUri().toString();
+
+        registry.addResourceHandler("/uploads/products/**")
+                .addResourceLocations(productLocation);
+    }
 
 
     }
 
-}
+

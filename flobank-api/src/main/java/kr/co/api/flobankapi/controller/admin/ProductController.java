@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -70,6 +71,8 @@ public class ProductController {
     @PostMapping("/register")
     public String registerProduct(
             ProductDTO dto,
+            @RequestParam(value = "dpstInfoPdf", required = false) MultipartFile dpstInfoPdf,
+
             @RequestParam(value = "dpstCurrency", required = false) String[] currencies,
             @RequestParam("ageLimit") String ageLimit,
             @RequestParam(value="lmtCurrency", required = false) String[] lmtCurrency,
@@ -81,7 +84,7 @@ public class ProductController {
             @RequestParam(value="withdrawAfterMonths", required = false) Integer withdrawAfterMonths,
             @RequestParam(value="withdrawCount", required = false) Integer withdrawCount,
             HttpServletRequest request
-    ) {
+    ) throws Exception {
 
     /* -----------------------------
        통화 처리
@@ -206,7 +209,7 @@ public class ProductController {
     /* -----------------------------
        최종 저장
     ------------------------------ */
-        productService.insertProduct(dto, limits, periods, wdrwInfo, withdrawAmts);
+        productService.insertProduct(dto, limits, periods, wdrwInfo, withdrawAmts, dpstInfoPdf);
 
         return "redirect:/admin/products";
     }
