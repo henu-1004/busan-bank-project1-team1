@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.util.StringUtils;                // ⭐ 추가
 
+import java.io.File;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -105,36 +106,42 @@ public class TermsDbService {
 
 
 
-    /** =====================================================================================
-     파일 저장 함수
-     ===================================================================================== */
+    // PDF 저장
+
     private String saveTermsPdf(MultipartFile file) throws Exception {
+        String basePath = filePathConfig.getPdfTermsPath(); // 예: /app/uploads/terms
 
-        String basePath = filePathConfig.getPdfTermsPath(); // yml에서 가져옴
-
-        // ⭐ dev에서는 basePath가 없으면 skip
         if (basePath == null || basePath.isBlank()) {
             log.warn("⚠ 파일 업로드 경로가 설정되지 않음 → 파일 저장 스킵");
             return null;
         }
 
-
-        // 폴더 없으면 생성
-        Files.createDirectories(Paths.get(basePath));
-
-        // 원본 파일명 처리
+        // 1. 원본 파일명 정리 (특수문자 제거 등)
         String original = file.getOriginalFilename();
-        String safeName = StringUtils.cleanPath(original);
-        safeName = safeName.replaceAll("[^a-zA-Z0-9._-]", "_");
+        String safeName = StringUtils.cleanPath(original).replaceAll("[^a-zA-Z0-9._-]", "_");
 
-        // 유니크 파일명 생성
+        // 2. 유니크 파일명 생성
         String stored = UUID.randomUUID() + "_" + safeName;
 
-        // 실제 저장 위치
-        Path path = Paths.get(basePath, stored);
-        file.transferTo(path.toFile());
+        // 3. 저장할 파일 객체 생성
+        // Paths.get(...).toFile() 대신 new File(...)을 사용하여 제어합니다.
+        File dest = new File(basePath, stored);
 
-        // 브라우저 접근용 URL 반환
+        if (!dest.isAbsolute()) {
+            dest = dest.getAbsoluteFile();
+        }
+
+        log.info(" 실제 저장 시도 경로: {}", dest.getPath());
+
+        //  [핵심] 저장하려는 '그 파일'의 부모 폴더가 없으면 생성
+        if (!dest.getParentFile().exists()) {
+            dest.getParentFile().mkdirs();
+        }
+
+        // 4. 파일 저장
+        file.transferTo(dest);
+
+        // 5. 브라우저 접근용 URL 반환
         return "/uploads/terms/" + stored;
     }
 

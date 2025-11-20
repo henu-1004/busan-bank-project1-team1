@@ -455,6 +455,42 @@
             </li>
         </ul>
     </div>
+
+        <!-- 공시승인번호 영역 -->
+        <div class="view-approval-box" style="border-top: 1px solid #eee; padding-top: 20px; margin-top: 40px;">
+
+            <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 10px;">공시승인번호</h3>
+
+            <p style="font-size: 14px; color: #666; margin-bottom: 12px;">
+                이 내용은 법령 및 내부통제기준에 따른 광고관련 절차를 준수하였습니다.
+            </p>
+
+            <p style="font-size: 15px; color: #333; margin-bottom: 6px;">
+                준법감시인 심의필
+                <strong th:text="${product.dpstDelibNo}">2025-0786</strong>
+                (심의일자 :
+                <span th:text="${#temporals.format(delibDate, 'yyyy.MM.dd')}">2025.04.22</span>
+                )
+            </p>
+
+            <p style="font-size: 15px; color: #333;">
+                유효기일
+                <span th:text="${#temporals.format(startDate, 'yyyy.MM.dd')}">2025.04.25</span>
+                ~
+                <span th:text="${#temporals.format(startDate.plusYears(1).minusDays(1), 'yyyy.MM.dd')}">
+            2026.04.24
+        </span>
+            </p>
+
+        </div>
+
+
+
+
+
+
+
+
         <div class="view-bottom">
             <a class="view-btn-primary" th:href="@{/deposit/deposit_step1(dpstId=${product.dpstId})}">
                 <span>가입하기</span>
