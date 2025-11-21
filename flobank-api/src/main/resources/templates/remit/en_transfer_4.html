@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>외화 계좌이체 4</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>외화 계좌이체 4</title>
     <link rel="stylesheet" th:href="@{/css/mypage.css}">
     <link rel="stylesheet" th:href="@{/css/header.css}">
     <link rel="stylesheet" th:href="@{/css/footer.css}">
 
     <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-    crossorigin="anonymous"
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+            crossorigin="anonymous"
     />
 
 </head>
@@ -19,118 +19,114 @@
 <div th:replace="~{_template/_header.html}"></div>
 
 <main class="transfer3-container">
-  <div class="transfer3-box">
+    <div class="transfer3-box">
 
-    <!-- 단계 표시 -->
-    <div class="transfer3-steps">
-      <div class="transfer3-step">
-        <span class="num">1</span><span class="text">약관동의</span>
-      </div>
-      <div class="transfer3-step">
-        <span class="num">2</span><span class="text">정보입력</span>
-      </div>
-      <div class="transfer3-step">
-        <span class="num">3</span><span class="text">이체확인</span>
-      </div>
-      <div class="transfer3-step active">
-        <span class="num">4</span><span class="text">이체완료</span>
-      </div>
-    </div>
-
-  <!-- ✅ 완료 안내 -->
-      <section class="transfer3-complete-box">
-        <div class="transfer3-icon">
-          <i class="fa-solid fa-circle-check"></i>
+        <div class="transfer3-steps">
+            <div class="transfer3-step">
+                <span class="num">1</span><span class="text">약관동의</span>
+            </div>
+            <div class="transfer3-step">
+                <span class="num">2</span><span class="text">정보입력</span>
+            </div>
+            <div class="transfer3-step">
+                <span class="num">3</span><span class="text">이체확인</span>
+            </div>
+            <div class="transfer3-step active">
+                <span class="num">4</span><span class="text">이체완료</span>
+            </div>
         </div>
-        <div class="transfer3-complete-text">
-          <h2><strong>외화송금</strong>이 정상적으로 완료되었습니다.</h2>
-          <p>
-            송금 내역은 <strong>마이페이지 → 외화송금 현황</strong>에서<br>
-            언제든지 확인하실 수 있습니다.
-          </p>
+
+        <section class="transfer3-complete-box">
+            <div class="transfer3-icon">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <div class="transfer3-complete-text">
+                <h2><strong>외화송금</strong>이 정상적으로 완료되었습니다.</h2>
+                <p>
+                    송금 내역은 <strong>마이페이지 → 외화송금 현황</strong>에서<br>
+                    언제든지 확인하실 수 있습니다.
+                </p>
+            </div>
+        </section>
+
+        <section class="transfer3-section">
+            <h3 class="transfer3-subtitle">송금 결과 요약</h3>
+            <table class="transfer3-table">
+                <tbody>
+                <tr>
+                    <th>출금계좌</th>
+                    <td th:text="|${custFrgnAcctDTO.frgnAcctName} ${custFrgnAcctDTO.frgnAcctNo}|">
+                        플로뱅크 외화종합계좌 000-0000-0000
+                    </td>
+                </tr>
+                <tr>
+                    <th>송금통화</th>
+                    <td th:text="|${frgnRemtTranDTO.remtCurrency} ${targetCurrencyName}|">USD (미국 달러)</td>
+                </tr>
+                <tr>
+                    <th>송금금액</th>
+                    <td th:text="|${targetCurrencySymbol}${#numbers.formatInteger(frgnRemtTranDTO.remtAmount, 0, 'COMMA')}|">$1,000</td>
+                </tr>
+                <tr>
+                    <th>송금수수료</th>
+                    <td th:text="|${feeCurrencySymbol}${frgnRemtTranDTO.remtFee} (중계은행 수수료 포함)|">$10.00</td>
+                </tr>
+                <tr>
+                    <th>처리결과</th>
+                    <td><span class="transfer3-success" th:text="${state}">정상 처리</span></td>
+                </tr>
+                <tr>
+                    <th>거래일시</th>
+                    <td th:text="${#dates.format(#dates.createNow(), 'yyyy-MM-dd HH:mm:ss')}">2025-11-09</td>
+                </tr>
+                </tbody>
+            </table>
+            <p class="transfer3-guide">
+                ※ 송금 완료 후 중계은행 및 해외은행 사정에 따라<br>
+                수취인 계좌 반영까지 시간이 소요될 수 있습니다.
+            </p>
+        </section>
+
+        <section class="transfer3-section">
+            <h3 class="transfer3-subtitle">수취인 정보</h3>
+            <table class="transfer3-table">
+                <tbody>
+                <tr>
+                    <th>수취국가</th>
+                    <td th:text="${frgnRemtTranDTO.remtCountry}">미국 (USA)</td>
+                </tr>
+                <tr>
+                    <th>수취인(영문 이름)</th>
+                    <td th:text="${frgnRemtTranDTO.remtRecName}">JOHN DOE</td>
+                </tr>
+                <tr>
+                    <th>수취인 주소</th>
+                    <td th:text="|${frgnRemtTranDTO.remtAddr}, ${frgnRemtTranDTO.remtCity}, ${frgnRemtTranDTO.remtState}|">ADDR...</td>
+                </tr>
+                <tr>
+                    <th>은행코드 (ACH Routing No)</th>
+                    <td th:text="${frgnRemtTranDTO.remtRecBkCode}">026009593</td>
+                </tr>
+                <tr>
+                    <th>계좌번호 (Account No)</th>
+                    <td th:text="${frgnRemtTranDTO.remtRecAccNo}">1234567890</td>
+                </tr>
+                </tbody>
+            </table>
+
+            <p class="transfer3-guide">
+                ※ 수취인 정보는 송금 요청 시 입력한 내용 기준으로 처리됩니다.
+            </p>
+        </section>
+
+        <div class="transfer2-actions">
+            <a th:href="@{/}" class="transfer2-btn-main">완료</a>
         </div>
-      </section>
-
-      <!-- ✅ 송금결과 요약 -->
-      <section class="transfer3-section">
-          <h3 class="transfer3-subtitle">송금 결과 요약</h3>
-          <table class="transfer3-table">
-              <tbody>
-              <tr>
-                  <th>출금계좌</th>
-                  <td th:text="|${custFrgnAcctDTO.frgnAcctName} ${custFrgnAcctDTO.frgnAcctNo}|">
-                      플로뱅크 외화종합계좌 000-0000-0000
-                  </td>
-              </tr>
-              <tr>
-                  <th>송금통화</th>
-                  <td th:text="|${frgnRemtTranDTO.remtCurrency} ${currency}|">USD (미국 달러)</td>
-              </tr>
-              <tr>
-                  <th>송금금액</th>
-                  <td th:text="|${currencySymbol}${#numbers.formatInteger(frgnRemtTranDTO.remtAmount, 0, 'COMMA')}|">$1,000</td>
-              </tr>
-              <tr>
-                  <th>송금수수료</th>
-                  <td th:text="|${currencySymbol}${frgnRemtTranDTO.remtFee} (중계은행 수수료 포함)|">$10.00</td>
-              </tr>
-              <tr>
-                  <th>처리결과</th>
-                  <td><span class="transfer3-success" th:text="${state}">정상 처리</span></td>
-              </tr>
-              <tr>
-                  <th>거래일시</th>
-                  <td th:text="${#dates.format(#dates.createNow(), 'yyyy-MM-dd HH:mm:ss')}">2025-11-09</td>
-              </tr>
-              </tbody>
-          </table>
-          <p class="transfer3-guide">
-              ※ 송금 완료 후 중계은행 및 해외은행 사정에 따라<br>
-              수취인 계좌 반영까지 시간이 소요될 수 있습니다.
-          </p>
-      </section>
-
-      <section class="transfer3-section">
-          <h3 class="transfer3-subtitle">수취인 정보</h3>
-          <table class="transfer3-table">
-              <tbody>
-              <tr>
-                  <th>수취국가</th>
-                  <td th:text="${frgnRemtTranDTO.remtCountry}">미국 (USA)</td>
-              </tr>
-              <tr>
-                  <th>수취인(영문 이름)</th>
-                  <td th:text="${frgnRemtTranDTO.remtRecName}">JOHN DOE</td>
-              </tr>
-              <tr>
-                  <th>수취인 주소</th>
-                  <td th:text="|${frgnRemtTranDTO.remtAddr}, ${frgnRemtTranDTO.remtCity}, ${frgnRemtTranDTO.remtState}|">ADDR...</td>
-              </tr>
-              <tr>
-                  <th>은행코드 (ACH Routing No)</th>
-                  <td th:text="${frgnRemtTranDTO.remtRecBkCode}">026009593</td>
-              </tr>
-              <tr>
-                  <th>계좌번호 (Account No)</th>
-                  <td th:text="${frgnRemtTranDTO.remtRecAccNo}">1234567890</td>
-              </tr>
-              </tbody>
-          </table>
-
-        <p class="transfer3-guide">
-          ※ 수취인 정보는 송금 요청 시 입력한 내용 기준으로 처리됩니다.
-        </p>
-      </section>
-
-    <div class="transfer2-actions">
-      <a th:href="@{/}" class="transfer2-btn-main">완료</a>
-    </div>
 
     </div>
-  </main>
+</main>
 
 <div th:replace="~{_template/_footer.html}"></div>
 
 </body>
 </html>
-

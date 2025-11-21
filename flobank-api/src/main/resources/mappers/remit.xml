@@ -22,7 +22,7 @@
 
     <update id="updateMinusBal">
         UPDATE TB_FRGN_ACCT_BALANCE SET BAL_BALANCE = BAL_BALANCE - #{amount}
-        WHERE REMT_ACCT_NO = #{acctNo}
+        WHERE BAL_NO = #{acctNo}
     </update>
 
     <select id="selectParAcctNo">
