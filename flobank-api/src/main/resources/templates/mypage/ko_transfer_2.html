@@ -48,33 +48,53 @@
     </div>
 
     <!-- 이체정보 -->
-    <section class="transfer2-section">
-      <h3 class="transfer2-subtitle">이체정보</h3>
-      <table class="transfer2-table">
-        <thead>
-          <tr>
-            <th>출금계좌(내통장표시)</th>
-            <th>입금계좌(받는분통장표시)</th>
-            <th>받는분</th>
-            <th>이체금액</th>
-            <th>수수료</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>
-                <span th:text="${custTranHistDTO.tranAcctNo}">내 계좌</span>
-                <br>
-                <span class="sub" th:text="${custTranHistDTO.tranCustName}">이름</span>
-            </td>
-            <td th:text="${custTranHistDTO.tranRecAcctNo}">상대방 계좌<br></td>
-            <td th:text="${custTranHistDTO.tranRecName}">상대방 이름</td>
-            <td th:text="${custTranHistDTO.tranAmount}">금액</td>
-            <td>0<br></td>
-          </tr>
-        </tbody>
-      </table>
-    </section>
+      <section class="transfer2-section">
+          <h3 class="transfer2-subtitle">이체정보 확인</h3>
+          <table class="transfer2-table">
+              <colgroup>
+                  <col style="width: 25%;">
+                  <col style="width: 30%;">
+                  <col style="width: 20%;">
+                  <col style="width: 25%;">
+              </colgroup>
+              <thead>
+              <tr>
+                  <th>출금 정보</th>
+                  <th>입금 정보 (받는분)</th>
+                  <th>이체 금액</th>
+                  <th>통장 표시 내용</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr>
+                  <td class="cell-center">
+                      <div style="font-weight:bold; color:#333;">플로은행</div>
+                      <span th:text="${custTranHistDTO.tranAcctNo}">출금계좌번호</span>
+                  </td>
+
+                  <td class="cell-center">
+                      <span th:text="${custTranHistDTO.tranRecAcctNo}">입금계좌번호</span>
+                      <div style="margin-top: 4px;">
+                          <span style="font-size: 0.85rem; color: #666;">예금주:</span>
+                          <strong style="font-size: 1.1rem; color: #004085;" th:text="${custTranHistDTO.tranRecName}">상대방 이름</strong>
+                      </div>
+                  </td>
+
+                  <td class="cell-right">
+                      <strong th:text="${#numbers.formatInteger(custTranHistDTO.tranAmount, 0, 'COMMA')}">금액</strong>원
+                      <div style="font-size: 0.8rem; color: #888;">수수료 면제</div>
+                  </td>
+
+                  <td class="cell-left" style="text-align: left; padding-left: 20px;">
+                      <div style="margin-bottom: 4px;">
+                          <span style="background: #f1f3f5; padding: 2px 6px; border-radius: 4px; font-size: 0.8rem;">나에게</span>
+                          <span th:text="${custTranHistDTO.tranCustName}">내 메모</span>
+                      </div>
+                  </td>
+              </tr>
+              </tbody>
+          </table>
+      </section>
 
     <!-- 인증 안내 -->
     <section class="transfer2-section">
@@ -89,22 +109,25 @@
     </section>
 
     <!-- 버튼 -->
-      <form th:action="@{/mypage/ko_transfer_3}" th:object="${custTranHistDTO}" method="post">
+      <div class="transfer2-actions">
+          <form th:action="@{/mypage/ko_transfer_1}" method="post" style="display:inline;">
+              <input type="hidden" name="acctNo" th:value="${custTranHistDTO.tranAcctNo}">
+              <button type="submit" class="transfer2-btn-sub">이전</button>
+          </form>
 
-          <input type="hidden" th:field="*{tranAcctNo}">
-          <input type="hidden" th:field="*{tranCustName}">
-          <input type="hidden" th:field="*{tranRecAcctNo}">
-          <input type="hidden" th:field="*{tranRecName}">
-          <input type="hidden" th:field="*{tranAmount}">
-          <input type="hidden" th:field="*{tranRecBkCode}">
-          <input type="hidden" th:field="*{tranMemo}">
-          <input type="hidden" th:field="*{tranType}">
+          <form th:action="@{/mypage/ko_transfer_3}" th:object="${custTranHistDTO}" method="post" style="display:inline;">
+              <input type="hidden" th:field="*{tranAcctNo}">
+              <input type="hidden" th:field="*{tranCustName}">
+              <input type="hidden" th:field="*{tranRecAcctNo}">
+              <input type="hidden" th:field="*{tranRecName}">
+              <input type="hidden" th:field="*{tranAmount}">
+              <input type="hidden" th:field="*{tranRecBkCode}">
+              <input type="hidden" th:field="*{tranMemo}">
+              <input type="hidden" th:field="*{tranType}">
 
-          <div class="transfer2-actions">
-              <a th:href="@{/mypage/ko_transfer_1}" class="transfer2-btn-sub">이전</a>
               <button type="submit" class="transfer2-btn-main">이체실행</button>
-          </div>
-      </form>
+          </form>
+      </div>
 
   </div>
 </main>

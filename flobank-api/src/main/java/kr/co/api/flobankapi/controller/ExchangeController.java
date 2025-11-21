@@ -7,6 +7,7 @@
 
 package kr.co.api.flobankapi.controller;
 
+import kr.co.api.flobankapi.dto.CouponDTO;
 import kr.co.api.flobankapi.dto.CustAcctDTO;
 import kr.co.api.flobankapi.service.ExchangeService;
 import lombok.RequiredArgsConstructor;
@@ -121,9 +122,14 @@ public class ExchangeController {
     @GetMapping("/step2")
     public String step2(@AuthenticationPrincipal UserDetails user, Model model){
         String userCode = user.getUsername();
+
+        // 계좌 리스트
         List<CustAcctDTO> custAcctDTOList = exchangeService.getAllKoAcct(userCode);
         model.addAttribute("custAcctDTOList",custAcctDTOList);
-
+        
+        // 쿠폰 리스트
+        List<CouponDTO> couponDTOList = exchangeService.getCoupons(userCode);
+        model.addAttribute("couponDTOList",couponDTOList);
 
         return "exchange/step2";
     }

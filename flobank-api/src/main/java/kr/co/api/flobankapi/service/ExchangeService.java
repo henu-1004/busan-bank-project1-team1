@@ -2,8 +2,10 @@ package kr.co.api.flobankapi.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import kr.co.api.flobankapi.dto.CouponDTO;
 import kr.co.api.flobankapi.dto.CustAcctDTO;
 import kr.co.api.flobankapi.dto.RateInfoDTO;
+import kr.co.api.flobankapi.mapper.ExchangeMapper;
 import kr.co.api.flobankapi.mapper.MypageMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,7 @@ public class ExchangeService {
     private final RateService rateService;
     private final ObjectMapper objectMapper; // JSON 파싱용 (Spring Boot 기본 내장)
     private final MypageMapper mypageMapper;
+    private final ExchangeMapper exchangeMapper;
 
     public BigDecimal calculateExchange(String date, String targetCurrency, BigDecimal krwAmount) {
         try {
@@ -58,6 +61,11 @@ public class ExchangeService {
     public List<CustAcctDTO> getAllKoAcct(String custCode) {
 
         return mypageMapper.selectAllKoAcct(custCode);
+    }
+
+    // 고객 보유 전체 쿠폰 확인
+    public List<CouponDTO> getCoupons(String custCode) {
+        return exchangeMapper.selectAllCoupon(custCode);
     }
 
 }

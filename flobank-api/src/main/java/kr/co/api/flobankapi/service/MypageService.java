@@ -1,6 +1,7 @@
 package kr.co.api.flobankapi.service;
 
 import kr.co.api.flobankapi.dto.*;
+import kr.co.api.flobankapi.mapper.ExtAcctMapper;
 import kr.co.api.flobankapi.mapper.MemberMapper;
 import kr.co.api.flobankapi.mapper.MypageMapper;
 import kr.co.api.flobankapi.util.AesUtil;
@@ -24,6 +25,7 @@ public class MypageService {
     private final MemberMapper memberMapper;
     private final MypageMapper mypageMapper;
     private final PasswordEncoder passwordEncoder;
+    private final ExtAcctMapper extAcctMapper;
 
     public void saveAcct(CustAcctDTO custAcctDTO) { // 계좌 생성
         // 계좌 비밀번호 암호화 => 단방향
@@ -94,7 +96,7 @@ public class MypageService {
         mypageMapper.updateFrgnAcctName(name, acctNo);
     }
 
-    // 계좌 단건 조회
+    // 원화 계좌 단건 조회
     public CustAcctDTO findCustAcct(String acctNo) {
         return mypageMapper.selectCustAcct(acctNo);
     }
@@ -102,6 +104,11 @@ public class MypageService {
     // 원화 입출금 계좌 개수 확인
     public Integer findCntAcct(String custCode) {
         return  mypageMapper.selectCntAcct(custCode);
+    }
+
+    // 국내 외부 은행에 존재하는 계좌번호인지 조회 및 정보 들고오기
+    public ExtAcctDTO findExtAcct(String acctNo, String bkCode) {
+        return extAcctMapper.selectExtAcct(acctNo, bkCode);
     }
 
     // 입금, 출금

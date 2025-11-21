@@ -157,7 +157,9 @@
       <div class="coupon-modal-content">
         <h3>쿠폰 선택</h3>
         <ul>
-          <li><button class="coupon-option" data-discount="0.05">수수료 5% 할인 쿠폰</button></li>
+          <li th:each="dto : ${couponDTOList}">
+              <button class="coupon-option" data-discount="0.05">수수료 5% 할인 쿠폰</button>
+          </li>
           <li><button class="coupon-option" data-discount="0.10">수수료 10% 할인 쿠폰</button></li>
           <li><button class="coupon-option" data-discount="0.20">수수료 20% 할인 쿠폰</button></li>
         </ul>
