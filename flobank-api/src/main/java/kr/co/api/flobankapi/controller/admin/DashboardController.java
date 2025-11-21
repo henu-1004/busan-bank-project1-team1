@@ -28,7 +28,7 @@ public class DashboardController {
         }
         model.addAttribute("stats", stats);
         model.addAttribute("baseTime", LocalDateTime.now());
-        model.addAttribute("activeItem", "dashboard");
+        model.addAttribute("activeItem", "stats");
         return "admin/index";
     }
 }

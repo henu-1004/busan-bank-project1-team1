@@ -11,29 +11,54 @@
         </div>
 
         <div class="admin-stats-row">
-            <!-- 오늘 방문자 수 -->
+            <!-- d원화 -->
             <article class="admin-stat-card admin-graph-card">
-                <h3>오늘 방문자 수
+                <h3> 원화 거래 수
                     <span th:text="|(${#temporals.format(baseTime,'yyyy.MM.dd HH:mm:ss')} 기준)|"></span>
                 </h3>
-                <div class="admin-graph-box">
-                    <img th:src="@{/images/ex.png}" alt="오늘 방문자 수 그래프" />
+                <div class="admin-graph-box admin-summary-cards">
+                    <div class="summary-card">
+                        <div class="summary-main">
+                            <h4>총 거래 건수</h4>
+                            <!-- JS에서 숫자 세팅 -->
+                            <p class="summary-value" id="totalTxCountText">0건</p>
+                            <p class="summary-sub">
+                                <!-- 전일 대비는 나중에 백엔드 연결 시 변경 -->
+                                <span id="totalTxCountDiff" class="diff diff-up">+0%</span>
+                                <span class="diff-label">전일 대비</span>
+                            </p>
+                        </div>
+                        <div class="summary-mini-chart">
+                            <canvas id="krwCountMiniChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="summary-card">
+                        <div class="summary-main">
+                            <h4>총 거래 금액</h4>
+                            <!-- JS에서 숫자 세팅 -->
+                            <p class="summary-value" id="totalTxAmountText">0원</p>
+                            <p class="summary-sub">
+                                <span id="totalTxAmountDiff" class="diff diff-down">-0%</span>
+                                <span class="diff-label">전일 대비</span>
+                            </p>
+                        </div>
+                        <div class="summary-mini-chart">
+                            <canvas id="krwAmountMiniChart"></canvas>
+                        </div>
+                    </div>
                 </div>
             </article>
 
-            <!-- 오늘 거래 건수 -->
+            <!-- 외화 건수 -->
             <article class="admin-stat-card admin-graph-card">
-                <h3>오늘 거래 건수
-                    <span th:text="|(입출금,환전,외화송금) ${#temporals.format(baseTime, 'yyyy.MM.dd HH:mm:ss')} 기준)|"></span>
+                <h3>외화 거래 수
+                    <span th:text="|(환전,외화송금) ${#temporals.format(baseTime, 'yyyy.MM.dd HH:mm:ss')} 기준)|"></span>
                 </h3>
                 <div class="admin-graph-box">
-                    <canvas id="todayTxChart"></canvas>
+                    <canvas id="fxLineChart"></canvas>
                 </div>
-                <p style="color:red"
-                   th:if="${stats != null}"
-                   th:each="tx : ${stats.todayTxCounts}">
-                    [[${tx.type}]] : [[${tx.count}]]
-                </p>
+
             </article>
         </div>
     </section>
@@ -102,45 +127,48 @@
 </th:block>
 
 <th:block th:fragment="script">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script th:inline="javascript">
-        // DTO(List<TxCountDTO>) → JS 배열로 변환
-        const txLabels = [];
-        const txCounts = [];
+        /*<![CDATA[*/
+        window.dashboardData = {
+            // 오늘 총 거래 건수 / 금액
+            todayTotalTxCount:  [[${stats != null ? stats.todayTotalTxCount : 0}]],
+        todayTotalTxAmount: [[${stats != null ? stats.todayTotalTxAmount : 0}]],
 
-        /*[# th:each="tx : ${stats.todayTxCounts}"]*/
-        txLabels.push(/*[[${tx.type}]]*/);
-        txCounts.push(/*[[${tx.count}]]*/);
+        // 오늘 환전·외화송금 건수 리스트
+        todayFxTxCounts: [
+            /*[# th:if="${stats != null && stats.todayTxCounts != null}"]*/
+            /*[# th:each="tx, iterStat : ${stats.todayTxCounts}"]*/
+            {
+                // 문자열은 JS 주석 인라인 방식으로 안전하게 넣기
+                type: /*[[${tx.type}]]*/"",
+                count: [[${tx.count}]]
+            }/*[# th:if="${!iterStat.last}"]*/,/*[/]*/
+            /*[/]*/
+            /*[/]*/
+        ],
+
+            // 🔹 최근 7일 (null 안전하게 처리)
+            last7Days: [
+            /*[# th:if="${stats != null && stats.last7Days != null}"]*/
+            /*[# th:each="d, iter : ${stats.last7Days}"]*/
+            {
+                date: '[[${d != null && d.baseDate != null ? #temporals.format(d.baseDate, "MM/dd") : ""}]]',
+                count: [[${d != null ? d.count : 0}]],
+        amount: [[${d != null ? d.amount : 0}]]
+        }/*[# th:if="${!iter.last}"]*/,/*[/]*/
         /*[/]*/
-
-        const todayTxCtx = document.getElementById('todayTxChart');
-
-        if (todayTxCtx) {
-            new Chart(todayTxCtx, {
-                type: 'bar',
-                data: {
-                    labels: txLabels,           // ["입출금","환전","외화송금", ...]
-                    datasets: [{
-                        label: '오늘 거래 건수(건)',
-                        data: txCounts          // [123, 45, 7, ...]
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: { display: false }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: { stepSize: 1 }
-                        }
-                    }
-                }
-            });
-        }
+        /*[/]*/
+        ]
+        };
+        /*]]>*/
     </script>
 
+
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script th:src="@{/js/dashboard.js}"></script>
+
+    <!-- 4) 키워드 폰트 랜덤 (원래 있던 JS) -->
     <script>
         document.querySelectorAll('.admin-keyword-box span').forEach(el => {
             const randomSize = Math.floor(Math.random() * 14) + 14; // 14~28px
