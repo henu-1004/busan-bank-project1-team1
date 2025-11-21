@@ -8,9 +8,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const dataObj = window.dashboardData;
 
-    // -----------------------------
     // 1) 원화 요약 카드 숫자 세팅
-    // -----------------------------
+
     const totalTxCount = dataObj.todayTotalTxCount || 0;      // 오늘 총 거래 건수
     const totalTxAmount = dataObj.todayTotalTxAmount || 0;    // 오늘 총 거래 금액 (원)
 
@@ -35,9 +34,9 @@ document.addEventListener('DOMContentLoaded', function () {
         totalTxAmountTextEl.textContent = displayText;
     }
 
-    // -----------------------------
-    // 1-1) 전일 대비 % 계산 (최근 7일 데이터 이용)
-    // -----------------------------
+
+    // 1-1) 전일 대비 % 계산
+
     const last7 = dataObj.last7Days || [];
     let countDiffPercent = null;
     let amountDiffPercent = null;
@@ -89,10 +88,8 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // -----------------------------
-    // 2) 원화 미니차트 (건수/금액 스파크라인)
-    // -----------------------------
 
+    // 2) 원화 미니차트 (건수/금액 스파크라인)
     if (typeof Chart === 'undefined') {
         console.warn('Chart.js가 로드되지 않았습니다.');
         return;
@@ -127,23 +124,23 @@ document.addEventListener('DOMContentLoaded', function () {
                         backgroundColor: 'rgba(32, 43, 68, 0.15)',
                         tension: 0.4,
                         fill: true,
-                        pointRadius: 0,      // 점은 안 보이게
-                        hoverRadius: 0,      // 호버해도 점 안 생김
-                        pointHitRadius: 15   // 대신 맞추기 쉽게 히트 영역 크게
+                        pointRadius: 0,
+                        hoverRadius: 0,
+                        pointHitRadius: 15
                     }
                 ]
             },
             options: {
                 responsive: true,
-                animation: false,          // ✅ 그래프 안 움직이게 (로딩 애니메이션 없음)
+                animation: true,
                 interaction: {
-                    mode: 'index',         // x축 기준으로 한 번에
+                    mode: 'index',
                     intersect: false
                 },
                 plugins: {
                     legend: { display: false },
                     tooltip: {
-                        enabled: true,     // ✅ 호버하면 숫자 툴팁
+                        enabled: true,
                         callbacks: {
                             label: function (ctx) {
                                 const value = ctx.parsed.y || 0;
@@ -176,8 +173,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 datasets: [
                     {
                         data: amountTrendData,
-                        borderColor: '#FF9F40',
-                        backgroundColor: 'rgba(255, 159, 64, 0.15)',
+                        borderColor: '#202b44',
+                        backgroundColor: 'rgb(92,128,200)',
                         tension: 0.4,
                         fill: true,
                         pointRadius: 0,
@@ -188,7 +185,7 @@ document.addEventListener('DOMContentLoaded', function () {
             },
             options: {
                 responsive: true,
-                animation: false,         // ✅ 로딩/재렌더링할 때도 안 움직임
+                animation: true,
                 interaction: {
                     mode: 'index',
                     intersect: false
@@ -227,22 +224,26 @@ document.addEventListener('DOMContentLoaded', function () {
     if (fxCanvas && fxList.length > 0) {
         const labels = fxList.map(tx => tx.type);           // "환전", "외화송금"
         const counts = fxList.map(tx => tx.count || 0);
+        const maxValue = counts.length > 0 ? Math.max(...counts) : 0;
 
         const fxCtx = fxCanvas.getContext('2d');
         new Chart(fxCtx, {
-            type: 'bar',   // 여기서는 바 차트로 예시
+            type: 'bar',
             data: {
                 labels: labels,
                 datasets: [
                     {
                         label: '오늘 외화 거래 건수',
                         data: counts,
-                        backgroundColor: 'rgba(32, 43, 68, 0.7)'
+                        backgroundColor: 'rgba(32, 43, 68, 0.7)',
+                        barPercentage: 0.2,
+                        categoryPercentage: 0.6,
                     }
                 ]
             },
             options: {
                 responsive: true,
+                animation: true,
                 plugins: {
                     legend: {
                         display: true,
@@ -256,6 +257,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 scales: {
                     y: {
                         beginAtZero: true,
+                        suggestedMax: maxValue + 1,
                         ticks: {
                             precision: 0
                         }

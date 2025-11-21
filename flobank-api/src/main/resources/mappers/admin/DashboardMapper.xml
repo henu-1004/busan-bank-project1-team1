@@ -31,9 +31,9 @@
     <select id="selectTodayFrgnRemtTxCount" resultType="int">
         SELECT COUNT(*)
         FROM TB_FRGN_REMT_TRAN
-        WHERE remt_status = 1
-          AND remt_dt IS NOT NULL
-          AND TRUNC(remt_dt) = TRUNC(SYSDATE)
+        WHERE remt_dt IS NOT NULL
+          AND remt_dt &gt;= TRUNC(SYSDATE)
+          AND remt_dt &lt;  TRUNC(SYSDATE) + 1
     </select>
 
     <!-- 일별 가입자 수 -->
