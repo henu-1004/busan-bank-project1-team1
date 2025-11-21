@@ -36,4 +36,8 @@ public interface DepositMapper {
     public String getAcctPw(String acctNo);
     public String getFrgnAcctPw(String frgnAcctNo);
     public InterestRateDTO getRecentInterest(String currency);
+    public void insertDpstAcctHdr(DpstAcctHdrDTO dpstAcctHdrDTO);
+    public DpstAcctHdrDTO selectInsertedAcct(String dpstHdrCustCode, String dpstHdrDpstId);
+    public void insertDpstAcctDtl(DpstAcctDtlDTO dpstAcctDtlDTO);
+    public void insertCustTranHist(CustTranHistDTO custTranHistDTO);
 }

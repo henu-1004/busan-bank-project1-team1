@@ -8,6 +8,7 @@ import kr.co.api.flobankapi.mapper.admin.ProductMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -169,6 +170,44 @@ public class DepositService {
 
     public InterestRateDTO getRecentInterest(String currency) {
         return depositMapper.getRecentInterest(currency);
+    }
+
+    public DpstAcctHdrDTO insertAndGetDpstAcct(DpstAcctHdrDTO hdrDTO){
+        depositMapper.insertDpstAcctHdr(hdrDTO);
+        return depositMapper.selectInsertedAcct(hdrDTO.getDpstHdrCustCode(), hdrDTO.getDpstHdrDpstId());
+    }
+
+    public void insertDpstDtl(DpstAcctDtlDTO dpstAcctDtlDTO) {
+        depositMapper.insertDpstAcctDtl(dpstAcctDtlDTO);
+    }
+
+    public void insertCustTranHist(CustTranHistDTO custTranHistDTO) {
+        depositMapper.insertCustTranHist(custTranHistDTO);
+    }
+
+    @Transactional
+    public DpstAcctHdrDTO openDepositAcctTransaction(
+            DpstAcctHdrDTO hdrDTO,
+            DpstAcctDtlDTO dtlDTO,
+            CustTranHistDTO custTranDTO
+    ) {
+        // 1. 예금 헤더 insert
+        depositMapper.insertDpstAcctHdr(hdrDTO);
+
+        DpstAcctHdrDTO insdto = depositMapper.selectInsertedAcct(hdrDTO.getDpstHdrCustCode(), hdrDTO.getDpstHdrDpstId());
+
+        // 2. 예금 거래내역 insert
+        dtlDTO.setDpstDtlHdrNo(insdto.getDpstHdrAcctNo());
+        depositMapper.insertDpstAcctDtl(dtlDTO);
+
+        custTranDTO.setTranAcctNo(insdto.getDpstHdrLinkedAcctNo());
+        custTranDTO.setTranRecAcctNo(insdto.getDpstHdrAcctNo());
+        // 3. 고객 거래내역 insert
+        depositMapper.insertCustTranHist(custTranDTO);
+
+
+        // 4. 방금 생성된 예금계좌 다시 조회
+        return insdto;
     }
 
 }

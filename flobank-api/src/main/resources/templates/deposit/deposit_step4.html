@@ -40,7 +40,7 @@
       <table class="complete-table">
         <tr><th>고객명</th><td>[[${custName}]]</td></tr>
         <tr><th>예금명</th><td>[[${product.dpstName}]]</td></tr>
-        <tr><th>신규계좌번호</th><td>104368-11-027105</td></tr>
+        <tr><th>신규계좌번호</th><td>[[${insertDTO.dpstHdrAcctNo}]]</td></tr>
         <tr><th>신규통화</th><td>[[${dto.dpstHdrCurrency}]] ([[${dto.selectedCurName}]])</td></tr>
         <tr><th>신규금액</th><td>[[${#numbers.formatDecimal(dto.dpstAmount, 0, 'COMMA', 2, 'POINT')}]] [[${dto.dpstHdrCurrency}]]</td></tr>
         <tr><th>입금회차</th><td>1</td></tr>
@@ -69,12 +69,12 @@
         <!--
         <tr><th>자동해지신청 여부</th><td>예</td></tr>
         -->
-        <tr><th>계약체결일시</th><td>2025.11.07 13:44:56</td></tr>
+        <tr><th>계약체결일시</th><td>[[${insertDTO.dpstHdrContractDt}]]</td></tr>
       </table>
 
       <!-- 하단 버튼 -->
       <div class="complete-actions">
-        <a href="/" class="btn-home">메인으로 가기</a>
+        <a th:href="@{/}" class="btn-home">메인으로 가기</a>
       </div>
 
     </div>

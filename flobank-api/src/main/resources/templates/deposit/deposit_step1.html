@@ -176,8 +176,8 @@
     </div>
 
   <div class="step1-actions">
-    <a href="/deposit/view.html" class="step1-btn-prev">이전</a>
-    <a href="/deposit/deposit_step2.html" class="step1-btn-next">다음</a>
+    <a th:href="@{/deposit/view(dpstId=${dpstId})}" class="step1-btn-prev">이전</a>
+    <a th:href="@{/deposit/deposit_step2(dpstId=${dpstId})}" class="step1-btn-next">다음</a>
   </div>
   </div>
 </main>

@@ -253,4 +253,117 @@
         FETCH FIRST 1 ROWS ONLY
     </select>
 
+
+    <insert id="insertDpstAcctHdr">
+        INSERT INTO TB_DPST_ACCT_HDR (
+        DPST_HDR_DPST_ID,
+        DPST_HDR_PW,
+        DPST_HDR_CUST_CODE,
+        DPST_HDR_MONTH,
+        DPST_HDR_START_DY,
+        DPST_HDR_FIN_DY,
+        DPST_HDR_CURRENCY,
+        DPST_HDR_BALANCE,
+        DPST_HDR_INTEREST,
+        DPST_HDR_STATUS,
+        DPST_HDR_LINKED_ACCT_NO,
+        DPST_HDR_AUTO_RENEW_YN,
+        DPST_HDR_PART_WDRW_CNT,
+        DPST_HDR_INFO_AGREE_YN,
+        DPST_HDR_INFO_AGREE_DT,
+        DPST_HDR_CONTRACT_DT,
+        DPST_HDR_RATE,
+        DPST_HDR_CURRENCY_EXP
+        <if test="dpstHdrAutoRenewYn != null and dpstHdrAutoRenewYn.equalsIgnoreCase('y')">
+            , DPST_HDR_AUTO_RENEW_TERM
+            , DPST_HDR_AUTO_RENEW_CNT
+        </if>
+        )
+        VALUES (
+        #{dpstHdrDpstId},
+        #{dpstHdrPw},
+        #{dpstHdrCustCode},
+        #{dpstHdrMonth},
+        #{dpstHdrStartDy},
+        #{dpstHdrFinDy},
+        #{dpstHdrCurrency},
+        #{dpstHdrBalance},
+        #{dpstHdrInterest},
+        #{dpstHdrStatus},
+        #{dpstHdrLinkedAcctNo},
+        #{dpstHdrAutoRenewYn, jdbcType=CHAR},
+        #{dpstHdrPartWdrwCnt},
+        #{dpstHdrInfoAgreeYn},
+        #{dpstHdrInfoAgreeDt},
+        SYSDATE,
+        #{dpstHdrRate},
+        #{dpstHdrCurrencyExp}
+        <if test="dpstHdrAutoRenewYn != null and dpstHdrAutoRenewYn.equalsIgnoreCase('y')">
+            , #{dpstHdrAutoRenewTerm}
+            , #{dpstHdrAutoRenewCnt}
+        </if>
+        )
+    </insert>
+
+    <select id="selectInsertedAcct" resultType="kr.co.api.flobankapi.dto.DpstAcctHdrDTO">
+        SELECT *
+        FROM TB_DPST_ACCT_HDR
+        WHERE DPST_HDR_CUST_CODE = #{dpstHdrCustCode}
+        AND DPST_HDR_DPST_ID = #{dpstHdrDpstId}
+        ORDER BY DPST_HDR_CONTRACT_DT DESC
+        FETCH FIRST 1 ROWS ONLY
+    </select>
+
+    <insert id="insertDpstAcctDtl">
+        INSERT INTO TB_DPST_ACCT_DTL (
+        DPST_DTL_TYPE,
+        DPST_DTL_AMOUNT,
+        DPST_TRAN_DT,
+        DPST_DTL_HDR_NO,
+        DPST_DTL_ESIGN_YN
+        <if test="dpstDtlEsignYn != null and dpstDtlEsignYn.equalsIgnoreCase('y')">
+            , DPST_DTL_ESIGN_DT
+        </if>
+        )
+        VALUES (
+        #{dpstDtlType},
+        #{dpstDtlAmount},
+        SYSDATE,
+        #{dpstDtlHdrNo},
+        #{dpstDtlEsignYn}
+        <if test="dpstDtlEsignYn != null and dpstDtlEsignYn.equalsIgnoreCase('y')">
+            , #{dpstDtlEsignDt}
+        </if>
+        )
+    </insert>
+
+    <insert id="insertCustTranHist">
+        INSERT INTO TB_CUST_TRAN_HIST (
+        TRAN_ACCT_NO,
+        TRAN_CUST_NAME,
+        TRAN_TYPE,
+        TRAN_AMOUNT,
+        TRAN_REC_ACCT_NO,
+        TRAN_REC_NAME,
+        TRAN_REC_BK_CODE,
+        TRAN_ESIGN_YN,
+        TRAN_ESIGN_DT,
+        TRAN_DT
+        )
+        VALUES (
+        #{tranAcctNo},
+        #{tranCustName},
+        #{tranType},
+        #{tranAmount},
+        #{tranRecAcctNo},
+        #{tranRecName},
+        #{tranRecBkCode},
+        #{tranEsignYn},
+        TO_TIMESTAMP(#{tranEsignDt}, 'YYYY-MM-DD HH24:MI:SS.FF3'),
+        SYSDATE
+        )
+    </insert>
+
+
+
 </mapper>

@@ -31,6 +31,8 @@ public class DepositRequestDTO {
     private Integer dpstHdrMonth;   // 가입 월수
     private String selectedCurName;
 
+    private String dpstHdrCurrencyExp;
+
     // 환율 계산 결과 (JS에서 hidden input 추가해야 넘어감)
     private BigDecimal baseRate;        // 송금보낼때 환율
     private BigDecimal appliedRate;     // 우대 적용 환율

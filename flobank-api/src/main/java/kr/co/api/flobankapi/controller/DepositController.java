@@ -39,6 +39,7 @@ public class DepositController {
 
     @GetMapping("/deposit_step1")
     public String deposit_step1(Model model, @RequestParam String dpstId) {
+        model.addAttribute("dpstId", dpstId);
         model.addAttribute("activeItem","product");
         return "deposit/deposit_step1";
     }
@@ -227,7 +228,11 @@ public class DepositController {
         dpstAcctHdrDTO.setDpstHdrCurrency(dto.getDpstHdrCurrency());
         dpstAcctHdrDTO.setDpstHdrBalance(dto.getDpstAmount());
         dpstAcctHdrDTO.setDpstHdrInterest(dto.getAppliedInterest());
+        dpstAcctHdrDTO.setDpstHdrRate(dto.getAppliedRate());
         dpstAcctHdrDTO.setDpstHdrStatus(1);
+        if (product.getDpstRateType() == 1){
+            dpstAcctHdrDTO.setDpstHdrCurrencyExp(dto.getDpstHdrCurrency());
+        }
         dpstAcctHdrDTO.setDpstHdrLinkedAcctNo(
                 "krw".equals(dto.getWithdrawType()) ? dto.getAcctNo() : dto.getFrgnAcctNo()
         );
@@ -237,9 +242,38 @@ public class DepositController {
             dpstAcctHdrDTO.setDpstHdrAutoRenewCnt(0);
         }
         dpstAcctHdrDTO.setDpstHdrPartWdrwCnt(0);
-        dpstAcctHdrDTO.setDpstHdrInfoAgreeYn("Y");
+        dpstAcctHdrDTO.setDpstHdrInfoAgreeYn("y");
         dpstAcctHdrDTO.setDpstHdrInfoAgreeDt(LocalDateTime.now());
 
+
+
+        // 첫 예금 거래 내역
+        DpstAcctDtlDTO dtlDTO = new DpstAcctDtlDTO();
+        dtlDTO.setDpstDtlType(1);
+        dtlDTO.setDpstDtlAmount(dto.getDpstAmount());
+        dtlDTO.setDpstDtlEsignYn("y");
+        dtlDTO.setDpstDtlEsignDt(LocalDateTime.now());
+
+
+
+
+        // 내 계좌 거래내역
+        CustTranHistDTO custTranHistDTO = new CustTranHistDTO();
+
+        custTranHistDTO.setTranCustName(user.getCustName());
+        custTranHistDTO.setTranType(2);
+        custTranHistDTO.setTranAmount(Integer.parseInt(String.valueOf(dto.getKrwAmount())));
+
+        custTranHistDTO.setTranRecName(user.getCustName());
+        custTranHistDTO.setTranRecBkCode("888");
+        custTranHistDTO.setTranEsignYn("Y");
+        DateTimeFormatter dt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
+        custTranHistDTO.setTranEsignDt(LocalDateTime.now().format(dt));
+
+
+        // 트랜잭션 처리
+        DpstAcctHdrDTO insertDTO = depositService.openDepositAcctTransaction(dpstAcctHdrDTO, dtlDTO, custTranHistDTO);
+        model.addAttribute("insertDTO", insertDTO);
         return "deposit/deposit_step4";
     }
 

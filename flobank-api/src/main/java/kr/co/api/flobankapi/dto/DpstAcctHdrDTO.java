@@ -34,10 +34,12 @@ public class DpstAcctHdrDTO {
     private Integer dpstHdrAutoRenewTerm;// 자동연장 주기 (개월)
 
     private String dpstHdrAutoTermiYn;
+    private BigDecimal dpstHdrRate;
 
     private Integer dpstHdrAddPayCnt;
     private Integer dpstHdrPartWdrwCnt;
 
     private String dpstHdrInfoAgreeYn;
     private LocalDateTime dpstHdrInfoAgreeDt;
+    private LocalDateTime dpstHdrContractDt;
 }
