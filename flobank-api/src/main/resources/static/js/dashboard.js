@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function () {
         totalTxCountTextEl.textContent = totalTxCount.toLocaleString('ko-KR') + '건';
     }
 
-    // 카드 2: 총 거래 금액 (표시는 '억' 기준으로)
+    // 카드 2: 총 거래 금액
     const totalTxAmountTextEl = document.getElementById('totalTxAmountText');
     if (totalTxAmountTextEl) {
         let displayText;
@@ -268,4 +268,160 @@ document.addEventListener('DOMContentLoaded', function () {
     } else if (!fxList.length) {
         console.warn('todayFxTxCounts 데이터가 비어 있습니다.');
     }
+
+    (function () {
+        const dataObj = window.dashboardData || {};
+
+        // 일별
+        const dailyJoinChartEl = document.getElementById('joinDailyChart');
+        if (dailyJoinChartEl) {
+            const array = Array.isArray(dataObj.dailyJoinStats) ? dataObj.dailyJoinStats : [];
+
+            const labels = array.map(item =>
+                item && item.baseDate ? item.baseDate : ''
+            );
+            const data = array.map(item =>
+                item && typeof item.joinCount === 'number' ? item.joinCount : 0
+            );
+
+            // 🔹 최대값 계산 (축 최대값용)
+            const maxVal = data.length > 0 ? Math.max(...data) : 0;
+
+            window.joindailyChartInstance = new Chart(dailyJoinChartEl.getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '일별 가입자 수',
+                        data: data,
+                        borderColor: '#4CAF50',
+                        backgroundColor: 'rgba(76, 175, 80, 0.2)',
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 3
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1,
+                                precision: 0 // 정수로만
+                            },
+                            suggestedMax: maxVal === 0 ? 1 : maxVal + 1
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true
+                        }
+                    },
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+        const weeklyJoinChartEl = document.getElementById('joinWeeklyChart');
+        if (weeklyJoinChartEl) {
+            // 🔴 오타 수정: weelyJoinStats → weeklyJoinStats
+            const weeklyArray = Array.isArray(dataObj.weeklyJoinStats) ? dataObj.weeklyJoinStats : [];
+
+            const labels = weeklyArray.map(item =>
+                item && item.baseDate ? item.baseDate : ''
+            );
+            const data = weeklyArray.map(item =>
+                item && typeof item.joinCount === 'number' ? item.joinCount : 0
+            );
+
+            const maxVal = data.length > 0 ? Math.max(...data) : 0;
+
+            window.joinweeklyChartInstance = new Chart(weeklyJoinChartEl.getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '주별 가입자 수',
+                        data: data,
+                        borderColor: '#2196F3',
+                        backgroundColor: 'rgba(33, 150, 243, 0.2)',
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 3
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1,
+                                precision: 0
+                            },
+                            suggestedMax: maxVal === 0 ? 1 : maxVal + 1
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true
+                        }
+                    },
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+        const monthlyJoinChartEl = document.getElementById('joinMonthlyChart');
+        if (monthlyJoinChartEl) {
+            const monthlyArray = Array.isArray(dataObj.monthlyJoinStats) ? dataObj.monthlyJoinStats : [];
+
+            const labels = monthlyArray.map(item =>
+                item && item.baseDate ? item.baseDate : ''
+            );
+            const data = monthlyArray.map(item =>
+                item && typeof item.joinCount === 'number' ? item.joinCount : 0
+            );
+
+            const maxVal = data.length > 0 ? Math.max(...data) : 0;
+
+            window.joinmonthlyChartInstance = new Chart(monthlyJoinChartEl.getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '월별 가입자 수',
+                        data: data,
+                        borderColor: '#FF9800',
+                        backgroundColor: 'rgba(255, 152, 0, 0.2)',
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 3
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1,
+                                precision: 0
+                            },
+                            suggestedMax: maxVal === 0 ? 1 : maxVal + 1
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true
+                        }
+                    },
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+
+        // dataObj.weeklyJoinStats / monthlyJoinStats 사용해서 생성하면 끝
+    })();
+
+
 });

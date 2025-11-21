@@ -18,7 +18,6 @@ public class DashboardController {
 
     private final DashboardService dashboardService;
 
-    // /admin → 대시보드 메인
     @GetMapping({"", "/", "/index"})
     public String adminHome(Model model) {
 
