@@ -1,74 +1,157 @@
+
+function openTab(evt, tabName) {
+    var i, tabcontent, tablinks;
+    tabcontent = document.getElementsByClassName("view-content");
+    for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+    }
+    tablinks = document.getElementsByClassName("view-tab");
+    for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].classList.remove("active");
+    }
+    document.getElementById(tabName).style.display = "block";
+    evt.currentTarget.classList.add("active");
+}
+
+
+function fetchRateData(baseDate) {
+    const tableBody = document.getElementById('rateTableBody');
+    if (!tableBody) return; // 테이블이 없는 페이지에서는 실행하지 않음
+
+    // 로딩 상태 표시
+    tableBody.innerHTML = `<tr><td colspan="13" class="no-data" style="padding: 30px; text-align: center; color: #999;">데이터를 불러오는 중...</td></tr>`;
+
+    // AJAX를 사용하여 백엔드(Controller)에 요청
+    fetch(`/deposit/rates?baseDate=${baseDate}`)
+        .then(response => {
+            if (!response.ok) {
+                // HTTP 오류 상태 (404, 500 등) 처리
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="13" class="no-data" style="padding: 30px; text-align: center; color: #999;">${baseDate}에 조회된 금리 데이터가 없습니다.</td></tr>`;
+                return;
+            }
+
+            let html = '';
+
+            // 데이터를 테이블 행으로 변환
+            data.forEach(item => {
+                // 금리를 소수점 2자리까지 표시하는 보조 함수
+                const formatRate = (rate) => {
+                    // null, 0, undefined 또는 NaN일 경우 '-' 반환
+                    if (rate == null || parseFloat(rate) === 0 || isNaN(parseFloat(rate))) {
+                        return '-';
+                    }
+                    return parseFloat(rate).toFixed(2);
+                };
+
+                html += '<tr>';
+                html += `<th>${item.currency}</th>`;
+                // DTO 필드명 (rate1M ~ rate12M)을 사용하여 값 표시
+                html += `<td>${formatRate(item.rate1M)}</td>`;
+                html += `<td>${formatRate(item.rate2M)}</td>`;
+                html += `<td>${formatRate(item.rate3M)}</td>`;
+                html += `<td>${formatRate(item.rate4M)}</td>`;
+                html += `<td>${formatRate(item.rate5M)}</td>`;
+                html += `<td>${formatRate(item.rate6M)}</td>`;
+                html += `<td>${formatRate(item.rate7M)}</td>`;
+                html += `<td>${formatRate(item.rate8M)}</td>`;
+                html += `<td>${formatRate(item.rate9M)}</td>`;
+                html += `<td>${formatRate(item.rate10M)}</td>`;
+                html += `<td>${formatRate(item.rate11M)}</td>`;
+                html += `<td>${formatRate(item.rate12M)}</td>`;
+                html += '</tr>';
+            });
+
+            tableBody.innerHTML = html;
+        })
+        .catch(error => {
+            console.error('금리 데이터 조회 에러:', error);
+            tableBody.innerHTML = `<tr><td colspan="13" class="no-data" style="padding: 30px; text-align: center; color: #d12a2a;">데이터를 불러오는 중 오류가 발생했습니다. (콘솔 확인)</td></tr>`;
+        });
+}
+
+// ==========================================================
+// 2. DOMContentLoaded 영역: 페이지 로드 후 이벤트 리스너 설정
+// ==========================================================
+
 document.addEventListener("DOMContentLoaded", () => {
-  // 🔹 탭 버튼 활성화 전환 + 콘텐츠 전환
-  const tabs = document.querySelectorAll('.view-tab');
-  const contents = document.querySelectorAll('.view-content');
 
-  tabs.forEach((tab, index) => {
-    tab.addEventListener('click', () => {
-      tabs.forEach(t => t.classList.remove('active'));
-      contents.forEach(c => c.classList.remove('active'));
 
-      tab.classList.add('active');
-      contents[index].classList.add('active');
+    const tabs = document.querySelectorAll('.view-tab');
+    const contents = document.querySelectorAll('.view-content');
+
+    tabs.forEach((tab, index) => {
+        tab.addEventListener('click', () => {
+            tabs.forEach(t => t.classList.remove('active'));
+            contents.forEach(c => c.classList.remove('active'));
+
+            tab.classList.add('active');
+            contents[index].classList.add('active');
+        });
     });
-  });
 
-  // 🔹 만기자동연장신청 토글
-  const radioApply = document.querySelector('input[name="autoRenew"][value="apply"]');
-  const radioNo = document.querySelector('input[name="autoRenew"][value="no"]');
-  const extraFields = document.getElementById("autoRenewFields");
+    // 🔹 만기자동연장신청 토글
+    const radioApply = document.querySelector('input[name="autoRenew"][value="apply"]');
+    const radioNo = document.querySelector('input[name="autoRenew"][value="no"]');
+    const extraFields = document.getElementById("autoRenewFields");
 
-  if (radioApply && radioNo && extraFields) {
-    radioApply.addEventListener("change", () => {
-      if (radioApply.checked) extraFields.classList.remove("hidden");
-    });
-    radioNo.addEventListener("change", () => {
-      if (radioNo.checked) extraFields.classList.add("hidden");
-    });
-  }
+    if (radioApply && radioNo && extraFields) {
+        radioApply.addEventListener("change", () => {
+            if (radioApply.checked) extraFields.classList.remove("hidden");
+        });
+        radioNo.addEventListener("change", () => {
+            if (radioNo.checked) extraFields.classList.add("hidden");
+        });
+    }
 
-  // 🔹 이메일 / 문자 수령방법 전환
-  const emailRadio = document.querySelector('input[name="receiveMethod"][value="email"]');
-  const smsRadio = document.querySelector('input[name="receiveMethod"][value="sms"]');
-  const emailFields = document.getElementById("emailFields");
-  const smsHint = document.getElementById("smsHint");
+    // 🔹 이메일 / 문자 수령방법 전환
+    const emailRadio = document.querySelector('input[name="receiveMethod"][value="email"]');
+    const smsRadio = document.querySelector('input[name="receiveMethod"][value="sms"]');
+    const emailFields = document.getElementById("emailFields");
+    const smsHint = document.getElementById("smsHint");
 
-  if (emailRadio && smsRadio && emailFields && smsHint) {
-    emailRadio.addEventListener("change", () => {
-      if (emailRadio.checked) {
-        emailFields.classList.remove("hidden");
-        smsHint.classList.add("hidden");
-      }
-    });
-    smsRadio.addEventListener("change", () => {
-      if (smsRadio.checked) {
-        emailFields.classList.add("hidden");
-        smsHint.classList.remove("hidden");
-      }
-    });
-  }
+    if (emailRadio && smsRadio && emailFields && smsHint) {
+        emailRadio.addEventListener("change", () => {
+            if (emailRadio.checked) {
+                emailFields.classList.remove("hidden");
+                smsHint.classList.add("hidden");
+            }
+        });
+        smsRadio.addEventListener("change", () => {
+            if (smsRadio.checked) {
+                emailFields.classList.add("hidden");
+                smsHint.classList.remove("hidden");
+            }
+        });
+    }
 
-  // 🔹 원화/외화 출금계좌 토글
-  const krwRadio = document.querySelector('input[name="withdrawType"][value="krw"]');
-  const fxRadio = document.querySelector('input[name="withdrawType"][value="fx"]');
-  const krwFields = document.getElementById("krwFields");
-  const fxFields = document.getElementById("fxFields");
+    // 🔹 원화/외화 출금계좌 토글
+    const krwRadio = document.querySelector('input[name="withdrawType"][value="krw"]');
+    const fxRadio = document.querySelector('input[name="withdrawType"][value="fx"]');
+    const krwFields = document.getElementById("krwFields");
+    const fxFields = document.getElementById("fxFields");
 
-  if (krwRadio && fxRadio && krwFields && fxFields) {
-    krwRadio.addEventListener("change", () => {
-      if (krwRadio.checked) {
-        krwFields.classList.remove("hidden");
-        fxFields.classList.add("hidden");
-      }
-    });
-    fxRadio.addEventListener("change", () => {
-      if (fxRadio.checked) {
-        fxFields.classList.remove("hidden");
-        krwFields.classList.add("hidden");
-      }
-    });
-  }
+    if (krwRadio && fxRadio && krwFields && fxFields) {
+        krwRadio.addEventListener("change", () => {
+            if (krwRadio.checked) {
+                krwFields.classList.remove("hidden");
+                fxFields.classList.add("hidden");
+            }
+        });
+        fxRadio.addEventListener("change", () => {
+            if (fxRadio.checked) {
+                fxFields.classList.remove("hidden");
+                krwFields.classList.add("hidden");
+            }
+        });
+    }
 
+    // 🔹 원화 출금계좌 잔액 힌트 업데이트
     const select = document.getElementById("withdrawAccount");
     const balanceHint = document.getElementById("balanceHint");
 
@@ -84,6 +167,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    // 🔹 외화 출금계좌 잔액 힌트 업데이트
     const frgnSelect = document.getElementById("withdrawFrgnAccount");
     const frgnBalanceHint = document.getElementById("frgnBalanceHint");
 
@@ -97,7 +181,6 @@ document.addEventListener("DOMContentLoaded", () => {
             frgnBalanceHint.textContent = `출금가능금액 ${fformattedBalance} ${fcurrency}`;
         });
     }
-
 
 
     const curSelect = document.getElementById("curSelect");
@@ -123,6 +206,21 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     }
+
+
+    // 🔹 금리 조회 (날짜 변경 이벤트 리스너)
+    const searchDateInput = document.getElementById('searchDate');
+
+    if (searchDateInput) {
+        // 날짜를 선택(change)하면 fetchRateData 함수(전역)를 호출합니다.
+        searchDateInput.addEventListener('change', (e) => {
+            const selectedDate = e.target.value;
+            if (selectedDate) {
+                fetchRateData(selectedDate);
+            }
+        });
+    }
+});
 
 
     const calcBtn = document.getElementById("calcBtn");
@@ -219,3 +317,4 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 });
+

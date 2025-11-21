@@ -1783,3 +1783,45 @@
     text-align: end;
 
 }
+
+/* 달력 감싸는 영역 (dd 태그) */
+.view-detail .date-picker-area {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0; /* dd 기본 여백 제거 */
+}
+
+/* "조회기준일" 라벨 */
+.view-detail .date-picker-area label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #22304E;
+    cursor: pointer;
+}
+
+/* 달력 input 스타일 (기존 form-input 스타일과 통일감 유지) */
+.view-detail input[type="date"] {
+    padding: 6px 12px;
+    border: 1px solid #dcdfe6;
+    border-radius: 6px;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 14px;
+    color: #333;
+    background: #fff;
+    outline: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+/* 달력 포커스 효과 */
+.view-detail input[type="date"]:focus {
+    border-color: #2C5DE5;
+    box-shadow: 0 0 0 2px rgba(44, 93, 229, 0.15);
+}
+
+/* 테이블 가로 스크롤 (컬럼이 13개라 좁을 수 있음) */
+.table-wrap {
+    overflow-x: auto;
+    white-space: nowrap; /* 줄바꿈 방지 */
+}

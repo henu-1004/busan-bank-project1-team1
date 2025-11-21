@@ -193,5 +193,33 @@
     </select>
 
 
+    <select id="findRatesByBaseDate"
+            parameterType="java.util.Date"
+            resultType="kr.co.api.flobankapi.dto.DepositRateDTO">
+
+        SELECT
+        BASE_DATE,
+        CURRENCY,
+        RATE_1M,
+        RATE_2M,
+        RATE_3M,
+        RATE_4M,
+        RATE_5M,
+        RATE_6M,
+        RATE_7M,
+        RATE_8M,
+        RATE_9M,
+        RATE_10M,
+        RATE_11M,
+        RATE_12M
+        FROM
+        EXCHANGE_RATE_12M
+        WHERE
+        BASE_DATE = #{baseDate}
+        ORDER BY
+        CURRENCY
+    </select>
+
+
 
 </mapper>
