@@ -44,7 +44,6 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     }
-ㄴ
 
 
 

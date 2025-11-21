@@ -14,10 +14,10 @@ public interface MypageMapper {
     // 외화 입출금 개설
     void insertFrgnAcct(CustFrgnAcctDTO custFrgnAcctDTO);
 
-    // 외화 계좌 이미 있는지 확인
+    // 외화 계좌 있는지 확인
     int selectCheckCntEnAcct(String custCode);
 
-    // 고객 보유 전체 계좌 확인
+    // 고객 보유 전체 원화 계좌 확인
     List<CustAcctDTO> selectAllKoAcct(String custCode);
 
     // 고객 외환 계좌 확인

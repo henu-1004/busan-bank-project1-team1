@@ -57,6 +57,8 @@
           <option value="JPY">JPY (일본 엔)</option>
           <option value="EUR">EUR (유로화)</option>
           <option value="CNH">CNH (중국 위안)</option>
+            <option value="GBP">GBP (영국 파운드)</option>
+            <option value="AUD">AUD (호주 달러)</option>
         </select>
       </div>
 
@@ -111,8 +113,7 @@
       <div class="step2-form-group">
         <label class="step2-label">출금계좌선택</label>
         <select class="step2-select">
-          <option>104302-04-412952 (잔액 1,000원)</option>
-          <option>104302-04-991142 (잔액 200,000원)</option>
+            <option th:each="dto : ${custAcctDTOList}" th:text="|${dto.acctNo} (잔액 ${#numbers.formatInteger(dto.acctBalance, 0, 'COMMA')}원)|" th:value="${dto.acctNo}">104302-04-412952 (잔액 1,000원)</option>
         </select>
       </div>
 

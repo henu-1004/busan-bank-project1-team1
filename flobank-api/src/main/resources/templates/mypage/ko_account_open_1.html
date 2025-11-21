@@ -36,21 +36,21 @@
             <div class="terms-box" th:each="t, stat : ${termsList}">
                 <h3 class="terms-title" th:text="${t.termTitle}">약관 제목</h3>
 
-                <div class="terms-content">
-                    <pre th:text="${t.thistContent}"></pre>
-                </div>
+        <div class="terms-content">
+            <pre th:text="${t.thistContent}"></pre>
 
-                <div class="terms-check">
-                    <label class="custom-check">
-                        <input type="checkbox" class="term-check"
-                               th:id="|ko-term${stat.index}|"
-                               th:attr="data-cate=${t.termCate}, data-order=${t.termOrder}">
-                        <span class="checkmark"></span>
-                        위 약관에 동의합니다.
-                    </label>
-                </div>
             </div>
-        </section>
+            <div class="terms-check">
+                <label class="custom-check">
+                    <input type="checkbox" class="term-check"
+                           th:id="|ko-term${stat.index}|"
+                           th:attr="data-cate=${t.termCate}, data-order=${t.termOrder}">
+                    <span class="checkmark"></span>
+                    위 약관에 동의합니다.
+                </label>
+            </div>
+        </div>
+    </section>
 
         <div class="terms-all">
             <label class="custom-check">
