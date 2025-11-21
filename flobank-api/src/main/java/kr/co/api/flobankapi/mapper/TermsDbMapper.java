@@ -11,7 +11,11 @@ public interface TermsDbMapper {
 
     List<TermsHistDTO> selectTermsByCate(@Param("cate") int cate);
 
+    TermsHistDTO selectTermsHist(@Param("thistNo") Long thistNo);
+
+
     int insertTermsMaster(TermsMasterDTO dto);
+
 
     // 최신 order 조회
     Integer selectMaxOrderByCate(@Param("cate") int cate);

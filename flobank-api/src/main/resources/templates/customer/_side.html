@@ -9,7 +9,8 @@
         <li><a th:href="@{/customer/event_list}" th:class="${activeItem == 'event'} ? 'active' : ''">이벤트</a></li>
         <li><a th:href="@{/customer/notice_list}" th:class="${activeItem == 'notice'} ? 'active' : ''">공지사항</a></li>
         <li><a th:href="@{/articles}" th:classappend="${activeItem == 'articles'} ? 'active' : ''">뉴스 리스트</a></li>
-        </li>
+        <li><a th:href="@{/customer/terms_download}" th:class="${activeItem == 'terms'} ? 'active' : ''">약관 다운로드</a></li>
+
 
 
     </ul>

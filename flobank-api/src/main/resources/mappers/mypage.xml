@@ -102,4 +102,59 @@
         WHERE BAL_FRGN_ACCT_NO = #{frgnAcctNo}
     </select>
 
+
+
+    <select id="selectCustInfoByCode" resultType="kr.co.api.flobankapi.dto.CustInfoDTO">
+        SELECT * FROM TB_CUST_INFO
+        WHERE CUST_CODE = #{custCode}
+    </select>
+
+    <update id="updateCustInfo" parameterType="kr.co.api.flobankapi.dto.CustInfoDTO">
+        UPDATE TB_CUST_INFO
+        SET
+        CUST_ZIP = #{custZip},
+        CUST_ADDR1 = #{custAddr1},
+        CUST_ADDR2 = #{custAddr2}
+
+        <if test="custPw != null and custPw != ''">
+            , CUST_PW = #{custPw}
+        </if>
+
+        WHERE CUST_CODE = #{custCode}
+    </update>
+
+
+    <select id="selectTranHist" resultType="kr.co.api.flobankapi.dto.CustTranHistDTO">
+        SELECT
+        TRAN_NO,
+        TRAN_ACCT_NO,
+        TRAN_CUST_NAME,
+        TRAN_TYPE,
+        TRAN_AMOUNT,
+        /* 날짜를 '2025-11-21 14:30' 형식의 문자열로 변환 */
+        TO_CHAR(TRAN_DT, 'YYYY-MM-DD HH24:MI') as TRAN_DT,
+        TRAN_REC_ACCT_NO,
+        TRAN_REC_NAME,
+        TRAN_REC_BK_CODE,
+        TRAN_MEMO,
+        TRAN_ESIGN_YN
+        FROM TB_CUST_TRAN_HIST
+        WHERE TRAN_ACCT_NO = #{acctNo}
+        ORDER BY TRAN_DT DESC, TRAN_NO DESC
+    </select>
+
+
+    <select id="selectCouponList" resultType="kr.co.api.flobankapi.dto.CouponDTO">
+        SELECT
+        COUP_NO,
+        COUP_CUST_CODE,
+        COUP_TYPE,
+        COUP_RATE,
+        COUP_ISSUED_DY,
+        COUP_STATUS
+        FROM TB_COUPON
+        WHERE COUP_CUST_CODE = #{custCode}
+        ORDER BY COUP_STATUS DESC, COUP_ISSUED_DY DESC
+    </select>
+
 </mapper>

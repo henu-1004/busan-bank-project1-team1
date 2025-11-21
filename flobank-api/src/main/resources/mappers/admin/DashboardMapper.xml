@@ -4,21 +4,36 @@
 
 <mapper namespace="kr.co.api.flobankapi.mapper.admin.DashboardMapper">
 
-    <!-- 오늘 입출금 건수: TB_CUST_TRAN_HIST -->
-    <select id="selectTodayWonTxCount" resultType="int">
-        SELECT COUNT(*)
+    <!-- 1) 오늘 총 거래 요약 (입출금 기준: TB_CUST_TRAN_HIST) -->
+    <select id="selectTodayTotalTxSummary"
+            resultType="kr.co.api.flobankapi.dto.admin.dashboard.TotalTxSummaryDTO">
+        SELECT COUNT(*) AS count,
+               NVL(SUM(tran_amount), 0) AS amount
         FROM TB_CUST_TRAN_HIST
         WHERE tran_dt IS NOT NULL
           AND TRUNC(tran_dt) = TRUNC(SYSDATE)
+    </select>
+
+    <select id="selectLast7DaysTotalTxSummary"
+            resultType="kr.co.api.flobankapi.dto.admin.dashboard.DailyTxSummaryDTO">
+        SELECT TRUNC(tran_dt)           AS baseDate,
+               COUNT(*)                 AS count,
+               NVL(SUM(tran_amount), 0) AS amount
+        FROM TB_CUST_TRAN_HIST
+        WHERE tran_dt IS NOT NULL
+          AND TRUNC(tran_dt) BETWEEN TRUNC(SYSDATE) - 6
+          AND TRUNC(SYSDATE)
+        GROUP BY TRUNC(tran_dt)
+        ORDER BY baseDate
     </select>
 
     <!-- 오늘 외화송금 건수: TB_FRGN_REMT_TRAN -->
     <select id="selectTodayFrgnRemtTxCount" resultType="int">
         SELECT COUNT(*)
         FROM TB_FRGN_REMT_TRAN
-        WHERE remt_status = 1
-          AND remt_dt IS NOT NULL
-          AND TRUNC(remt_dt) = TRUNC(SYSDATE)
+        WHERE remt_dt IS NOT NULL
+          AND remt_dt &gt;= TRUNC(SYSDATE)
+          AND remt_dt &lt;  TRUNC(SYSDATE) + 1
     </select>
 
     <!-- 일별 가입자 수 -->

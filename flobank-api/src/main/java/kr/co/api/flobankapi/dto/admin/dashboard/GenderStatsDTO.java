@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class GenderStatsDTO {
-
+    //성별
     private String gender;
     private long count;
 }

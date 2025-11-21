@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>약관 다운로드</title>
+
+    <link rel="stylesheet" th:href="@{/css/customer.css}">
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+    <link rel="stylesheet" th:href="@{/css/footer.css}">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+          crossorigin="anonymous"/>
+</head>
+<body>
+
+<div th:replace="~{_template/_header.html}"></div>
+
+<main class="customer-container">
+    <div th:replace="~{customer/_side.html}"></div>
+
+    <section class="customer-content terms-download">
+        <h2>약관 다운로드</h2>
+        <p class="customer-desc">
+            카테고리별 최신 버전 약관과 PDF를 확인하고 내려받을 수 있습니다. 필요한 약관을 선택해 가장 최근
+            버전을 확인하세요.
+        </p>
+
+        <div class="terms-section" th:each="entry : ${#lists.toList(categoryNames.entrySet())}">
+            <div class="terms-section__header">
+                <div>
+                    <p class="terms-section__title" th:text="${entry.value}">카테고리명</p>
+                    <p class="terms-section__subtitle" th:text="|카테고리 ${entry.key} 최신 약관|">카테고리 설명</p>
+                </div>
+                <span class="terms-section__count"
+                      th:text="|총 ${#lists.size(termsByCate[entry.key])}건|">총 0건</span>
+            </div>
+
+            <div class="terms-list" th:if="${!#lists.isEmpty(termsByCate[entry.key])}">
+                <article class="terms-card" th:each="term : ${termsByCate[entry.key]}">
+                    <div class="terms-card__body">
+                        <p class="terms-card__title" th:text="${term.termTitle}">약관 제목</p>
+                        <div class="terms-card__meta">
+                            <span th:text="|버전 v${term.thistVersion}|">버전</span>
+                            <span th:text="|등록일 ${term.thistRegDy}|">등록일</span>
+                        </div>
+                        <p class="terms-card__desc"
+                           th:text="${term.thistContent}">
+                            약관 내용 요약
+                        </p>
+                    </div>
+                    <div class="terms-card__actions">
+                        <a th:if="${term.thistFile != null}"
+                           class="btn-download"
+                           th:href="@{/customer/terms_download/{id}/file(id=${term.thistNo})}"
+                           download>
+                            <i class="fa-solid fa-file-arrow-down"></i>
+                            PDF 다운로드
+                        </a>
+                        <span th:if="${term.thistFile == null}" class="btn-download disabled">
+                            <i class="fa-solid fa-ban"></i>
+                            PDF 준비 중
+                        </span>
+                    </div>
+                </article>
+            </div>
+
+            <div class="terms-empty" th:if="${#lists.isEmpty(termsByCate[entry.key])}">
+                아직 등록된 약관이 없습니다.
+            </div>
+        </div>
+    </section>
+</main>
+
+<div th:replace="~{_template/_footer.html}"></div>
+
+<script th:src="@{/js/customer.js}"></script>
+</body>
+</html>

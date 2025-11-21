@@ -6,7 +6,8 @@ import lombok.Data;
 @Data
 @Builder
 public class TxCountDTO {
-
-    private String type;        // "입출금", "환전", "외화송금"
+    // today -1
+    // "건수", "금액"
+    private String type;
     private long count;
 }

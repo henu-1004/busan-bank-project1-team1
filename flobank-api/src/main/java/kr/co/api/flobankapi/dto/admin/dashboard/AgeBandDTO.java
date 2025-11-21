@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AgeBandDTO {
-
+    //나이
     private String ageBand;
     private long count;
 }

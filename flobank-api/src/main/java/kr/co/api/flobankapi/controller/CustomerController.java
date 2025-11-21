@@ -5,21 +5,39 @@ import kr.co.api.flobankapi.service.FaqService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import kr.co.api.flobankapi.dto.BoardDTO;
-import kr.co.api.flobankapi.service.BoardService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+
+
+
+
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.bind.annotation.RequestParam;
-import java.util.Map;
 import java.util.List;
 import java.util.stream.Collectors;
+import kr.co.api.flobankapi.dto.BoardDTO;
+import kr.co.api.flobankapi.dto.TermsHistDTO;
+import kr.co.api.flobankapi.service.BoardService;
+import kr.co.api.flobankapi.service.TermsDbService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.server.ResponseStatusException;
+import java.util.Map;
 
-import kr.co.api.flobankapi.dto.FaqDTO;
-import kr.co.api.flobankapi.service.FaqService;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 
+
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
+
+import kr.co.api.flobankapi.dto.TermsHistDTO;
+import kr.co.api.flobankapi.service.TermsDbService;
 
 
 
@@ -33,6 +51,7 @@ public class CustomerController {
 
     private final BoardService boardService;
     private final FaqService faqService;
+    private final TermsDbService termsDbService;
 
 
 
@@ -130,6 +149,59 @@ public class CustomerController {
         model.addAttribute("notice", notice);
         return "customer/notice_view";
     }
+
+
+    @GetMapping("/terms_download")
+    public String termsDownload(Model model) {
+        int[] categories = {1, 2, 3, 5, 6};
+
+        Map<Integer, List<TermsHistDTO>> termsByCate = new LinkedHashMap<>();
+        Map<Integer, String> categoryNames = new LinkedHashMap<>();
+
+        categoryNames.put(1, "회원가입");
+        categoryNames.put(2, "환전하기");
+        categoryNames.put(3, "외화송금");
+        categoryNames.put(5, "원화통장 개설");
+        categoryNames.put(6, "외화통장 개설");
+
+        for (int cate : categories) {
+            List<TermsHistDTO> terms = termsDbService.getTermsByLocation(cate);
+            termsByCate.put(cate, terms == null ? Collections.emptyList() : terms);
+        }
+
+        model.addAttribute("categoryNames", categoryNames);
+        model.addAttribute("termsByCate", termsByCate);
+        model.addAttribute("activeItem", "terms");
+
+        return "customer/terms_download";
+    }
+
+
+    @GetMapping("/terms_download/{histId}/file")
+    public ResponseEntity<Resource> downloadTermsFile(@PathVariable Long histId) {
+        TermsHistDTO hist = termsDbService.getTermsHist(histId);
+
+        if (hist == null || hist.getThistFile() == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+
+        Resource resource = termsDbService.loadTermsFile(hist);
+
+        if (resource == null || !resource.exists() || !resource.isReadable()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+
+        String downloadName = termsDbService.buildDownloadFileName(hist);
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\"" + downloadName + "\"")
+                .body(resource);
+    }
+
+
+
 
 
     @GetMapping("/qna_edit")

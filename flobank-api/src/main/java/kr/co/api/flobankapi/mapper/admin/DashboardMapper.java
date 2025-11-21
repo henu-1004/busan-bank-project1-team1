@@ -1,19 +1,21 @@
 package kr.co.api.flobankapi.mapper.admin;
 
-import kr.co.api.flobankapi.dto.admin.dashboard.AgeBandDTO;
-import kr.co.api.flobankapi.dto.admin.dashboard.GenderStatsDTO;
-import kr.co.api.flobankapi.dto.admin.dashboard.JoinStatsDTO;
+import kr.co.api.flobankapi.dto.admin.dashboard.*;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface DashboardMapper {
 
+    //오늘 거래금액 + 수
+    TotalTxSummaryDTO selectTodayTotalTxSummary();
+    List<DailyTxSummaryDTO> selectLast7DaysTotalTxSummary();
+
     // 오늘 거래 건수들
-    int selectTodayWonTxCount();    //예금계좌 테이블
     int selectTodayFrgnRemtTxCount();   // 해외송금 테이블
-    int selectTodayExChangeTxCount();
+    int selectTodayExChangeTxCount();   //ㅎㅈ
 
 
     // 가입자 통계
@@ -24,6 +26,8 @@ public interface DashboardMapper {
     // 연령/성별 분포
     List<AgeBandDTO> selectAgeDist();
     List<GenderStatsDTO> selectGenderDist();
+
+
 
 
 }

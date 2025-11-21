@@ -2,9 +2,7 @@ package kr.co.api.flobankapi.service.admin;
 
 import jakarta.annotation.PostConstruct;
 import kr.co.api.flobankapi.dto.admin.dashboard.*;
-import kr.co.api.flobankapi.mapper.BoardMapper;
 import kr.co.api.flobankapi.mapper.admin.DashboardMapper;
-import kr.co.api.flobankapi.mapper.admin.ProductMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -12,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -28,18 +27,22 @@ public class DashboardService {
         refreshStats();
     }
 
-    // @EnableScheduling 설정 클래스에 꼭 붙여야 동작함
     @Scheduled(fixedRate = 5 * 60 * 1000) // 5분마다
     public void refreshStats() {
         log.info("Refreshing dashboard stats...");
 
+
         // 1) 거래 건수
-        int wonCount  = dashboardMapper.selectTodayWonTxCount();
-        int remtCount = dashboardMapper.selectTodayFrgnRemtTxCount();
+        TotalTxSummaryDTO total = dashboardMapper.selectTodayTotalTxSummary();
+        int  todayTotalTxCount  = (total != null) ? total.getCount()  : 0;
+        long todayTotalTxAmount = (total != null) ? total.getAmount() : 0L;
+
+        List<DailyTxSummaryDTO> last7Days = dashboardMapper.selectLast7DaysTotalTxSummary();
+
+        int remtCount = dashboardMapper.selectTodayFrgnRemtTxCount(); // 외화송금
         int exchCount = 0; // TODO: 환전 테이블 생기면 Mapper 추가
 
-        List<TxCountDTO> txCounts = List.of(
-                TxCountDTO.builder().type("입출금").count(wonCount).build(),
+        List<TxCountDTO> todayFxTxCounts = List.of(
                 TxCountDTO.builder().type("환전").count(exchCount).build(),
                 TxCountDTO.builder().type("외화송금").count(remtCount).build()
         );
@@ -53,22 +56,26 @@ public class DashboardService {
         List<AgeBandDTO> ageDist   = dashboardMapper.selectAgeDist();
         List<GenderStatsDTO> genderDist = dashboardMapper.selectGenderDist();
 
-        // 4) 방문자 수 (나중에 구현)
-        int todayVisitCount    = 0;
-        int recent5mVisitCount = 0;
-
         this.lastUpdatedAt = LocalDateTime.now();
 
-        DashboardDTO dto = DashboardDTO.builder()
-                .todayVisitCount(todayVisitCount)
-                .recent5mVisitCount(recent5mVisitCount)
-                .todayTxCounts(txCounts)
+        this.cache = DashboardDTO.builder()
+                // 1번 그래프용
+                .todayTotalTxCount(todayTotalTxCount)
+                .todayTotalTxAmount(todayTotalTxAmount)
+
+                .last7Days(last7Days)
+
+                // 2번 그래프용
+                .todayTxCounts(todayFxTxCounts)
+
+                // 가입자 / 연령 / 성별
                 .dailyJoin(dailyJoin)
-//                .weeklyJoin(weeklyJoin)
-//                .monthlyJoin(monthlyJoin)
+                // .weeklyJoin(weeklyJoin)
+                // .monthlyJoin(monthlyJoin)
                 .ageDist(ageDist)
                 .genderDist(genderDist)
-                .lastUpdatedAt(LocalDateTime.now())
+
+                .lastUpdatedAt(this.lastUpdatedAt)
                 .build();
     }
 

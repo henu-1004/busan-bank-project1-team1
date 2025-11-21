@@ -21,4 +21,7 @@ public class TermsHistDTO {
     private Integer termCate;   // m.term_cate
     private Integer termOrder;  // m.term_order
     private String termTitle;   // m.term_title
+
+
+    private Integer tranBalance;
 }

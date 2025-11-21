@@ -20,7 +20,12 @@ import java.io.File;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.nio.file.*;                               // ⭐ 추가
+import java.net.MalformedURLException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.*;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 
 @Service
 @RequiredArgsConstructor
@@ -303,6 +308,79 @@ public class TermsDbService {
         // Mapper에서 이미 "카테고리별 최신버전 1개"만 가져오도록 쿼리가 짜져 있으므로
         // 추가로 중복 제거할 필요 없이 그대로 반환
         return mapper.selectTermsByCate(termCate);
+    }
+
+
+    public TermsHistDTO getTermsHist(Long histId) {
+        if (histId == null) {
+            return null;
+        }
+        return mapper.selectTermsHist(histId);
+    }
+
+    public Resource loadTermsFile(TermsHistDTO hist) {
+        if (hist == null || hist.getThistFile() == null) {
+            return null;
+        }
+
+        String storedPath = hist.getThistFile();
+
+        // 🔥 첫 번째 로그: DB에서 읽은 값
+        log.info("📁 DB 저장경로(storedPath) = [{}]", storedPath);
+
+        try {
+            Path filePath = resolveStoredPath(storedPath);
+
+            // 🔥 두 번째 로그: 변환된 실제 파일경로
+            log.info("📁 변환된 실제 파일경로(filePath) = [{}]", filePath);
+
+            // 🔥 세 번째 로그: 파일 존재 여부 + 읽기 가능 여부
+            log.info("📁 exists = {}, readable = {}",
+                    Files.exists(filePath),
+                    Files.isReadable(filePath));
+
+            if (filePath == null) {
+                return null;
+            }
+
+            Resource resource = new UrlResource(filePath.toUri());
+            return (resource.exists() && resource.isReadable()) ? resource : null;
+
+        } catch (Exception e) {
+            log.error("[약관 파일 로드 실패] storedPath={}", storedPath, e);
+            return null;
+        }
+    }
+
+
+
+    public String buildDownloadFileName(TermsHistDTO hist) {
+        String baseName = (hist.getTermTitle() != null ? hist.getTermTitle() : "terms")
+                + "_v" + hist.getThistVersion() + ".pdf";
+
+        return URLEncoder.encode(baseName, StandardCharsets.UTF_8)
+                .replaceAll("\\+", "%20");
+    }
+
+
+    private Path resolveStoredPath(String storedPath) {
+        if (storedPath == null || storedPath.isBlank()) {
+            return null;
+        }
+
+        Path baseDir = Paths.get(filePathConfig.getPdfTermsPath());
+
+        // 저장된 경로가 "/uploads/terms/파일" 형태라면 파일명만 추출해 물리 경로로 변환
+        if (storedPath.startsWith("/uploads/terms/")) {
+            String filename = Paths.get(storedPath).getFileName().toString();
+            return baseDir.resolve(filename).normalize();
+        }
+
+        Path directPath = Paths.get(storedPath);
+        if (!directPath.isAbsolute()) {
+            return baseDir.resolve(directPath).normalize();
+        }
+        return directPath.normalize();
     }
 
 

@@ -20,7 +20,7 @@
 
     <update id="insertLastLogin">
         UPDATE TB_CUST_INFO
-        SET CUST_LAST_LOGIN_DT = sysdate
+        SET CUST_LAST_LOGIN_DT = SYSDATE
         WHERE CUST_ID = #{custId}
     </update>
 
