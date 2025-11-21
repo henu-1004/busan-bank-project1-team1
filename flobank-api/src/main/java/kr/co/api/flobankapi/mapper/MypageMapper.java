@@ -53,4 +53,17 @@ public interface MypageMapper {
     CustInfoDTO selectCustInfo(String custId);
     LocalDate selectCheckKoAcct(String custCode);
     int selectCheckCntKoAcct(String custCode);
+
+
+    // 회원정보 수정 비밀번호 확인
+    CustInfoDTO selectCustInfoByCode(String custCode);
+
+    // 회원 정보 수정
+    void updateCustInfo(CustInfoDTO custInfoDTO);
+
+    // 거래내역 조회 메서드
+    List<CustTranHistDTO> selectTranHist(String acctNo);
+
+    // 쿠폰 목록 조회
+    List<CouponDTO> selectCouponList(String custCode);
 }

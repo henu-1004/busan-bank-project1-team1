@@ -2801,34 +2801,54 @@ body.event-page {
   background: #999;
 }
 
-/* ✅ 거래내역 테이블 비율 재조정 */
+/* [1] 거래일시: 20% */
 .account-modal .transaction-table th:nth-child(1),
 .account-modal .transaction-table td:nth-child(1) {
-  width: 22%; /* 거래일시 */
+    width: 18%;
+    text-align: center;
 }
 
+/* [2] 구분: 8% (짧으니까 좁게) */
 .account-modal .transaction-table th:nth-child(2),
 .account-modal .transaction-table td:nth-child(2) {
-  width: 15%; /* 구분 - 더 줄임 */
-  text-align: center;
+    width: 10%;
+    text-align: center;
 }
 
+/* [3] 거래전금액: 18% (새로 추가된 칸) */
 .account-modal .transaction-table th:nth-child(3),
 .account-modal .transaction-table td:nth-child(3) {
-  width: 18%; /* 거래금액 */
-  text-align: right;
+    width: 18%;
+    text-align: center; /* 숫자는 우측 정렬 */
+    padding-right: 10px; /* 우측 여백 */
 }
 
+/* [4] 거래금액: 18% */
 .account-modal .transaction-table th:nth-child(4),
 .account-modal .transaction-table td:nth-child(4) {
-  width: 18%; /* 잔액 */
-  text-align: right;
+    width: 18%;
+    text-align: center;
+    padding-right: 10px;
 }
 
+/* [5] 잔액: 18% */
 .account-modal .transaction-table th:nth-child(5),
 .account-modal .transaction-table td:nth-child(5) {
-  width: 34%; /* ✅ 메모 칸 확 넓힘 */
-  text-align: left;
+    width: 18%;
+    text-align: center;
+    padding-right: 10px;
+}
+
+/* [6] 메모: 18% (남은 공간) */
+.account-modal .transaction-table th:nth-child(6),
+.account-modal .transaction-table td:nth-child(6) {
+    width: 18%;
+    text-align: center;
+    padding-left: 10px;
+    /* 메모가 길면 ... 처리 */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* ✅ 스크롤 영역 유지 */
@@ -3297,4 +3317,31 @@ body.event-page {
         margin-left: 0;
         margin-top: 5px;
     }
+}
+
+
+/* 모달 하단 버튼 그룹 정렬 */
+.modal-btn-group {
+    display: flex;
+    flex-direction: column; /* 세로로 배치 (저장이 위, 탈퇴가 아래) */
+    gap: 10px; /* 버튼 사이 간격 */
+    margin-top: 20px;
+}
+
+/* 회원 탈퇴 버튼 스타일 (빨간색) */
+.btn-withdraw {
+    width: 100%;
+    padding: 12px;
+    background-color: #fff;
+    color: #ff4d4d; /* 빨간 글씨 */
+    border: 1px solid #ff4d4d;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-withdraw:hover {
+    background-color: #fff0f0; /* 마우스 올리면 연한 빨강 배경 */
 }

@@ -13,12 +13,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,14 +39,30 @@ public class MypageController {
     private final PineconeService pineconeService;
     private final ChatGPTService chatGPTService;
 
+    private final PasswordEncoder passwordEncoder;
 
     @GetMapping({"/main","/"})
     public String mypage(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
 
         String userCode = userDetails.getUsername();
+        CustInfoDTO custInfo = mypageService.getCustInfo(userCode);
         List<CustAcctDTO> custAcctDTOList = mypageService.findAllAcct(userCode);
         CustFrgnAcctDTO  custFrgnAcctDTO = mypageService.findFrgnAcct(userCode);
 
+        CustFrgnAcctDTO frgnAcct = mypageService.findFrgnAcct(userCode);
+        List<FrgnAcctBalanceDTO> frgnBalanceList = new ArrayList<>();
+
+        if (frgnAcct != null) {
+            // 외화 계좌(모체)가 있으면 -> 자식 계좌 리스트(USD, JPY...) 조회
+            frgnBalanceList = mypageService.getAllFrgnAcctBal(frgnAcct.getFrgnAcctNo());
+            model.addAttribute("custFrgnAcctDTO", frgnAcct);
+        }
+
+
+        List<CouponDTO> couponList = mypageService.getCouponList(userCode);
+        model.addAttribute("couponList", couponList);
+        model.addAttribute("frgnBalanceList", frgnBalanceList);
+        model.addAttribute("custInfo", custInfo);
         model.addAttribute("custAcctDTOList",custAcctDTOList);
         model.addAttribute("custFrgnAcctDTO",custFrgnAcctDTO);
 
@@ -326,6 +344,75 @@ public class MypageController {
         return  "mypage/ko_transfer_3";
     }
 
+
+    @PostMapping("/checkPw")
+    @ResponseBody // [필수] JSON 응답을 위해 꼭 필요
+    public Map<String, Object> checkPw(@RequestBody Map<String, String> requestData,
+                                       @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            String inputPw = requestData.get("password");
+            String userCode = userDetails.getUsername();
+
+            boolean isMatch = mypageService.checkPassword(userCode, inputPw);
+
+            if (isMatch) {
+                response.put("status", "success");
+            } else {
+                response.put("status", "fail");
+            }
+
+        } catch (Exception e) {
+            log.error("비밀번호 확인 중 에러 발생", e);
+            response.put("status", "error");
+            response.put("message", "서버 오류가 발생했습니다.");
+        }
+
+        return response;
+    }
+
+
+    @PostMapping("/updateUserInfo")
+    @ResponseBody
+    public Map<String, Object> updateUserInfo(@RequestBody Map<String, String> requestData,
+                                              @AuthenticationPrincipal CustomUserDetails userDetails) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            String userCode = userDetails.getUsername();
+            // 서비스 호출 (데이터 맵과 유저코드를 넘김)
+            mypageService.modifyUserInfo(userCode, requestData);
+            response.put("status", "success");
+
+        } catch (Exception e) {
+            response.put("status", "error");
+            response.put("message", "서버 오류 발생");
+        }
+
+        return response;
+    }
+
+
+    @PostMapping("/transactionHistory")
+    @ResponseBody
+    public Map<String, Object> transactionHistory(@RequestBody Map<String, String> requestData) {
+        Map<String, Object> response = new HashMap<>();
+        String acctNo = requestData.get("acctNo");
+
+        try {
+            // 서비스 호출 (잔액 계산된 내역 가져오기)
+            Map<String, Object> data = mypageService.getAcctDetailWithHistory(acctNo);
+            response.put("status", "success");
+            response.put("data", data);
+
+        } catch (Exception e) {
+            response.put("status", "error");
+            response.put("message", "서버 오류가 발생했습니다.");
+        }
+
+        return response;
+    }
 
 
 }

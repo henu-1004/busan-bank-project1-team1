@@ -22,7 +22,7 @@ public class CustInfoDTO {
     private String custAddr1;
     private String custAddr2;
     private Integer custSecurityLevel; // 보안 등급
-    private String custLasLoginDt;
+    private String custLastLoginDt;
 
     // 추가 필드
     private String custMaskHp;
