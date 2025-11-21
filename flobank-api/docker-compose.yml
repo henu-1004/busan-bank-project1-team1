@@ -8,11 +8,9 @@ services:
     restart: always
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - SPRING_ELASTICSEARCH_URIS=http://elasticsearch:9200
     volumes:
       - flobank_uploads:/app/uploads
-    depends_on:
-      - elasticsearch
+
 
 
 
