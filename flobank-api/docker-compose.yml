@@ -8,8 +8,35 @@ services:
     restart: always
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - SPRING_ELASTICSEARCH_URIS=http://elasticsearch:9200
     volumes:
       - flobank_uploads:/app/uploads
+    depends_on:
+      - elasticsearch
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.15.0
+    container_name: flobank-elasticsearch
+    environment:
+      - node.name=elasticsearch
+      - cluster.name=docker-cluster
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - xpack.security.enabled=false  # 보안 비활성화 (개발용)
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+
+
+
 volumes:
   flobank_uploads:
     external: true
+  es_data:
+    driver: local
