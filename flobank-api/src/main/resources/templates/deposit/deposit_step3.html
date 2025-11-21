@@ -24,72 +24,125 @@
 
 
   <div class="step1-container">
-    <h2 class="step1-title">BNK 모아드림 외화적금</h2>
-
-  
-    <div class="step1-steps">
-      <div class="step1-step">
-        <span class="num">1</span><span class="text">약관동의</span>
-      </div>
-      <div class="step1-step">
-        <span class="num">2</span><span class="text">정보입력</span>
-      </div>
-      <div class="step1-step active">
-        <span class="num">3</span><span class="text">입력정보확인</span>
-      </div>
-    </div>
+      <form id="depositFinalForm" method="post" th:action="@{/deposit/deposit_step4(dpstId=${product.dpstId})}">
+          <h2 class="step1-title">BNK 모아드림 외화적금</h2>
 
 
-    
-    <!--  안내문 -->
-    <div class="step3-info-box">
-      <ul>
-        <li>고객님의 입력 정보를 다시 한 번 확인한 후 거래를 진행하시기 바랍니다.</li>
-        <li>아래의 적용환율은 현재 고시된 환율이며, 실제 거래시점의 적용환율은 변동될 수 있습니다.</li>
-      </ul>
-    </div>
+          <div class="step1-steps">
+              <div class="step1-step">
+                  <span class="num">1</span><span class="text">약관동의</span>
+              </div>
+              <div class="step1-step">
+                  <span class="num">2</span><span class="text">정보입력</span>
+              </div>
+              <div class="step1-step active">
+                  <span class="num">3</span><span class="text">입력정보확인</span>
+              </div>
+          </div>
 
-    <!--  정보확인 표 -->
-    <section class="step3-confirm-section">
-      
-      <table class="step3-table">
-        <tr><th>예금명</th><td>외화정기예금</td></tr>
-        <tr><th>신규통화</th><td>CNH (중국 위안)</td></tr>
-        <tr><th>신규금액</th><td>1.00</td></tr>
-        <tr><th>입금회차</th><td>1</td></tr>
-        <tr><th>예금금리</th><td>0%</td></tr>
-        <tr><th>적용과세</th><td>일반</td></tr>
-        <tr><th>만기일</th><td>2025.12.07</td></tr>
-        <tr><th>예치기간</th><td>1개월</td></tr>
-        <tr><th>출금계좌번호</th><td>104302-04-412952</td></tr>
-        <tr><th>출금통화</th><td>KRW (한국 원)</td></tr>
-        <tr><th>출금적용환율</th><td>205.85</td></tr>
-        <tr><th>예금금액</th><td>205</td></tr>
-        <tr><th>자동연장신청 여부</th><td>아니오</td></tr>
-        <tr><th>자동해지신청 여부</th><td>예</td></tr>
-      </table>
-    </section>
 
-    <!--  안내문 -->
-    <div class="step3-note-box">
-      <p class="step3-note-text">
-        ※ 본 상품정보 요약문은 이용자의 상품에 대한 이해를 돕기 위한 안내이며, 
-        자세한 내용은 해당 상품의 상품설명서를 참고해주시기 바랍니다.
-      </p>
-      <p class="step3-note-text">* 가입불가 : 약관만동의 외화에서 상품설명서 확인 불가</p>
-      <p class="step3-note-text">* 확인 : 계약서류 관리 거래를 통해 상품설명서 확인 가능</p>
-    </div>
 
-    <!--  버튼 -->
-  <div class="step1-actions">
-    <a href="/deposit/deposit_step2.html" class="step1-btn-prev">이전</a>
-    <a href="/deposit/deposit_step4.html" class="step1-btn-next">완료</a>
-  </div>
+          <!--  안내문 -->
+          <div class="step3-info-box">
+              <ul>
+                  <li>고객님의 입력 정보를 다시 한 번 확인한 후 거래를 진행하시기 바랍니다.</li>
+                  <li>아래의 적용환율은 현재 고시된 환율이며, 실제 거래시점의 적용환율은 변동될 수 있습니다.</li>
+              </ul>
+          </div>
+
+          <!--  정보확인 표 -->
+          <section class="step3-confirm-section">
+              <input type="hidden" name="maturityDate" th:value="${maturityDate}">
+              <input type="hidden" name="appliedInterest" th:value="${appliedInterest}">
+
+              <table class="step3-table">
+                  <tr><th>예금명</th><td>[[${product.dpstName}]]</td></tr>
+                  <tr><th>신규통화</th><td>[[${dto.dpstHdrCurrency}]] ([[${dto.selectedCurName}]])</td></tr>
+                  <tr><th>신규금액</th><td>[[${#numbers.formatDecimal(dto.dpstAmount, 0, 'COMMA', 2, 'POINT')}]] [[${dto.dpstHdrCurrency}]]</td></tr>
+                  <tr><th>입금회차</th><td>1</td></tr>
+                  <tr><th>예금금리</th><td>[[${appliedInterest}]]%</td></tr>
+                  <tr><th>적용과세</th><td>일반</td></tr>
+                  <tr><th>만기일</th><td>[[${#temporals.format(maturityDate, 'yyyy.MM.dd')}]]</td></tr>
+                  <tr><th>예치기간</th><td>[[${dto.dpstHdrMonth}]]개월</td></tr>
+                  <tr><th>출금계좌번호</th><td>[[${dto.withdrawType == 'krw' ? dto.acctNo : dto.frgnAcctNo}]]</td></tr>
+                  <tr><th>출금통화</th><td>[[${dto.withdrawType == 'krw' ? 'KRW (한국 원)' : dto.dpstHdrCurrency + ' (' + dto.selectedCurName + ')'}]]</td></tr>
+                  <tr><th>출금적용환율</th><td>[[${dto.appliedRate}]]</td></tr>
+                  <tr><th>예금금액</th>
+                      <td>
+                          <!-- 원화 계좌 출금 -->
+                          <span th:if="${dto.withdrawType == 'krw'}">
+                  [[${#numbers.formatDecimal(dto.krwAmount, 0, 'COMMA', 2, 'POINT')}]] 원
+                </span>
+
+                          <!-- 외화 계좌 출금 -->
+                          <span th:if="${dto.withdrawType == 'fx'}">
+                  [[${#numbers.formatDecimal(dto.dpstAmount, 0, 'COMMA', 2, 'POINT')}]] [[${dto.dpstHdrCurrency}]]
+                </span>
+                      </td>
+                  </tr>
+                  <tr th:if="${product.dpstAutoRenewYn.equals('Y')}"><th>자동연장신청 여부</th><td>[[${dto.autoRenewYn == 'y' ? '신청' : '미신청'}]]</td></tr>
+                  <tr th:if="${dto.autoRenewYn.equals('y')}"><th>자동연장주기</th><td>[[${dto.autoRenewTerm}]]개월</td></tr>
+                  <!-- <tr><th>자동해지신청 여부</th><td>예</td></tr> -->
+              </table>
+          </section>
+
+          <!--  안내문 -->
+          <div class="step3-note-box">
+              <p class="step3-note-text">
+                  ※ 본 상품정보 요약문은 이용자의 상품에 대한 이해를 돕기 위한 안내이며,
+                  자세한 내용은 해당 상품의 상품설명서를 참고해주시기 바랍니다.
+              </p>
+              <p class="step3-note-text">* 가입불가 : 약관만동의 외화에서 상품설명서 확인 불가</p>
+              <p class="step3-note-text">* 확인 : 계약서류 관리 거래를 통해 상품설명서 확인 가능</p>
+          </div>
+
+
+          <input type="hidden" name="withdrawType" th:value="${dto.withdrawType}">
+
+          <!-- 🔹 원화 출금 -->
+          <input type="hidden" name="acctNo" th:value="${dto.acctNo}">
+          <input type="hidden" name="acctPw" th:value="${dto.acctPw}">
+
+          <!-- 🔹 외화 출금 -->
+          <input type="hidden" name="frgnAcctNo" th:value="${dto.frgnAcctNo}">
+          <input type="hidden" name="frgnAcctPw" th:value="${dto.frgnAcctPw}">
+          <input type="hidden" name="balNo" th:value="${dto.balNo}">
+
+          <!-- 🔹 신규 가입 정보 -->
+          <input type="hidden" name="dpstHdrCurrency" th:value="${dto.dpstHdrCurrency}">
+          <input type="hidden" name="dpstAmount" th:value="${dto.dpstAmount}">
+          <input type="hidden" name="dpstHdrMonth" th:value="${dto.dpstHdrMonth}">
+          <input type="hidden" name="selectedCurName" th:value="${dto.selectedCurName}">
+
+          <!-- 🔹 환율 계산 결과 -->
+          <input type="hidden" name="baseRate" th:value="${dto.baseRate}">
+          <input type="hidden" name="appliedRate" th:value="${dto.appliedRate}">
+          <input type="hidden" name="prefRate" th:value="${dto.prefRate}">
+          <input type="hidden" name="spreadHalfPref" th:value="${dto.spreadHalfPref}">
+          <input type="hidden" name="krwAmount" th:value="${dto.krwAmount}">
+
+          <!-- 🔹 만기 자동 연장 -->
+          <input type="hidden" name="autoRenewYn" th:value="${dto.autoRenewYn}">
+          <input type="hidden" name="autoRenewTerm" th:value="${dto.autoRenewTerm}">
+
+          <!-- 🔹 수령 방식 -->
+          <input type="hidden" name="receiveMethod" th:value="${dto.receiveMethod}">
+
+          <!-- 🔹 정기예금 비밀번호 -->
+          <input type="hidden" name="dpstPw" th:value="${dto.dpstPw}">
+
+          <!--  버튼 -->
+          <div class="step1-actions">
+              <a th:href="@{/deposit/deposit_step2(dpstId=${product.dpstId})}" onclick="return confirmBeforeBack();" class="step1-btn-prev">이전</a>
+              <button type="submit" style="background-color: transparent; border: 0; height: 30px"><a class="step1-btn-next">완료</a></button>
+          </div>
+
+      </form>
   </div>
 </main>
 
+<script th:src ="@{/js/deposit.js}"></script>
 <div th:replace="~{_template/_footer.html}"></div>
-<script src ="/static/js/deposit.js"></script>
 
 </body>
 </html>

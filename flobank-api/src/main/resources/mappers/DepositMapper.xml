@@ -220,6 +220,37 @@
         CURRENCY
     </select>
 
+    <select id="getAcctPw" resultType="String">
+        select acct_pw from tb_cust_acct
+        where acct_no=#{acctNo}
+    </select>
 
+    <select id="getFrgnAcctPw" resultType="String">
+        select frgn_acct_pw from tb_cust_frgn_acct
+        where frgn_acct_no=#{frgnAcctNo}
+    </select>
+
+    <select id="getRecentInterest" resultType="kr.co.api.flobankapi.dto.InterestRateDTO">
+        SELECT
+        BASE_DATE AS baseDate,
+        CURRENCY AS currency,
+        RATE_1M AS rate1M,
+        RATE_2M AS rate2M,
+        RATE_3M AS rate3M,
+        RATE_4M AS rate4M,
+        RATE_5M AS rate5M,
+        RATE_6M AS rate6M,
+        RATE_7M AS rate7M,
+        RATE_8M AS rate8M,
+        RATE_9M AS rate9M,
+        RATE_10M AS rate10M,
+        RATE_11M AS rate11M,
+        RATE_12M AS rate12M,
+        CREATED_AT AS createdAt
+        FROM EXCHANGE_RATE_12M
+        WHERE CURRENCY = #{currency}
+        ORDER BY BASE_DATE DESC
+        FETCH FIRST 1 ROWS ONLY
+    </select>
 
 </mapper>

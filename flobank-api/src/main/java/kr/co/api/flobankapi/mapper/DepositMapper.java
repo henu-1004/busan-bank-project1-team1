@@ -33,4 +33,7 @@ public interface DepositMapper {
     List<DepositRateDTO> findRatesByBaseDate(@Param("baseDate") Date baseDate);
 
     public int getPrefRate(String currency);
+    public String getAcctPw(String acctNo);
+    public String getFrgnAcctPw(String frgnAcctNo);
+    public InterestRateDTO getRecentInterest(String currency);
 }

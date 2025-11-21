@@ -95,8 +95,8 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // 🔹 만기자동연장신청 토글
-    const radioApply = document.querySelector('input[name="autoRenew"][value="apply"]');
-    const radioNo = document.querySelector('input[name="autoRenew"][value="no"]');
+    const radioApply = document.querySelector('input[name="autoRenewYn"][value="y"]');
+    const radioNo = document.querySelector('input[name="autoRenewYn"][value="n"]');
     const extraFields = document.getElementById("autoRenewFields");
 
     if (radioApply && radioNo && extraFields) {
@@ -225,7 +225,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const calcBtn = document.getElementById("calcBtn");
     if (calcBtn) {
       calcBtn.addEventListener("click", async () => {
-        const curS = document.getElementById("curSelect");
+
+          const curS = document.getElementById("curSelect");
         const curSelected = curS.options[curS.selectedIndex];
         const currencyCode = curSelected.value;
         const foreignAmountInput = document.getElementById("foreignAmount");
@@ -271,7 +272,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
             const data = await res.json();  // 백엔드 반환값
-            updateTable(data, foreignAmount);              // 값 반영
+            updateTable(data, foreignAmount, curSelected.getAttribute("data-curName"));              // 값 반영
 
         } catch (e) {
             console.error(e);
@@ -285,15 +286,60 @@ document.addEventListener("DOMContentLoaded", () => {
         return Number(value).toLocaleString("ko-KR");
     }
 
-    function updateTable(data, foreignAmount) {
+    function updateTable(data, foreignAmount, curName) {
         const table = document.getElementById("calcResultTable");
-        const cells = table.querySelectorAll(".prod-amt-right");
 
-        cells[0].textContent = numberFormat(data.baseRate) + " 원";
-        cells[1].textContent = numberFormat(data.appliedRate) + " 원";
-        cells[2].textContent = data.prefRate + "%";
-        cells[3].textContent = numberFormat(Number(data.spreadHalfPref) * Number(foreignAmount)) + " 원";
-        cells[4].textContent = numberFormat(data.krwAmount) + " 원";
+        table.innerHTML = `
+           <input type="hidden" name="selectedCurName" value="${curName}">
+        <tr>
+                <td class="prod-amt-left">
+                    송금보내실때환율
+                </td>
+                <td class="prod-amt-right">
+                    ${numberFormat(data.baseRate)} 원
+                </td>
+            </tr>
+            <tr>
+                <td class="prod-amt-left">
+                    우대적용환율
+                </td>
+                <td class="prod-amt-right">
+                    <input type="hidden" name="appliedRate" value="${Number(data.appliedRate)}">
+                    ${numberFormat(data.appliedRate)} 원
+                </td>
+            </tr>
+            <tr>
+                <td class="prod-amt-left">
+                    우대율
+                </td>
+                <td class="prod-amt-right">
+                    ${data.prefRate}%
+                </td>
+            </tr>
+            <tr>
+                <td class="prod-amt-left">
+                    우대받는금액
+                </td>
+                <td class="prod-amt-right">
+                    ${numberFormat(Number(data.spreadHalfPref) * Number(foreignAmount))} 원
+                </td>
+            </tr>
+            <tr>
+                <td class="prod-amt-left">
+                    예상원화금액
+                </td>
+                <td class="prod-amt-right" style="color: #ef0909; font-weight: bold">
+                    <input type="hidden" name="krwAmount" value="${Number(data.krwAmount)}">
+                    ${numberFormat(data.krwAmount)} 원
+                </td>
+            </tr>
+            <tr>
+                <td class="prod-amt-left" colspan="2" style="color: gray">
+                    상기 예상금액은 실제 가입 시점의 환율 변동에 따라 달라질 수 있습니다.(수수료 미포함)
+                </td>
+            </tr>
+        `;
+
 
         // 테이블 표시
         table.style.display = "table";
@@ -315,3 +361,185 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    const depositRegForm = document.getElementById("depositRegForm");
+    if (depositRegForm){
+        depositRegForm.addEventListener("submit", function (e) {
+            // 출금 계좌 비밀번호
+            const withdrawType = document.querySelector('input[name="withdrawType"]:checked').value;
+            const acctPw = document.querySelector('input[name="acctPw"]')?.value;           // 원화
+            const frgnAcctPw = document.querySelector('input[name="frgnAcctPw"]')?.value;   // 외화
+
+            if (withdrawType === "krw") {
+                const withdrawAccount = document.getElementById("withdrawAccount");
+                if (!withdrawAccount.value || withdrawAccount.selectedIndex === 0) {
+                    alert("출금 계좌를 선택해 주세요.");
+                    e.preventDefault();
+                    return;
+                }
+            } else if (withdrawType === "fx") {
+                const frgnSelect = document.getElementById("withdrawFrgnAccount");
+                if (!frgnSelect.value || frgnSelect.selectedIndex === 0) {
+                    alert("외화 출금 통화를 선택해 주세요.");
+                    e.preventDefault();
+                    return;
+                }
+            }
+
+
+
+
+            // 4자리 입력 여부 체크
+            if (withdrawType === "krw") {
+                if (!acctPw || acctPw.length !== 4) {
+                    alert("출금계좌 비밀번호를 정확히 입력해 주세요.");
+                    e.preventDefault();
+                    return;
+                }
+            } else if (withdrawType === "fx") {
+                if (!frgnAcctPw || frgnAcctPw.length !== 4) {
+                    alert("외화출금계좌 비밀번호를 정확히 입력해 주세요.");
+                    e.preventDefault();
+                    return;
+                }
+            }
+
+
+
+
+
+            const curSelect = document.getElementById("curSelect");
+            if (!curSelect.value || curSelect.selectedIndex === 0) {
+                alert("신규 통화 종류를 선택해 주세요.");
+                e.preventDefault();
+                return;
+            }
+
+            const foreignAmount = document.getElementById("foreignAmount").value;
+            if (!foreignAmount) {
+                alert("신규 금액을 입력해 주세요.");
+                e.preventDefault();
+                return;
+            }
+
+            const periodFixed = document.querySelector('select[name="dpstHdrMonth"]');
+            const periodInput = document.getElementById("periodInput");
+
+            if (periodFixed && periodFixed.value !== undefined) {
+                if (!periodFixed.value) {
+                    alert("가입 기간을 선택해 주세요.");
+                    e.preventDefault();
+                    return;
+                }
+            } else if (periodInput) {
+                if (!periodInput.value) {
+                    alert("가입 기간을 입력해 주세요.");
+                    e.preventDefault();
+                    return;
+                }
+            }
+
+
+            // 정기예금 비밀번호 & 확인
+            const dpstPw = document.getElementById("dpstPw").value;
+            const dpstPwCheck = document.getElementById("dpstPwCheck").value;
+
+            if (!dpstPw ) {
+                alert("정기예금 비밀번호를 입력해 주세요.");
+                e.preventDefault();
+                return;
+            }
+
+            if ( dpstPw.length !== 4) {
+                alert("정기예금 비밀번호를 정확히 입력해 주세요.");
+                e.preventDefault();
+                return;
+            }
+
+            if (!dpstPwCheck) {
+                alert("비밀번호 확인란을 입력해 주세요.");
+                e.preventDefault();
+                return;
+            }
+
+            if (dpstPw !== dpstPwCheck) {
+                alert("정기예금 비밀번호가 일치하지 않습니다.");
+                e.preventDefault();
+                return;
+            }
+
+
+            const autoRenewRadio = document.querySelector('input[name="autoRenewYn"][value="apply"]');
+            if (autoRenewRadio && autoRenewRadio.checked) {
+                const autoRenewTerm = document.querySelector('select[name="autoRenewTerm"]');
+                if (!autoRenewTerm.value) {
+                    alert("자동연장 주기 월수를 선택해 주세요.");
+                    e.preventDefault();
+                    return;
+                }
+            }
+
+
+            const withdrawT = document.querySelector('input[name="withdrawType"]:checked').value;
+            const foreignA = Number(document.getElementById("foreignAmount").value);
+
+            // 원화/외화 출금 계좌 잔액
+            let balance = 0;
+            if (withdrawT === "krw") {
+                const selected = document.querySelector('#withdrawAccount option:checked');
+                balance = Number(selected.getAttribute("data-balance"));
+            } else if (withdrawT === "fx") {
+                const selected = document.querySelector('#withdrawFrgnAccount option:checked');
+                balance = Number(selected.getAttribute("data-balance"));
+            }
+
+            // 예상 원화금액 (calc 버튼 클릭 후 테이블 생성된 경우)
+            const krwAmountInput = document.querySelector('input[name="krwAmount"]');
+            const krwAmount = krwAmountInput ? Number(krwAmountInput.value) : null;
+
+            /* -----------------------
+               🔥 금액 유효성 체크
+            ------------------------*/
+
+            if (withdrawT === "krw") {
+                // 원화 계좌에서 출금 = 계산된 예상 원화금액 기준 비교
+                if (!krwAmount) {
+                    alert("예상금액확인을 먼저 진행해 주세요.");
+                    e.preventDefault();
+                    return;
+                }
+                if (krwAmount > balance) {
+                    alert("출금 가능 금액보다 큰 금액입니다.");
+                    e.preventDefault();
+                    return;
+                }
+            } else if (withdrawT === "fx") {
+                // 외화 계좌에서 출금 = 입력된 외화 금액 기준 비교
+                if (foreignA > balance) {
+                    alert("출금 가능 외화 잔액보다 큰 금액입니다.");
+                    e.preventDefault();
+                    return;
+                }
+            }
+
+
+        });
+
+        const dpstPw = document.getElementById("dpstPw");
+        const dpstPwCheck = document.getElementById("dpstPwCheck");
+        const pwError = document.getElementById("pwError");
+
+        if (dpstPwCheck) {
+            dpstPwCheck.addEventListener("input", () => {
+                if (dpstPw.value !== dpstPwCheck.value) {
+                    pwError.style.display = "block";
+                } else {
+                    pwError.style.display = "none";
+                }
+            });
+        }
+    }
+
+
+function confirmBeforeBack() {
+    return confirm("이전 단계로 이동하면 현재 입력한 정보가 모두 사라집니다.\n계속하시겠습니까?");
+}

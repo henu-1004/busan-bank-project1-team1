@@ -159,6 +159,18 @@ public class DepositService {
         return depositMapper.findRatesByBaseDate(baseDate);
     }
 
+    public String getKAcctPw(String acctNo){
+        return depositMapper.getAcctPw(acctNo);
+    }
+
+    public String getFAcctPw(String frgnAcctNo){
+        return depositMapper.getFrgnAcctPw(frgnAcctNo);
+    }
+
+    public InterestRateDTO getRecentInterest(String currency) {
+        return depositMapper.getRecentInterest(currency);
+    }
+
 }
 
 
