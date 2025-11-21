@@ -91,16 +91,22 @@ public class RemitController {
     }
 
     @PostMapping("en_transfer_3")
-    public String enTransfer3Post(@ModelAttribute FrgnRemtTranDTO frgnRemtTranDTO, Model model){
+    public String enTransfer3Post(@ModelAttribute FrgnRemtTranDTO frgnRemtTranDTO, Model model, @AuthenticationPrincipal CustomUserDetails userDetails) {
         if(frgnRemtTranDTO.getRemtCustName() == null){
-            frgnRemtTranDTO.setRemtCustName(frgnRemtTranDTO.getRemtRecAccNo());
+            frgnRemtTranDTO.setRemtCustName(userDetails.getCustName());
         }
 
         frgnRemtTranDTO.setRemtEsignYn("Y");
 
-        // 고객에게 출력될 계좌번호는 모체이기에 다시 불러옴
-        CustFrgnAcctDTO custFrgnAcctDTO = remitService.getParAcctNo(frgnRemtTranDTO.getRemtAcctNo());
-        model.addAttribute("custFrgnAcctDTO", custFrgnAcctDTO);
+        if (frgnRemtTranDTO.getRemtAcctNo().contains("-10-")) {
+            CustFrgnAcctDTO krwAcct = new CustFrgnAcctDTO();
+            krwAcct.setFrgnAcctNo(frgnRemtTranDTO.getRemtAcctNo());
+            krwAcct.setFrgnAcctName("원화 입출금통장");
+            model.addAttribute("custFrgnAcctDTO", krwAcct);
+        } else {
+            CustFrgnAcctDTO custFrgnAcctDTO = remitService.getParAcctNo(frgnRemtTranDTO.getRemtAcctNo());
+            model.addAttribute("custFrgnAcctDTO", custFrgnAcctDTO);
+        }
 
         if("Y".equals(frgnRemtTranDTO.getRemtEsignYn())){
             model.addAttribute("state", "정상");
@@ -165,8 +171,15 @@ public class RemitController {
         frgnRemtTranDTO.setRemtEsignYn("Y");
         boolean check = remitService.saveFrgnTran(frgnRemtTranDTO);
 
-        CustFrgnAcctDTO custFrgnAcctDTO = remitService.getParAcctNo(frgnRemtTranDTO.getRemtAcctNo());
-        model.addAttribute("custFrgnAcctDTO", custFrgnAcctDTO);
+        if (frgnRemtTranDTO.getRemtAcctNo().contains("-10-")) {
+            CustFrgnAcctDTO krwAcct = new CustFrgnAcctDTO();
+            krwAcct.setFrgnAcctNo(frgnRemtTranDTO.getRemtAcctNo());
+            krwAcct.setFrgnAcctName("원화 입출금통장");
+            model.addAttribute("custFrgnAcctDTO", krwAcct);
+        } else {
+            CustFrgnAcctDTO custFrgnAcctDTO = remitService.getParAcctNo(frgnRemtTranDTO.getRemtAcctNo());
+            model.addAttribute("custFrgnAcctDTO", custFrgnAcctDTO);
+        }
 
         // 1. 송금 통화 정보 설정
         String targetSymbol = "";
