@@ -7,7 +7,7 @@ plugins {
 }
 
 group = 'kr.co.api'
-version = '0.0.5-SNAPSHOT'
+version = '0.0.6-SNAPSHOT'
 description = 'flobank-api'
 
 processResources {
@@ -95,6 +95,8 @@ dependencies {
     //Spring Boot WebFlux 의존성 추가 WebClient사용 위함
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
+    // 엘라스틱 서치
+    implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
 
 }
 

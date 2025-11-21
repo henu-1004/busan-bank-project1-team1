@@ -8,3 +8,34 @@ services:
       # application.yml의 관리용 웹 포트 8081을 외부에 8081로 노출
       - "8081:8081"
     restart: always # VM이 재시작되어도 자동으로 컨테이너 실행
+
+
+    environment:
+      # 스프링부트가 엘라스틱서치 컨테이너를 찾을 주소 설정
+      - SPRING_ELASTICSEARCH_URIS=http://elasticsearch:9200
+    depends_on:
+      - elasticsearch
+
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.15.0
+    container_name: flobank-elasticsearch
+    environment:
+      - node.name=elasticsearch
+      - cluster.name=docker-cluster
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - xpack.security.enabled=false  # 보안 비활성화 (개발용)
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+
+volumes:
+    es_data:
+      driver: local

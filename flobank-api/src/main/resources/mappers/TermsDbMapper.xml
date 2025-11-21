@@ -117,6 +117,7 @@
                      m.term_order    AS termOrder,
                      m.term_title    AS termTitle,
 
+                     h.thist_no         AS thistNo,
                      h.thist_term_order AS thistTermOrder,
                      h.thist_content    AS thistContent,
                      h.thist_version    AS thistVersion,
@@ -124,9 +125,9 @@
                      h.thist_file       AS thistFile,
 
                      ROW_NUMBER() OVER (
-                PARTITION BY m.term_order
-                ORDER BY h.thist_version DESC, h.thist_reg_dy DESC, h.thist_no DESC
-            ) AS rn
+                         PARTITION BY m.term_cate, m.term_order
+                         ORDER BY h.thist_version DESC, h.thist_reg_dy DESC, h.thist_no DESC
+                     ) AS rn
                  FROM TB_TERMS_MASTER m
                           JOIN TB_TERMS_HIST h
                                ON h.thist_term_cate = m.term_cate
@@ -134,8 +135,31 @@
                  WHERE m.term_cate = #{cate}
              )
         WHERE rn = 1
-        ORDER BY termOrder
+        ORDER BY termCate, termOrder
     </select>
+
+
+    <select id="selectTermsHist" parameterType="long"
+            resultType="kr.co.api.flobankapi.dto.TermsHistDTO">
+        SELECT
+            h.thist_no        AS thistNo,
+            h.thist_term_cate AS thistTermCate,
+            h.thist_term_order AS thistTermOrder,
+            h.thist_file      AS thistFile,
+            h.thist_content   AS thistContent,
+            h.thist_version   AS thistVersion,
+            h.thist_ver_memo  AS thistVerMemo,
+            h.thist_admin_id  AS thistAdminId,
+            h.thist_reg_dy    AS thistRegDy,
+            m.term_cate       AS termCate,
+            m.term_order      AS termOrder,
+            m.term_title      AS termTitle
+        FROM TB_TERMS_HIST h
+                 JOIN TB_TERMS_MASTER m
+                      ON m.term_cate = h.thist_term_cate
+                          AND m.term_order = h.thist_term_order
+        WHERE h.thist_no = #{thistNo}
+        </select>
 
 
 

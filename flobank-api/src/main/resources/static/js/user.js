@@ -4,8 +4,9 @@ document.addEventListener("DOMContentLoaded", function () {
     // -------------------------------------------------------------
     // 사용자 정보 변경 모달 (userInfoModal)
     // -------------------------------------------------------------
-    const editProfileBtn = document.getElementById('editProfileBtn');
+    const editProfileBtn = document.getElementById('btn-user-info-modal');
     const userInfoModal = document.getElementById('userInfoModal');
+    const btnWithdraw = document.getElementById("btn-withdraw");
 
     if (editProfileBtn && userInfoModal) {
         const closeUserInfoBtn = userInfoModal.querySelector(".close-btn");
@@ -26,6 +27,22 @@ document.addEventListener("DOMContentLoaded", function () {
                 userInfoModal.style.display = 'none';
             }
         });
+
+        if (btnWithdraw) {
+            btnWithdraw.addEventListener("click", function() {
+                // 1. 단순 확인 (한 번만 묻기)
+                if (confirm("정말 탈퇴하시겠습니까?")) {
+
+                    // 2. 작별 인사 알림창
+                    alert("그동안 FLOBANK를 이용해주셔서 감사합니다.");
+
+                    // 3. 확인 버튼을 누르면 서버의 탈퇴 처리 URL로 이동
+                    // (아래 컨트롤러를 만들어야 404 에러가 안 뜹니다!)
+                    location.href = "/mypage/withdraw";
+                }
+            });
+        }
+
     }
 
     // -------------------------------------------------------------
@@ -58,30 +75,135 @@ document.addEventListener("DOMContentLoaded", function () {
     // -------------------------------------------------------------
     // 계좌 거래내역 모달 (accountModal)
     // -------------------------------------------------------------
+    // -------------------------------------------------------------
+    // 계좌 거래내역 모달 (accountModal)
+    // -------------------------------------------------------------
     const accountModal = document.getElementById("accountModal");
+
     if (accountModal) {
         const closeAccountBtn = accountModal.querySelector(".close-btn");
 
-        // [수정] 외화 '상세확인' 버튼도 포함하도록 셀렉터 변경
-        document.querySelectorAll(".account-table .account-link").forEach(cell => {
-            cell.addEventListener("click", () => {
-                accountModal.style.display = "flex";
-                // TODO: 실제 계좌번호(cell.innerText)로 fetch API 호출
-            });
-        });
+        // HTML에서 비워둔 칸들 (JS로 채울 예정)
+        const modalAccName = document.getElementById("acc-name");
+        const modalAccNum = document.getElementById("acc-number");
+        const modalAccDate = document.getElementById("acc-date");
+        const historyTbody = document.getElementById("history-tbody");
 
+        // 숫자 포맷터 (1,000원)
+        const formatter = new Intl.NumberFormat('ko-KR');
+
+        // [핵심] .account-link 클래스를 가진 모든 버튼에 클릭 이벤트 부여
+        document.querySelectorAll(".account-link").forEach(btn => {
+            btn.addEventListener("click", async function() {
+
+                // 1. 클릭한 버튼의 텍스트(계좌번호)를 가져옴
+                const acctNo = this.textContent.trim();
+
+                // 2. 모달 열기 & 로딩 표시
+                historyTbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px;">내역을 불러오는 중...</td></tr>';
+                accountModal.style.display = "flex";
+
+                try {
+                    // 3. 서버로 계좌번호 전송 (AJAX)
+                    const response = await fetch('/flobank/mypage/transactionHistory', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ acctNo: acctNo })
+                    });
+
+                    const result = await response.json();
+
+                    if (result.status === 'success') {
+                        const acc = result.data.account;     // 계좌 기본정보
+                        const histList = result.data.history; // 거래내역 리스트 (잔액 계산됨)
+
+                        // 4. 상단 정보 채우기
+                        modalAccName.textContent = acc.acctName;
+                        modalAccNum.textContent = acc.acctNo;
+                        // 날짜가 있으면 앞 10자리만 자르기 (2024-06-15)
+                        modalAccDate.textContent = acc.acctRegDt ? acc.acctRegDt.substring(0, 10) : '-';
+
+                        // 5. 하단 리스트 채우기
+                        historyTbody.innerHTML = ""; // 초기화
+
+                        if (histList.length === 0) {
+                            // colspan="6"으로 변경
+                            historyTbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 20px;">거래 내역이 없습니다.</td></tr>';
+                        } else {
+                            histList.forEach(h => {
+                                const tr = document.createElement("tr");
+
+                                // 1. 스타일링 설정
+                                let typeStr = "기타";
+                                let typeColor = "#333";
+                                let amountColor = "#333";
+                                let amountPrefix = "";
+
+                                // 2. 거래 전 잔액 계산을 위한 변수
+                                let beforeBalance = 0;
+
+                                if (h.tranType === 1) {
+                                    // [입금]
+                                    typeStr = "입금";
+                                    typeColor = "blue";
+                                    amountColor = "blue";
+                                    amountPrefix = "+";
+                                    beforeBalance = h.tranBalance - h.tranAmount;
+
+                                } else if (h.tranType === 2) {
+                                    // [출금]
+                                    typeStr = "출금";
+                                    typeColor = "red";
+                                    amountColor = "red";
+                                    amountPrefix = "-";
+                                    beforeBalance = h.tranBalance + h.tranAmount;
+                                }
+
+                                // 3. HTML 조립
+                                tr.innerHTML = `
+                                    <td>${h.tranDt}</td>
+                                    <td style="color: ${typeColor}; font-weight:bold;">${typeStr}</td>
+                                    
+                                    <td style="text-align:right; padding-right:20px; color: #666;">
+                                        ${formatter.format(beforeBalance)}원
+                                    </td>
+
+                                    <td style="color: ${amountColor}; text-align:right; padding-right:20px;">
+                                        ${amountPrefix}${formatter.format(h.tranAmount)}원
+                                    </td>
+                                    <td style="text-align:right; padding-right:20px; font-weight:bold;">
+                                        ${formatter.format(h.tranBalance)}원
+                                    </td>
+                                    <td>${h.tranMemo || ''}</td>
+                                `;
+                                historyTbody.appendChild(tr);
+                            });
+                        }
+                    } else {
+                        // 성공 응답이 아닐 경우 (status != success)
+                        alert("데이터를 불러오지 못했습니다.");
+                        accountModal.style.display = "none";
+                    }
+
+                } catch (err) {
+                    // try 블록에서 에러 발생 시
+                    console.error(err);
+                    historyTbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:red;">오류가 발생했습니다.</td></tr>';
+                }
+            }); // click 이벤트 끝
+        }); // forEach 끝
+
+        // 닫기 버튼 (X)
         if (closeAccountBtn) {
-            closeAccountBtn.addEventListener("click", () => {
-                accountModal.style.display = "none";
-            });
+            closeAccountBtn.addEventListener("click", () => accountModal.style.display = "none");
         }
 
+        // 배경 클릭 닫기
         window.addEventListener("click", (e) => {
-            if (e.target === accountModal) {
-                accountModal.style.display = "none";
-            }
+            if (e.target === accountModal) accountModal.style.display = "none";
         });
     }
+
 
     // -------------------------------------------------------------
     // 예금 상세정보 모달 (depositModal)
@@ -289,4 +411,170 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
     }
+
+    // -------------------------------------------------------------
+    // [비밀번호 변경 로직] 현재 비밀번호 확인 -> 새 비밀번호 표시
+    // -------------------------------------------------------------
+    const btnCheckPw = document.getElementById("btn-check-pw");
+    const currentPwInput = document.getElementById("currentPw");
+    const pwCheckMsg = document.getElementById("pw-check-msg");
+    const step2Section = document.getElementById("step2-new-pw");
+
+    if (btnCheckPw) {
+        btnCheckPw.addEventListener("click", async function() {
+            const inputPw = currentPwInput.value;
+
+            if (!inputPw) {
+                alert("현재 비밀번호를 입력해주세요.");
+                return;
+            }
+
+            try {
+                // 1. 서버에 비밀번호 검증 요청 (AJAX)
+                const response = await fetch('/flobank/mypage/checkPw', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: inputPw })
+                });
+
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    // 2. 일치 시: 성공 메시지 + 입력창 잠금 + 새 비밀번호 창 열기
+                    pwCheckMsg.style.display = 'block';
+                    pwCheckMsg.style.color = 'blue';
+                    pwCheckMsg.textContent = "비밀번호가 확인되었습니다.";
+
+                    currentPwInput.readOnly = true;     // 수정 못하게 막음
+                    btnCheckPw.disabled = true;         // 버튼 비활성화
+                    step2Section.style.display = 'block'; // 2단계 열기
+
+                } else {
+                    // 3. 불일치 시: 에러 메시지
+                    pwCheckMsg.style.display = 'block';
+                    pwCheckMsg.style.color = 'red';
+                    pwCheckMsg.textContent = "비밀번호가 일치하지 않습니다.";
+                    currentPwInput.value = ""; // 비번 초기화
+                    currentPwInput.focus();
+                }
+
+            } catch (error) {
+                console.error("비밀번호 확인 중 오류:", error);
+                alert("서버 오류가 발생했습니다.");
+            }
+        });
+    }
+
+    // (추가) 새 비밀번호와 새 비밀번호 확인 일치 여부 실시간 체크
+    const newPw = document.getElementById("newPw");
+    const confirmNewPw = document.getElementById("confirmNewPw");
+    const newPwMsg = document.getElementById("new-pw-msg");
+
+    function checkNewPwMatch() {
+        const p1 = newPw.value;
+        const p2 = confirmNewPw.value;
+
+        if (p1 && p2) {
+            newPwMsg.style.display = 'block';
+            if (p1 === p2) {
+                newPwMsg.style.color = 'blue';
+                newPwMsg.textContent = "비밀번호가 일치합니다.";
+            } else {
+                newPwMsg.style.color = 'red';
+                newPwMsg.textContent = "비밀번호가 서로 다릅니다.";
+            }
+        } else {
+            newPwMsg.style.display = 'none';
+        }
+    }
+
+    if(newPw && confirmNewPw) {
+        newPw.addEventListener("keyup", checkNewPwMatch);
+        confirmNewPw.addEventListener("keyup", checkNewPwMatch);
+    }
+
+
+    const btnSearchZip = document.getElementById("btn-search-zip");
+
+    if (btnSearchZip) {
+        btnSearchZip.addEventListener("click", function() {
+            new daum.Postcode({
+                oncomplete: function(data) {
+                    // 1. 도로명/지번 주소 선택 로직
+                    var addr = ''; // 주소 변수
+
+                    if (data.userSelectedType === 'R') { // 도로명 주소 선택 시
+                        addr = data.roadAddress;
+                    } else { // 지번 주소 선택 시
+                        addr = data.jibunAddress;
+                    }
+
+                    // 2. 우편번호와 기본주소 입력
+                    document.getElementById('zipcode').value = data.zonecode;
+                    document.getElementById('addr1').value = addr;
+
+                    // 3. 상세주소 입력칸으로 포커스 이동 및 초기화
+                    const addr2Input = document.getElementById('addr2');
+                    addr2Input.value = '';
+                    addr2Input.focus();
+                }
+            }).open();
+        });
+    }
+
+    const btnSave = document.querySelector('.btn-save'); // 저장 버튼
+
+    if (btnSave) {
+        btnSave.addEventListener('click', async function() {
+
+            // 1. 보낼 데이터 준비 (기본 정보)
+            const updateData = {
+                email: document.getElementById('email').value,
+                hp: document.getElementById('hp').value,
+                zipcode: document.getElementById('zipcode').value,
+                addr1: document.getElementById('addr1').value,
+                addr2: document.getElementById('addr2').value
+            };
+
+            // 2. 비밀번호 변경 로직 확인
+            // (step2 영역이 보이고, 새 비밀번호가 입력되었을 때만 비번 변경 요청)
+            const step2Div = document.getElementById('step2-new-pw');
+            const newPwVal = document.getElementById('newPw').value;
+            const confirmPwVal = document.getElementById('confirmNewPw').value;
+
+            if (step2Div.style.display !== 'none' && newPwVal.trim() !== "") {
+                // 유효성 검사
+                if (newPwVal !== confirmPwVal) {
+                    alert("새 비밀번호와 확인 비밀번호가 일치하지 않습니다.");
+                    return;
+                }
+                // 비밀번호 데이터에 추가
+                updateData.newPassword = newPwVal;
+            }
+
+            // 3. 서버로 전송 (AJAX)
+            try {
+                const response = await fetch('/flobank/mypage/updateUserInfo', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updateData)
+                });
+
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    alert("회원 정보가 성공적으로 수정되었습니다.");
+                    location.reload(); // 화면 새로고침해서 변경된 정보 반영
+                } else {
+                    alert("수정 실패: " + result.message);
+                }
+
+            } catch (error) {
+                console.error("정보 수정 중 오류:", error);
+                alert("서버 통신 오류가 발생했습니다.");
+            }
+        });
+    }
+
+
 }); // <-- 메인 DOMContentLoaded 닫기

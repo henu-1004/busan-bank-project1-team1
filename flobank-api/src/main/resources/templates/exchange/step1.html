@@ -4,96 +4,108 @@
 * 내용 : 약관 동의관련 수정
 -->
 
-
-
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>환전하기1</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>환전하기1</title>
+
     <link rel="stylesheet" th:href="@{/css/exchange.css}">
     <link rel="stylesheet" th:href="@{/css/header.css}">
     <link rel="stylesheet" th:href="@{/css/footer.css}">
 
     <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-    crossorigin="anonymous"
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+            crossorigin="anonymous"
     />
-
 </head>
+
 <body>
 
 <div th:replace="~{_template/_header.html}"></div>
 
 <main class="step1-container">
 
-  <h1 class="step1-top-title">환전 약관 동의</h1>
+    <h1 class="step1-top-title">환전 약관 동의</h1>
 
-
-  <!-- 단계 표시 -->
-  <div class="step1-steps">
-    <div class="step1-step active">
-      <span class="num">1</span>
-      <span class="text">약관동의</span>
-    </div>
-    <div class="step1-step">
-      <span class="num">2</span>
-      <span class="text">정보입력</span>
-    </div>
-    <div class="step1-step">
-      <span class="num">3</span>
-      <span class="text">환전완료</span>
-    </div>
-  </div>
-
-
-
-
-  <div class="step1-box">
-
-    <div class="step1-info-box">
-      <p>
-        • 환전 서비스를 이용하시기 전, 아래 약관을 반드시 읽고 동의해주세요.<br>
-        • 모든 약관에 동의하셔야 다음 단계로 진행할 수 있습니다.
-      </p>
+    <!-- 단계 표시 -->
+    <div class="step1-steps">
+        <div class="step1-step active">
+            <span class="num">1</span>
+            <span class="text">약관동의</span>
+        </div>
+        <div class="step1-step">
+            <span class="num">2</span>
+            <span class="text">정보입력</span>
+        </div>
+        <div class="step1-step">
+            <span class="num">3</span>
+            <span class="text">환전완료</span>
+        </div>
     </div>
 
-    <!-- 약관 동의 영역 -->
-    <section class="step1-section">
+    <div class="step1-box">
 
-        <div class="step1-form-group" th:each="t, stat : ${termsList}">
-            <label class="step1-label" th:text="|${t.termTitle} (필수)|">약관 제목</label>
-
-        <div class="step1-input readonly">
-            <pre th:text="${t.thistContent}"></pre>
+        <div class="step1-info-box">
+            <p>
+                • 환전 서비스를 이용하시기 전, 아래 약관을 반드시 읽고 동의해주세요.<br>
+                • 모든 약관에 동의하셔야 다음 단계로 진행할 수 있습니다.
+            </p>
         </div>
 
-        <div class="step1-check">
-            <input type="checkbox" class="term-check"
-                   th:id="|exchange-term${stat.index}|"
-                   th:attr="data-cate=${t.termCate}, data-order=${t.termOrder}"> 위 약관에 동의합니다.
+        <!-- 약관 동의 영역 -->
+        <section class="step1-section">
+
+            <!-- 🔹 약관 1개씩 박스 형태로 출력 -->
+            <div class="step1-term-box" th:each="t, stat : ${termsList}">
+
+                <!-- 약관 제목 -->
+                <label class="step1-label" th:text="|${t.termTitle} (필수)|"></label>
+
+                <!-- 약관 내용 -->
+                <div class="step1-input readonly">
+                    <pre th:text="${t.thistContent}"></pre>
+                </div>
+
+                <!-- 체크박스 -->
+                <div class="step1-check">
+                    <input type="checkbox" class="term-check"
+                           th:id="|exchange-term${stat.index}|"
+                           th:attr="data-cate=${t.termCate}, data-order=${t.termOrder}">
+                    위 약관에 동의합니다.
+                </div>
+
+            </div>
+
+            <!-- 전체 동의 -->
+            <div class="step1-agree-all">
+                <label><input type="checkbox" id="agreeAll"> 모든 약관에 동의합니다.</label>
+            </div>
+
+        </section>
+
+        <!-- 버튼 -->
+        <div class="step1-actions">
+            <a th:href="@{/exchange/step2}" class="step1-btn-next">다음</a>
         </div>
-      </div>
 
-      <!-- 전체 동의 -->
-      <div class="step1-agree-all">
-        <label><input type="checkbox" id="agreeAll"> 모든 약관에 동의합니다.</label>
-      </div>
-    </section>
-
-    <!-- 버튼 -->
-    <div class="step1-actions">
-      <a th:href="@{/exchange/step2}">
-        <button class="step1-btn-next">다음</button>
-      </a>
     </div>
-  </div>
 </main>
+
 <div th:replace="~{_template/_footer.html}"></div>
-<script th:src ="@{/js/exchange.js}"></script>
+<script th:src="@{/js/exchange.js}"></script>
+
+
+
 
 </body>
 </html>
+
+
+
+
+
+
 

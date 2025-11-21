@@ -1,23 +1,26 @@
 package kr.co.api.flobankapi.dto.admin.dashboard;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Getter
+@Setter
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class DashboardDTO {
 
-    private int todayVisitCount;    //null
-    private int recent5mVisitCount;  //null
+    // 오늘 거래 건수 ( 원화? )
+    private int todayTotalTxCount;
+    // 오늘 거래 금액 ( 원화? )
+    private long todayTotalTxAmount;
+    private List<DailyTxSummaryDTO> last7Days;
 
-    // 오늘 거래 건수 (입출금 / 환전 / 외화송금 )
+
+    // 오늘 거래 건수 ( 환전 / 외화송금 )
     private List<TxCountDTO> todayTxCounts;
 
     // 가입자 수 (일/주/월)
@@ -31,4 +34,5 @@ public class DashboardDTO {
 
     // 기준 시각 (5분 단위 갱신 시간)
     private LocalDateTime lastUpdatedAt;
+
 }

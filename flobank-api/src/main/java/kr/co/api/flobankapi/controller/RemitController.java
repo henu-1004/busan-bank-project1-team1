@@ -19,10 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import kr.co.api.flobankapi.service.TermsDbService;
 
 import java.sql.Timestamp;
@@ -94,65 +91,73 @@ public class RemitController {
     }
 
     @PostMapping("en_transfer_3")
-    public String enTransfer3Post(@ModelAttribute FrgnRemtTranDTO frgnRemtTranDTO, Model model){
+    public String enTransfer3Post(@ModelAttribute FrgnRemtTranDTO frgnRemtTranDTO, Model model, @AuthenticationPrincipal CustomUserDetails userDetails) {
         if(frgnRemtTranDTO.getRemtCustName() == null){
-            frgnRemtTranDTO.setRemtCustName(frgnRemtTranDTO.getRemtRecAccNo());
+            frgnRemtTranDTO.setRemtCustName(userDetails.getCustName());
         }
 
         frgnRemtTranDTO.setRemtEsignYn("Y");
 
-        // 고객에게 출력될 계좌번호는 모체이기에 다시 불러옴
-        CustFrgnAcctDTO custFrgnAcctDTO = remitService.getParAcctNo(frgnRemtTranDTO.getRemtAcctNo());
-        model.addAttribute("custFrgnAcctDTO", custFrgnAcctDTO);
+        if (frgnRemtTranDTO.getRemtAcctNo().contains("-10-")) {
+            CustFrgnAcctDTO krwAcct = new CustFrgnAcctDTO();
+            krwAcct.setFrgnAcctNo(frgnRemtTranDTO.getRemtAcctNo());
+            krwAcct.setFrgnAcctName("원화 입출금통장");
+            model.addAttribute("custFrgnAcctDTO", krwAcct);
+        } else {
+            CustFrgnAcctDTO custFrgnAcctDTO = remitService.getParAcctNo(frgnRemtTranDTO.getRemtAcctNo());
+            model.addAttribute("custFrgnAcctDTO", custFrgnAcctDTO);
+        }
 
         if("Y".equals(frgnRemtTranDTO.getRemtEsignYn())){
             model.addAttribute("state", "정상");
-            model.addAttribute("frgnRemtTranDTO", frgnRemtTranDTO);
         }else {
             model.addAttribute("state", "실패");
-            model.addAttribute("frgnRemtTranDTO", frgnRemtTranDTO);
+        }
+        model.addAttribute("frgnRemtTranDTO", frgnRemtTranDTO);
+
+        // 1. 송금 통화(Target Currency) 설정 (받는 돈 기준)
+        String targetSymbol = "";
+        String targetName = "";
+        double defaultForeignFee = 0.0;
+
+        switch (frgnRemtTranDTO.getRemtCurrency()) {
+            case "USD": targetName = "(미국 달러)"; targetSymbol = "$"; defaultForeignFee = 3.34; break;
+            case "JPY": targetName = "(일본 엔화)"; targetSymbol = "¥"; defaultForeignFee = 526.33; break;
+            case "EUR": targetName = "(유럽 유로)"; targetSymbol = "€"; defaultForeignFee = 2.89; break;
+            case "CNH": targetName = "(중국 위안화)"; targetSymbol = "¥"; defaultForeignFee = 23.72; break;
+            case "GBP": targetName = "(영국 파운드)"; targetSymbol = "£"; defaultForeignFee = 2.55; break;
+            case "AUD": targetName = "(호주 달러)"; targetSymbol = "$"; defaultForeignFee = 5.14; break;
+            default: break;
         }
 
-        // 원화 계좌일 때의 수수료 / 각 통화별 수수료 설정
+        // 송금 금액 표시는 항상 해당 외화 기준
+        model.addAttribute("targetCurrencyName", targetName);
+        model.addAttribute("targetCurrencySymbol", targetSymbol);
+
+        // 2. 출금 계좌 타입에 따른 로직 분리 (원화 vs 외화)
         if(frgnRemtTranDTO.getRemtAcctNo().contains("-10-")){
-            model.addAttribute("currency", "(한국 원화)");
-            model.addAttribute("currencySymbol", "₩");
-            frgnRemtTranDTO.setRemtFee(4900); // 고정 수수료
-        } else{
-            switch (frgnRemtTranDTO.getRemtCurrency()) {
-                case "USD":
-                    model.addAttribute("currency", "(미국 달러)");
-                    model.addAttribute("currencySymbol", "$");   // 미국 달러
-                    frgnRemtTranDTO.setRemtFee(3.34);
-                    break;
-                case "JPY":
-                    model.addAttribute("currency", "(일본 엔화)");
-                    model.addAttribute("currencySymbol", "¥");   // 일본 엔화
-                    frgnRemtTranDTO.setRemtFee(526.33);
-                    break;
-                case "EUR":
-                    model.addAttribute("currency", "(유럽 유로)");
-                    model.addAttribute("currencySymbol", "€");   // 유로
-                    frgnRemtTranDTO.setRemtFee(2.89);
-                    break;
-                case "CNH":
-                    model.addAttribute("currency", "(중국 위안화)");
-                    model.addAttribute("currencySymbol", "¥");   // 중국 위안화
-                    frgnRemtTranDTO.setRemtFee(23.72);
-                    break;
-                case "GBP":
-                    model.addAttribute("currency", "(영국 파운드)");
-                    model.addAttribute("currencySymbol", "£");   // 영국 파운드
-                    frgnRemtTranDTO.setRemtFee(2.55);
-                    break;
-                case "AUD":
-                    model.addAttribute("currency", "(호주 달러)");
-                    model.addAttribute("currencySymbol", "$");   // 호주 달러 (구분이 필요하면 "A$" 사용 가능)
-                    frgnRemtTranDTO.setRemtFee(5.14);
-                    break;
-                default:
-                    break;
-            }
+            // [원화 계좌 출금]
+            // 수수료 및 출금액은 '원화(₩)'로 표시
+            frgnRemtTranDTO.setRemtFee(4900); // 원화 고정 수수료
+
+            // 예상 출금 금액 계산 (송금액 * 환율 + 수수료)
+            // (주의: 화면에서 넘어온 remtAppliedRate가 있어야 정확한 계산 가능)
+            double withdrawAmount = (frgnRemtTranDTO.getRemtAmount() * frgnRemtTranDTO.getRemtAppliedRate());
+
+            model.addAttribute("feeCurrencySymbol", "₩");
+            model.addAttribute("withdrawalAmount", (long)withdrawAmount); // 원화는 정수로 표시
+            model.addAttribute("totalWithdrawalAmount", (long)(withdrawAmount + frgnRemtTranDTO.getRemtFee())); // 총 출금액
+            model.addAttribute("isKrwAccount", true);
+
+        } else {
+            // [외화 계좌 출금]
+            // 수수료 및 출금액은 '해당 외화'로 표시
+            frgnRemtTranDTO.setRemtFee(defaultForeignFee);
+
+            model.addAttribute("feeCurrencySymbol", targetSymbol);
+            model.addAttribute("withdrawalAmount", frgnRemtTranDTO.getRemtAmount());
+            model.addAttribute("totalWithdrawalAmount", frgnRemtTranDTO.getRemtAmount() + frgnRemtTranDTO.getRemtFee());
+            model.addAttribute("isKrwAccount", false);
         }
 
         log.info("frgnRemtTranDTO = {}", frgnRemtTranDTO);
@@ -163,40 +168,47 @@ public class RemitController {
     @PostMapping("/en_transfer_4")
     public String en_transfer_4(@ModelAttribute FrgnRemtTranDTO frgnRemtTranDTO, Model model) {
 
-        // 1. 이체 승인 여부 설정 (Y)
         frgnRemtTranDTO.setRemtEsignYn("Y");
-
-        // 2. DB 저장 (Service 호출)
         boolean check = remitService.saveFrgnTran(frgnRemtTranDTO);
 
-        // 3. 완료 페이지 보여주기 위한 데이터 세팅
-        // 3-1. 출금 계좌 정보(모체 계좌) 다시 조회
-        CustFrgnAcctDTO custFrgnAcctDTO = remitService.getParAcctNo(frgnRemtTranDTO.getRemtAcctNo());
-        model.addAttribute("custFrgnAcctDTO", custFrgnAcctDTO);
-
-        // 3-2. 통화 기호 및 수수료 정보 다시 세팅 (화면에 보여주기 위함)
-        String currencySymbol = "";
-        String currencyName = "";
-
-        if(frgnRemtTranDTO.getRemtAcctNo().contains("-10-")){
-            currencyName = "(한국 원화)";
-            currencySymbol = "₩";
+        if (frgnRemtTranDTO.getRemtAcctNo().contains("-10-")) {
+            CustFrgnAcctDTO krwAcct = new CustFrgnAcctDTO();
+            krwAcct.setFrgnAcctNo(frgnRemtTranDTO.getRemtAcctNo());
+            krwAcct.setFrgnAcctName("원화 입출금통장");
+            model.addAttribute("custFrgnAcctDTO", krwAcct);
         } else {
-            switch (frgnRemtTranDTO.getRemtCurrency()) {
-                case "USD": currencyName = "(미국 달러)"; currencySymbol = "$"; break;
-                case "JPY": currencyName = "(일본 엔화)"; currencySymbol = "¥"; break;
-                case "EUR": currencyName = "(유럽 유로)"; currencySymbol = "€"; break;
-                case "CNH": currencyName = "(중국 위안화)"; currencySymbol = "¥"; break;
-                case "GBP": currencyName = "(영국 파운드)"; currencySymbol = "£"; break;
-                case "AUD": currencyName = "(호주 달러)"; currencySymbol = "$"; break;
-            }
+            CustFrgnAcctDTO custFrgnAcctDTO = remitService.getParAcctNo(frgnRemtTranDTO.getRemtAcctNo());
+            model.addAttribute("custFrgnAcctDTO", custFrgnAcctDTO);
         }
 
-        model.addAttribute("currency", currencyName);
-        model.addAttribute("currencySymbol", currencySymbol);
+        // 1. 송금 통화 정보 설정
+        String targetSymbol = "";
+        String targetName = "";
+        switch (frgnRemtTranDTO.getRemtCurrency()) {
+            case "USD": targetName = "(미국 달러)"; targetSymbol = "$"; break;
+            case "JPY": targetName = "(일본 엔화)"; targetSymbol = "¥"; break;
+            case "EUR": targetName = "(유럽 유로)"; targetSymbol = "€"; break;
+            case "CNH": targetName = "(중국 위안화)"; targetSymbol = "¥"; break;
+            case "GBP": targetName = "(영국 파운드)"; targetSymbol = "£"; break;
+            case "AUD": targetName = "(호주 달러)"; targetSymbol = "$"; break;
+        }
+        model.addAttribute("targetCurrencyName", targetName);
+        model.addAttribute("targetCurrencySymbol", targetSymbol);
 
-        // 결과 상태
-        if(check){ // DB 결과 정상적으로 작동하지 않았는데 여기로 왔다면 실패
+        // 2. 출금/수수료 통화 정보 설정
+        if(frgnRemtTranDTO.getRemtAcctNo().contains("-10-")){
+            model.addAttribute("feeCurrencySymbol", "₩");
+            model.addAttribute("isKrwAccount", true);
+            // 원화 환산 출금액 (수수료 제외한 순수 환전금액)
+            double withdrawAmount = frgnRemtTranDTO.getRemtAmount() * frgnRemtTranDTO.getRemtAppliedRate();
+            model.addAttribute("withdrawalAmount", (long)withdrawAmount);
+        } else {
+            model.addAttribute("feeCurrencySymbol", targetSymbol);
+            model.addAttribute("isKrwAccount", false);
+            model.addAttribute("withdrawalAmount", frgnRemtTranDTO.getRemtAmount());
+        }
+
+        if(check){
             model.addAttribute("state", "정상");
         }else{
             model.addAttribute("state", "실패");

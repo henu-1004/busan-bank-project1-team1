@@ -23,27 +23,46 @@
     <aside class="profile-card">
         <div class="profile-header">
             <i class="fa-solid fa-circle-user"></i>
-            <h3>OOO 고객님</h3>
-            <p>최근 접속일 2025.11.02 15:03:03</p>
+            <h3 th:text="|${custInfo.custName} 고객님|"></h3>
+            <p th:text="|최근 접속일 ${custInfo.custLastLoginDt}|"></p>
 
-            <div class="security-container">
-                <div class="security-info">
-                    <span class="security-badge grade-1">보안등급 1등급</span>
-                    <p class="limit-text">이체한도: 1일 5억원 / 1회 1억원</p>
-                </div>
+            <div class="security-info">
+                <span class="security-badge"
+                      th:classappend="|grade-${custInfo.custSecurityLevel}|"
+                      th:text="|보안등급 ${custInfo.custSecurityLevel}등급|">
+                </span>
+                <th:block th:switch="${custInfo.custSecurityLevel}">
+                    <p th:case="1" class="limit-text">이체한도: 1일 5억원 / 1회 1억원</p>
+                    <p th:case="2" class="limit-text">이체한도: 1일 5천만원 / 1회 1천만원</p>
+                    <p th:case="3" class="limit-text">이체한도: 1일 1천만원 / 1회 1천만원</p>
+                    <p th:case="*" class="limit-text">등급 정보 없음</p>
+                </th:block>
             </div>
 
         </div>
 
 
         <ul class="profile-info">
-            <li><i class="fa-solid fa-user"></i> idididid</li>
-            <li><i class="fa-solid fa-envelope"></i> qqqq@naver.com</li>
-            <li><i class="fa-solid fa-phone"></i> 010-1111-****</li>
+            <ul class="profile-info">
+                <li>
+                    <i class="fa-solid fa-user"></i>
+                    <span th:text="${custInfo.custId}"></span>
+                </li>
+
+                <li>
+                    <i class="fa-solid fa-envelope"></i>
+                    <span th:text="${custInfo.custEmail}"></span>
+                </li>
+
+                <li>
+                    <i class="fa-solid fa-phone"></i>
+                    <span th:text="${custInfo.custHp}"></span>
+                </li>
+            </ul>
         </ul>
 
         <div class="profile-footer">
-            <a href="#">사용자 정보 변경 <i class="fa-solid fa-pen"></i></a>
+            <a href="#" id="btn-user-info-modal">사용자 정보 변경 <i class="fa-solid fa-pen"></i></a>
             <div class="profile-action">
                 <a th:href="@{/mypage/account_open_main}" class="btn-flow-open">
                     <i class="fa-solid fa-building-columns"></i> 입출금통장 개설
@@ -105,7 +124,7 @@
                         <td>
                             <button class="account-link" th:text="${acct.acctNo}">계좌번호</button>
                         </td>
-                        <!-- #numbers.formatInteger로 콤마(,) 추가 -->
+
                         <td th:text="|${#numbers.formatInteger(acct.acctBalance, 0, 'COMMA')}원|">잔액</td>
                         <td>
                             <form th:action="@{/mypage/ko_transfer_1}" method="post" style="display: inline;">
@@ -150,12 +169,6 @@
                         </td>
                         <td>
                             <a th:href="@{/remit/en_transfer_1}" class="btn-transfer">이체</a>
-                            <!--
-                            <form th:action="@{/remit/en_transfer_1}" method="post">
-                                <input type="hidden" name="acctNo" th:value="${custFrgnAcctDTO.frgnAcctNo}">
-                                <button type="submit" class="btn-transfer">이체</button>
-                            </form>
-                            -->
                         </td>
                     </tr>
 
@@ -257,48 +270,125 @@
                 <h2>보유 외화 자산</h2>
             </div>
 
-            <div class="currency-list">
-                <div class="currency-card">
-                    <i class="fa-solid fa-dollar-sign"></i>
-                    <p>미국 달러 (USD)</p>
-                    <strong>$1,245.00</strong>
-                </div>
+            <div th:if="${#lists.isEmpty(frgnBalanceList)}" style="text-align: center; padding: 30px; color: #666; background: #f9f9f9; border-radius: 12px;">
+                <i class="fa-solid fa-circle-exclamation" style="font-size: 24px; margin-bottom: 10px; color: #ccc;"></i>
+                <p>보유 중인 외화 계좌가 없습니다.</p>
+            </div>
 
-                <div class="currency-card">
-                    <i class="fa-solid fa-yen-sign"></i>
-                    <p>일본 엔화 (JPY)</p>
-                    <strong>¥158,230</strong>
-                </div>
+            <div class="currency-list" th:unless="${#lists.isEmpty(frgnBalanceList)}">
 
-                <div class="currency-card">
-                    <i class="fa-solid fa-euro-sign"></i>
-                    <p>유럽 유로 (EUR)</p>
-                    <strong>€980.50</strong>
-                </div>
+                <div class="currency-card" th:each="bal : ${frgnBalanceList}">
 
-                <div class="currency-card">
-                    <i class="fa-solid fa-yen-sign"></i>
-                    <p>중국 위안화 (CNH)</p>
-                    <strong>¥8,350.00</strong>
-                </div>
+                    <th:block th:switch="${bal.balCurrency}">
+                        <th:block th:case="'USD'">
+                            <i class="fa-solid fa-dollar-sign"></i>
+                            <p>미국 달러 (USD)</p>
+                        </th:block>
+                        <th:block th:case="'JPY'">
+                            <i class="fa-solid fa-yen-sign"></i>
+                            <p>일본 엔화 (JPY)</p>
+                        </th:block>
+                        <th:block th:case="'EUR'">
+                            <i class="fa-solid fa-euro-sign"></i>
+                            <p>유럽 유로 (EUR)</p>
+                        </th:block>
+                        <th:block th:case="'CNH'">
+                            <i class="fa-solid fa-yen-sign"></i> <p>중국 위안화 (CNH)</p>
+                        </th:block>
+                        <th:block th:case="'GBP'">
+                            <i class="fa-solid fa-sterling-sign"></i>
+                            <p>영국 파운드 (GBP)</p>
+                        </th:block>
+                        <th:block th:case="'AUD'">
+                            <i class="fa-solid fa-dollar-sign"></i>
+                            <p>호주 달러 (AUD)</p>
+                        </th:block>
+                    </th:block>
 
-                <div class="currency-card">
-                    <i class="fa-solid fa-sterling-sign"></i>
-                    <p>영국 파운드 (GBP)</p>
-                    <strong>£700.20</strong>
-                </div>
+                    <strong th:switch="${bal.balCurrency}">
 
-                <div class="currency-card">
-                    <i class="fa-solid fa-dollar-sign"></i>
-                    <p>호주 달러 (AUD)</p>
-                    <strong>$530.45</strong>
+                        <span th:case="'USD'"
+                              th:text="|$${(bal.balBalance % 1 == 0) ? #numbers.formatInteger(bal.balBalance, 1, 'COMMA') : #numbers.formatDecimal(bal.balBalance, 1, 'COMMA', 2, 'POINT')}|">
+                        </span>
+                        <span th:case="'AUD'"
+                              th:text="|$${(bal.balBalance % 1 == 0) ? #numbers.formatInteger(bal.balBalance, 1, 'COMMA') : #numbers.formatDecimal(bal.balBalance, 1, 'COMMA', 2, 'POINT')}|">
+                        </span>
+
+                        <span th:case="'JPY'"
+                              th:text="|¥${(bal.balBalance % 1 == 0) ? #numbers.formatInteger(bal.balBalance, 1, 'COMMA') : #numbers.formatDecimal(bal.balBalance, 1, 'COMMA', 2, 'POINT')}|">
+                        </span>
+                        <span th:case="'CNH'"
+                              th:text="|¥${(bal.balBalance % 1 == 0) ? #numbers.formatInteger(bal.balBalance, 1, 'COMMA') : #numbers.formatDecimal(bal.balBalance, 1, 'COMMA', 2, 'POINT')}|">
+                        </span>
+
+                        <span th:case="'EUR'"
+                              th:text="|€${(bal.balBalance % 1 == 0) ? #numbers.formatInteger(bal.balBalance, 1, 'COMMA') : #numbers.formatDecimal(bal.balBalance, 1, 'COMMA', 2, 'POINT')}|">
+                        </span>
+
+                        <span th:case="'GBP'"
+                              th:text="|£${(bal.balBalance % 1 == 0) ? #numbers.formatInteger(bal.balBalance, 1, 'COMMA') : #numbers.formatDecimal(bal.balBalance, 1, 'COMMA', 2, 'POINT')}|">
+                        </span>
+
+                    </strong>
+
                 </div>
             </div>
         </div>
+        <div class="my-account" style="margin-top: 40px;">
 
-    </section>
-</main>
+            <div class="account-header">
+                <h2>쿠폰 보유 내역</h2>
+            </div>
 
+            <div class="account-body">
+
+                <div th:if="${#lists.isEmpty(couponList)}" style="text-align: center; padding: 40px 0; color: #888;">
+                    <p>보유 중인 쿠폰이 없습니다.</p>
+                </div>
+
+                <table class="account-table" th:unless="${#lists.isEmpty(couponList)}">
+                    <thead>
+                    <tr>
+                        <th>쿠폰명</th>
+                        <th>우대율</th>
+                        <th>발급일자</th>
+                        <th>상태</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="coupon : ${couponList}">
+
+                        <td style="font-weight: 600;">환전 수수료 우대 쿠폰</td>
+
+                        <td style="color: #005eb8; font-weight: 700;"
+                            th:text="|${coupon.coupRate}%|">
+                        </td>
+
+                        <td>
+                            <span th:if="${coupon.coupIssuedDy != null and coupon.coupIssuedDy.length() == 8}"
+                                  th:text="|${#strings.substring(coupon.coupIssuedDy,0,4)}-${#strings.substring(coupon.coupIssuedDy,4,6)}-${#strings.substring(coupon.coupIssuedDy,6,8)}|">
+                            </span>
+                            <span th:unless="${coupon.coupIssuedDy != null and coupon.coupIssuedDy.length() == 8}"
+                                  th:text="${coupon.coupIssuedDy}">
+                            </span>
+                        </td>
+
+                        <td>
+                            <span th:if="${coupon.coupStatus == 1}"
+                                  style="color: #005eb8; background: #e8f0fe; padding: 4px 10px; border-radius: 20px; font-size: 13px; font-weight: 600;">
+                                사용가능
+                            </span>
+                            <span th:if="${coupon.coupStatus == 0}"
+                                  style="color: #666; background: #f5f5f5; padding: 4px 10px; border-radius: 20px; font-size: 13px; font-weight: 600;">
+                                사용불가
+                            </span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section> </main>
 
 <div id="userInfoModal" class="modal">
     <div class="modal-content">
@@ -308,52 +398,69 @@
         <form class="user-info-form">
             <div class="form-group">
                 <label>이름</label>
-                <input type="text" value="홍길동" readonly>
+                <input type="text" th:value="${custInfo.custName}" readonly>
             </div>
 
             <div class="form-group">
                 <label>성별</label>
-                <input type="text" value="남자" readonly>
+                <input type="text" th:value="${custInfo.custGen == 'M' ? '남자' : '여자'}" readonly>
             </div>
 
             <div class="form-group">
                 <label>아이디</label>
-                <input type="text" value="idididid">
+                <input type="text" th:value="${custInfo.custId}" readonly>
             </div>
 
-            <div class="form-group">
-                <label>비밀번호</label>
-                <input type="password" placeholder="새 비밀번호 입력">
-            </div>
+            <div class="password-section">
 
-            <div class="form-group">
-                <label>비밀번호 확인</label>
-                <input type="password" placeholder="비밀번호를 다시 입력하세요">
+                <div id="step1-current-pw" class="form-group">
+                    <label>현재 비밀번호</label>
+                    <div class="input-inline">
+                        <input type="password" id="currentPw" placeholder="현재 비밀번호를 입력하세요">
+                        <button type="button" id="btn-check-pw" class="register-btn">확인</button>
+                    </div>
+                    <div id="pw-check-msg" style="display: none; font-size: 12px; margin-top: 5px;"></div>
+                </div>
+
+                <div id="step2-new-pw" style="display: none;">
+                    <div class="form-group">
+                        <label>새 비밀번호</label>
+                        <input type="password" id="newPw" placeholder="새 비밀번호 입력">
+                    </div>
+
+                    <div class="form-group">
+                        <label>새 비밀번호 확인</label>
+                        <input type="password" id="confirmNewPw" placeholder="새 비밀번호 다시 입력">
+                        <div id="new-pw-msg" style="font-size: 12px; margin-top: 5px; color: red; display: none;"></div>
+                    </div>
+                </div>
+
             </div>
 
             <div class="form-group">
                 <label>이메일</label>
-                <input type="email" value="qqqq@naver.com">
+                <input type="email" id="email" th:value="${custInfo.custEmail}">
             </div>
 
             <div class="form-group">
                 <label>휴대폰번호</label>
-                <input type="text" value="010-1111-****">
+                <input type="text" id="hp" th:value="${custInfo.custHp}">
             </div>
 
             <div class="form-group">
                 <label>주소</label>
                 <div class="address-group">
                     <div class="input-inline">
-                        <input type="text" id="zipcode" placeholder="우편번호" readonly>
-                        <button type="button" class="register-btn">우편번호 검색</button>
+                        <input type="text" id="zipcode" th:value="${custInfo.custZip}" placeholder="우편번호" readonly>
+                        <button type="button" class="register-btn" id="btn-search-zip">우편번호 검색</button>
                     </div>
-                    <input type="text" id="addr1" placeholder="기본주소">
-                    <input type="text" id="addr2" placeholder="상세주소">
+                    <input type="text" id="addr1" th:value="${custInfo.custAddr1}" placeholder="기본주소">
+                    <input type="text" id="addr2" th:value="${custInfo.custAddr2}" placeholder="상세주소">
                 </div>
             </div>
 
             <button type="button" class="btn-save">변경사항 저장</button>
+            <button type="button" class="btn-withdraw" id="btn-withdraw">회원 탈퇴</button>
         </form>
     </div>
 </div>
@@ -403,44 +510,40 @@
 
         <table class="detail-table">
             <tbody>
-            <tr><th>계좌명</th><td id="acc-name">자유저축예금</td></tr>
-            <tr><th>계좌번호</th><td id="acc-number">112-2188-1931-00</td></tr>
-            <tr><th>계좌개설일</th><td id="acc-date">2024-06-15</td></tr>
+            <tr>
+                <th>계좌명</th>
+                <td id="acc-name"></td>
+            </tr>
+            <tr>
+                <th>계좌번호</th>
+                <td id="acc-number"></td>
+            </tr>
+            <tr>
+                <th>계좌개설일</th>
+                <td id="acc-date"></td>
+            </tr>
             </tbody>
         </table>
 
         <h3>거래내역</h3>
+
         <table class="detail-table transaction-table">
             <thead>
             <tr>
                 <th>거래일시</th>
                 <th>구분</th>
+                <th>거래전금액</th>
                 <th>거래금액</th>
                 <th>잔액</th>
                 <th>메모</th>
             </tr>
             </thead>
-            <tbody>
+
+            <tbody id="history-tbody">
             <tr>
-                <td>2025-11-01 15:42</td>
-                <td>입금</td>
-                <td>₩2,000,000</td>
-                <td>₩2,450,000</td>
-                <td>급여</td>
-            </tr>
-            <tr>
-                <td>2025-10-31 17:35</td>
-                <td>출금</td>
-                <td>₩500,000</td>
-                <td>₩450,000</td>
-                <td>월세</td>
-            </tr>
-            <tr>
-                <td>2025-10-30 09:22</td>
-                <td>출금</td>
-                <td>₩120,000</td>
-                <td>₩350,000</td>
-                <td>식비</td>
+                <td colspan="6" style="text-align: center; padding: 20px;">
+                    계좌번호를 선택하면 내역이 표시됩니다.
+                </td>
             </tr>
             </tbody>
         </table>
@@ -486,6 +589,7 @@
 </div>
 
 <div th:replace="~{_template/_footer.html}"></div>
+<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 <script th:src="@{/js/user.js}"></script>
 
 </body>

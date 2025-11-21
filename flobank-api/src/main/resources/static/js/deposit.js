@@ -22,7 +22,7 @@ function fetchRateData(baseDate) {
     tableBody.innerHTML = `<tr><td colspan="13" class="no-data" style="padding: 30px; text-align: center; color: #999;">데이터를 불러오는 중...</td></tr>`;
 
     // AJAX를 사용하여 백엔드(Controller)에 요청
-    fetch(`/deposit/rates?baseDate=${baseDate}`)
+    fetch(`/flobank/deposit/rates?baseDate=${baseDate}`)
         .then(response => {
             if (!response.ok) {
                 // HTTP 오류 상태 (404, 500 등) 처리
@@ -42,9 +42,8 @@ function fetchRateData(baseDate) {
             data.forEach(item => {
                 // 금리를 소수점 2자리까지 표시하는 보조 함수
                 const formatRate = (rate) => {
-                    // null, 0, undefined 또는 NaN일 경우 '-' 반환
                     if (rate == null || parseFloat(rate) === 0 || isNaN(parseFloat(rate))) {
-                        return '-';
+                        return '0';
                     }
                     return parseFloat(rate).toFixed(2);
                 };

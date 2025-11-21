@@ -26,10 +26,18 @@ public class RemitService {
 
             // 계좌 잔액 처리
             if(frgnRemtTranDTO.getRemtAcctNo().contains("-10-")){
-                Integer bal = Math.toIntExact(Math.round(frgnRemtTranDTO.getRemtAmount()));
-                mypageMapper.updateMinusAcct(bal, frgnRemtTranDTO.getRemtAcctNo());
+                // [수정] 원화 계좌인 경우: (외화금액 * 환율) + 수수료(원화) 차감
+                // getRemtAmount는 외화 기준이므로 환율을 곱해야 함
+                double krwAmount = frgnRemtTranDTO.getRemtAmount() * frgnRemtTranDTO.getRemtAppliedRate();
+                // 수수료까지 포함하여 차감할지, 수수료는 별도인지 정책에 따름 (보통 총 출금액 차감)
+                // 여기서는 수수료 포함하여 차감하는 로직으로 작성
+                int totalDeductAmount = (int)(krwAmount + frgnRemtTranDTO.getRemtFee());
+
+                mypageMapper.updateMinusAcct(totalDeductAmount, frgnRemtTranDTO.getRemtAcctNo());
             } else {
-                remitMapper.updateMinusBal(frgnRemtTranDTO.getRemtAmount(), frgnRemtTranDTO.getRemtAcctNo());
+                // 외화 계좌인 경우: 외화금액 + 수수료(외화) 차감
+                double totalDeductAmount = frgnRemtTranDTO.getRemtAmount() + frgnRemtTranDTO.getRemtFee();
+                remitMapper.updateMinusBal(totalDeductAmount, frgnRemtTranDTO.getRemtAcctNo());
             }
 
         }catch (Exception e){
@@ -38,7 +46,6 @@ public class RemitService {
         }
 
         return true;
-
     }
 
     // 모체 계좌번호 가져오기

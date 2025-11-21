@@ -13,12 +13,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,14 +39,30 @@ public class MypageController {
     private final PineconeService pineconeService;
     private final ChatGPTService chatGPTService;
 
+    private final PasswordEncoder passwordEncoder;
 
     @GetMapping({"/main","/"})
     public String mypage(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
 
         String userCode = userDetails.getUsername();
+        CustInfoDTO custInfo = mypageService.getCustInfo(userCode);
         List<CustAcctDTO> custAcctDTOList = mypageService.findAllAcct(userCode);
         CustFrgnAcctDTO  custFrgnAcctDTO = mypageService.findFrgnAcct(userCode);
 
+        CustFrgnAcctDTO frgnAcct = mypageService.findFrgnAcct(userCode);
+        List<FrgnAcctBalanceDTO> frgnBalanceList = new ArrayList<>();
+
+        if (frgnAcct != null) {
+            // 외화 계좌(모체)가 있으면 -> 자식 계좌 리스트(USD, JPY...) 조회
+            frgnBalanceList = mypageService.getAllFrgnAcctBal(frgnAcct.getFrgnAcctNo());
+            model.addAttribute("custFrgnAcctDTO", frgnAcct);
+        }
+
+
+        List<CouponDTO> couponList = mypageService.getCouponList(userCode);
+        model.addAttribute("couponList", couponList);
+        model.addAttribute("frgnBalanceList", frgnBalanceList);
+        model.addAttribute("custInfo", custInfo);
         model.addAttribute("custAcctDTOList",custAcctDTOList);
         model.addAttribute("custFrgnAcctDTO",custFrgnAcctDTO);
 
@@ -287,19 +305,101 @@ public class MypageController {
     }
 
     @PostMapping("/ko_transfer_2")
-    public String ko_transfer_2(Model model, @ModelAttribute CustTranHistDTO custTranHistDTO, @AuthenticationPrincipal CustomUserDetails userDetails) {
-        log.info("수정전 custTranHistDTO = " + custTranHistDTO);
+    public String ko_transfer_2(Model model,
+                                @ModelAttribute CustTranHistDTO custTranHistDTO,
+                                @AuthenticationPrincipal CustomUserDetails userDetails,
+                                RedirectAttributes redirectAttributes) {
+
+        log.info("이체 2단계 진입 - 입력 정보: " + custTranHistDTO);
+
+        // 1. 입금 은행 코드 및 계좌번호 추출
+        String bankCode = custTranHistDTO.getTranRecBkCode();
+        String acctNo = custTranHistDTO.getTranRecAcctNo();
+        String realOwnerName = ""; // 조회된 실제 예금주명
+
+        // 2. 은행 코드에 따른 분기 처리 (자행 vs 타행)
+        try {
+            if ("888".equals(bankCode)) { // 자행
+                // [플로은행] 내부 계좌 조회
+                CustAcctDTO acct = mypageService.findCustAcct(acctNo);
+
+                if (acct == null) {
+                    throw new Exception("존재하지 않는 플로은행 계좌입니다.");
+                }
+
+                realOwnerName = acct.getAcctName();
+
+            } else { // 타행
+                // [외부은행] 타행 계좌 조회 (TB_EXT_ACCT)
+                ExtAcctDTO extAcct = mypageService.findExtAcct(acctNo, custTranHistDTO.getTranRecBkCode());
+
+                if (extAcct == null) {
+                    throw new Exception("해당 은행에 존재하지 않는 계좌번호입니다.");
+                }
+                // ExtAcctDTO의 예금주명 필드 (예: extCustName)
+                realOwnerName = extAcct.getExtCustName(); // ※실제 DTO 변수명에 맞춰 수정 필요
+            }
+        } catch (Exception e) {
+            // 계좌 검증 실패 시 이전 페이지로 리다이렉트
+            log.error("계좌 조회 실패: {}", e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            // 계좌번호 등 입력했던 정보를 다시 유지하고 싶다면 파라미터로 붙여서 보낼 수 있음
+            return "redirect:/mypage/ko_transfer_1?acctNo=" + custTranHistDTO.getTranAcctNo();
+        }
+
+        // 3. 검증된 '실제 예금주명'을 DTO에 세팅
+        // 사용자가 입력한 값이 있더라도, 금융 실명 확인을 위해 조회된 이름으로 덮어쓰는 것이 안전함
+        custTranHistDTO.setTranRecName(realOwnerName);
+
+
+        // 4. 나머지 데이터(메모 등) 처리
+        // '내통장표시'가 비어있으면 -> 사용자 이름(보내는 사람) or 조회된 받는분 이름 등 정책에 따라 설정
         if(custTranHistDTO.getTranCustName() == null || custTranHistDTO.getTranCustName().trim().isEmpty()){
+            // 예: 비어있으면 '나에게' 메모에는 '받는 사람 이름'을 기본으로 입력 등
+            // 여기서는 기존 로직 유지 (로그인 유저 이름)
             custTranHistDTO.setTranCustName(userDetails.getCustName());
         }
-        if(custTranHistDTO.getTranRecName() == null || custTranHistDTO.getTranRecName().trim().isEmpty()){
-            custTranHistDTO.setTranRecName(custTranHistDTO.getTranRecAcctNo());
-        }
-        log.info("수정후 custTranHistDTO = " + custTranHistDTO);
+
+        // 로그 확인
+        log.info("검증 완료 후 DTO: " + custTranHistDTO);
 
         model.addAttribute("custTranHistDTO", custTranHistDTO);
 
-        return  "mypage/ko_transfer_2";
+        return "mypage/ko_transfer_2";
+    }
+
+    // 계좌번호 유효성 검사 API
+    @PostMapping("/api/validate-account")
+    public ResponseEntity<Map<String, Object>> validateAccount(@RequestBody Map<String, String> requestData) {
+        String bankCode = requestData.get("bankCode");
+        String acctNo = requestData.get("acctNo");
+
+        boolean exists = false;
+        String ownerName = "";
+
+        // 1. 플로은행(888)인 경우
+        if ("888".equals(bankCode)) {
+            CustAcctDTO acct = mypageService.findCustAcct(acctNo);
+            if (acct != null) {
+                exists = true;
+                // 예금주명 가져오기 (DTO 필드명 확인 필요, 여기선 예시)
+                ownerName = acct.getAcctName();
+            }
+        }
+        // 2. 타행인 경우 (TB_EXT_ACCT 조회)
+        else {
+            ExtAcctDTO extAcct = mypageService.findExtAcct(acctNo, bankCode);
+            if (extAcct != null) {
+                exists = true;
+                ownerName = extAcct.getExtCustName();
+            }
+        }
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("exists", exists);
+        response.put("ownerName", ownerName); // 필요 시 사용
+
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/ko_transfer_3")
@@ -326,6 +426,75 @@ public class MypageController {
         return  "mypage/ko_transfer_3";
     }
 
+
+    @PostMapping("/checkPw")
+    @ResponseBody // [필수] JSON 응답을 위해 꼭 필요
+    public Map<String, Object> checkPw(@RequestBody Map<String, String> requestData,
+                                       @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            String inputPw = requestData.get("password");
+            String userCode = userDetails.getUsername();
+
+            boolean isMatch = mypageService.checkPassword(userCode, inputPw);
+
+            if (isMatch) {
+                response.put("status", "success");
+            } else {
+                response.put("status", "fail");
+            }
+
+        } catch (Exception e) {
+            log.error("비밀번호 확인 중 에러 발생", e);
+            response.put("status", "error");
+            response.put("message", "서버 오류가 발생했습니다.");
+        }
+
+        return response;
+    }
+
+
+    @PostMapping("/updateUserInfo")
+    @ResponseBody
+    public Map<String, Object> updateUserInfo(@RequestBody Map<String, String> requestData,
+                                              @AuthenticationPrincipal CustomUserDetails userDetails) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            String userCode = userDetails.getUsername();
+            // 서비스 호출 (데이터 맵과 유저코드를 넘김)
+            mypageService.modifyUserInfo(userCode, requestData);
+            response.put("status", "success");
+
+        } catch (Exception e) {
+            response.put("status", "error");
+            response.put("message", "서버 오류 발생");
+        }
+
+        return response;
+    }
+
+
+    @PostMapping("/transactionHistory")
+    @ResponseBody
+    public Map<String, Object> transactionHistory(@RequestBody Map<String, String> requestData) {
+        Map<String, Object> response = new HashMap<>();
+        String acctNo = requestData.get("acctNo");
+
+        try {
+            // 서비스 호출 (잔액 계산된 내역 가져오기)
+            Map<String, Object> data = mypageService.getAcctDetailWithHistory(acctNo);
+            response.put("status", "success");
+            response.put("data", data);
+
+        } catch (Exception e) {
+            response.put("status", "error");
+            response.put("message", "서버 오류가 발생했습니다.");
+        }
+
+        return response;
+    }
 
 
 }

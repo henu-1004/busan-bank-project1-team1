@@ -257,3 +257,11 @@
   color: #2C5DE5;
   font-weight: 700;
 }
+
+.terms-content {
+    overflow-x: hidden;   /* 가로 스크롤 제거 */
+}
+
+.terms-content pre {
+    white-space: pre-wrap; /* 가로 스크롤 없이 줄바꿈 */
+}

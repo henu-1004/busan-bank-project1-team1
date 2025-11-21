@@ -4,14 +4,18 @@ document.addEventListener('DOMContentLoaded', function() {
     const tranAmountInput = document.getElementById('tranAmount');      // 보여지는 입력창 (Text)
     const hiddenTranAmount = document.getElementById('hiddenTranAmount'); // 실제 전송용 (Hidden)
     const tranRecAcctNoInput = document.getElementById('tranRecAcctNo');
+    const tranRecBkCodeInput = document.getElementById('tranRecBkCode'); // [추가] 은행 코드 선택값 가져오기 위함
 
     const accountBalanceInput = document.getElementById('accountBalance');
 
     const tranAmountError = document.getElementById('tranAmountError');
     const tranRecAcctNoError = document.getElementById('tranRecAcctNoError');
 
-    // [기능 1] 폼 제출 시 유효성 검사
-    form.addEventListener('submit', function(event) {
+    // [기능 1] 폼 제출 시 유효성 검사 및 서버 계좌 확인
+    form.addEventListener('submit', async function(event) {
+        // 1. 일단 폼의 자동 제출을 막습니다.
+        event.preventDefault();
+
         let isValid = true;
 
         const balance = accountBalanceInput ? Number(accountBalanceInput.value) : 0;
@@ -26,6 +30,8 @@ document.addEventListener('DOMContentLoaded', function() {
         resetError(tranAmountInput, tranAmountError);
         resetError(tranRecAcctNoInput, tranRecAcctNoError);
 
+        // --- [클라이언트 측 검사 시작] ---
+
         // 1. 이체 금액 확인
         if (!rawAmountStr || inputAmount <= 0) {
             showError(tranAmountInput, tranAmountError, "이체하실 금액을 입력해주세요.");
@@ -36,30 +42,74 @@ document.addEventListener('DOMContentLoaded', function() {
             isValid = false;
         }
 
-        // 2. 입금 계좌번호 확인
+        // 2. 입금 계좌번호 입력 확인
         if (!tranRecAcctNoInput.value.trim()) {
             showError(tranRecAcctNoInput, tranRecAcctNoError, "입금받으실 계좌번호를 입력해주세요.");
             if (isValid) {
                 tranRecAcctNoInput.focus();
             }
             isValid = false;
-        } else {
-            if (!isValid) {
-                tranAmountInput.focus();
-            }
         }
 
+        // 클라이언트 검사에서 실패하면 종료
         if (!isValid) {
-            event.preventDefault();
             return false;
+        }
+
+        // --- [서버 측 계좌 실존 여부 확인 (AJAX)] ---
+
+        const bankCode = tranRecBkCodeInput.value;
+        const acctNo = tranRecAcctNoInput.value;
+
+        try {
+            // CSRF 토큰 가져오기 (Spring Security 사용 시 필수)
+            // _template/_header.html <head> 내에 <meta name="_csrf" ...> 태그가 있어야 함
+            const csrfTokenMeta = document.querySelector('meta[name="_csrf"]');
+            const csrfHeaderMeta = document.querySelector('meta[name="_csrf_header"]');
+
+            const headers = {
+                'Content-Type': 'application/json'
+            };
+
+            if (csrfTokenMeta && csrfHeaderMeta) {
+                headers[csrfHeaderMeta.content] = csrfTokenMeta.content;
+            }
+
+            // 컨트롤러 URL 주의: 클래스 매핑(/mypage) + 메서드 매핑(/api/validate-account)
+            const response = await fetch('/flobank/mypage/api/validate-account', {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify({
+                    bankCode: bankCode,
+                    acctNo: acctNo
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('서버 통신 오류');
+            }
+
+            const result = await response.json();
+
+            if (result.exists) {
+                // [성공] 계좌가 존재함 -> 폼을 진짜로 제출 (programmatic submit)
+                // event.target.submit()을 쓰면 다시 이벤트 리스너가 돌지 않고 바로 전송됨
+                form.submit();
+            } else {
+                // [실패] 존재하지 않는 계좌 -> 에러 표시
+                showError(tranRecAcctNoInput, tranRecAcctNoError, "존재하지 않는 계좌번호입니다. 다시 확인해주세요.");
+                tranRecAcctNoInput.focus();
+            }
+
+        } catch (error) {
+            console.error('Error:', error);
+            alert("계좌 확인 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.");
         }
     });
 
     // [기능 2] 에러 숨기기 (입력 시)
     tranAmountInput.addEventListener('input', function() {
-        // 콤마 포맷팅 적용 (아래 inputNumberFormat 함수가 onkeyup으로도 호출되지만, input 이벤트에서도 처리)
-        inputNumberFormat(this);
-
+        inputNumberFormat(this); // 콤마 포맷팅
         const currentVal = Number(uncomma(this.value));
         if (currentVal > 0) {
             resetError(this, tranAmountError);
@@ -75,22 +125,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // --- [콤마 관련 유틸리티 함수] ---
 
-// 1. 콤마 찍기
 function comma(str) {
     str = String(str);
     return str.replace(/(\d)(?=(?:\d{3})+(?!\d))/g, '$1,');
 }
 
-// 2. 콤마 풀기
 function uncomma(str) {
     str = String(str);
     return str.replace(/[^\d]+/g, '');
 }
 
-// 3. 입력 시 포맷팅 적용 (HTML onkeyup 등에서 호출)
 function inputNumberFormat(obj) {
     obj.value = comma(uncomma(obj.value));
-    // Hidden 필드 값 동기화
     const hiddenInput = document.getElementById('hiddenTranAmount');
     if(hiddenInput) {
         hiddenInput.value = uncomma(obj.value);
@@ -100,44 +146,34 @@ function inputNumberFormat(obj) {
 
 // --- [금액 조작 함수] ---
 
-// [기능 3] 금액 더하기
 function addAmount(amount) {
     const input = document.getElementById('tranAmount');
     const errorDiv = document.getElementById('tranAmountError');
     const accountBalanceInput = document.getElementById('accountBalance');
 
-    // 현재 값 가져오기 (콤마 제거 후 숫자 변환)
     let currentVal = Number(uncomma(input.value)) || 0;
     let balance = accountBalanceInput ? Number(accountBalanceInput.value) : 0;
 
     let newVal = currentVal + amount;
 
-    // 잔액 초과 체크
     if (newVal > balance) {
         showError(input, errorDiv, "이체 금액이 잔액을 초과하여 입력할 수 없습니다.");
         input.focus();
         return;
     }
 
-    // 값 업데이트 (콤마 적용해서 보여주기)
     input.value = comma(newVal);
-
-    // Hidden 필드 동기화
     document.getElementById('hiddenTranAmount').value = newVal;
 
     input.classList.remove('input-error');
     if(errorDiv) errorDiv.style.display = 'none';
 }
 
-// [기능 4] 전액 버튼
 function setFullAmount(balance) {
     const input = document.getElementById('tranAmount');
     const errorDiv = document.getElementById('tranAmountError');
 
-    // 잔액을 콤마 찍어서 입력
     input.value = comma(balance);
-
-    // Hidden 필드 동기화
     document.getElementById('hiddenTranAmount').value = balance;
 
     input.classList.remove('input-error');

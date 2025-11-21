@@ -14,10 +14,10 @@ public interface MypageMapper {
     // 외화 입출금 개설
     void insertFrgnAcct(CustFrgnAcctDTO custFrgnAcctDTO);
 
-    // 외화 계좌 이미 있는지 확인
+    // 외화 계좌 있는지 확인
     int selectCheckCntEnAcct(String custCode);
 
-    // 고객 보유 전체 계좌 확인
+    // 고객 보유 전체 원화 계좌 확인
     List<CustAcctDTO> selectAllKoAcct(String custCode);
 
     // 고객 외환 계좌 확인
@@ -53,4 +53,17 @@ public interface MypageMapper {
     CustInfoDTO selectCustInfo(String custId);
     LocalDate selectCheckKoAcct(String custCode);
     int selectCheckCntKoAcct(String custCode);
+
+
+    // 회원정보 수정 비밀번호 확인
+    CustInfoDTO selectCustInfoByCode(String custCode);
+
+    // 회원 정보 수정
+    void updateCustInfo(CustInfoDTO custInfoDTO);
+
+    // 거래내역 조회 메서드
+    List<CustTranHistDTO> selectTranHist(String acctNo);
+
+    // 쿠폰 목록 조회
+    List<CouponDTO> selectCouponList(String custCode);
 }
