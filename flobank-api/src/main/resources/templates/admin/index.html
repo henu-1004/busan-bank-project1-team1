@@ -20,10 +20,8 @@
                     <div class="summary-card">
                         <div class="summary-main">
                             <h4>총 거래 건수</h4>
-                            <!-- JS에서 숫자 세팅 -->
                             <p class="summary-value" id="totalTxCountText">0건</p>
                             <p class="summary-sub">
-                                <!-- 전일 대비는 나중에 백엔드 연결 시 변경 -->
                                 <span id="totalTxCountDiff" class="diff diff-up">+0%</span>
                                 <span class="diff-label">전일 대비</span>
                             </p>
@@ -36,7 +34,6 @@
                     <div class="summary-card">
                         <div class="summary-main">
                             <h4>총 거래 금액</h4>
-                            <!-- JS에서 숫자 세팅 -->
                             <p class="summary-value" id="totalTxAmountText">0원</p>
                             <p class="summary-sub">
                                 <span id="totalTxAmountDiff" class="diff diff-down">-0%</span>
@@ -70,35 +67,32 @@
         </div>
 
         <div class="admin-stats-row-3">
-            <!-- 월별 -->
             <article class="admin-stat-card-3 admin-graph-card">
                 <h3>월별 가입자수
                     <span th:text="|(${#temporals.format(baseTime, 'yyyy.MM.dd HH:mm:ss')} 기준)|"></span>
                 </h3>
                 <div class="admin-graph-box-3">
-                    <img th:src="@{/images/ex.png}" alt="월별 가입자수 그래프" />
+                    <canvas id="joinDailyChart"></canvas>
                 </div>
             </article>
 
-<!--            &lt;!&ndash; 주별 &ndash;&gt;-->
-<!--            <article class="admin-stat-card-3 admin-graph-card">-->
-<!--                 <h3>주별 가입자수
+            <article class="admin-stat-card-3 admin-graph-card">
+                 <h3>주별 가입자수
                         <span th:text="|(${#temporals.format(baseTime, 'yyyy.MM.dd HH:mm:ss')} 기준)|"></span>
-                    </h3>-->
-<!--                <div class="admin-graph-box-3">-->
-<!--                    <img th:src="@{/images/ex.png}" alt="주별 가입자수 그래프" />-->
-<!--                </div>-->
-<!--            </article>-->
+                    </h3>
+                <div class="admin-graph-box-3">
+                   <canvas id="joinWeeklyChart"></canvas>
+                </div>
+            </article>
 
-<!--            &lt;!&ndash; 일별 &ndash;&gt;-->
-<!--            <article class="admin-stat-card-3 admin-graph-card">-->
-<!--                < <h3>일별 가입자수
+            <article class="admin-stat-card-3 admin-graph-card">
+                <h3>일별 가입자수
                         <span th:text="|(${#temporals.format(baseTime, 'yyyy.MM.dd HH:mm:ss')} 기준)|"></span>
-                    </h3>-->
-<!--                <div class="admin-graph-box-3">-->
-<!--                    <img th:src="@{/images/ex.png}" alt="일별 가입자수 그래프" />-->
-<!--                </div>-->
-<!--            </article>-->
+                    </h3>
+                <div class="admin-graph-box-3">
+                   <canvas id="joinMonthlyChart"></canvas>
+                </div>
+            </article>
         </div>
     </section>
 
@@ -132,7 +126,7 @@
         window.dashboardData = {
             // 오늘 총 거래 건수 / 금액
             todayTotalTxCount:  [[${stats != null ? stats.todayTotalTxCount : 0}]],
-        todayTotalTxAmount: [[${stats != null ? stats.todayTotalTxAmount : 0}]],
+            todayTotalTxAmount: [[${stats != null ? stats.todayTotalTxAmount : 0}]],
 
         // 오늘 환전·외화송금 건수 리스트
         todayFxTxCounts: [
@@ -158,13 +152,44 @@
         }/*[# th:if="${!iter.last}"]*/,/*[/]*/
         /*[/]*/
         /*[/]*/
+        ],
+        dailyJoinStats: [
+            /*[# th:if="${stats != null and stats.dailyJoinStats != null}"]*/
+            /*[# th:each="j, iter : ${stats.dailyJoinStats}"]*/
+            {
+                // baseDate는 String 이라 그냥 문자열로 출력
+                baseDate: '[[${j != null ? j.baseDate : ""}]]',
+                // joinCount는 숫자, j가 null이면 0
+                joinCount: [[${j != null ? j.joinCount : 0}]]
+        }/*[# th:if="${!iter.last}"]*/,/*[/]*/
+        /*[/]*/
+        /*[/]*/
+        ],
+
+        weeklyJoinStats: [
+            /*[# th:if="${stats != null and stats.weeklyJoinStats != null}"]*/
+            /*[# th:each="j, iter : ${stats.weeklyJoinStats}"]*/
+            {
+                baseDate: '[[${j != null ? j.baseDate : ""}]]',
+                joinCount: [[${j != null ? j.joinCount : 0}]]
+        }/*[# th:if="${!iter.last}"]*/,/*[/]*/
+        /*[/]*/
+        /*[/]*/
+        ],
+        monthlyJoinStats: [
+            /*[# th:if="${stats != null and stats.monthlyJoinStats != null}"]*/
+            /*[# th:each="j, iter : ${stats.monthlyJoinStats}"]*/
+            {
+                baseDate: '[[${j != null ? j.baseDate : ""}]]',
+                joinCount: [[${j != null ? j.joinCount : 0}]]
+        }/*[# th:if="${!iter.last}"]*/,/*[/]*/
+        /*[/]*/
+        /*[/]*/
         ]
+
         };
         /*]]>*/
     </script>
-
-
-
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script th:src="@{/js/dashboard.js}"></script>
 

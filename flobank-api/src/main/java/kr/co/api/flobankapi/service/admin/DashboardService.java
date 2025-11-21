@@ -40,7 +40,7 @@ public class DashboardService {
         List<DailyTxSummaryDTO> last7Days = dashboardMapper.selectLast7DaysTotalTxSummary();
 
         int remtCount = dashboardMapper.selectTodayFrgnRemtTxCount(); // 외화송금
-        int exchCount = 0; // TODO: 환전 테이블 생기면 Mapper 추가
+        int exchCount = dashboardMapper.selectTodayExChangeTxCount(); // TODO: 환전 테이블 생기면 Mapper 추가
 
         List<TxCountDTO> todayFxTxCounts = List.of(
                 TxCountDTO.builder().type("환전").count(exchCount).build(),
@@ -49,8 +49,8 @@ public class DashboardService {
 
         // 2) 가입자 수
         List<JoinStatsDTO> dailyJoin   = dashboardMapper.selectDailyJoinStats();
-//        List<JoinStatsDTO> weeklyJoin  = dashboardMapper.selectWeeklyJoinStats();
-//        List<JoinStatsDTO> monthlyJoin = dashboardMapper.selectMonthlyJoinStats();
+        List<JoinStatsDTO> weeklyJoin  = dashboardMapper.selectWeeklyJoinStats();
+        List<JoinStatsDTO> monthlyJoin = dashboardMapper.selectMonthlyJoinStats();
 
         // 3) 연령/성별
         List<AgeBandDTO> ageDist   = dashboardMapper.selectAgeDist();
@@ -62,16 +62,15 @@ public class DashboardService {
                 // 1번 그래프용
                 .todayTotalTxCount(todayTotalTxCount)
                 .todayTotalTxAmount(todayTotalTxAmount)
-
                 .last7Days(last7Days)
 
                 // 2번 그래프용
                 .todayTxCounts(todayFxTxCounts)
 
                 // 가입자 / 연령 / 성별
-                .dailyJoin(dailyJoin)
-                // .weeklyJoin(weeklyJoin)
-                // .monthlyJoin(monthlyJoin)
+                .dailyJoinStats(dailyJoin)
+                .weeklyJoinStats(weeklyJoin)
+                .monthlyJoinStats(monthlyJoin)
                 .ageDist(ageDist)
                 .genderDist(genderDist)
 

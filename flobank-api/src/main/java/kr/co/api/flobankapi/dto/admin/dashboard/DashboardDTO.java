@@ -13,9 +13,9 @@ import java.util.List;
 @AllArgsConstructor
 public class DashboardDTO {
 
-    // 오늘 거래 건수 ( 원화? )
+    // 오늘 거래 건수 ( 원화)
     private int todayTotalTxCount;
-    // 오늘 거래 금액 ( 원화? )
+    // 오늘 거래 금액 ( 원화 )
     private long todayTotalTxAmount;
     private List<DailyTxSummaryDTO> last7Days;
 
@@ -23,10 +23,11 @@ public class DashboardDTO {
     // 오늘 거래 건수 ( 환전 / 외화송금 )
     private List<TxCountDTO> todayTxCounts;
 
+
     // 가입자 수 (일/주/월)
-    private List<JoinStatsDTO> dailyJoin;
-    private List<JoinStatsDTO> weeklyJoin;
-    private List<JoinStatsDTO> monthlyJoin;
+    private List<JoinStatsDTO> dailyJoinStats;
+    private List<JoinStatsDTO> weeklyJoinStats;
+    private List<JoinStatsDTO> monthlyJoinStats;
 
     // 연령/성별 분포
     private List<AgeBandDTO> ageDist;

@@ -35,6 +35,14 @@
           AND remt_dt &gt;= TRUNC(SYSDATE)
           AND remt_dt &lt;  TRUNC(SYSDATE) + 1
     </select>
+    <!-- 환전 수 : Tb_frgn_exch_tran -->
+    <select id="selectTodayExChangeTxCount" resultType="int">
+        SELECT COUNT(*)
+        FROM TB_FRGN_EXCH_TRAN
+        WHERE exch_req_dt IS NOT NULL
+          AND exch_req_dt &gt;= TRUNC(SYSDATE)
+          AND exch_req_dt &lt;  TRUNC(SYSDATE) + 1
+    </select>
 
     <!-- 일별 가입자 수 -->
     <select id="selectDailyJoinStats"
@@ -42,30 +50,30 @@
         SELECT TO_CHAR(cust_reg_dt, 'YYYY-MM-DD') AS label,
         COUNT(*) AS count
         FROM TB_CUST_INFO
-        WHERE cust_reg_dt >= TRUNC(SYSDATE) - 6  <!-- 최근 7일 -->
+        WHERE cust_reg_dt >= TRUNC(SYSDATE) - 6
         GROUP BY TO_CHAR(cust_reg_dt, 'YYYY-MM-DD')
         ORDER BY label
     </select>
 
-<!--    <select id="selectWeeklyJoinStats"-->
-<!--            resultType="kr.co.api.flobankapi.dto.admin.dashboard.JoinStatsDTO">-->
-<!--        SELECT TO_CHAR(cust_reg_dt, 'YYYY-MM-DD') AS label,-->
-<!--        COUNT(*) AS count-->
-<!--        FROM TB_CUST_INFO-->
-<!--        WHERE cust_reg_dt >= TRUNC(SYSDATE) - 6  &lt;!&ndash; 일단 복사 &ndash;&gt;-->
-<!--        GROUP BY TO_CHAR(cust_reg_dt, 'YYYY-MM-DD')-->
-<!--        ORDER BY label-->
-<!--    </select>-->
+    <select id="selectWeeklyJoinStats"
+            resultType="kr.co.api.flobankapi.dto.admin.dashboard.JoinStatsDTO">
+        SELECT TO_CHAR(cust_reg_dt, 'YYYY-MM-DD') AS label,
+               COUNT(*) AS count
+        FROM TB_CUST_INFO
+        WHERE cust_reg_dt >= TRUNC(ADD_MONTHS(SYSDATE, -2), 'IW')
+        GROUP BY TO_CHAR(cust_reg_dt, 'YYYY-MM-DD')
+        ORDER BY label
+    </select>
 
-<!--    <select id="selectMonthlyJoinStats"-->
-<!--            resultType="kr.co.api.flobankapi.dto.admin.dashboard.JoinStatsDTO">-->
-<!--        SELECT TO_CHAR(cust_reg_dt, 'YYYY-MM-DD') AS label,-->
-<!--        COUNT(*) AS count-->
-<!--        FROM TB_CUST_INFO-->
-<!--        WHERE cust_reg_dt >= TRUNC(SYSDATE) - 6  &lt;!&ndash; 일단 복사 &ndash;&gt;-->
-<!--        GROUP BY TO_CHAR(cust_reg_dt, 'YYYY-MM-DD')-->
-<!--        ORDER BY label-->
-<!--    </select>-->
+    <select id="selectMonthlyJoinStats"
+            resultType="kr.co.api.flobankapi.dto.admin.dashboard.JoinStatsDTO">
+        SELECT TO_CHAR(cust_reg_dt, 'YYYY-MM-DD') AS label,
+               COUNT(*) AS count
+        FROM TB_CUST_INFO
+        WHERE cust_reg_dt >= ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -11)
+        GROUP BY TO_CHAR(cust_reg_dt, 'YYYY-MM-DD')
+        ORDER BY label
+    </select>
 
     <!-- 연령대 분포 -->
     <select id="selectAgeDist"
