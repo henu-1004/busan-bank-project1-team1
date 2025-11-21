@@ -208,170 +208,296 @@
 /* ============================================
    환전하기 1단계 (step1)
    ============================================ */
-   :root {
-  --main-color: #22304E;      /* 딥 네이비 (Main) */
-  --sub-color: #E3E7EC;       /* 미스트 그레이 (Sub) */
-  --point-color: #4A6FA5;     /* 스틸 블루 (Point) */
-  --bg-color: #F5F5F5;        /* 화이트 스모크 (Background) */
-  --text-dark: #222;
-  --text-gray: #666;
-  --border-light: #e5e5e5;
+
+/* -----------------------------
+   환전 STEP1 — remit 스타일과 동일하게 통합
+------------------------------ */
+
+/* 전체 컨테이너 (remit-container 스타일 적용) */
+.exchange-container {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    max-width: 1100px;
+    margin: 80px auto;
+    align-items: flex-start;
 }
 
+/* 왼쪽 사이드바 — remit-sidebar와 동일 */
+.exchange-sidebar {
+    width: 230px;
+    background: #fff;
+    border: 1px solid #e2e6ec;
+    border-radius: 10px;
+    padding: 25px 20px;
+    height: fit-content;
+}
+
+.exchange-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #22304E;
+    margin-bottom: 20px;
+}
+
+/* 카테고리 스타일 (remit과 동일한 느낌으로 보정) */
+.exchange-category {
+    list-style: none;
+    padding: 0;
+}
+
+.exchange-category > li {
+    margin-bottom: 14px;
+}
+
+.exchange-category > li > a {
+    color: #222;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 600;
+    transition: 0.2s ease;
+}
+
+.exchange-category > li > a:hover,
+.exchange-category li.active > a {
+    color: #2C5DE5;
+    font-weight: 700;
+}
+
+/* 서브 카테고리 */
+.exchange-subcategory {
+    list-style: none;
+    margin-top: 8px;
+    padding-left: 10px;
+}
+
+.exchange-subcategory li {
+    margin-bottom: 6px;
+}
+
+.exchange-subcategory a {
+    color: #666;
+    font-size: 13px;
+    text-decoration: none;
+    transition: 0.2s ease;
+}
+
+.exchange-subcategory a:hover,
+.exchange-subcategory li.active a {
+    color: #2C5DE5;
+    font-weight: 700;
+}
+
+/* -----------------------------
+   오른쪽 content (remit-content와 동일)
+------------------------------ */
+.exchange-content {
+    flex: 1;
+    background: #fff;
+    border: 1px solid #e2e6ec;
+    border-radius: 10px;
+    padding: 30px 40px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.04);
+    min-height: 500px;
+}
+
+.exchange-content h2 {
+    font-size: 20px;
+    color: #22304E;
+    border-bottom: 2px solid #E3E7EC;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+/* -----------------------------
+   STEP1 핵심 UI 요소
+------------------------------ */
+
+/* 제목 */
 .step1-top-title {
-  text-align: center;
-  font-size: 1.8rem;
-  font-weight: 700;
-  color: #22304E;  /* 플로뱅크 테마 색상 */
-  margin-bottom: 20px;
-}
-
-
-
-
-.step1-container {
-  width: 70%;
-  margin: 80px auto;
-  text-align: center;
+    font-size: 22px;
+    font-weight: 700;
+    color: #22304E;
+    text-align: center;
+    margin-bottom: 25px;
 }
 
 /* 단계 표시 */
 .step1-steps {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 18px;
-  margin-bottom: 35px;
+    display: flex;
+    justify-content: center;
+    gap: 18px;
+    margin-bottom: 35px;
 }
+
 .step1-step {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 14px;
-  color: #aaa;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    color: #aaa;
 }
+
 .step1-step .num {
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  border: 1.8px solid #ccc;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-weight: 600;
-  background: #fff;
-  color: #888;
-  transition: all 0.3s ease;
+    width: 26px;
+    height: 26px;
+    background: #fff;
+    border: 1.8px solid #ccc;
+    color: #888;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
+
 .step1-step.active .num {
-  border-color: var(--main-color);
-  color: var(--main-color);
-  font-weight: 700;
+    border-color: #22304E;
+    color: #22304E;
+    font-weight: 700;
 }
+
 .step1-step.active .text {
-  color: var(--main-color);
-  font-weight: 700;
+    color: #22304E;
+    font-weight: 700;
 }
 
-/* 박스 */
+/* Step1 박스 (remit의 transfer1-box 동일) */
 .step1-box {
-  background: #fff;
-  border: 1px solid #e2e6ec;
-  border-radius: 12px;
-  padding: 40px 50px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-  text-align: left;
+    width: 750px;
+    margin: 0 auto;
+    background: #fff;
+    border: 1px solid #e2e6ec;
+    border-radius: 12px;
+    padding: 40px 50px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
-.step1-title {
-  font-size: 22px;
-  font-weight: 700;
-  color: var(--main-color);
-  text-align: center;
-  margin-bottom: 25px;
-}
+
+/* 안내 박스 */
 .step1-info-box {
-  background: #fafafa;
-  border: 1px solid #e2e6ec;
-  border-radius: 8px;
-  font-size: 14px;
-  color: #555;
-  padding: 15px 20px;
-  margin-bottom: 30px;
-  line-height: 1.6;
+    background: #fafafa;
+    border: 1px solid #ddd;
+    padding: 15px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 30px;
 }
 
-/* 약관 그룹 */
-.step1-form-group {
-  margin-bottom: 25px;
+/* 약관 박스 */
+.step1-term-box {
+    background: #fafafa;
+    border: 1px solid #ddd;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 25px;
 }
+
+/* 약관 제목 */
 .step1-label {
-  display: block;
-  font-weight: 600;
-  font-size: 15px;
-  color: #222;
-  margin-bottom: 10px;
-}
-.step1-input.readonly {
-  background: #fafafa;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  padding: 15px;
-  height: 180px;
-  overflow-y: auto;
-  font-size: 14px;
-  color: #444;
-  line-height: 1.6;
-}
-.step1-input.readonly::-webkit-scrollbar {
-  width: 8px;
-}
-.step1-input.readonly::-webkit-scrollbar-thumb {
-  background-color: #ccc;
-  border-radius: 4px;
-}
-.step1-input.readonly::-webkit-scrollbar-thumb:hover {
-  background-color: #aaa;
+    display: block;
+    font-size: 15px;
+    font-weight: 700;
+    color: #222;
+    margin-bottom: 12px;
 }
 
-/* 개별 체크 */
+/* 약관 내용 */
+.step1-input {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    max-height: 200px;
+    padding: 15px;
+    font-size: 13px;
+    color: #555;
+    line-height: 1.6;
+    overflow-y: auto;
+}
+
+.step1-input pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+/* 체크박스 */
 .step1-check {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 8px;
-  font-size: 14px;
-  color: #222;
+    margin-top: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
 }
 
-/* 전체동의 */
+/* 전체 동의 */
 .step1-agree-all {
-  margin-top: 25px;
-  font-size: 15px;
-  font-weight: 600;
-  color: #222;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px dashed #ccc;
+    font-size: 15px;
+    color: #22304E;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
-/* 버튼 */
+/* 다음 버튼 */
 .step1-actions {
-  text-align: center;
-  margin-top: 40px;
+    text-align: center;
+    margin-top: 40px;
 }
+
 .step1-btn-next {
-  background: var(--main-color);
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  padding: 12px 36px;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  box-shadow: 0 3px 8px rgba(34,48,78,0.25);
-  transition: all 0.25s ease;
+    background: #22304E;
+    color: #fff;
+    padding: 12px 36px;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none;
+    box-shadow: 0 3px 8px rgba(34,48,78,0.25);
+    transition: 0.2s ease;
 }
+
 .step1-btn-next:hover {
-  background: var(--highlight);
-  transform: translateY(-2px);
+    background: #4FBDBA;
+    transform: translateY(-2px);
 }
+
+/* 약관 체크 영역: 정렬 + 글자 크기만 조정 */
+.step1-check {
+    display: flex;
+    align-items: center;      /* 체크박스와 텍스트 세로 중앙 정렬 */
+    gap: 8px;                 /* 체크박스 - 글자 간격 */
+    margin-top: 12px;
+    font-size: 15px;          /* 텍스트 약간 키움 (원래 느낌 유지하면서) */
+    color: #222;
+}
+
+/* 체크박스: 크기만 키우기 (색은 전역 설정 그대로 사용) */
+.step1-check input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+/* 전체 동의 영역도 동일하게 정렬만 맞추기 */
+.step1-agree-all label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.step1-agree-all input[type="checkbox"] {
+    width: 19px;
+    height: 19px;
+    cursor: pointer;
+}
+
+
+
 
 
 /* ============================================
@@ -799,3 +925,4 @@
     max-width: 100%;             /* 컨테이너 넘치지 않게 */
     box-sizing: border-box;
 }
+

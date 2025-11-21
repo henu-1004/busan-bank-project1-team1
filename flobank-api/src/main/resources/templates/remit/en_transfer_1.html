@@ -14,6 +14,8 @@
     <link rel="stylesheet" th:href="@{/css/mypage.css}">
     <link rel="stylesheet" th:href="@{/css/header.css}">
     <link rel="stylesheet" th:href="@{/css/footer.css}">
+    <link rel="stylesheet" th:href="@{/css/remit.css}">
+
 
     <link
     rel="stylesheet"
@@ -54,45 +56,49 @@
       외화계좌이체를 이용하시기 전에 아래 약관을 반드시 확인하고 동의해 주세요.
     </p>
 
-    <!-- 약관 그룹 -->
-      <section class="terms-group">
-          <div class="terms-box" th:each="t, stat : ${termsList}">
-              <p class="terms-title" th:text="${t.termTitle}"></p>
+      <form id="remitTermsForm" th:action="@{/remit/en_transfer_2}" method="get">
 
-              <div class="terms-content">
-                  <pre th:text="${t.thistContent}"></pre>
+          <section class="terms-group">
+
+              <div class="terms-box" th:each="t, stat : ${termsList}">
+                  <p class="terms-title" th:text="${t.termTitle}"></p>
+
+                  <div class="terms-content">
+                      <pre th:text="${t.thistContent}"></pre>
+                  </div>
+
+                  <div class="terms-check">
+                      <label class="custom-check">
+                          <input type="checkbox" class="term-check"
+                                 th:id="|remit-term${stat.index}|"
+                                 th:attr="data-cate=${t.termCate}, data-order=${t.termOrder}">
+                          <span class="checkmark"></span>
+                          위 약관에 동의합니다.
+                      </label>
+                  </div>
               </div>
 
-              <div class="terms-check">
+              <!-- 전체 동의 -->
+              <div class="terms-all">
                   <label class="custom-check">
-                      <input type="checkbox" class="term-check"
-                             th:id="|remit-term${stat.index}|"
-                             th:attr="data-cate=${t.termCate}, data-order=${t.termOrder}">
-                      <span class="checkmark"></span> 위 약관에 동의합니다.
+                      <input type="checkbox" id="agreeAll">
+                      <span class="checkmark"></span>
+                      전체 약관에 동의합니다.
                   </label>
               </div>
+
+          </section>
+
+          <!-- ✔ 다음 버튼 변경 -->
+          <div class="terms-actions">
+              <button type="submit" class="btn-next">다음</button>
           </div>
 
-          <!-- 전체 동의 -->
-          <div class="terms-all">
-              <label class="custom-check">
-                  <input type="checkbox" id="agreeAll">
-                  <span class="checkmark"></span> 전체 약관에 동의합니다.
-              </label>
-          </div>
-      </section>
-
-
-    <!-- 다음 버튼 -->
-      <div class="terms-actions">
-          <a th:href="@{/remit/en_transfer_2}">
-
-          <button class="btn-next">다음</button>
-          </a>
-      </div>
-
-
+      </form>
   </div>
+
+
+
 </main>
 
 <div th:replace="~{_template/_footer.html}"></div>

@@ -1513,7 +1513,7 @@ body {
   margin-top: 40px;
   display: flex;
   justify-content: center;
-  gap: 15px; 
+  gap: 15px;
 }
 
 .transfer2-btn-main {
@@ -2466,7 +2466,7 @@ body.event-page {
   align-items: center;
   gap: 25px; /* 프로필-배너 간 간격 */
 }
-/* 
+/*
  출석 이벤트 배너 */
 .event-container {
   width: 100%;
@@ -2563,7 +2563,7 @@ body.event-page {
 
 
 .open2-currency-guide {
-  color: #4A6FA5;  
+  color: #4A6FA5;
   font-weight: 600;
 }
 
@@ -3298,3 +3298,18 @@ body.event-page {
         margin-top: 5px;
     }
 }
+
+/*원화 통장 개설에 밑줄 없애기*/
+.btn-next {
+    text-decoration: none;
+}
+
+/*약관 관련 가로 스크롤 업애기*/
+.terms-content {
+    overflow-x: hidden;   /* 가로 스크롤 제거 */
+}
+
+.terms-content pre {
+    white-space: pre-wrap; /* 가로 스크롤 없이 줄바꿈 */
+}
+

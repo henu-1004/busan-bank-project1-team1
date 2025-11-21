@@ -13,6 +13,39 @@ let currentExchangeRate = 0; // 전역 변수로 환율 관리 (폼 전송 시 �
 
 document.addEventListener("DOMContentLoaded", () => {
 
+    ////////////////////////////////////////////////////////////////////////////
+    // 1️⃣ 약관 동의(원화/외화 공통) - 전체동작
+    ////////////////////////////////////////////////////////////////////////////
+    const agreeAll = document.getElementById("agreeAll");
+    const checks = document.querySelectorAll(".term-check");
+    const termsForm = document.getElementById("termsForm");
+
+    if (termsForm && agreeAll && checks.length > 0) {
+
+        // 전체 동의 체크 시 개별 체크박스 모두 변경
+        agreeAll.addEventListener("change", () => {
+            checks.forEach(c => (c.checked = agreeAll.checked));
+        });
+
+        // 개별 체크 변경 시 전체동의 체크 여부 변경
+        checks.forEach(chk => {
+            chk.addEventListener("change", () => {
+                agreeAll.checked = [...checks].every(c => c.checked);
+            });
+        });
+
+        // 제출 시 전체 체크 여부 검사
+        termsForm.addEventListener("submit", (e) => {
+            const allChecked = [...checks].every(c => c.checked);
+
+            if (!allChecked) {
+                e.preventDefault();
+                alert("모든 약관에 동의해야 다음 단계로 진행할 수 있습니다.");
+            }
+        });
+    }
+ㄴ
+
 
 
     ////////////////////////////////////////////////////////////////////////////

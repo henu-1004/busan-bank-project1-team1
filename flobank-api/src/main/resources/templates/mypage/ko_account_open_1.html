@@ -30,9 +30,11 @@
     <h2>입출금 통장 개설 약관 동의</h2>
     <p class="terms-desc">통장 개설을 위해 아래 약관을 확인하시고 동의해주세요.</p>
 
-    <section class="terms-group">
-        <div class="terms-box" th:each="t, stat : ${termsList}">
-            <h3 class="terms-title" th:text="${t.termTitle}">약관 제목</h3>
+    <form id="termsForm" th:action="@{/mypage/ko_account_open_2}" method="get">
+
+        <section class="terms-group">
+            <div class="terms-box" th:each="t, stat : ${termsList}">
+                <h3 class="terms-title" th:text="${t.termTitle}">약관 제목</h3>
 
         <div class="terms-content">
             <pre th:text="${t.thistContent}"></pre>
@@ -50,17 +52,20 @@
         </div>
     </section>
 
-    <div class="terms-all">
-        <label class="custom-check">
-            <input type="checkbox" id="agreeAll">
-            <span class="checkmark"></span>
-            <strong> 모든 약관에 동의합니다.</strong>
-        </label>
-    </div>
+        <div class="terms-all">
+            <label class="custom-check">
+                <input type="checkbox" id="agreeAll">
+                <span class="checkmark"></span>
+                <strong> 모든 약관에 동의합니다.</strong>
+            </label>
+        </div>
 
-    <div class="terms-actions">
-        <a th:href="@{/mypage/ko_account_open_2}" class="btn-next">다음</a>
-    </div>
+        <div class="terms-actions">
+            <button type="submit" class="btn-next">다음</button>
+        </div>
+
+    </form>
+
 
 </main>
 <div th:replace="~{_template/_footer.html}"></div>
