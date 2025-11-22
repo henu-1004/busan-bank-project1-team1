@@ -18,6 +18,9 @@ spring:
     password: 1234
     driver-class-name: oracle.jdbc.OracleDriver
 
+  elasticsearch:
+    uris: http://localhost:9200
+
   mail:
     host: smtp.gmail.com
     port: 587
