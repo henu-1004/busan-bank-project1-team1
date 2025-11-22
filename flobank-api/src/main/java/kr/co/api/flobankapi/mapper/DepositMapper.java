@@ -40,4 +40,8 @@ public interface DepositMapper {
     public DpstAcctHdrDTO selectInsertedAcct(String dpstHdrCustCode, String dpstHdrDpstId);
     public void insertDpstAcctDtl(DpstAcctDtlDTO dpstAcctDtlDTO);
     public void insertCustTranHist(CustTranHistDTO custTranHistDTO);
+    public CustAcctDTO selectKrwAcctBalance(String acctNo);
+    public FrgnAcctBalanceDTO selectFrgnAcctBalance(String balNo);
+    public void updateAcctBalance(CustAcctDTO custAcctDTO);
+    public void updateBalBalance(FrgnAcctBalanceDTO frgnAcctBalanceDTO);
 }

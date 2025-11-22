@@ -234,6 +234,9 @@ public class DepositController {
             dpstAcctHdrDTO.setDpstHdrCurrencyExp(dto.getDpstHdrCurrency());
         }
         dpstAcctHdrDTO.setDpstHdrLinkedAcctNo(
+                "krw".equals(dto.getWithdrawType()) ? dto.getAcctNo() : dto.getBalNo()
+        );
+        dpstAcctHdrDTO.setDpstHdrExpAcctNo(
                 "krw".equals(dto.getWithdrawType()) ? dto.getAcctNo() : dto.getFrgnAcctNo()
         );
         dpstAcctHdrDTO.setDpstHdrAutoRenewYn("y".equals(dto.getAutoRenewYn()) ? "y" : "n");
@@ -262,7 +265,13 @@ public class DepositController {
 
         custTranHistDTO.setTranCustName(user.getCustName());
         custTranHistDTO.setTranType(2);
-        custTranHistDTO.setTranAmount(Integer.parseInt(String.valueOf(dto.getKrwAmount())));
+        if (dto.getWithdrawType().equals("krw")) {
+            custTranHistDTO.setTranAmount(Integer.parseInt(String.valueOf(dto.getKrwAmount())));
+            custTranHistDTO.setTranCurrency("KRW");
+        }else {
+            custTranHistDTO.setTranAmount(Integer.parseInt(String.valueOf(dto.getDpstAmount())));
+            custTranHistDTO.setTranCurrency(dpstAcctHdrDTO.getDpstHdrCurrency());
+        }
 
         custTranHistDTO.setTranRecName(user.getCustName());
         custTranHistDTO.setTranRecBkCode("888");
@@ -272,7 +281,7 @@ public class DepositController {
 
 
         // 트랜잭션 처리
-        DpstAcctHdrDTO insertDTO = depositService.openDepositAcctTransaction(dpstAcctHdrDTO, dtlDTO, custTranHistDTO);
+        DpstAcctHdrDTO insertDTO = depositService.openDepositAcctTransaction(dpstAcctHdrDTO, dtlDTO, custTranHistDTO, dto.getWithdrawType());
         model.addAttribute("insertDTO", insertDTO);
         return "deposit/deposit_step4";
     }

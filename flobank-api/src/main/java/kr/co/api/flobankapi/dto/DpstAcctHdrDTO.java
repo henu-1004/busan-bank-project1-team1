@@ -28,6 +28,7 @@ public class DpstAcctHdrDTO {
     private Integer dpstHdrStatus;       // 상태 (1: 정상)
 
     private String dpstHdrLinkedAcctNo;  // 출금 계좌번호 (원화 또는 외화)
+    private String dpstHdrExpAcctNo;
 
     private String dpstHdrAutoRenewYn;   // 자동연장 여부 (Y/N)
     private Integer dpstHdrAutoRenewCnt; // 자동연장 횟수

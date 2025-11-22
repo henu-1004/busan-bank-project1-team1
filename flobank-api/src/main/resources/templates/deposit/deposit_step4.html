@@ -69,7 +69,7 @@
         <!--
         <tr><th>자동해지신청 여부</th><td>예</td></tr>
         -->
-        <tr><th>계약체결일시</th><td>[[${insertDTO.dpstHdrContractDt}]]</td></tr>
+        <tr><th>계약체결일시</th><td>[[${#temporals.format(insertDTO.dpstHdrContractDt, 'yyyy-MM-dd HH:mm:ss')}]]</td></tr>
       </table>
 
       <!-- 하단 버튼 -->
