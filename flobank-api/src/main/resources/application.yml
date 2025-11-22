@@ -19,7 +19,7 @@ spring:
     driver-class-name: oracle.jdbc.OracleDriver
 
   elasticsearch:
-    uris: http://localhost:9200
+    uris: http://34.64.124.33:9200
 
   mail:
     host: smtp.gmail.com
