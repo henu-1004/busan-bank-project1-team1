@@ -8,20 +8,20 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CustTranHistDTO {
-    Integer tranNo;
-    String tranAcctNo;
-    String tranCustName;
-    Integer tranType;
-    Integer tranAmount;
-    String tranDt;
-    String tranRecAcctNo;
-    String tranRecName;
-    String tranRecBkCode;
-    String tranMemo;
-    String tranApproveNo;
-    String tranEsignYn; // 전자서명 y / n
-    String tranEsignDt; // 전자서명 받은 날짜
-    String tranCurrency;
+    private Integer tranNo;
+    private String tranAcctNo;
+    private String tranCustName;
+    private Integer tranType;
+    private Integer tranAmount;
+    private String tranDt;
+    private String tranRecAcctNo;
+    private String tranRecName;
+    private String tranRecBkCode;
+    private String tranMemo;
+    private String tranApproveNo;
+    private String tranEsignYn; // 전자서명 y / n
+    private String tranEsignDt; // 전자서명 받은 날짜
+    private String tranCurrency;
 
 
     private Integer tranBalance;
