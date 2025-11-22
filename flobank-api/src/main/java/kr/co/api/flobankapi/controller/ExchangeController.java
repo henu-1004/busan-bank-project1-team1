@@ -9,6 +9,7 @@ package kr.co.api.flobankapi.controller;
 
 import kr.co.api.flobankapi.dto.CouponDTO;
 import kr.co.api.flobankapi.dto.CustAcctDTO;
+import kr.co.api.flobankapi.dto.FrgnExchTranDTO;
 import kr.co.api.flobankapi.service.ExchangeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -119,6 +120,35 @@ public class ExchangeController {
         return "exchange/step1";
     }
 
+    // 계좌비밀번호 일치하는지 비교
+    @ResponseBody
+    @PostMapping("/passcheck")
+    public ResponseEntity<?> checkPassword(@RequestBody Map<String, String> request) {
+        String acctNo = request.get("acctNo");
+        String acctPw = request.get("acctPw");
+
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            // 서비스에서 비밀번호 검증 수행
+            boolean isValid = exchangeService.checkAccountPassword(acctNo, acctPw);
+
+            if (isValid) {
+                response.put("status", "success");
+            } else {
+                response.put("status", "fail");
+                response.put("message", "계좌 비밀번호가 일치하지 않습니다.");
+            }
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            log.error("비밀번호 확인 중 오류", e);
+            response.put("status", "error");
+            response.put("message", "서버 오류가 발생했습니다.");
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
+
     @GetMapping("/step2")
     public String step2(@AuthenticationPrincipal UserDetails user, Model model){
         String userCode = user.getUsername();
@@ -134,8 +164,34 @@ public class ExchangeController {
         return "exchange/step2";
     }
 
+    // [추가] 환전 신청 처리 (DB 저장)
+    @ResponseBody
+    @PostMapping("/process")
+    public ResponseEntity<?> processExchange(@RequestBody FrgnExchTranDTO transDTO) {
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            log.info("환전 신청 요청 데이터: {}", transDTO);
+
+            // 서비스 호출하여 DB 저장
+            // exchangeService.processExchange(transDTO);
+
+            response.put("status", "success");
+            response.put("message", "환전 신청이 완료되었습니다.");
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            log.error("환전 신청 처리 중 에러", e);
+            response.put("status", "error");
+            response.put("message", "환전 처리 중 오류가 발생했습니다.");
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
+
     @GetMapping("/step3")
     public String step3(){
+
+
         return "exchange/step3";
     }
 }

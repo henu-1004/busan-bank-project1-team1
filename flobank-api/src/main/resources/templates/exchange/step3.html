@@ -48,7 +48,7 @@
 
       <!-- 캐릭터 이미지 -->
       <div class="step3-char-img">
-        <img src="/static/images/character2.png" alt="플로은행 캐릭터">
+        <img th:src="@{/images/character2.png}" alt="플로은행 캐릭터">
       </div>
 
       <!-- 완료 문구 -->
@@ -58,9 +58,11 @@
           고객님께서 신청하신 외화는 선택하신 <strong>수령희망지점</strong>에서 수령하실 수 있습니다.<br>
           외화 수령 시 반드시 <strong>신분증을 지참</strong>하시고, <strong>신청인 본인만 수령 가능</strong>합니다.<br><br>
           플로은행을 이용해 주셔서 감사합니다.
+            <br>
+            <strong>※마이페이지 - 나의 환전 이력에서 상세 내역 확인 가능합니다.</strong>
         </p>
 
-        <a href="/" class="step3-complete-btn">메인으로 가기</a>
+        <a th:href="@{/mypage/main}" class="step3-complete-btn">마이페이지로 바로가기</a>
       </div>
     </div>
   </div>

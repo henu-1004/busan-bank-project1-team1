@@ -310,8 +310,6 @@ public class MypageController {
                                 @AuthenticationPrincipal CustomUserDetails userDetails,
                                 RedirectAttributes redirectAttributes) {
 
-        log.info("이체 2단계 진입 - 입력 정보: " + custTranHistDTO);
-
         // 1. 입금 은행 코드 및 계좌번호 추출
         String bankCode = custTranHistDTO.getTranRecBkCode();
         String acctNo = custTranHistDTO.getTranRecAcctNo();
@@ -360,9 +358,6 @@ public class MypageController {
             custTranHistDTO.setTranCustName(userDetails.getCustName());
         }
 
-        // 로그 확인
-        log.info("검증 완료 후 DTO: " + custTranHistDTO);
-
         model.addAttribute("custTranHistDTO", custTranHistDTO);
 
         return "mypage/ko_transfer_2";
@@ -407,7 +402,6 @@ public class MypageController {
         // 전자서명 임시 승인 수정해야함
         custTranHistDTO.setTranEsignYn("Y");
         CustAcctDTO custAcctDTO = new  CustAcctDTO();
-        log.info("마지막 단계(ko_transfer_3): custTranHistDTO = " + custTranHistDTO);
 
         if(custTranHistDTO.getTranEsignYn().equals("Y")) {
             // 이체 내역 db에 반영

@@ -8,6 +8,7 @@ import kr.co.api.flobankapi.dto.RateInfoDTO;
 import kr.co.api.flobankapi.mapper.ExchangeMapper;
 import kr.co.api.flobankapi.mapper.MypageMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -24,6 +25,7 @@ public class ExchangeService {
     private final ObjectMapper objectMapper; // JSON 파싱용 (Spring Boot 기본 내장)
     private final MypageMapper mypageMapper;
     private final ExchangeMapper exchangeMapper;
+    private final PasswordEncoder passwordEncoder;
 
     public BigDecimal calculateExchange(String date, String targetCurrency, BigDecimal krwAmount) {
         try {
@@ -66,6 +68,19 @@ public class ExchangeService {
     // 고객 보유 전체 쿠폰 확인
     public List<CouponDTO> getCoupons(String custCode) {
         return exchangeMapper.selectAllCoupon(custCode);
+    }
+
+
+
+    // 환전하기 전 계좌 비밀번호 일치하는지 확인
+    public boolean checkAccountPassword(String acctNo, String acctPass) {
+
+        CustAcctDTO custAcctDTO = mypageMapper.selectCustAcct(acctNo);
+        if (custAcctDTO == null) {
+            return false;
+        }
+
+        return passwordEncoder.matches(acctPass, custAcctDTO.getAcctPw());
     }
 
 }

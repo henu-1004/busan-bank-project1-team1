@@ -1,225 +1,384 @@
 /*
-* 날짜 : 2025/11/21
-* 이름 : 김대현
-* 내용 : 환전 기능 (약관 동의, 실시간 환율 계산, 쿠폰 적용)
-* */
+* 날짜 : 2025/11/22
+* 이름 : 김대현, 이민준
+* 내용 :
+* 환전 기능 (좌우 입력 방식, 고시환율 기준 표시, 실시간 계산)
+*/
 
 document.addEventListener("DOMContentLoaded", () => {
 
-    /////////////////////////////////////////////////////////////
-    // 1. 환전 약관 동의 (step1)
-    /////////////////////////////////////////////////////////////
-    const agreeAll = document.getElementById("agreeAll");
-    const termChecks = document.querySelectorAll(".term-check");
-    const nextBtnStep1 = document.querySelector(".step1-btn-next"); // 클래스명 주의
+    // =========================================
+    // 1. DOM 요소 선택
+    // =========================================
+    const fromCurrency = document.getElementById("fromCurrency"); // 보내는 통화
+    const toCurrency = document.getElementById("toCurrency");     // 받는 통화
+    const fromAmount = document.getElementById("fromAmount");     // 입력 금액 (From)
+    const toAmount = document.getElementById("toAmount");         // 환산 금액 (To - 고시환율 기준)
 
-    if (agreeAll && termChecks.length > 0) {
-        // 전체 동의 체크박스
-        agreeAll.addEventListener("change", () => {
-            termChecks.forEach(chk => (chk.checked = agreeAll.checked));
-        });
+    const accountWon = document.getElementById("accountSelectWon");
+    const accountForeign = document.getElementById("accountSelectForeign");
+    const withdrawLabel = document.getElementById("withdrawLabel");
+    const pwInput = document.getElementById("pwInput");
 
-        // 개별 체크박스
-        termChecks.forEach(chk => {
-            chk.addEventListener("change", () => {
-                const allChecked = [...termChecks].every(box => box.checked);
-                agreeAll.checked = allChecked;
-            });
-        });
-    }
+    const buySection = document.getElementById("buySection");
+    const sellSection = document.getElementById("sellSection");
 
-    // step1 다음 버튼 이벤트
-    if (nextBtnStep1) {
-        nextBtnStep1.addEventListener("click", e => {
-            if (!agreeAll.checked) {
-                e.preventDefault();
-                alert("모든 약관에 동의해야 다음 단계로 진행할 수 있습니다.");
-                return;
-            }
-            window.location.href = "/exchange/step2";
-        });
-    }
-
-
-    /////////////////////////////////////////////////////////////
-    // 2. 환전 정보 입력 및 계산 (step2)
-    /////////////////////////////////////////////////////////////
-    const calculateBtn = document.getElementById("calculateBtn");
-    const exchangeResult = document.getElementById("exchangeResult");
-    const amountInput = document.getElementById("exchangeAmount");
-    const currencySelect = document.getElementById("currencySelect");
-    const nextBtnStep2 = document.querySelector(".step2-btn-next");
-
-    // 결과 출력 요소
+    // 결과 표시 요소
+    const resultBaseRate = document.getElementById("result-base-rate"); // 고시환율
+    const resultRate = document.getElementById("result-rate");         // 우대 적용 환율
     const resultFee = document.getElementById("result-fee");
-    const resultWon = document.getElementById("result-won");
-    const resultRate = document.getElementById("result-rate");
-    const resultApplied = document.getElementById("result-applied");
+    const resultFinal = document.getElementById("result-final");       // 최종 예상 금액
+    const spreadRateDisplay = document.getElementById("spreadRateDisplay");
 
-    // 쿠폰 관련
+    // 쿠폰 모달 관련
     const couponBtn = document.getElementById("couponBtn");
     const couponModal = document.getElementById("couponModal");
-    const couponOptions = document.querySelectorAll(".coupon-option");
     const couponClose = document.getElementById("couponClose");
+    const couponOptions = document.querySelectorAll(".coupon-option");
 
-    // 상태 변수
-    let selectedCouponRate = 0; // 쿠폰 우대율 (예: 0.5 -> 50%)
-    let currentBaseRate = 0;    // 서버에서 받아온 기준 환율
+    // 전역 변수
+    let selectedCouponRate = 0; // 쿠폰 우대율 (0.5 = 50%)
+    let currentBaseRate = 0;    // 기준 환율 (API 호출값)
+    let currentMode = 'BUY';    // 'BUY'(원화->외화) or 'SELL'(외화->원화)
 
     // =========================================
-    // [쿠폰 모달 로직]
+    // 2. 초기화
     // =========================================
-    if (couponBtn && couponModal) {
-        couponBtn.addEventListener("click", () => {
-            couponModal.style.display = "flex";
-        });
+    // 휴대폰 번호 010 자동 입력
+    const phoneInputs = document.querySelectorAll('.step2-input.small');
+    if (phoneInputs.length >= 3) {
+        phoneInputs[0].value = "010";
     }
 
-    if (couponClose) {
-        couponClose.addEventListener("click", () => {
-            couponModal.style.display = "none";
-        });
-    }
+    // 초기 화면 상태 설정 (기본 USD)
+    updateUIState();
+    fetchRate('USD');
 
-    window.addEventListener("click", e => {
-        if (e.target === couponModal) {
-            couponModal.style.display = "none";
+
+    // =========================================
+    // 3. 이벤트 리스너
+    // =========================================
+
+    // (1) 왼쪽(From) 통화 변경 시
+    fromCurrency.addEventListener("change", () => {
+        const val = fromCurrency.value;
+
+        if (val === 'KRW') {
+            // 왼쪽이 KRW -> 'BUY' 모드 (외화 사기)
+            // 오른쪽을 외화 목록으로 채움
+            updateSelectOptions(toCurrency, 'FOREIGN');
+        } else {
+            // 왼쪽이 외화 -> 'SELL' 모드 (외화 팔기)
+            // 오른쪽을 KRW로 고정
+            toCurrency.innerHTML = '<option value="KRW">KRW (원)</option>';
         }
+
+        updateUIState(); // UI(계좌, 섹션) 갱신
+
+        // 환율 가져오기 (KRW가 아닌 쪽이 외화)
+        const foreignCode = (val === 'KRW') ? toCurrency.value : val;
+        fetchRate(foreignCode);
     });
 
-    // 쿠폰 선택 시
+    // (2) 오른쪽(To) 통화 변경 시 (BUY 모드일 때만 동작)
+    toCurrency.addEventListener("change", () => {
+        fetchRate(toCurrency.value);
+    });
+
+    // (3) 금액 입력 시 실시간 계산
+    fromAmount.addEventListener("input", () => {
+        calculateExchange();
+    });
+
+    // (4) 쿠폰 모달 열기/닫기/선택
+    if (couponBtn) couponBtn.addEventListener("click", () => couponModal.style.display = "flex");
+    if (couponClose) couponClose.addEventListener("click", () => couponModal.style.display = "none");
+
     couponOptions.forEach(btn => {
         btn.addEventListener("click", () => {
-            // data-discount="0.20" -> 20% 우대
             selectedCouponRate = parseFloat(btn.dataset.discount);
-            alert(`✅ 환율 우대 쿠폰(${selectedCouponRate * 100}%)이 적용되었습니다!`);
-            couponModal.style.display = "none";
+            // 화면에 우대율 표시 업데이트
+            if(spreadRateDisplay) spreadRateDisplay.innerText = (selectedCouponRate * 100).toFixed(0);
 
-            // 이미 계산된 내역이 있다면 재계산 수행
-            if (currentBaseRate > 0 && amountInput.value) {
-                calculateExchange();
-            }
+            alert("쿠폰이 적용되었습니다.");
+            couponModal.style.display = "none";
+            calculateExchange(); // 쿠폰 적용 후 재계산
         });
     });
 
 
     // =========================================
-    // [환율 계산 로직 (API 연동)]
+    // 4. 핵심 기능 함수들
     // =========================================
-    if (calculateBtn) {
-        calculateBtn.addEventListener("click", () => {
-            const amount = parseFloat(amountInput.value);
-            const currency = currencySelect.value;
 
-            if (!amount || amount <= 0) {
-                alert("환전 금액을 올바르게 입력해주세요.");
-                amountInput.focus();
-                return;
+    // [UI 상태 업데이트]
+    function updateUIState() {
+        currentMode = (fromCurrency.value === 'KRW') ? 'BUY' : 'SELL';
+
+        if (currentMode === 'BUY') {
+            // [살 때]
+            withdrawLabel.innerText = '출금계좌선택 (원화)';
+            accountWon.style.display = 'block';
+            accountForeign.style.display = 'none';
+            buySection.style.display = 'block';
+            sellSection.style.display = 'none';
+        } else {
+            // [팔 때]
+            withdrawLabel.innerText = '출금계좌선택 (외화)';
+            accountWon.style.display = 'none';
+            accountForeign.style.display = 'block';
+            buySection.style.display = 'none';
+            sellSection.style.display = 'block';
+        }
+
+        // 값 초기화
+        fromAmount.value = '';
+        toAmount.value = '';
+        resultFinal.innerText = '0';
+    }
+
+    // [환율 정보 가져오기]
+    function fetchRate(currencyCode) {
+        // TODO: 실제 서버 API 호출로 변경
+        /*
+        fetch(`/flobank/exchange/api/rate?currency=${currencyCode}`)
+            .then(res => res.json())
+            .then(data => {
+                currentBaseRate = data.rate;
+                calculateExchange();
+            });
+        */
+
+        // Mock Data (테스트용)
+        const mockRates = { 'USD': 1400, 'JPY': 900, 'EUR': 1500, 'CNH': 190, 'GBP': 1700, 'AUD': 900 };
+        currentBaseRate = mockRates[currencyCode] || 1000;
+
+        calculateExchange();
+    }
+
+    // [환율 계산 로직 - 핵심]
+    function calculateExchange() {
+        if (!currentBaseRate || !fromAmount.value) {
+            toAmount.value = '';
+            return;
+        }
+
+        const amount = parseFloat(fromAmount.value);
+        const spreadRate = 0.0175; // 기본 수수료율 (1.75%)
+        const appliedSpread = spreadRate * (1 - selectedCouponRate); // 우대율 적용된 수수료
+        const foreignCode = (currentMode === 'BUY') ? toCurrency.value : fromCurrency.value;
+
+        // -----------------------------------------------------
+        // 1. 인풋박스용 (To Amount): 순수 고시환율 기준 계산
+        //    (쿠폰/수수료 미적용 금액을 보여줌)
+        // -----------------------------------------------------
+        let baseVal = 0;
+        if (currentMode === 'BUY') {
+            // 원화 -> 외화 (나누기)
+            // JPY, CNH는 100단위
+            if (foreignCode === 'JPY' || foreignCode === 'CNH') {
+                baseVal = amount / (currentBaseRate / 100);
+            } else {
+                baseVal = amount / currentBaseRate;
             }
+        } else {
+            // 외화 -> 원화 (곱하기)
+            if (foreignCode === 'JPY' || foreignCode === 'CNH') {
+                baseVal = amount * (currentBaseRate / 100);
+            } else {
+                baseVal = amount * currentBaseRate;
+            }
+        }
 
-            // 1. 서버 API 호출 (Redis 데이터 가져오기)
-            fetch(`/flobank/exchange/api/rate?currency=${currency}`)
-                .then(response => response.json())
+        // 인풋박스 업데이트
+        if (currentMode === 'BUY') {
+            toAmount.value = baseVal.toFixed(2); // 외화는 소수점
+        } else {
+            toAmount.value = Math.floor(baseVal).toLocaleString(); // 원화는 정수
+        }
+
+
+        // -----------------------------------------------------
+        // 2. 결과창용 (Final Result): 실제 거래 환율(우대적용) 계산
+        // -----------------------------------------------------
+        let finalRate = 0; // 적용 환율
+        let resultVal = 0; // 최종 금액
+
+        if (currentMode === 'BUY') {
+            // 살 때: 환율 = 기준율 + 수수료
+            finalRate = currentBaseRate * (1 + appliedSpread);
+
+            if (foreignCode === 'JPY' || foreignCode === 'CNH') {
+                resultVal = amount / (finalRate / 100);
+            } else {
+                resultVal = amount / finalRate;
+            }
+        } else {
+            // 팔 때: 환율 = 기준율 - 수수료
+            finalRate = currentBaseRate * (1 - appliedSpread);
+
+            if (foreignCode === 'JPY' || foreignCode === 'CNH') {
+                resultVal = amount * (finalRate / 100);
+            } else {
+                resultVal = amount * finalRate;
+            }
+        }
+
+        // 결과창 업데이트
+        resultBaseRate.innerText = `${currentBaseRate.toLocaleString()} 원`; // 고시환율
+        resultRate.innerText = `${finalRate.toFixed(2)} 원`;               // 적용환율
+
+        // 최종 금액 표시
+        if (currentMode === 'BUY') {
+            resultFinal.innerText = `${resultVal.toFixed(2)} ${foreignCode}`;
+        } else {
+            resultFinal.innerText = `${Math.floor(resultVal).toLocaleString()} KRW`;
+        }
+
+        // 수수료율 정보
+        if (resultFee) {
+            resultFee.innerText = `${(spreadRate * 100).toFixed(2)}% → ${(appliedSpread * 100).toFixed(2)}%`;
+        }
+    }
+
+    // [드롭다운 옵션 생성 헬퍼]
+    function updateSelectOptions(selectElement, type) {
+        selectElement.innerHTML = '';
+        if (type === 'FOREIGN') {
+            const currencies = [
+                {val:'USD', txt:'USD (달러)'}, {val:'JPY', txt:'JPY (엔)'},
+                {val:'EUR', txt:'EUR (유로)'}, {val:'CNH', txt:'CNH (위안)'},
+                {val:'GBP', txt:'GBP (파운드)'}, {val:'AUD', txt:'AUD (호주달러)'}
+            ];
+            currencies.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c.val; opt.text = c.txt;
+                selectElement.appendChild(opt);
+            });
+        }
+    }
+
+    // =========================================
+    // 5. 환전 신청 (서버 전송)
+    // =========================================
+    const nextBtnStep2 = document.querySelector(".step2-btn-next");
+
+    if (nextBtnStep2) {
+        nextBtnStep2.addEventListener("click", () => {
+
+            // 유효성 검사
+            if (!fromAmount.value || fromAmount.value <= 0) { alert("금액을 입력해주세요."); return; }
+            if (!pwInput.value) { alert("비밀번호를 입력해주세요."); return; }
+
+            // 출금 계좌 확인
+            let selectedAccount = (currentMode === 'BUY') ? accountWon.value : accountForeign.value;
+            if (!selectedAccount) { alert("출금 계좌를 선택해주세요."); return; }
+
+            // 비밀번호 확인 요청
+            const requestData = {
+                acctNo: selectedAccount,
+                acctPw: pwInput.value.trim()
+            };
+
+            fetch('/flobank/exchange/passcheck', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(requestData)
+            })
+                .then(res => res.json())
                 .then(data => {
                     if (data.status === 'success') {
-                        currentBaseRate = data.rate; // API에서 받은 환율 저장
-                        calculateExchange(); // 계산 함수 호출
+                        submitExchangeRequest(selectedAccount);
                     } else {
-                        alert("환율 정보를 불러오는데 실패했습니다.");
+                        alert(data.message || "비밀번호가 일치하지 않습니다.");
+                        pwInput.value = "";
+                        pwInput.focus();
                     }
                 })
                 .catch(error => {
-                    console.error("Error fetching rate:", error);
-                    alert("서버 통신 중 오류가 발생했습니다.");
+                    console.error("Error:", error);
+                    alert("시스템 오류가 발생했습니다.");
                 });
         });
     }
 
-    // 실제 계산 수행 함수
-    function calculateExchange() {
-        const amount = parseFloat(amountInput.value);
-        const currency = currencySelect.value;
+    // 실제 데이터 전송 함수
+    function submitExchangeRequest(sourceAcctNo) {
+        const appliedRateText = document.getElementById("result-rate").innerText.replace(/[^0-9.]/g, "");
+        const foreignCode = (currentMode === 'BUY') ? toCurrency.value : fromCurrency.value;
 
-        // 1. 은행 기본 수수료율 (Spread) 설정 (예: 1.75%)
-        const spreadRate = 0.0175;
+        // DB 저장 로직
+        // BUY(살 때): 최종적으로 받는 외화 금액 (수수료 적용 후 금액) -> resultFinal 파싱
+        // SELL(팔 때): 판매한 외화 금액 (입력 금액 그대로) -> fromAmount
+        let finalForeignAmt = 0;
 
-        // 2. 우대율 적용된 수수료율 계산
-        // (기본수수료) * (1 - 쿠폰할인율)
-        // 예: 1.75% * (1 - 0.5) = 0.875% 수수료만 부과
-        const appliedSpreadRate = spreadRate * (1 - selectedCouponRate);
-
-        // 3. 고객 적용 환율 (살 때 환율)
-        // 기준환율 + (기준환율 * 적용수수료율)
-        // 예: 1400 + (1400 * 0.00875) = 1412.25
-        let appliedRate = currentBaseRate + (currentBaseRate * appliedSpreadRate);
-
-        // 4. 최종 원화 금액
-        let totalWon = 0;
-
-        // JPY, VND 등 100단위 통화 처리 (보통 API가 100단위 환율을 주면 그대로 쓰고, 1단위면 곱함)
-        // 여기서는 API가 '100엔당 원화'를 준다고 가정하고, 입력 금액도 '엔' 단위이므로 보정 필요
-        if (currency === 'JPY' || currency === 'CNH') {
-            // 예: 100엔이 900원이면, 1000엔 환전 시 -> 1000 * (900 / 100)
-            totalWon = amount * (appliedRate / 100);
+        if(currentMode === 'BUY') {
+            // 예: "100.00 USD" 에서 숫자만 추출
+            finalForeignAmt = parseFloat(document.getElementById("result-final").innerText.replace(/[^0-9.]/g, ""));
         } else {
-            totalWon = amount * appliedRate;
+            finalForeignAmt = parseFloat(fromAmount.value);
         }
 
-        // 5. 화면 출력 (소수점 및 콤마 처리)
-        // (1) 적용된 수수료(우대율 반영) 표시
-        const discountPercent = (selectedCouponRate * 100).toFixed(0);
-        if(selectedCouponRate > 0){
-            resultFee.innerHTML = `<span style="color:blue; font-weight:bold;">${discountPercent}% 우대 적용</span>`;
+        let exchangeData = {
+            exchAcctNo: sourceAcctNo,
+            exchToCurrency: foreignCode,
+            exchAmount: finalForeignAmt, // 실제 거래되는 외화 양
+            exchAppliedRate: parseFloat(appliedRateText),
+            exchEsignYn: 'Y',
+            exchType: currentMode
+        };
+
+        // 주소 및 수령일 설정
+        if (currentMode === 'BUY') {
+            const branchSelect = document.getElementById("receiveBranch");
+            if (!branchSelect.value) { alert("수령 지점을 선택해주세요."); return; }
+
+            const branchName = branchSelect.options[branchSelect.selectedIndex].text;
+            const method = document.getElementById("receiveMethod").value;
+
+            exchangeData.exchAddr = `${branchName} (${method === 'ATM' ? 'ATM' : '영업점'})`;
+            exchangeData.exchExpDy = document.getElementById("receiveDate").value;
+
+            if (!exchangeData.exchExpDy) { alert("수령일을 선택해주세요."); return; }
+
         } else {
-            resultFee.innerText = "우대 없음 (기본 수수료)";
+            const depositAcct = document.getElementById("depositAccountSelect").value;
+            exchangeData.exchAddr = `즉시입금:${depositAcct}`;
+            exchangeData.exchExpDy = new Date().toISOString().split("T")[0];
         }
 
-        // (2) 현재 고시 환율
-        resultRate.innerText = `${currentBaseRate.toLocaleString()} 원`;
-
-        // (3) 적용 환율
-        resultApplied.innerText = `${appliedRate.toFixed(2)} 원`;
-
-        // (4) 최종 필요 원화 금액 (십원 단위 절사 등 정책에 따라 조정 가능, 여기선 정수표시)
-        resultWon.innerText = `${Math.floor(totalWon).toLocaleString()} 원`;
-
-        // 결과창 보이기
-        exchangeResult.style.display = "block";
-        // 부드럽게 스크롤 이동
-        // exchangeResult.scrollIntoView({ behavior: "smooth", block: "center" });
+        // 최종 요청
+        fetch('/flobank/exchange/process', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(exchangeData)
+        })
+            .then(res => res.json())
+            .then(resData => {
+                if (resData.status === 'success') {
+                    alert("환전 처리가 완료되었습니다.");
+                    window.location.href = "/flobank/exchange/step3";
+                } else {
+                    alert("처리 실패: " + resData.message);
+                }
+            })
+            .catch(err => {
+                console.error("Exchange Process Error:", err);
+                alert("통신 오류가 발생했습니다.");
+            });
     }
 
+    // 수령 방법 버튼 클릭 UI 이벤트 (기존 유지)
+    const methodBtns = document.querySelectorAll('.method-btn');
+    const receiveMethodInput = document.getElementById('receiveMethod');
 
-    // =========================================
-    // [다음 단계 진행 (step3)]
-    // =========================================
-    if (nextBtnStep2) {
-        nextBtnStep2.addEventListener("click", () => {
-            // 필수 입력값 검증
-            if (!exchangeResult.style.display || exchangeResult.style.display === "none") {
-                alert("환전 예상금액 확인을 먼저 진행해주세요.");
-                return;
-            }
-
-            // 폼 전송 또는 다음 페이지 이동 로직
-            // document.querySelector(".step2-form").submit(); // 실제 전송 시 사용
-            alert("다음 단계로 이동합니다 (구현 예정)");
-            // window.location.href = "/exchange/step3";
+    if(methodBtns) {
+        methodBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                methodBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                receiveMethodInput.value = btn.getAttribute('data-value');
+            });
         });
     }
-
-    // =========================================
-    // [수령 희망일 제한 (오늘 이전 선택 불가)]
-    // =========================================
-    const dateInput = document.querySelector('input[type="date"]');
-    if(dateInput) {
-        const today = new Date().toISOString().split("T")[0];
-        dateInput.setAttribute("min", today);
-
-        // 최대 1개월 설정
-        let maxDate = new Date();
-        maxDate.setMonth(maxDate.getMonth() + 1);
-        dateInput.setAttribute("max", maxDate.toISOString().split("T")[0]);
-    }
-
 });

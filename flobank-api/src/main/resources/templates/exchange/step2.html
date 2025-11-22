@@ -1,181 +1,207 @@
-<!--
-* 날짜 : 2025/11/20
-* 이름 : 김대현
-* 내용 : 약관 동의관련 수정
--->
-
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>환전하기2</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>환전하기 - FLOBANK</title>
     <link rel="stylesheet" th:href="@{/css/exchange.css}">
     <link rel="stylesheet" th:href="@{/css/header.css}">
     <link rel="stylesheet" th:href="@{/css/footer.css}">
-
-    <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-    crossorigin="anonymous"
-    />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" />
 
 </head>
 <body>
 <div th:replace="~{_template/_header.html}"></div>
 <main class="step2-container">
 
-
-  <!-- 단계 표시 -->
-  <div class="step2-steps">
-    <div class="step2-step">
-      <span class="num">1</span>
-      <span class="text">약관동의</span>
-    </div>
-    <div class="step2-step active">
-      <span class="num">2</span>
-      <span class="text">정보입력</span>
-    </div>
-    <div class="step2-step">
-      <span class="num">3</span>
-      <span class="text">환전완료</span>
-    </div>
-  </div>
-
-  <div class="step2-box">
-    <h2 class="step2-title">환전정보 입력</h2>
-    <p class="step2-subtitle">고객 정보를 확인하고 환전정보를 입력해주세요.</p>
-
-    <form class="step2-form">
-
-      <!-- 통화 및 금액 -->
-      <div class="step2-form-group">
-        <label class="step2-label">통화선택</label>
-        <select id="currencySelect" class="step2-select">
-          <option value="USD">USD (미국 달러)</option>
-          <option value="JPY">JPY (일본 엔)</option>
-          <option value="EUR">EUR (유로화)</option>
-          <option value="CNH">CNH (중국 위안)</option>
-            <option value="GBP">GBP (영국 파운드)</option>
-            <option value="AUD">AUD (호주 달러)</option>
-        </select>
-      </div>
-
-      <div class="step2-form-group">
-        <label class="step2-label">환전금액</label>
-        <div class="step2-flex">
-          <input type="number" id="exchangeAmount" class="step2-input short" placeholder="금액 입력 (예: 100)">
-          <button type="button" id="calculateBtn" class="step2-btn-sub">
-            환전예상금액 확인
-          </button>
+    <div class="step2-steps">
+        <div class="step2-step">
+            <span class="num">1</span>
+            <span class="text">약관동의</span>
         </div>
-      </div>
-
-      <!--  환전 예상금액 영역 -->
-      <div id="exchangeResult" class="step2-result-box" style="display:none;">
-        <h4>환전예상금액</h4>
-        <table class="step2-result-table">
-          <tr>
-            <th>
-              수수료
-              <button type="button" id="couponBtn" class="coupon-btn">쿠폰 적용</button>
-            </th>
-            <td id="result-fee">0.30%</td>
-          </tr>
-          <tr>
-            <th>원화금액(수수료포함)</th>
-            <td id="result-won">-</td>
-          </tr>
-          <tr>
-            <th>현재고시환율</th>
-            <td id="result-rate">-</td>
-          </tr>
-          <tr>
-            <th>적용환율</th>
-            <td id="result-applied">-</td>
-          </tr>
-        </table>
-      </div>
-
-      <!-- 고객정보 -->
-      <div class="step2-form-group">
-        <label class="step2-label">휴대폰번호</label>
-        <div class="step2-flex">
-          <input type="text" class="step2-input small" placeholder="010">
-          <span>-</span>
-          <input type="text" class="step2-input small">
-          <span>-</span>
-          <input type="text" class="step2-input small">
+        <div class="step2-step active">
+            <span class="num">2</span>
+            <span class="text">정보입력</span>
         </div>
-      </div>
+        <div class="step2-step">
+            <span class="num">3</span>
+            <span class="text">환전완료</span>
+        </div>
+    </div>
 
-      <div class="step2-form-group">
-        <label class="step2-label">출금계좌선택</label>
-        <select class="step2-select">
-            <option th:each="dto : ${custAcctDTOList}" th:text="|${dto.acctNo} (잔액 ${#numbers.formatInteger(dto.acctBalance, 0, 'COMMA')}원)|" th:value="${dto.acctNo}">104302-04-412952 (잔액 1,000원)</option>
-        </select>
-      </div>
+    <div class="step2-box">
+        <h2 class="step2-title">환전정보 입력</h2>
+        <p class="step2-subtitle">환전할 통화와 금액을 입력해주세요.</p>
 
-      <div class="step2-form-group">
-        <label class="step2-label">출금계좌비밀번호</label>
-        <input type="password" class="step2-input short" maxlength="4" placeholder="비밀번호 4자리">
-      </div>
+        <form class="step2-form">
 
-      <!-- 수령정보 -->
-      <div class="step2-form-group">
-        <label class="step2-label">수령희망지점</label>
-        <select class="step2-select">
-          <option>인천공항</option>
-          <option>김해공항</option>
-          <option>서울역점</option>
-          <option>부산서면점</option>
-        </select>
-        <p class="step2-note red">※ 신청인 본인만 외화수령이 가능합니다.</p>
+            <div class="exchange-swapper">
+                <div class="currency-box">
+                    <label>보내실 때 (From)</label>
+                    <div class="input-group">
+                        <select id="fromCurrency" class="currency-select">
+                            <option value="KRW">KRW (원)</option>
+                            <option value="USD">USD (달러)</option>
+                            <option value="JPY">JPY (엔)</option>
+                            <option value="EUR">EUR (유로)</option>
+                            <option value="CNH">CNH (위안)</option>
+                            <option value="GBP">GBP (파운드)</option>
+                            <option value="AUD">AUD (호주달러)</option>
+                        </select>
+                        <input type="number" id="fromAmount" class="amount-input" placeholder="0">
+                    </div>
+                </div>
 
-      </div>
+                <div class="arrow-icon">
+                    <i class="fa-solid fa-arrow-right"></i>
+                </div>
 
-      <div class="step2-form-group">
-        <label class="step2-label">수령희망일</label>
-        <input type="date" class="step2-input short">
-        <p class="step2-note">※ 최대 1개월 이내 수령 가능합니다.</p>
-      </div>
+                <div class="currency-box">
+                    <label>받으실 때 (To)</label>
+                    <div class="input-group">
+                        <select id="toCurrency" class="currency-select">
+                            <option value="USD" selected>USD (달러)</option>
+                            <option value="KRW">KRW (원)</option>
+                        </select>
+                        <input type="text" id="toAmount" class="amount-input" readonly placeholder="0">
+                    </div>
+                </div>
+            </div>
 
+            <div id="exchangeResult" class="step2-result-box">
+                <table class="step2-result-table">
+                    <tr>
+                        <th>
+                            현재고시환율
+                            <span class="tooltip-icon">
+                                <i class="fa-regular fa-circle-question"></i>
+                                <span class="tooltip-text">한국수출입은행 금일 1회차 고시환율이 적용됩니다.</span>
+                            </span>
+                        </th>
+                        <td id="result-base-rate" style="color:#555;">-</td>
+                    </tr>
+                    <tr>
+                        <th>
+                            적용 환율 (우대 <span id="spreadRateDisplay">0</span>%)
+                            <button type="button" id="couponBtn" class="coupon-btn" style="margin-left:5px; padding:2px 8px; font-size:11px;">쿠폰선택</button>
+                        </th>
+                        <td id="result-rate" style="font-weight:bold; color:#333;">-</td>
+                    </tr>
+                    <tr>
+                        <th>수수료 (할인적용)</th>
+                        <td id="result-fee">-</td>
+                    </tr>
+                    <tr style="border-top: 1px dashed #ccc;">
+                        <th>최종 예상 금액</th> <td id="result-final" style="color:#00907f; font-size:1.2em; font-weight:bold;">0</td>
+                    </tr>
+                </table>
+            </div>
 
-      <!-- 버튼 -->
-      <div class="step2-actions">
-        <button type="button" class="step2-btn-next">다음</button>
-      </div>
+            <hr class="divider" style="margin: 30px 0; border:0; border-top:1px solid #eee;">
 
-    </form>
-  </div>
+            <div class="step2-form-group">
+                <label class="step2-label">휴대폰번호</label>
+                <div class="step2-flex">
+                    <input type="text" class="step2-input small" placeholder="010">
+                    <span>-</span>
+                    <input type="text" class="step2-input small">
+                    <span>-</span>
+                    <input type="text" class="step2-input small">
+                </div>
+            </div>
 
+            <div class="step2-form-group">
+                <label class="step2-label" id="withdrawLabel">출금계좌선택 (원화)</label>
+                <select id="accountSelectWon" class="step2-select">
+                    <option th:each="dto : ${custAcctDTOList}"
+                            th:text="|${dto.acctNo} (잔액 ${#numbers.formatInteger(dto.acctBalance, 0, 'COMMA')}원)|"
+                            th:value="${dto.acctNo}">
+                    </option>
+                </select>
+                <select id="accountSelectForeign" class="step2-select" style="display:none;">
+                    <option th:if="${foreignAcctDTOList == null or #lists.isEmpty(foreignAcctDTOList)}" value="">
+                        보유하신 외화 입출금 통장이 없습니다.
+                    </option>
+                    <option th:each="dto : ${foreignAcctDTOList}"
+                            th:text="|${dto.acctNo} (잔액 ${dto.acctBalance} ${dto.currencyCode})|"
+                            th:value="${dto.acctNo}">
+                    </option>
+                </select>
+            </div>
 
+            <div class="step2-form-group">
+                <label class="step2-label">출금계좌비밀번호</label>
+                <input type="password" id="pwInput" class="step2-input short" maxlength="4" placeholder="비밀번호 4자리">
+            </div>
 
-  <!--  쿠폰 선택 모달 -->
+            <div id="buySection" class="mode-section">
+                <div class="step2-form-group">
+                    <label class="step2-label">수령방법</label>
+                    <div class="receive-method-group">
+                        <button type="button" class="method-btn active" data-value="BRANCH">영업점 방문</button>
+                        <button type="button" class="method-btn" data-value="ATM">ATM 수령</button>
+                        <input type="hidden" id="receiveMethod" value="BRANCH">
+                    </div>
+                </div>
+                <div class="step2-form-group">
+                    <label class="step2-label">수령희망지점</label>
+                    <select id="receiveBranch" class="step2-select">
+                        <option value="">지점을 선택해주세요</option>
+                        <optgroup label="공항/항만점">
+                            <option value="ICN_T1">인천국제공항 제1여객터미널</option>
+                            <option value="ICN_T2">인천국제공항 제2여객터미널</option>
+                        </optgroup>
+                        <optgroup label="주요 영업점">
+                            <option value="SEOUL_ST">서울역점 (환전센터)</option>
+                            <option value="BUSAN_MAIN">부산은행 본점영업부</option>
+                        </optgroup>
+                    </select>
+                </div>
+                <div class="step2-form-group">
+                    <label class="step2-label">수령희망일</label>
+                    <input type="date" id="receiveDate" class="step2-input short">
+                </div>
+            </div>
+
+            <div id="sellSection" class="mode-section" style="display:none;">
+                <div class="step2-form-group">
+                    <label class="step2-label">입금받을 계좌 (원화)</label>
+                    <select id="depositAccountSelect" class="step2-select">
+                        <option th:each="dto : ${custAcctDTOList}"
+                                th:text="|${dto.acctNo} (입금가능)|"
+                                th:value="${dto.acctNo}">
+                        </option>
+                    </select>
+                    <p class="step2-note" style="color:blue; margin-top:5px;">※ 환전된 원화는 즉시 입금됩니다.</p>
+                </div>
+            </div>
+
+            <div class="step2-actions">
+                <button type="button" class="step2-btn-next">환전하기</button>
+            </div>
+
+        </form>
+    </div>
+
     <div id="couponModal" class="coupon-modal" style="display:none;">
-      <div class="coupon-modal-content">
-        <h3>쿠폰 선택</h3>
-        <ul>
-          <li th:each="dto : ${couponDTOList}">
-              <button class="coupon-option" data-discount="0.05">수수료 5% 할인 쿠폰</button>
-          </li>
-          <li><button class="coupon-option" data-discount="0.10">수수료 10% 할인 쿠폰</button></li>
-          <li><button class="coupon-option" data-discount="0.20">수수료 20% 할인 쿠폰</button></li>
-        </ul>
-        <button id="couponClose" class="coupon-close">닫기</button>
-      </div>
+        <div class="coupon-modal-content">
+            <h3>쿠폰 선택</h3>
+            <ul th:if="${not #lists.isEmpty(couponDTOList)}">
+                <li th:each="dto : ${couponDTOList}">
+                    <button class="coupon-option"
+                            th:data-discount="${dto.coupRate / 100.0}"
+                            th:text="|환전 수수료 ${dto.coupRate}% 우대 쿠폰|">
+                        수수료 할인 쿠폰
+                    </button>
+                </li>
+            </ul>
+            <button id="couponClose" class="coupon-close">닫기</button>
+        </div>
     </div>
-
-
-
-
 
 </main>
-
 <div th:replace="~{_template/_footer.html}"></div>
 <script th:src="@{/js/exchange.js}"></script>
 
 </body>
 </html>
-

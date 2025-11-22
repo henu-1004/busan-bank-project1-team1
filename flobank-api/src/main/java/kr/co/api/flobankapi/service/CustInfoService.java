@@ -65,7 +65,6 @@ public class CustInfoService {
      */
     public CustInfoDTO login(String custId, String rawPassword) {
         CustInfoDTO custInfoDTO = memberMapper.findByIdCustInfo(custId); // DB에서 ID 있는지 확인
-        log.info("login custInfoDTO={}", custInfoDTO);
 
         if(custInfoDTO == null){ // 없으면
             log.info("로그인 실패: 존재하지 않는 아이디 - {}", custId);

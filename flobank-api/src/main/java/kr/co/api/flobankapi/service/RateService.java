@@ -10,7 +10,9 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import java.time.Duration;
@@ -62,37 +64,42 @@ public class RateService {
 
     // 특정 통화의 환율만 추출
     public double getCurrencyRate(String currency) {
-        // 1. 오늘 날짜 구하기 (주말/공휴일 처리는 별도 로직 필요하지만 일단 오늘로 시도)
-        String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+        // 1. 조회 시작 날짜 계산 (토/일/월 오전 -> 금요일 등)
+        LocalDate targetDate = getTargetDate();
+        String formattedDate = targetDate.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
 
-        // 2. 전체 리스트 가져오기 (기존 메서드 활용 -> Redis 자동 사용됨)
-        String jsonResponse = getRate(today);
+        String jsonResponse = null;
 
+        // 2. 데이터가 없으면(공휴일 등) 최대 5일 전까지 과거로 가며 데이터를 찾음 (안전장치)
+        for (int i = 0; i < 5; i++) {
+            jsonResponse = getRate(formattedDate);
+
+            // 데이터가 유효하면 반복 종료
+            if (jsonResponse != null && !jsonResponse.isEmpty() && !jsonResponse.equals("[]")) {
+                break;
+            }
+
+            // 데이터가 없으면 하루 전으로 이동하여 재시도
+            targetDate = targetDate.minusDays(1);
+            formattedDate = targetDate.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+        }
+
+        // 5일간 뒤져도 없으면 0.0 반환
         if (jsonResponse == null || jsonResponse.isEmpty() || jsonResponse.equals("[]")) {
-            // 오늘 데이터가 없으면(공휴일 등) 어제나 최근 데이터를 찾는 로직이 필요할 수 있음
-            // 일단 테스트를 위해 0.0 반환
             return 0.0;
         }
 
-        // 3. JSON 파싱해서 해당 통화 찾기
+        // 3. JSON 파싱 (기존 로직과 동일)
         try {
             JsonNode root = objectMapper.readTree(jsonResponse);
-
             if (root.isArray()) {
                 for (JsonNode node : root) {
-                    // cur_unit이 일치하는지 확인 (JPY(100) 같은 경우 처리 필요)
                     String curUnit = node.path("cur_unit").asText();
-
-                    // JPY(100), IDR(100) 등은 괄호 제거하고 비교하거나 포함 여부 확인
                     if (curUnit.equals(currency) || curUnit.startsWith(currency + "(")) {
-
-                        // "deal_bas_r" (매매기준율) 가져오기. 콤마(,) 제거 후 파싱
                         String dealBasR = node.path("kftc_deal_bas_r").asText().replace(",", "");
-                        // 만약 kftc_deal_bas_r이 없으면 deal_bas_r 사용
                         if(dealBasR.isEmpty() || dealBasR.equals("0")) {
                             dealBasR = node.path("deal_bas_r").asText().replace(",", "");
                         }
-
                         return Double.parseDouble(dealBasR);
                     }
                 }
@@ -102,5 +109,33 @@ public class RateService {
         }
 
         return 0.0;
+    }
+
+    // 영업일 기준 날짜 계산 로직
+    private LocalDate getTargetDate() {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDate date = now.toLocalDate();
+        DayOfWeek dayOfWeek = now.getDayOfWeek();
+        int hour = now.getHour();
+
+        // 1. 토요일이면 -> 1일 전(금)
+        if (dayOfWeek == DayOfWeek.SATURDAY) {
+            return date.minusDays(1);
+        }
+        // 2. 일요일이면 -> 2일 전(금)
+        else if (dayOfWeek == DayOfWeek.SUNDAY) {
+            return date.minusDays(2);
+        }
+        // 3. 월요일이고 11시 이전이면 -> 3일 전(금)
+        else if (dayOfWeek == DayOfWeek.MONDAY && hour < 11) {
+            return date.minusDays(3);
+        }
+        // 4. 화~금 평일인데 11시 이전이면 -> 1일 전 (아직 오늘 고시 안됨)
+        else if (hour < 11) {
+            return date.minusDays(1);
+        }
+
+        // 그 외(평일 11시 이후)는 오늘 날짜 반환
+        return date;
     }
 }
