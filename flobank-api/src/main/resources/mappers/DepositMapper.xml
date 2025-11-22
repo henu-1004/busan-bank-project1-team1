@@ -273,7 +273,8 @@
         DPST_HDR_INFO_AGREE_DT,
         DPST_HDR_CONTRACT_DT,
         DPST_HDR_RATE,
-        DPST_HDR_CURRENCY_EXP
+        DPST_HDR_CURRENCY_EXP,
+        DPST_HDR_EXP_ACCT_NO
         <if test="dpstHdrAutoRenewYn != null and dpstHdrAutoRenewYn.equalsIgnoreCase('y')">
             , DPST_HDR_AUTO_RENEW_TERM
             , DPST_HDR_AUTO_RENEW_CNT
@@ -297,7 +298,8 @@
         #{dpstHdrInfoAgreeDt},
         SYSDATE,
         #{dpstHdrRate},
-        #{dpstHdrCurrencyExp}
+        #{dpstHdrCurrencyExp},
+        #{dpstHdrExpAcctNo}
         <if test="dpstHdrAutoRenewYn != null and dpstHdrAutoRenewYn.equalsIgnoreCase('y')">
             , #{dpstHdrAutoRenewTerm}
             , #{dpstHdrAutoRenewCnt}
@@ -348,7 +350,8 @@
         TRAN_REC_BK_CODE,
         TRAN_ESIGN_YN,
         TRAN_ESIGN_DT,
-        TRAN_DT
+        TRAN_DT,
+        TRAN_CURRENCY
         )
         VALUES (
         #{tranAcctNo},
@@ -360,10 +363,34 @@
         #{tranRecBkCode},
         #{tranEsignYn},
         TO_TIMESTAMP(#{tranEsignDt}, 'YYYY-MM-DD HH24:MI:SS.FF3'),
-        SYSDATE
+        SYSDATE,
+        #{tranCurrency}
         )
     </insert>
 
+    <select id="selectKrwAcctBalance" resultType="kr.co.api.flobankapi.dto.CustAcctDTO">
+        select acct_balance
+        from tb_cust_acct
+        where acct_no = #{acctNo}
+    </select>
+
+    <select id="selectFrgnAcctBalance" resultType="kr.co.api.flobankapi.dto.FrgnAcctBalanceDTO">
+        select bal_balance
+        from TB_FRGN_ACCT_BALANCE
+        where bal_no = #{balNo}
+    </select>
+
+    <update id="updateAcctBalance">
+        UPDATE TB_CUST_ACCT
+        SET ACCT_BALANCE = #{acctBalance}
+        WHERE ACCT_NO = #{acctNo}
+    </update>
+
+    <update id="updateBalBalance">
+        UPDATE TB_FRGN_ACCT_BALANCE
+        SET BAL_BALANCE = #{balBalance}
+        WHERE BAL_NO = #{balNo}
+    </update>
 
 
 </mapper>
