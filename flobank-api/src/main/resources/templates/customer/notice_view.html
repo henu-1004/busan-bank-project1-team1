@@ -24,31 +24,35 @@
   <section class="customer-content">
     <h2>공지사항</h2>
 
-    <div class="qna-view">
-        <div class="view-header">
-            <h3 th:text="${notice.boardTitle}"></h3>
 
-            <p class="meta">
-                작성자 <span th:text="${notice.boardAdminId}"></span> |
-                등록일 <span th:text="${notice.boardRegDt}"></span> |
-                조회수 <span th:text="${notice.boardHit}"></span>
-            </p>
+      <div class="qna-view notice-view">
 
-            <!-- ★ 본문 출력 (줄바꿈 처리) -->
-            <p th:utext="${#strings.replace(notice.boardContent, '\n', '<br/>')}"></p>
-        </div>
+          <!-- 헤더 -->
+          <div class="view-header">
+              <h3 th:text="${notice.boardTitle}"></h3>
 
-        <div class="view-body">
-            <!-- ★ 이 부분은 삭제하거나, 필요하면 다른 정보로 대체 -->
-        </div>
+              <p class="meta">
+                  작성자 <strong th:text="${notice.boardAdminId}"></strong> |
+                  등록일 <span th:text="${notice.boardRegDt}"></span> |
+                  조회수 <span th:text="${notice.boardHit}"></span>
+              </p>
+          </div>
 
+          <!-- 본문 -->
+          <div class="view-body">
+              <p th:utext="${#strings.replace(notice.boardContent, '\n', '<br/>')}"></p>
+          </div>
 
-        <div class="view-footer">
-          <a th:href="@{/customer/notice_list}" class="btn-cancel">
-          <i class="fa-solid fa-list"></i> 목록
-        </a>
+          <!-- 목록 버튼 -->
+          <div class="view-footer">
+              <a th:href="@{/customer/notice_list}" class="btn-cancel">
+                  <i class="fa-solid fa-list"></i> 목록
+              </a>
+          </div>
       </div>
-    </div>
+
+
+
   </section>
 </main>
 

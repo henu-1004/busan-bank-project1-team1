@@ -1209,3 +1209,91 @@ border: 1px solid #ccc;
     border-radius: 10px;
     background: #fff;
 }
+
+
+
+/*event_view 페이지 수정*/
+/* 이벤트 혜택 본문 스타일 */
+.event-benefit {
+    margin-top: 30px;
+    padding: 0 5px;
+}
+
+.event-benefit h4 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #22304E;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.event-benefit i {
+    color: #4A6FA5;
+    font-size: 17px;
+}
+
+.event-benefit p {
+    font-size: 14.5px;
+    color: #444;
+    line-height: 1.75;
+    margin: 0;
+}
+
+
+
+/* ============================
+      공지사항 상세 전용 스타일
+   ============================ */
+.notice-view {
+    border-top: 3px solid #22304E;
+    border-radius: 10px;
+    padding: 30px 35px 35px;
+    background: #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+}
+
+/* 제목 */
+.notice-view .view-header h3 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #22304E;
+    margin-bottom: 10px;
+}
+
+/* 메타 정보 */
+.notice-view .meta {
+    font-size: 13.5px;
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.notice-view .meta strong {
+    color: #4A6FA5;
+}
+
+/* 본문 */
+.notice-view .view-body {
+    font-size: 15px;
+    color: #333;
+    line-height: 1.85;
+    margin-bottom: 25px;
+}
+
+/* 버튼 */
+.notice-view .view-footer {
+    text-align: right;
+    margin-top: 10px;
+}
+
+.notice-view .btn-cancel {
+    background: #e9ecef;
+    padding: 10px 22px;
+    border-radius: 25px;
+}
+
+.notice-view .btn-cancel:hover {
+    background: #d9dee4;
+    transform: translateY(-2px);
+}

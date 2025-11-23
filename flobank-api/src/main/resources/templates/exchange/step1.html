@@ -1,9 +1,8 @@
 <!--
 * 날짜 : 2025/11/20
 * 이름 : 김대현
-* 내용 : 약관 동의관련 수정
+* 내용 : 환전 약관 동의 페이지 (remit.js 구조에 맞게 form 추가)
 -->
-
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -15,11 +14,9 @@
     <link rel="stylesheet" th:href="@{/css/header.css}">
     <link rel="stylesheet" th:href="@{/css/footer.css}">
 
-    <link
-            rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-            crossorigin="anonymous"
-    />
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+          crossorigin="anonymous"/>
 </head>
 
 <body>
@@ -54,57 +51,53 @@
             </p>
         </div>
 
-        <!-- 약관 동의 영역 -->
-        <section class="step1-section">
+        <!-- ⭐⭐⭐ 전체 약관 form 추가(remit.js가 요구함) -->
+        <form id="remitTermsForm" th:action="@{/exchange/step2}" method="get">
 
-            <!-- 🔹 약관 1개씩 박스 형태로 출력 -->
-            <div class="step1-term-box" th:each="t, stat : ${termsList}">
+            <section class="step1-section">
 
-                <!-- 약관 제목 -->
-                <label class="step1-label" th:text="|${t.termTitle} (필수)|"></label>
+                <!-- 약관 목록 -->
+                <div class="step1-term-box" th:each="t, stat : ${termsList}">
 
-                <!-- 약관 내용 -->
-                <div class="step1-input readonly">
-                    <pre th:text="${t.thistContent}"></pre>
+                    <!-- 약관 제목 -->
+                    <label class="step1-label" th:text="|${t.termTitle} (필수)|"></label>
+
+                    <!-- 약관 내용 -->
+                    <div class="step1-input readonly">
+                        <pre th:text="${t.thistContent}"></pre>
+                    </div>
+
+                    <!-- 체크박스 -->
+                    <div class="step1-check">
+                        <input type="checkbox" class="term-check"
+                               th:id="|exchange-term${stat.index}|"
+                               th:attr="data-cate=${t.termCate}, data-order=${t.termOrder}">
+                        위 약관에 동의합니다.
+                    </div>
+
                 </div>
 
-                <!-- 체크박스 -->
-                <div class="step1-check">
-                    <input type="checkbox" class="term-check"
-                           th:id="|exchange-term${stat.index}|"
-                           th:attr="data-cate=${t.termCate}, data-order=${t.termOrder}">
-                    위 약관에 동의합니다.
+                <!-- 전체 동의 -->
+                <div class="step1-agree-all">
+                    <label><input type="checkbox" id="agreeAll"> 모든 약관에 동의합니다.</label>
                 </div>
 
+            </section>
+
+            <!-- 다음 버튼 -->
+            <div class="step1-actions">
+                <button type="submit" class="step1-btn-next">다음</button>
             </div>
 
-            <!-- 전체 동의 -->
-            <div class="step1-agree-all">
-                <label><input type="checkbox" id="agreeAll"> 모든 약관에 동의합니다.</label>
-            </div>
-
-        </section>
-
-        <!-- 버튼 -->
-        <div class="step1-actions">
-            <a th:href="@{/exchange/step2}" class="step1-btn-next">다음</a>
-        </div>
+        </form>
+        <!-- ⭐⭐⭐ END FORM -->
 
     </div>
 </main>
 
 <div th:replace="~{_template/_footer.html}"></div>
-<script th:src="@{/js/exchange.js}"></script>
 
-
-
+<script th:src="@{/js/exchange_terms.js}"></script>
 
 </body>
 </html>
-
-
-
-
-
-
-
