@@ -58,25 +58,46 @@
                         </span>
                     </div>
 
+
+
                     <div class="view-info-item">
                         <span class="view-info-label">가입금액</span>
-                        <div class="view-info-value" style="display: flex; flex-direction: column; gap: 6px;">
-                            <th:block th:if="${product.limits != null and !product.limits.isEmpty()}">
-                                <div th:each="limit : ${product.limits}" style="display: flex; align-items: center;">
-                                    <span style="width: 50px; display: inline-block; font-weight: 700; color: #22304E;" th:text="${limit.lmtCurrency}">USD</span>
-                                    <span style="color: #333;">
-                                        <span th:text="${#numbers.formatInteger(limit.lmtMinAmt, 1, 'COMMA')}">1,000</span>
-                                        <span th:if="${limit.lmtMaxAmt != null and limit.lmtMaxAmt > 0}"
-                                              th:text="| ~ ${#numbers.formatInteger(limit.lmtMaxAmt, 1, 'COMMA')}|"></span>
-                                    </span>
+
+                        <!-- 1) 가입금액이 없는 경우 -->
+                        <div th:if="${product.limits == null or product.limits.isEmpty()}"
+                             class="view-info-value"
+                             style="font-size:18px; color:#333;">
+                            제한 없음
+                        </div>
+
+                        <!-- 2) 가입금액이 있는 경우 -->
+                        <div th:if="${product.limits != null and !product.limits.isEmpty()}"
+                             class="view-info-value">
+
+                            <div class="price-list" th:if="${product.limits != null and !product.limits.isEmpty()}">
+                                <div th:each="limit : ${product.limits}" class="price-row">
+                                    <span class="price-cur" th:text="${limit.lmtCurrency}"></span>
+                                    <span class="price-amt">
+            <span th:text="${#numbers.formatInteger(limit.lmtMinAmt, 1, 'COMMA')}"></span>
+            <span th:if="${limit.lmtMaxAmt != null and limit.lmtMaxAmt > 0}"
+                  th:text="| ~ ${#numbers.formatInteger(limit.lmtMaxAmt, 1, 'COMMA')}|"></span>
+        </span>
                                 </div>
-                            </th:block>
-                            <div th:if="${product.limits == null or product.limits.isEmpty()}" style="color: #333;">제한 없음</div>
+                            </div>
+
+
                         </div>
                     </div>
+
+
+
+
+
+
                 </div>
             </div>
         </div>
+
 
         <div class="view-tabs">
             <button class="view-tab active" onclick="openTab(event, 'tab1')">상품안내</button>
