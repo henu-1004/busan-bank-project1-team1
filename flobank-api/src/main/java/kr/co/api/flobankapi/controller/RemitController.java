@@ -22,6 +22,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import kr.co.api.flobankapi.service.TermsDbService;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -138,25 +140,31 @@ public class RemitController {
         if(frgnRemtTranDTO.getRemtAcctNo().contains("-10-")){
             // [원화 계좌 출금]
             // 수수료 및 출금액은 '원화(₩)'로 표시
-            frgnRemtTranDTO.setRemtFee(4900); // 원화 고정 수수료
+            frgnRemtTranDTO.setRemtFee(BigDecimal.valueOf(4900)); // 원화 고정 수수료
 
             // 예상 출금 금액 계산 (송금액 * 환율 + 수수료)
             // (주의: 화면에서 넘어온 remtAppliedRate가 있어야 정확한 계산 가능)
-            double withdrawAmount = (frgnRemtTranDTO.getRemtAmount() * frgnRemtTranDTO.getRemtAppliedRate());
+            BigDecimal withdrawAmount = frgnRemtTranDTO.getRemtAmount()
+                    .multiply(frgnRemtTranDTO.getRemtAppliedRate())
+                    .setScale(0, RoundingMode.FLOOR);
+
+            BigDecimal totalAmount = withdrawAmount.add(frgnRemtTranDTO.getRemtFee());
 
             model.addAttribute("feeCurrencySymbol", "₩");
-            model.addAttribute("withdrawalAmount", (long)withdrawAmount); // 원화는 정수로 표시
-            model.addAttribute("totalWithdrawalAmount", (long)(withdrawAmount + frgnRemtTranDTO.getRemtFee())); // 총 출금액
+            model.addAttribute("withdrawalAmount", withdrawAmount);
+            model.addAttribute("totalWithdrawalAmount", totalAmount);
             model.addAttribute("isKrwAccount", true);
 
         } else {
             // [외화 계좌 출금]
             // 수수료 및 출금액은 '해당 외화'로 표시
-            frgnRemtTranDTO.setRemtFee(defaultForeignFee);
+
+            frgnRemtTranDTO.setRemtFee(BigDecimal.valueOf(defaultForeignFee));
+            BigDecimal totalAmount = frgnRemtTranDTO.getRemtAmount().add(frgnRemtTranDTO.getRemtFee());
 
             model.addAttribute("feeCurrencySymbol", targetSymbol);
             model.addAttribute("withdrawalAmount", frgnRemtTranDTO.getRemtAmount());
-            model.addAttribute("totalWithdrawalAmount", frgnRemtTranDTO.getRemtAmount() + frgnRemtTranDTO.getRemtFee());
+            model.addAttribute("totalWithdrawalAmount", totalAmount);
             model.addAttribute("isKrwAccount", false);
         }
 
@@ -200,8 +208,10 @@ public class RemitController {
             model.addAttribute("feeCurrencySymbol", "₩");
             model.addAttribute("isKrwAccount", true);
             // 원화 환산 출금액 (수수료 제외한 순수 환전금액)
-            double withdrawAmount = frgnRemtTranDTO.getRemtAmount() * frgnRemtTranDTO.getRemtAppliedRate();
-            model.addAttribute("withdrawalAmount", (long)withdrawAmount);
+            BigDecimal withdrawAmount = frgnRemtTranDTO.getRemtAmount()
+                    .multiply(frgnRemtTranDTO.getRemtAppliedRate())
+                    .setScale(0, RoundingMode.FLOOR);
+            model.addAttribute("withdrawalAmount", withdrawAmount);
         } else {
             model.addAttribute("feeCurrencySymbol", targetSymbol);
             model.addAttribute("isKrwAccount", false);

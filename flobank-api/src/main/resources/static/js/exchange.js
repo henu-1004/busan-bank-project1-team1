@@ -7,6 +7,25 @@
 document.addEventListener("DOMContentLoaded", () => {
 
     // =========================================
+    // 서버 데이터 수신 및 처리 로직 이동
+    // =========================================
+    const frgnBalanceMap = {};
+    let frgnAcctNo = '';
+
+    if (window.exchData) {
+        // 1. 외화 계좌번호 가져오기
+        frgnAcctNo = window.exchData.frgnAcctNo || '';
+
+        // 2. 잔액 리스트를 Map으로 변환 { 'USD': 100.00, ... }
+        const rawList = window.exchData.balanceList;
+        if (rawList && Array.isArray(rawList)) {
+            rawList.forEach(dto => {
+                frgnBalanceMap[dto.balCurrency] = dto.balBalance;
+            });
+        }
+    }
+
+    // =========================================
     // 1. DOM 요소 선택 (중복 선언 통합 완료)
     // =========================================
     const fromCurrency = document.getElementById("fromCurrency");
@@ -200,9 +219,31 @@ document.addEventListener("DOMContentLoaded", () => {
             accountForeign.style.display = 'block';
             buySection.style.display = 'none';
             sellSection.style.display = 'block';
+            // SELL 모드일 때, 선택된 외화에 맞는 잔액 표시
+            updateForeignAcctBalanceDisplay();
         }
 
         calculateExchange();
+    }
+
+    // [로직 이동 완료] 외화 계좌 잔액 표시 함수
+    function updateForeignAcctBalanceDisplay() {
+        if (!accountForeign || accountForeign.options.length === 0) return;
+
+        // 현재 선택된 '보내는 통화' (예: USD)
+        const targetCurrency = fromCurrency.value;
+
+        // JS 내부 Map에서 조회
+        const balance = frgnBalanceMap[targetCurrency] || 0;
+
+        // 포맷팅
+        const formattedBalance = balance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+        // 텍스트 업데이트
+        const option = accountForeign.options[0];
+        if(option) {
+            option.text = `${frgnAcctNo} (잔액 ${formattedBalance} ${targetCurrency})`;
+        }
     }
 
     // [서버/Redis API 호출]
@@ -366,7 +407,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const requestData = {
                 acctNo: selectedAccount,
-                acctPw: pwInput.value.trim()
+                acctPw: pwInput.value.trim(),
+                mode: currentMode // BUY 또는 SELL 정보 전송
             };
 
             fetch('/flobank/exchange/passcheck', {
@@ -392,34 +434,36 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function submitExchangeRequest(sourceAcctNo) {
-        // 화면에 표시된 최종 적용 환율을 그대로 사용
+        // 1. 화면에서 최종 적용 환율 가져오기
         const appliedRateText = document.getElementById("result-rate").innerText.replace(/[^0-9.]/g, "");
         const foreignCode = (currentMode === 'BUY') ? toCurrency.value : fromCurrency.value;
-        let finalForeignAmt = 0;
 
+        // 2. 외화 금액 파싱
+        let finalForeignAmt = 0;
         if(currentMode === 'BUY') {
+            // 살 때: 결과창의 외화 금액
             finalForeignAmt = parseFloat(document.getElementById("result-final").innerText.replace(/[^0-9.]/g, ""));
         } else {
+            // 팔 때: 입력창의 외화 금액
             finalForeignAmt = parseFloat(fromAmount.value);
         }
 
+        // 3. spread(차액) 변수 재계산
+        let spread = 0;
+        if (currentMode === 'BUY') {
+            spread = currentTtsRate - currentBaseRate;
+        } else {
+            spread = currentBaseRate - currentTtbRate;
+        }
         if (spread < 0) spread = 0;
 
+        // 4. 총 수수료(원화) 계산
         const feeRate = FLO_BASIC_FEE * (1 - selectedCouponRate);
-        const unitFee = spread + (spread * feeRate); // 단위당 수수료 (예: 1달러당 수수료)
+        const unitFee = spread + (spread * feeRate); // 1단위당 수수료
 
-        // 최종 수수료 금액 = 단위당 수수료 * 요청 금액
-        // (단, 원화 -> 외화 살 때는 '외화금액' 기준이므로 toAmount * unitFee 가 아니라 fromAmount 관련 계산 필요)
-        // 하지만 통상적으로 수수료는 '원화 환산 금액'에 포함된 차액이므로,
-        // exchFee = (단위당 수수료) * (외화 금액)
+        let totalFeeKrw = unitFee * finalForeignAmt; // 전체 수수료 (원화)
 
-        let foreignAmt = (currentMode === 'BUY') ?
-            parseFloat(document.getElementById("result-final").innerText.replace(/[^0-9.]/g, "")) :
-            parseFloat(fromAmount.value);
-
-        // 최종 수수료 = 단위당 수수료 * 외화금액
-        let totalFeeKrw = unitFee * foreignAmt;
-
+        // 5. 데이터 세팅
         let exchangeData = {
             exchAcctNo: sourceAcctNo,
             exchToCurrency: foreignCode,
@@ -427,23 +471,28 @@ document.addEventListener("DOMContentLoaded", () => {
             exchAppliedRate: parseFloat(appliedRateText),
             exchEsignYn: 'Y',
             exchType: currentMode,
-            exchFee: Math.floor(totalFeeKrw)
+            exchFee: Math.floor(totalFeeKrw) // 소수점 절사
         };
 
+        // 6. 추가 정보 세팅 (수령지점 or 입금계좌)
         if (currentMode === 'BUY') {
             const branchSelect = document.getElementById("receiveBranch");
             if (!branchSelect.value) { alert("수령 지점을 선택해주세요."); return; }
             const branchName = branchSelect.options[branchSelect.selectedIndex].text;
             const method = document.getElementById("receiveMethod").value;
+
             exchangeData.exchAddr = `${branchName} (${method === 'ATM' ? 'ATM' : '영업점'})`;
             exchangeData.exchExpDy = document.getElementById("receiveDate").value;
             if (!exchangeData.exchExpDy) { alert("수령일을 선택해주세요."); return; }
         } else {
             const depositAcct = document.getElementById("depositAccountSelect").value;
+            // 주소 필드에 입금 계좌 정보 저장
             exchangeData.exchAddr = `즉시입금:${depositAcct}`;
+            // 입금은 즉시 처리되므로 오늘 날짜
             exchangeData.exchExpDy = new Date().toISOString().split("T")[0];
         }
 
+        // 7. 서버 전송
         fetch('/flobank/exchange/process', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

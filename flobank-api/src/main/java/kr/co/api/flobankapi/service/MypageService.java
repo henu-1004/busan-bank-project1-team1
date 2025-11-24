@@ -11,6 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -114,7 +115,7 @@ public class MypageService {
     // 입금, 출금
     @Transactional
     public void modifyCustAcctBal(CustTranHistDTO custTranHistDTO){
-        Integer amount = custTranHistDTO.getTranAmount();
+        BigDecimal amount = custTranHistDTO.getTranAmount();
         String acctNo = custTranHistDTO.getTranAcctNo();
         mypageMapper.updateMinusAcct(amount, acctNo);
 
@@ -253,7 +254,7 @@ public class MypageService {
 
         // 3. [핵심] 잔액 역산 로직
         // DB에 있는 '현재 잔액'을 시작점으로 잡습니다.
-        long calculatorBalance = account.getAcctBalance();
+        Integer calculatorBalance = account.getAcctBalance();
 
         for (CustTranHistDTO hist : historyList) {
             // (1) 현재 리스트의 row에 잔액을 세팅 (이 시점의 잔액은 이거였다!)
@@ -262,11 +263,11 @@ public class MypageService {
             // (2) 다음(더 과거) row를 위해 잔액을 되돌림
             // 최신 거래가 '입금(1)'이었다면 -> 입금 전에는 돈이 적었을 테니 뺌
             if (hist.getTranType() == 1) {
-                calculatorBalance = calculatorBalance - hist.getTranAmount();
+                calculatorBalance = calculatorBalance - hist.getTranAmount().intValue();
             }
             // 최신 거래가 '출금(2)'이었다면 -> 출금 전에는 돈이 많았을 테니 더함
             else if (hist.getTranType() == 2) {
-                calculatorBalance = calculatorBalance + hist.getTranAmount();
+                calculatorBalance = calculatorBalance + hist.getTranAmount().intValue();
             }
         }
 

@@ -14,7 +14,7 @@ public class CustTranHistDTO {
     private String tranAcctNo;
     private String tranCustName;
     private Integer tranType;
-    private Integer tranAmount;
+    private BigDecimal tranAmount;
     private String tranDt;
     private String tranRecAcctNo;
     private String tranRecName;

@@ -22,4 +22,7 @@ public class FrgnExchTranDTO {
     private BigDecimal exchFee;
     private String exchEsignYn;
     private String exchEsignDt;
+
+    // 추가 필드
+    private Long couponNo;
 }

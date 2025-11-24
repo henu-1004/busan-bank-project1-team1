@@ -37,10 +37,11 @@ public interface MypageMapper {
     void insertTranHist(CustTranHistDTO custTranHistDTO);
 
     // 입금
-    void updatePlusAcct(Integer amount, String acctNo);
+    void updatePlusAcct(BigDecimal amount, String acctNo);
+    void updatePlusAcctBig(BigDecimal amount, String acctNo);
 
     // 출금
-    void updateMinusAcct(Integer amount, String acctNo);
+    void updateMinusAcct(BigDecimal amount, String acctNo);
 
     // 원화 입출금 계좌 개수 확인
     Integer selectCntAcct(String custCode);

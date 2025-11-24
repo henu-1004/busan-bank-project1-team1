@@ -4,9 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.api.flobankapi.dto.*;
 import kr.co.api.flobankapi.jwt.CustomUserDetails;
-import kr.co.api.flobankapi.mapper.CustAcctMapper;
-import kr.co.api.flobankapi.mapper.ExchangeMapper;
-import kr.co.api.flobankapi.mapper.MypageMapper;
+import kr.co.api.flobankapi.mapper.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -30,6 +28,8 @@ public class ExchangeService {
     private final ExchangeMapper exchangeMapper;
     private final PasswordEncoder passwordEncoder;
     private final CustAcctMapper  custAcctMapper;
+    private final FrgnAcctMapper frgnAcctMapper;
+    private final CouponMapper couponMapper;
 
     public BigDecimal calculateExchange(String date, String targetCurrency, BigDecimal krwAmount) {
         try {
@@ -78,93 +78,133 @@ public class ExchangeService {
     @Transactional
     public void processExchange(FrgnExchTranDTO transDTO) {
 
-        // 1. 환전 내역 기록 (공통)
+        // 1. 환전 내역 테이블 INSERT (기존 값 그대로)
         exchangeMapper.insertExchange(transDTO);
 
-        // 2. 거래 방향에 따른 분기 처리
+        // 2. 사용자 이름 가져오기 (거래내역 기록용)
+        String custName = getAuthenticatedUserName();
+
+        // 3. 거래 유형별(BUY/SELL) 로직 분기
         if ("KRW".equals(transDTO.getExchFromCurrency())) {
             // ==========================================
-            // CASE A: 살 때 (원화 출금 -> 외화 수령)
+            // CASE A: 원화 -> 외화 (BUY)
             // ==========================================
 
-            // 1) 출금할 원화 금액 계산 (소수점 절사 필수)
+            // 1) 원화 출금액 계산 (소수점 절사)
+            // 공식: 외화금액 * 적용환율
             BigDecimal withdrawKrw = transDTO.getExchAmount()
                     .multiply(transDTO.getExchAppliedRate())
-                    .setScale(0, RoundingMode.FLOOR); // 원 단위 절사
+                    .setScale(0, RoundingMode.FLOOR);
 
-            // 2) 원화 계좌에서 출금 (기존 매퍼 사용)
-            custAcctMapper.updateKoAcctBal(withdrawKrw, transDTO.getExchAcctNo());
+            // 2) 원화 계좌 잔액 차감 (출금)
+            custAcctMapper.updateAcctBal(withdrawKrw, transDTO.getExchAcctNo());
 
-            // 3) 거래 내역 기록 (원화 계좌)
+            // 3) 원화 계좌 거래내역 INSERT (출금)
+            // 적요: "환전(USD)"
             insertTransactionHistory(
                     transDTO.getExchAcctNo(),
-                    "환전(" + transDTO.getExchToCurrency() + ")", // 예: 환전(USD)
+                    custName,
+                    "환전(" + transDTO.getExchToCurrency() + ")",
                     withdrawKrw,
-                    2 // 출금
+                    2 // 2: 출금
             );
 
         } else {
             // ==========================================
-            // CASE B: 팔 때 (외화 출금 -> 원화 입금)
+            // CASE B: 외화 -> 원화 (SELL)
             // ==========================================
 
-            // 1) 출금할 외화 금액 (소수점 유지!!)
+            // 1) 외화 출금액 (소수점 유지)
             BigDecimal withdrawForeign = transDTO.getExchAmount();
 
-            // 2) 외화 계좌에서 출금
-            // [주의] 외화 계좌 테이블을 업데이트하는 별도 매퍼가 필요합니다. (아래 XML 참고)
-            // custAcctMapper.updateFrgnAcctBal(withdrawForeign, transDTO.getExchAcctNo());
-
-            // 3) 입금될 원화 금액 계산 (소수점 절사)
+            // 2) 원화 입금액 계산 (소수점 절사)
             BigDecimal depositKrw = withdrawForeign
                     .multiply(transDTO.getExchAppliedRate())
                     .setScale(0, RoundingMode.FLOOR);
 
-            // 4) 입금받을 원화 계좌번호 파싱 (주소 필드에 "즉시입금:110-..." 형태로 들어옴)
-            String depositAcctNo = transDTO.getExchAddr().replace("즉시입금:", "").trim();
-            Integer koAmount = depositKrw.intValue();
-            // 5) 원화 계좌에 입금
-            // mypageMapper에 있는 updatePlusAcct 사용
-            mypageMapper.updatePlusAcct(koAmount, depositAcctNo);
+            // 3) 외화 계좌 잔액 차감 (출금)
+            // (주의: custAcct.xml에 updateFrgnAcctBal 쿼리가 있어야 함)
+            frgnAcctMapper.updateFrgnAcctBal(
+                    withdrawForeign,
+                    transDTO.getExchAcctNo(),
+                    transDTO.getExchFromCurrency() // 예: "USD"
+            );
 
-            // 6) 거래 내역 기록 (입금받은 원화 계좌 기준)
+            // 4) 원화 계좌 잔액 증가 (입금)
+            // 주소 필드("즉시입금:110-...")에서 입금 계좌번호 추출
+            String depositAcctNo = transDTO.getExchAddr().replace("즉시입금:", "").trim();
+            mypageMapper.updatePlusAcctBig(depositKrw, depositAcctNo);
+
+            // 5) 원화 계좌 거래내역 INSERT (입금)
+            // 적요: "환전입금(USD)"
             insertTransactionHistory(
                     depositAcctNo,
-                    "환전입금(" + transDTO.getExchFromCurrency() + ")", // 예: 환전입금(USD)
+                    custName,
+                    "환전입금(" + transDTO.getExchFromCurrency() + ")",
                     depositKrw,
-                    1 // 입금 (보통 1번이 입금, 2번이 출금)
+                    1 // 1: 입금
             );
+
+            /* * [참고] 외화 계좌의 출금 내역 기록
+             * 외화는 소수점(센트)이 있으므로 정수형인 TB_CUST_TRAN_HIST에 넣으면 데이터가 손실됩니다.
+             * 별도의 외화 거래내역 테이블(TB_FRGN_TRAN_HIST 등)이 있다면 여기서 insert를 수행해야 합니다.
+             */
+        }
+
+        // 4. 쿠폰 상태 업데이트 (사용 처리)
+        if (transDTO.getCouponNo() != null && transDTO.getCouponNo() > 0) {
+            couponMapper.updateCouponStatus(transDTO.getCouponNo());
         }
     }
 
-    // 거래 내역 저장용 헬퍼 메소드 (코드 중복 제거)
-    private void insertTransactionHistory(String acctNo, String summary, BigDecimal amount, int type) {
-        // 사용자 이름 가져오기
-        String custName = "";
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
-            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-            custName = userDetails.getCustName();
-        }
-
+    // [Helper] 거래내역 기록 공통 메소드
+    private void insertTransactionHistory(String acctNo, String custName, String summary, BigDecimal amount, int type) {
         CustTranHistDTO histDTO = new CustTranHistDTO();
         histDTO.setTranAcctNo(acctNo);
-        histDTO.setTranCustName(summary); // 적요
-        histDTO.setTranType(type);        // 1:입금, 2:출금
-        histDTO.setTranAmount(amount.intValue()); // 원화 금액이므로 int 변환 가능
+        histDTO.setTranCustName(custName); // 예: 홍길동
+        histDTO.setTranMemo(summary);      // 예: 환전(USD) -> 적요 필드가 있다면 여기에, 없으면 Name에 덮어쓰기 고려
+
+        // 만약 화면에 "환전(USD)"를 표시하고 싶다면 TranRecName(상대방명)이나 Memo에 넣어야 합니다.
+        // 여기서는 요청하신대로 "환전이라는 값이 출력될 수 있도록" TranRecName에 넣습니다.
+        histDTO.setTranRecName(summary);
+
+        histDTO.setTranType(type);         // 1:입금, 2:출금
+        histDTO.setTranAmount(amount); // 원화는 정수
+
+        // NULL 처리 (MyBatis 에러 방지용)
+        histDTO.setTranRecAcctNo("");
+        histDTO.setTranRecBkCode("");
+        histDTO.setTranEsignYn("Y");
 
         mypageMapper.insertTranHist(histDTO);
     }
 
-    // 환전하기 전 계좌 비밀번호 일치하는지 확인
-    public boolean checkAccountPassword(String acctNo, String acctPass) {
-
-        CustAcctDTO custAcctDTO = mypageMapper.selectCustAcct(acctNo);
-        if (custAcctDTO == null) {
-            return false;
+    // [Helper] 인증된 사용자 이름 가져오기
+    private String getAuthenticatedUserName() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
+            return ((CustomUserDetails) authentication.getPrincipal()).getCustName();
         }
+        return "Unknown";
+    }
 
-        return passwordEncoder.matches(acctPass, custAcctDTO.getAcctPw());
+    // 환전하기 전 계좌 비밀번호 일치하는지 확인
+    public boolean checkAccountPassword(String acctNo, String acctPass, String mode) {
+
+        if("BUY".equals(mode)){ // 원화 -> 외화
+            CustAcctDTO custAcctDTO = mypageMapper.selectCustAcct(acctNo);
+            if (custAcctDTO == null) {
+                return false;
+            }
+            return passwordEncoder.matches(acctPass, custAcctDTO.getAcctPw());
+        }
+        else{                  // 외화 -> 원화
+            CustFrgnAcctDTO custFrgnAcctDTO = frgnAcctMapper.selectFrgnAcctByAcctNo(acctNo);
+            if (custFrgnAcctDTO == null) {
+                return false;
+            }
+            return passwordEncoder.matches(acctPass, custFrgnAcctDTO.getFrgnAcctPw());
+        }
     }
 
 }

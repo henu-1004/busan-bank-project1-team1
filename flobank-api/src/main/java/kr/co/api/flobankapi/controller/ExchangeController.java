@@ -7,10 +7,9 @@
 
 package kr.co.api.flobankapi.controller;
 
-import kr.co.api.flobankapi.dto.CouponDTO;
-import kr.co.api.flobankapi.dto.CustAcctDTO;
-import kr.co.api.flobankapi.dto.FrgnExchTranDTO;
+import kr.co.api.flobankapi.dto.*;
 import kr.co.api.flobankapi.service.ExchangeService;
+import kr.co.api.flobankapi.service.FrgnAcctService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -45,6 +44,7 @@ public class ExchangeController {
     private final ExchangeService exchangeService;
     private final TermsDbService termsDbService;
     private final RateService rateService;
+    private final FrgnAcctService frgnAcctService;
 
 
     // 환전하기
@@ -132,12 +132,13 @@ public class ExchangeController {
     public ResponseEntity<?> checkPassword(@RequestBody Map<String, String> request) {
         String acctNo = request.get("acctNo");
         String acctPw = request.get("acctPw");
+        String mode = request.get("mode");
 
         Map<String, Object> response = new HashMap<>();
 
         try {
             // 서비스에서 비밀번호 검증 수행
-            boolean isValid = exchangeService.checkAccountPassword(acctNo, acctPw);
+            boolean isValid = exchangeService.checkAccountPassword(acctNo, acctPw, mode);
 
             if (isValid) {
                 response.put("status", "success");
@@ -162,7 +163,15 @@ public class ExchangeController {
         // 계좌 리스트
         List<CustAcctDTO> custAcctDTOList = exchangeService.getAllKoAcct(userCode);
         model.addAttribute("custAcctDTOList",custAcctDTOList);
-        
+
+        // 외화 계좌
+        CustFrgnAcctDTO custFrgnAcctDTO = frgnAcctService.getFrgnAcct(userCode);
+        model.addAttribute("custFrgnAcctDTO",custFrgnAcctDTO);
+
+        // 자식 외화 계좌 리스트
+        List<FrgnAcctBalanceDTO> frgnAcctBalanceDTOList = frgnAcctService.getSubFrgnAcctAll(custFrgnAcctDTO.getFrgnAcctNo());
+        model.addAttribute("frgnAcctBalanceDTOList",frgnAcctBalanceDTOList);
+
         // 쿠폰 리스트
         List<CouponDTO> couponDTOList = exchangeService.getCoupons(userCode);
         model.addAttribute("couponDTOList",couponDTOList);
@@ -216,6 +225,11 @@ public class ExchangeController {
             }
 
             log.info("DB 저장용 DTO 변환 완료: {}", transDTO);
+
+            // 쿠폰 번호 매핑
+            if (reqData.get("couponNo") != null) {
+                transDTO.setCouponNo(Long.parseLong(String.valueOf(reqData.get("couponNo"))));
+            }
 
             // 5. 서비스 호출 (DB 저장)
             exchangeService.processExchange(transDTO);

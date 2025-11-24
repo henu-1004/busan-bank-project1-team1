@@ -127,12 +127,12 @@
                     </option>
                 </select>
                 <select id="accountSelectForeign" class="step2-select" style="display:none;">
-                    <option th:if="${foreignAcctDTOList == null or #lists.isEmpty(foreignAcctDTOList)}" value="">
+                    <option th:if="${custFrgnAcctDTO == null}" value="">
                         보유하신 외화 입출금 통장이 없습니다.
                     </option>
-                    <option th:each="dto : ${foreignAcctDTOList}"
-                            th:text="|${dto.acctNo} (잔액 ${dto.acctBalance} ${dto.currencyCode})|"
-                            th:value="${dto.acctNo}">
+                    <option th:if="${custFrgnAcctDTO != null}"
+                            th:text="|${custFrgnAcctDTO.frgnAcctNo}|"
+                            th:value="${custFrgnAcctDTO.frgnAcctNo}">
                     </option>
                 </select>
             </div>
@@ -232,6 +232,25 @@
 
 </main>
 <div th:replace="~{_template/_footer.html}"></div>
+
+<!--
+    exchange.js는 정적(Static) 파일이라서 서버 데이터(Thymeleaf 변수 [])를 직접 읽을 수 없음.
+    따라서 HTML에서는 데이터를 '전역 변수'로 선언만 해두고,
+    실제 로직은 exchange.js에서 그 변수를 가져다 쓰는 방식으로 연결
+-->
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    window.exchData = {
+        balanceList: /*[[${frgnAcctBalanceDTOList}]]*/ [],
+        frgnAcctNo: ''
+    };
+
+    /*[# th:if="${custFrgnAcctDTO != null}"]*/
+    window.exchData.frgnAcctNo = /*[[${custFrgnAcctDTO.frgnAcctNo}]]*/ '';
+    /*[/]*/
+    /*]]>*/
+</script>
+
 <script th:src="@{/js/exchange.js}"></script>
 
 </body>

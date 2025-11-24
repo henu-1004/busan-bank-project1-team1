@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.api.flobankapi.mapper.FrgnAcctMapper">
+    <select id="selectFrgnAcctByCustCode">
+        SELECT * FROM TB_CUST_FRGN_ACCT
+        WHERE FRGN_ACCT_CUST_CODE = #{custCode}
+    </select>
+
+    <select id="selectFrgnAcctByAcctNo">
+        SELECT * FROM TB_CUST_FRGN_ACCT
+        WHERE FRGN_ACCT_CUST_CODE = #{acctNo}
+    </select>
+
+    <select id="selectSubFrgnAcctAll">
+        SELECT * FROM TB_FRGN_ACCT_BALANCE
+        WHERE BAL_FRGN_ACCT_NO = #{acctNo}
+    </select>
+
+    <update id="updateFrgnAcctBal">
+        UPDATE TB_FRGN_ACCT_BALANCE
+        SET BAL_BALANCE = BAL_BALANCE - #{amount}
+        WHERE BAL_FRGN_ACCT_NO = #{acctNo}
+        AND BAL_CURRENCY = #{currency}
+    </update>
+
+</mapper>

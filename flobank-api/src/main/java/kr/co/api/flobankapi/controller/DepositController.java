@@ -372,10 +372,10 @@ public class DepositController {
             custTranHistDTO.setTranCustName(user.getCustName());
             custTranHistDTO.setTranType(2);
             if (dto.getWithdrawType().equals("krw")) {
-                custTranHistDTO.setTranAmount(Integer.parseInt(String.valueOf(dto.getKrwAmount())));
+                custTranHistDTO.setTranAmount(dto.getKrwAmount());
                 custTranHistDTO.setTranCurrency("KRW");
             }else {
-                custTranHistDTO.setTranAmount(Integer.parseInt(String.valueOf(dto.getDpstAmount())));
+                custTranHistDTO.setTranAmount(dto.getDpstAmount());
                 custTranHistDTO.setTranCurrency(dpstAcctHdrDTO.getDpstHdrCurrency());
             }
 
