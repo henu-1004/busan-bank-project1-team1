@@ -50,6 +50,7 @@ public class SecurityConfig {
                         .requestMatchers("/deposit/deposit_step4").authenticated()
                         .requestMatchers("/customer/qna_write").authenticated()
                         .requestMatchers("/customer/qna_edit").authenticated()
+                        .requestMatchers("/uploads/**").permitAll()
                         .anyRequest().permitAll() // 일단 나머지는 다 허용 (개발 편의상)
                 )
                 // 우리가 만든 필터를 UsernamePasswordAuthenticationFilter 앞에 끼워넣기

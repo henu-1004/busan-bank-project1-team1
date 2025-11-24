@@ -203,6 +203,9 @@ public class SearchService {
 
     private SearchResultItemDTO convertDocumentToDTO(Object doc, String type) {
         SearchResultItemDTO item = new SearchResultItemDTO();
+        final String BASE_URL = "http://34.64.124.33:8080/flobank";
+
+
         try {
             switch (type) {
                 case "product":
@@ -221,12 +224,17 @@ public class SearchService {
                     TermDocument t = (TermDocument) doc;
                     item.setTitle(t.getTermTitle() + " (v" + t.getThistVersion() + ")");
                     item.setSummary(safeSummary(t.getThistContent()));
-                    if (t.getThistFile() != null && !t.getThistFile().isBlank()) {
-                        item.setUrl(t.getThistFile());
+                    String filePath = t.getThistFile();
+                    if (filePath != null && !filePath.isBlank()) {
+                        // 1. 파일 경로가 '/'로 시작하지 않으면 붙여줌
+                        if (!filePath.startsWith("/")) {
+                            filePath = "/" + filePath;
+                        }
+                        // 2. BASE_URL + 파일경로 결합
+                        item.setUrl(BASE_URL + filePath);
                     } else {
-                        item.setUrl("/customer/terms/" + t.getThistNo());
+                        item.setUrl("#");
                     }
-
                     if (t.getThistRegDy() != null) item.setExtra(t.getThistRegDy().format(DATE_FMT));
                     break;
                 case "notice":
