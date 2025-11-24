@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -68,8 +70,10 @@ public class DepositController {
         log.info("termUploadPath : " + termsUploadPath);
 
         String termPath = depositService.getTermContent(thistTermOrder, thistTermCate).getThistFile();
-        String fileName = Paths.get(termPath).getFileName().toString();  // UUID_원본명.pdf
-        String fullPath = termsUploadPath + "/" + fileName;  // → /app/uploads/terms/UUID_원본명.pdf
+        String fileName = Paths.get(termPath).getFileName().toString();
+        String fullPath = termsUploadPath + "/" + fileName;
+        log.info("fileName : " + fileName);
+        log.info("fullPath : " + fullPath);
 
         Path path = Paths.get(fullPath);
 
@@ -79,8 +83,10 @@ public class DepositController {
         }
 
         response.setContentType("application/pdf");
-        response.setHeader("Content-Disposition",
-                "attachment; filename=\"" + fileName + "\"");
+        response.setHeader(
+                "Content-Disposition",
+                "attachment; filename=\"" + fileName + "\"; filename*=UTF-8''" + fileName
+        );
         response.setHeader("Content-Length", String.valueOf(Files.size(path)));
 
         // 4) 파일을 스트림으로 직접 내려보냄
