@@ -80,6 +80,42 @@ document.addEventListener("DOMContentLoaded", function () {
     function updateDepositType() {
         const selectedType = document.querySelector('input[name="dpstType"]:checked').value;
 
+        const rate1 = document.querySelector('input[name="dpstRateType"][value="1"]');
+        const rate2 = document.querySelector('input[name="dpstRateType"][value="2"]');
+        const rate3 = document.querySelector('input[name="dpstRateType"][value="3"]');
+
+        const rate1Label = rate1.closest("label");
+        const rate2Label = rate2.closest("label");
+        const rate3Label = rate3.closest("label");
+
+        if (selectedType === "1") {
+            /* 거치식 예금 */
+            rate1Label.style.display = "inline-flex";
+            rate2Label.style.display = "inline-flex";
+            rate3Label.style.display = "none";
+
+            rate1.disabled = false;
+            rate2.disabled = false;
+            rate3.disabled = true;
+
+            // 기본값: 가입 시점(1)
+            rate1.checked = true;
+
+        } else {
+            /* 자유 적립식 */
+            rate1Label.style.display = "none";
+            rate2Label.style.display = "none";
+            rate3Label.style.display = "inline-flex";
+
+            // 납입 시 환율만 선택 + 고정
+            rate3.checked = true;
+            rate3.disabled = false;
+
+            rate1.disabled = true;
+            rate2.disabled = true;
+        }
+
+        /* 기존 기능 유지 (예금 유형 섹션 show/hide) */
         if (selectedType === "1") {
             document.querySelector(".conditional.deposit-type").style.display = "block";
             updateCurrencyAmountFields();
