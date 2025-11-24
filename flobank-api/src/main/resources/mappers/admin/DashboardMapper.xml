@@ -47,32 +47,32 @@
     <!-- 일별 가입자 수 -->
     <select id="selectDailyJoinStats"
             resultType="kr.co.api.flobankapi.dto.admin.dashboard.JoinStatsDTO">
-        SELECT TO_CHAR(cust_reg_dt, 'YYYY-MM-DD') AS label,
-        COUNT(*) AS count
+        SELECT TO_CHAR(cust_reg_dt, 'YYYY-MM-DD') AS baseDate,
+               COUNT(*) AS joinCount
         FROM TB_CUST_INFO
         WHERE cust_reg_dt >= TRUNC(SYSDATE) - 6
         GROUP BY TO_CHAR(cust_reg_dt, 'YYYY-MM-DD')
-        ORDER BY label
+        ORDER BY baseDate
     </select>
 
     <select id="selectWeeklyJoinStats"
             resultType="kr.co.api.flobankapi.dto.admin.dashboard.JoinStatsDTO">
-        SELECT TO_CHAR(cust_reg_dt, 'YYYY-MM-DD') AS label,
-               COUNT(*) AS count
+        SELECT TO_CHAR(cust_reg_dt, 'YYYY-MM-DD') AS baseDate,
+               COUNT(*) AS joinCount
         FROM TB_CUST_INFO
         WHERE cust_reg_dt >= TRUNC(ADD_MONTHS(SYSDATE, -2), 'IW')
         GROUP BY TO_CHAR(cust_reg_dt, 'YYYY-MM-DD')
-        ORDER BY label
+        ORDER BY baseDate
     </select>
 
     <select id="selectMonthlyJoinStats"
             resultType="kr.co.api.flobankapi.dto.admin.dashboard.JoinStatsDTO">
-        SELECT TO_CHAR(cust_reg_dt, 'YYYY-MM-DD') AS label,
-               COUNT(*) AS count
+        SELECT TO_CHAR(cust_reg_dt, 'YYYY-MM-DD') AS baseDate,
+               COUNT(*) AS joinCount
         FROM TB_CUST_INFO
         WHERE cust_reg_dt >= ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -11)
         GROUP BY TO_CHAR(cust_reg_dt, 'YYYY-MM-DD')
-        ORDER BY label
+        ORDER BY baseDate
     </select>
 
     <!-- 연령대 분포 -->

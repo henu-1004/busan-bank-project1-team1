@@ -52,6 +52,20 @@ public class DashboardService {
         List<JoinStatsDTO> weeklyJoin  = dashboardMapper.selectWeeklyJoinStats();
         List<JoinStatsDTO> monthlyJoin = dashboardMapper.selectMonthlyJoinStats();
 
+        log.info("=== monthlyJoin Stats ===");
+        if (monthlyJoin == null) {
+            log.info("monthlyJoin is null");
+        } else {
+            log.info("monthlyJoin size = {}", monthlyJoin.size());
+            for (JoinStatsDTO s : monthlyJoin) {
+                if (s == null) {
+                    log.warn("monthlyJoin contains NULL row!!");
+                    continue;
+                }
+                log.info("  baseDate = {}, joinCount = {}", s.getBaseDate(), s.getJoinCount());
+            }
+        }
+
         // 3) 연령/성별
         List<AgeBandDTO> ageDist   = dashboardMapper.selectAgeDist();
         List<GenderStatsDTO> genderDist = dashboardMapper.selectGenderDist();
