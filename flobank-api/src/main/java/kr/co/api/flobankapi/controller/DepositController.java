@@ -6,6 +6,7 @@ import kr.co.api.flobankapi.jwt.CustomUserDetails;
 import kr.co.api.flobankapi.service.DepositService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -327,11 +328,19 @@ public class DepositController {
         return "deposit/deposit_step4";
     }
 
+    @Value("${file.upload.pdf-terms-path}")
+    private String termsUploadPath;
+
     @GetMapping("/terms/download")
     public void downloadTerms(@RequestParam String termOrder, @RequestParam String termCate, HttpServletResponse response) throws IOException {
 
+
+
         String termPath = depositService.getTermContent(termOrder, termCate).getThistFile();
-        Path path = Paths.get(termPath);
+        String fileName = Paths.get(termPath).getFileName().toString();  // UUID_원본명.pdf
+        String fullPath = termsUploadPath + "/" + fileName;  // → /app/uploads/terms/UUID_원본명.pdf
+
+        Path path = Paths.get(fullPath);
 
         if (!Files.exists(path)) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND, "파일을 찾을 수 없습니다.");
@@ -340,7 +349,7 @@ public class DepositController {
 
         response.setContentType("application/pdf");
         response.setHeader("Content-Disposition",
-                "attachment; filename=\"" + path.getFileName().toString() + "\"");
+                "attachment; filename=\"" + fileName + "\"");
         response.setHeader("Content-Length", String.valueOf(Files.size(path)));
 
         // 4) 파일을 스트림으로 직접 내려보냄
