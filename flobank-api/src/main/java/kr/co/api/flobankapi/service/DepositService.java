@@ -277,12 +277,17 @@ public class DepositService {
     ) {
         // 예금 헤더 insert
         depositMapper.insertDpstAcctHdr(hdrDTO);
-
         DpstAcctHdrDTO insdto = depositMapper.selectInsertedAcct(hdrDTO.getDpstHdrCustCode(), hdrDTO.getDpstHdrDpstId());
-
-
         // 4. 방금 생성된 예금계좌 다시 조회
         return insdto;
+    }
+
+    public List<TermsHistDTO> getTerms(){
+        return depositMapper.selectDpstTermsMaster();
+    }
+
+    public TermsHistDTO getTermContent(String thistTermOrder, String thistTermCate){
+        return depositMapper.selectTermById(thistTermOrder, thistTermCate);
     }
 
 }

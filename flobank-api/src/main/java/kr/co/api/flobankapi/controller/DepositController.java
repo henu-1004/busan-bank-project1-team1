@@ -1,10 +1,13 @@
 package kr.co.api.flobankapi.controller;
 
+import jakarta.servlet.http.HttpServletResponse;
 import kr.co.api.flobankapi.dto.*;
 import kr.co.api.flobankapi.jwt.CustomUserDetails;
 import kr.co.api.flobankapi.service.DepositService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,6 +18,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.Date;
 import org.springframework.web.bind.annotation.*;
@@ -41,6 +49,12 @@ public class DepositController {
     public String deposit_step1(Model model, @RequestParam String dpstId) {
         model.addAttribute("dpstId", dpstId);
         model.addAttribute("activeItem","product");
+
+        List<TermsHistDTO> termsList = depositService.getTerms();
+        ProductDTO product = depositService.selectDpstProduct(dpstId);
+        model.addAttribute("product", product);
+        model.addAttribute("termsList",termsList);
+
         return "deposit/deposit_step1";
     }
 
@@ -311,6 +325,30 @@ public class DepositController {
         model.addAttribute("insertDTO", insertDTO);
 
         return "deposit/deposit_step4";
+    }
+
+    @GetMapping("/terms/download")
+    public void downloadTerms(@RequestParam String termOrder, @RequestParam String termCate, HttpServletResponse response) throws IOException {
+
+        String termPath = depositService.getTermContent(termOrder, termCate).getThistFile();
+        Path path = Paths.get(termPath);
+
+        if (!Files.exists(path)) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "파일을 찾을 수 없습니다.");
+            return;
+        }
+
+        response.setContentType("application/pdf");
+        response.setHeader("Content-Disposition",
+                "attachment; filename=\"" + path.getFileName().toString() + "\"");
+        response.setHeader("Content-Length", String.valueOf(Files.size(path)));
+
+        // 4) 파일을 스트림으로 직접 내려보냄
+        try (OutputStream os = response.getOutputStream()) {
+            Files.copy(path, os);
+            os.flush();
+        }
+
     }
 
     @GetMapping("/info")

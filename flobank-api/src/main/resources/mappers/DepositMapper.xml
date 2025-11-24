@@ -395,4 +395,32 @@
     </update>
 
 
+    <select id="selectDpstTermsMaster" resultType="kr.co.api.flobankapi.dto.TermsHistDTO">
+        SELECT
+        TERM_TITLE,
+        thist_term_order,
+        thist_file,
+        THIST_CONTENT
+        FROM TB_TERMS_MASTER m
+        JOIN tb_TERMS_HIST h
+        ON m.term_cate = h.thist_term_cate
+        AND m.term_order = h.thist_term_order
+        WHERE m.term_cate = 4
+        AND h.thist_version = (
+        SELECT MAX(thist_version)
+        FROM tb_TERMS_HIST
+        WHERE thist_term_cate = m.term_cate
+        AND thist_term_order = m.term_order
+        )
+    </select>
+
+    <select id="selectTermById" resultType="kr.co.api.flobankapi.dto.TermsHistDTO">
+        select
+        thist_file,
+        thist_content
+        from tb_terms_hist
+        where thist_term_order=#{thistTermOrder}
+        and thist_term_cate=#{thistTermCate}
+    </select>
+
 </mapper>

@@ -24,7 +24,7 @@
     <div th:replace="~{deposit/_side.html}"></div>
 
   <div class="step1-container">
-    <h2 class="step1-title">BNK 모아드림 외화적금</h2>
+    <h2 class="step1-title">[[${product.dpstName}]]</h2>
 
   <div class="step1-steps">
     <div class="step1-step active">
@@ -42,11 +42,11 @@
   <section class="step1-section">
     <h3 class="step1-subtitle">약관 및 상품설명서</h3>
     <ul class="step1-link-list">
-      <li>
+      <li th:each="term : ${termsList}">
         <label>
           <input type="checkbox" class="step1-checkbox">
-          <a href="#" target="_blank">
-            <span>[필수] 예금거래기본약관</span>
+          <a th:href="@{'/terms/download'(termCate=${term.termCate}, termOrder=${term.termOrder})}" target="_blank">
+            <span>[필수] [[${term.termTitle}]]</span>
             <i class="fa-solid fa-angle-right"></i>
           </a>
         </label>
@@ -54,16 +54,7 @@
       <li>
         <label>
           <input type="checkbox" class="step1-checkbox">
-          <a href="#" target="_blank">
-            <span>[필수] 외화예금거래기본약관</span>
-            <i class="fa-solid fa-angle-right"></i>
-          </a>
-        </label>
-      </li>
-      <li>
-        <label>
-          <input type="checkbox" class="step1-checkbox">
-          <a href="#" target="_blank">
+          <a th:href="@{${product.dpstInfoPdf}}" target="_blank">
             <span>[필수] 상품설명서</span>
             <i class="fa-solid fa-angle-right"></i>
           </a>

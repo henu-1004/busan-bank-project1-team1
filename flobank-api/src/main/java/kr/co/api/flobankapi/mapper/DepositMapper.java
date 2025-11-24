@@ -44,4 +44,6 @@ public interface DepositMapper {
     public FrgnAcctBalanceDTO selectFrgnAcctBalance(String balNo);
     public void updateAcctBalance(CustAcctDTO custAcctDTO);
     public void updateBalBalance(FrgnAcctBalanceDTO frgnAcctBalanceDTO);
+    public List<TermsHistDTO> selectDpstTermsMaster();
+    public TermsHistDTO selectTermById(String termOrder, String termCate);
 }
