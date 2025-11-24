@@ -53,7 +53,8 @@
                         type="text"
                         id="globalSearch"
                         placeholder="검색어를 입력하세요."
-                        autocomplete="search" />
+                        autocomplete="off"
+                />
                 <button
                         type="submit"
                         class="search-top-sheet__submit"
@@ -61,11 +62,14 @@
                 >
                     <i class="fa-solid fa-magnifying-glass"></i>
                 </button>
+
+                <ul id="autocompleteList" class="autocomplete-dropdown"></ul>
             </form>
 
             <button type="button" class="search-top-sheet__close" aria-label="닫기">
                 <i class="fa-solid fa-xmark"></i>
-            </button> </div>
+            </button>
+        </div>
 
         <div class="search-top-sheet__content">
             <div class="search-section">

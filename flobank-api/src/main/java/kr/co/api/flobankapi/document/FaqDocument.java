@@ -2,12 +2,12 @@ package kr.co.api.flobankapi.document;
 
 import lombok.Data;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.elasticsearch.annotations.Document;
-import org.springframework.data.elasticsearch.annotations.Field;
-import org.springframework.data.elasticsearch.annotations.FieldType;
+import org.springframework.data.elasticsearch.annotations.*;
 
 @Data
 @Document(indexName = "faq")
+@Setting(settingPath = "elastic/common-setting.json")
+@Mapping(mappingPath = "elastic/faq-mapping.json")
 public class FaqDocument {
 
     @Id
@@ -18,4 +18,8 @@ public class FaqDocument {
 
     @Field(type = FieldType.Text, analyzer = "nori")
     private String faqAnswer; // 답변 (mapToSearchResultItem에서 사용)
+
+    // 자동완성을 위한 필드
+    @CompletionField(maxInputLength = 100, preserveSeparators = true)
+    private Completion suggest;
 }

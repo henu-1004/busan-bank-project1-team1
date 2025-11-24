@@ -1,5 +1,9 @@
 package kr.co.api.flobankapi.service;
 
+import co.elastic.clients.elasticsearch._types.query_dsl.Operator;
+import co.elastic.clients.elasticsearch.core.search.CompletionSuggester;
+import co.elastic.clients.elasticsearch.core.search.FieldSuggester;
+import co.elastic.clients.elasticsearch.core.search.Suggester;
 import kr.co.api.flobankapi.document.*;
 import kr.co.api.flobankapi.dto.search.SearchLogDTO;
 import kr.co.api.flobankapi.dto.search.SearchResultItemDTO;
@@ -79,27 +83,27 @@ public class SearchService {
         List<String> tabKeys = new ArrayList<>();
 
         // 1) 상품
-        queries.add(buildNativeQuery(keyword, PREVIEW_SIZE, "dpstName^3", "dpstInfo", "dpstDescript"));
+        queries.add(buildNativeQuery(keyword, PREVIEW_SIZE, "dpstName^10", "dpstInfo^3", "dpstDescript"));
         classes.add(ProductDocument.class);
         tabKeys.add("product");
 
         // 2) FAQ
-        queries.add(buildNativeQuery(keyword, PREVIEW_SIZE, "faqQuestion^3", "faqAnswer"));
+        queries.add(buildNativeQuery(keyword, PREVIEW_SIZE, "faqQuestion^5", "faqAnswer"));
         classes.add(FaqDocument.class);
         tabKeys.add("faq");
 
         // 3) 약관
-        queries.add(buildNativeQuery(keyword, PREVIEW_SIZE, "termTitle^3", "thistContent"));
+        queries.add(buildNativeQuery(keyword, PREVIEW_SIZE, "termTitle^5", "thistContent"));
         classes.add(TermDocument.class);
         tabKeys.add("docs");
 
         // 4) 공지
-        queries.add(buildNativeQuery(keyword, PREVIEW_SIZE, "boardTitle^3", "boardContent"));
+        queries.add(buildNativeQuery(keyword, PREVIEW_SIZE, "boardTitle^5", "boardContent"));
         classes.add(NoticeDocument.class);
         tabKeys.add("notice");
 
         // 5) 이벤트
-        queries.add(buildNativeQuery(keyword, PREVIEW_SIZE, "boardTitle^3", "boardContent", "eventBenefit"));
+        queries.add(buildNativeQuery(keyword, PREVIEW_SIZE, "boardTitle^5", "boardContent", "eventBenefit"));
         classes.add(EventDocument.class);
         tabKeys.add("event");
 
@@ -165,28 +169,22 @@ public class SearchService {
     // 내부 헬퍼 메서드
     // ======================================================================
     private NativeQuery buildNativeQuery(String keyword, int size, String... fields) {
-        // "예금" -> "*예금*" 으로 변환하여 부분 일치 유도
-        String wildcardKeyword = "*" + keyword + "*";
-
         return NativeQuery.builder()
-                .withQuery(q -> q.queryString(qs -> qs
-                        .query(wildcardKeyword) // 와일드카드 쿼리 적용
-                        .fields(List.of(fields)) // 검색할 필드들
-                        .analyzeWildcard(true)   // 와일드카드 분석 활성화
+                .withQuery(q -> q.multiMatch(m -> m
+                        .query(keyword)
+                        .fields(List.of(fields))
+                        .operator(Operator.And) //  모든 단어가 다 포함되어야 검색됨
                 ))
                 .withMaxResults(size)
                 .build();
     }
 
-    // 2. 페이지네이션용 쿼리 빌더
     private NativeQuery buildNativeQuery(String keyword, Pageable pageable, String... fields) {
-        String wildcardKeyword = "*" + keyword + "*";
-
         return NativeQuery.builder()
-                .withQuery(q -> q.queryString(qs -> qs
-                        .query(wildcardKeyword)
+                .withQuery(q -> q.multiMatch(m -> m
+                        .query(keyword)
                         .fields(List.of(fields))
-                        .analyzeWildcard(true)
+                        .operator(Operator.And) //
                 ))
                 .withPageable(pageable)
                 .build();
@@ -275,4 +273,55 @@ public class SearchService {
 
         searchMapper.deleteSearchLog(keyword.trim(), custCode);
     }
+
+    // 자동 완성 기능
+    public List<String> getAutoCompletion(String keyword) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        try {
+            // 1. Completion Suggester 빌드 (Elasticsearch 8.x / Spring Data ES 5.x 스타일)
+            // 'suggest'라는 이름의 필드에서, 사용자가 입력한 keyword로 시작하는 단어를 찾음
+
+            // NativeQuery를 사용해 suggest 쿼리를 직접 구성합니다.
+            NativeQuery query = NativeQuery.builder()
+                    .withSuggester(new Suggester.Builder()
+                            .suggesters("my-suggestion", new FieldSuggester.Builder()
+                                    .completion(new CompletionSuggester.Builder()
+                                            .field("suggest")        // Document에 정의한 필드명
+                                            .size(10)                // 최대 10개 제안
+                                            .skipDuplicates(true)    // 중복 제거
+                                            .build())
+                                    .text(keyword)               // 사용자가 입력한 검색어 접두사
+                                    .build())
+                            .build())
+                    .build();
+
+            // 2. 검색 실행 (Product 인덱스에서 찾기 예시 - 필요하면 여러 인덱스 조회 가능)
+            SearchHits<ProductDocument> searchHits = elasticsearchOperations.search(query, ProductDocument.class);
+
+            // 3. 결과 파싱
+            List<String> resultList = new ArrayList<>();
+
+            // 응답에서 Suggestion 부분만 꺼내옵니다.
+            var suggestions = searchHits.getSuggest().getSuggestion("my-suggestion");
+
+            if (suggestions != null) {
+                // 제안된 검색어(text)만 추출해서 리스트에 담음
+                suggestions.getEntries().forEach(entry -> {
+                    entry.getOptions().forEach(option -> {
+                        resultList.add(option.getText());
+                    });
+                });
+            }
+
+            return resultList;
+
+        } catch (Exception e) {
+            log.error("자동완성 검색 중 오류: {}", e.getMessage());
+            return new ArrayList<>();
+        }
+    }
+
 }

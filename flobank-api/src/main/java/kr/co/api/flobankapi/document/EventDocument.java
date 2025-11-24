@@ -2,16 +2,15 @@ package kr.co.api.flobankapi.document;
 
 import lombok.Data;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.elasticsearch.annotations.DateFormat;
-import org.springframework.data.elasticsearch.annotations.Document;
-import org.springframework.data.elasticsearch.annotations.Field;
-import org.springframework.data.elasticsearch.annotations.FieldType;
+import org.springframework.data.elasticsearch.annotations.*;
 
 import java.time.LocalDate;
 
 
 @Data
 @Document(indexName = "event")
+@Setting(settingPath = "elastic/common-setting.json")
+@Mapping(mappingPath = "elastic/event-mapping.json")
 public class EventDocument {
 
     @Id
@@ -28,4 +27,8 @@ public class EventDocument {
 
     @Field(type = FieldType.Date, format = DateFormat.date)
     private LocalDate boardRegDt;
+
+    // 자동완성을 위한 필드
+    @CompletionField(maxInputLength = 100, preserveSeparators = true)
+    private Completion suggest;
 }
