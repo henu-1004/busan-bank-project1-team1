@@ -399,6 +399,7 @@
         SELECT
         TERM_TITLE,
         thist_term_order,
+        thist_term_cate,
         thist_file,
         THIST_CONTENT
         FROM TB_TERMS_MASTER m
