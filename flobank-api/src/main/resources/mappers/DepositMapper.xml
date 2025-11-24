@@ -422,6 +422,8 @@
         from tb_terms_hist
         where thist_term_order=#{thistTermOrder}
         and thist_term_cate=#{thistTermCate}
+        order by thist_version desc
+        FETCH FIRST 1 ROWS ONLY
     </select>
 
 </mapper>
