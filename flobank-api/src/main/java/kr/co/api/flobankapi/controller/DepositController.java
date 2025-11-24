@@ -117,12 +117,12 @@ public class DepositController {
         }
 
         response.setContentType("application/pdf");
+        response.setHeader("X-Content-Type-Options", "nosniff");
         response.setHeader(
                 "Content-Disposition",
-                "attachment; filename=\"" + fileName + "\"; filename*=UTF-8''" + fileName
+                "inline; filename=\"" + fileName + "\"; filename*=UTF-8''" + fileName
         );
         response.setHeader("Content-Length", String.valueOf(Files.size(path)));
-
         // 4) 파일을 스트림으로 직접 내려보냄
         try (OutputStream os = response.getOutputStream()) {
             Files.copy(path, os);

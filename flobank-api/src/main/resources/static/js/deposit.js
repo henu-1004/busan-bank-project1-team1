@@ -229,6 +229,20 @@ document.addEventListener("DOMContentLoaded", () => {
             curSelectionName.value = cur;
         });
     }
+
+    const nextBtn = document.querySelector(".step1-btn-next");
+
+    if (nextBtn) {
+        nextBtn.addEventListener("click", (e) => {
+            const checkboxes = document.querySelectorAll(".step1-checkbox");
+            const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+
+            if (!allChecked) {
+                e.preventDefault(); // 이동 막기
+                alert("필수 항목을 모두 확인하고 체크해 주세요.");
+            }
+        });
+    }
 });
 
 
