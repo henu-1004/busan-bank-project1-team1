@@ -12,7 +12,15 @@ public interface SearchDataMapper {
 
     // 1. 상품 (TB_DPST_PROD_INFO)
     // 이미지 기준: dpst_id, dpst_name, dpst_info, dpst_descript, dpst_reg_dt
-    @Select("SELECT dpst_id as dpstId, dpst_name as dpstName, dpst_info as dpstInfo, dpst_descript as dpstDescript FROM TB_DPST_PROD_INFO")
+    @Select("""
+    SELECT 
+        dpst_id AS dpstId,
+        dpst_name AS dpstName,
+        dpst_info AS dpstInfo,
+        dpst_descript AS dpstDescript
+    FROM TB_DPST_PROD_INFO
+    WHERE DPST_STATUS = 3
+""")
     List<ProductDocument> selectAllProducts();
 
     // 2. FAQ (TB_FAQ_HDR)

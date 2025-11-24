@@ -63,7 +63,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     /** ============================
-     * 2. 검색 모달 (로그인 처리 & API 연동 완료)
+     * 2. 검색 모달 (로그인 처리 & 자동완성 API 연동 완료)
      * ============================ */
     const searchTrigger = document.querySelector(".search-trigger");
     const searchModal = document.getElementById("searchModal");
@@ -71,19 +71,36 @@ document.addEventListener("DOMContentLoaded", () => {
     const searchForm = searchModal?.querySelector(".search-top-sheet__form");
     const searchInput = document.getElementById("globalSearch");
 
-    // 결과 목록 요소 선택
+// 기존 결과 목록 요소 선택
     const recentList = searchModal?.querySelector('.search-section:nth-of-type(1) .search-list');
     const popularList = searchModal?.querySelector('.search-section:nth-of-type(2) .search-list.rank');
 
+// [추가] 자동완성 관련 요소 선택 (HTML에 추가한 id="autocompleteList")
+    const autocompleteList = document.getElementById("autocompleteList");
+// [추가] 최근/인기 검색어를 감싸고 있는 컨텐츠 영역 (자동완성 시 숨기기 위함)
+    const defaultSearchContent = searchModal?.querySelector(".search-top-sheet__content");
+
     if (searchTrigger && searchModal) {
+
+        // -------------------------------------------------------
+        // [유틸] 디바운스 함수 (연속 입력 시 API 호출 방지)
+        // -------------------------------------------------------
+        function debounce(func, delay) {
+            let timeoutId;
+            return function (...args) {
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(() => {
+                    func.apply(this, args);
+                }, delay);
+            };
+        }
 
         // --- [내부 함수] API 호출 (JWT 토큰 포함) ---
         async function fetchKeywords(url) {
             try {
-                // 👇 [수정] 로컬스토리지 먼저 보고, 없으면 쿠키 확인
                 let token = localStorage.getItem('accessToken');
                 if (!token) {
-                    token = getCookie('accessToken'); // 쿠키 이름이 accessToken이라고 가정
+                    token = getCookie('accessToken');
                 }
 
                 const headers = { 'Content-Type': 'application/json' };
@@ -99,6 +116,82 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
 
+        // -------------------------------------------------------
+        // [신규] 자동완성 API 호출
+        // -------------------------------------------------------
+        async function fetchAutocomplete(keyword) {
+
+            // 검색어가 없으면 자동완성 숨기고 함수 종료
+            if (!keyword || keyword.trim().length < 1) {
+                hideAutocomplete();
+                return;
+            }
+
+            try {
+                const url = `${CONTEXT_PATH}/api/search/autocomplete?keyword=${encodeURIComponent(keyword)}`;
+
+                // 토큰 로직 (필요시)
+                let token = localStorage.getItem('accessToken');
+                if (!token) token = getCookie('accessToken');
+
+                const headers = { 'Content-Type': 'application/json' };
+                if (token) headers['Authorization'] = `Bearer ${token}`;
+
+                const response = await fetch(url, { headers: headers });
+
+                if (response.ok) {
+                    const suggestions = await response.json();
+                    renderAutocomplete(suggestions, keyword);
+                }
+            } catch (error) {
+                console.error("자동완성 로드 실패:", error);
+            }
+        }
+
+        // -------------------------------------------------------
+        // [신규] 자동완성 목록 렌더링
+        // -------------------------------------------------------
+        function renderAutocomplete(suggestions, keyword) {
+            // 결과가 없으면 아무것도 안 하거나 숨김
+            if (!suggestions || suggestions.length === 0) {
+                return;
+            }
+
+            // 2. 자동완성 목록 보이기
+            if (autocompleteList) {
+                autocompleteList.style.display = 'block';
+                autocompleteList.innerHTML = '';
+
+                suggestions.forEach(text => {
+                    const li = document.createElement('li');
+
+                    // 하이라이팅: 검색어와 일치하는 부분 강조
+                    const regex = new RegExp(`(${keyword})`, 'gi');
+                    const highlightedText = text.replace(regex, '<span style="color:#2C5DE5; font-weight:bold;">$1</span>');
+
+                    li.innerHTML = highlightedText;
+
+                    // 클릭 시 검색 실행
+                    li.addEventListener('click', () => {
+                        searchInput.value = text;
+                        goSearch(text);
+                    });
+
+                    autocompleteList.appendChild(li);
+                });
+            }
+        }
+
+        // -------------------------------------------------------
+        // 자동완성 숨기기 (초기 화면 복구)
+        // -------------------------------------------------------
+        function hideAutocomplete() {
+            if (autocompleteList) {
+                autocompleteList.style.display = 'none';
+                autocompleteList.innerHTML = '';
+            }
+        }
+
         // --- [내부 함수] 검색 실행 및 페이지 이동 ---
         function goSearch(keyword) {
             if (!keyword || keyword.trim().length < 1) {
@@ -108,7 +201,6 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             closeModal();
-            // 검색 결과 페이지로 이동 (여기서는 저장 로직 없음, 결과 페이지 로딩 시 백엔드가 저장함)
             window.location.href = `${CONTEXT_PATH}/search?keyword=${encodeURIComponent(keyword)}`;
         }
 
@@ -127,27 +219,22 @@ document.addEventListener("DOMContentLoaded", () => {
             data.forEach(item => {
                 const li = document.createElement('li');
                 li.innerHTML = `
-                    <a href="#" class="keyword-link">${item.keyword}</a>
-                    <span class="date">${item.date || ''}</span>
-                    <button type="button" class="btn-delete" aria-label="삭제">
-                        <i class="fa-solid fa-xmark"></i>
-                    </button>
-                `;
+                <a href="#" class="keyword-link">${item.keyword}</a>
+                <span class="date">${item.date || ''}</span>
+                <button type="button" class="btn-delete" aria-label="삭제">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            `;
 
-                // 1. 검색어 클릭
                 li.querySelector('.keyword-link').addEventListener('click', (e) => {
                     e.preventDefault();
                     goSearch(item.keyword);
                 });
 
-                // 2. 삭제 버튼 클릭 (디버깅 로그 추가)
                 const deleteBtn = li.querySelector('.btn-delete');
                 deleteBtn.addEventListener('click', (e) => {
                     e.preventDefault();
                     e.stopPropagation();
-
-                    console.log("🔥 [Frontend] 삭제 버튼 클릭됨! 키워드:", item.keyword); // 👈 이 로그가 뜨는지 확인!
-
                     deleteKeyword(item.keyword, li);
                 });
 
@@ -155,45 +242,28 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         }
 
-        // -------------------------------------------------------
-        // [수정됨] 검색어 삭제 API 호출 (팝업 제거)
-        // -------------------------------------------------------
         async function deleteKeyword(keyword, liElement) {
-            console.log("[Delete] 삭제 함수 진입! 키워드:", keyword);
-
             try {
                 const url = `${CONTEXT_PATH}/api/search/keywords?keyword=${encodeURIComponent(keyword)}`;
-                console.log("[Delete] 요청 URL:", url);
-
                 const response = await fetch(url, {
                     method: 'DELETE',
-                    credentials: 'include', // <- 중요: 쿠키 자동 포함
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' }
                 });
 
-                console.log("[Delete] 서버 응답 상태:", response.status);
-
                 if (response.ok) {
-                    console.log("[Delete] 삭제 성공! 화면에서 요소 제거");
                     liElement.remove();
-
                     if (recentList.querySelectorAll('li').length === 0) {
                         recentList.innerHTML = '<li class="empty">최근 검색 내역이 없습니다.</li>';
                     }
                 } else {
-                    console.error("[Delete] 삭제 실패. 서버 응답이 200 OK가 아닙니다.");
-                    const errorText = await response.text();
-                    console.error("[Delete] 서버 에러 내용:", errorText);
+                    console.error("[Delete] 삭제 실패");
                 }
-
             } catch (error) {
-                console.error("[Delete] 자바스크립트 에러:", error);
+                console.error("[Delete] 에러:", error);
             }
         }
 
-        // --- [내부 함수] 인기 검색어 렌더링 (숫자 제거됨) ---
         function renderPopularList(data) {
             if (!popularList) return;
             popularList.innerHTML = '';
@@ -205,10 +275,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             data.forEach((item) => {
                 const li = document.createElement('li');
-                // 순위 숫자 제거하고 링크만 표시
-                li.innerHTML = `
-                    <a href="#" class="keyword-link">${item.keyword}</a>
-                `;
+                li.innerHTML = `<a href="#" class="keyword-link">${item.keyword}</a>`;
 
                 li.querySelector('.keyword-link').addEventListener('click', (e) => {
                     e.preventDefault();
@@ -219,21 +286,17 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         }
 
-        // --- [내부 함수] 데이터 로드 실행 (조건부 호출) ---
         async function loadSearchData() {
-            // 1. 인기 검색어는 누구나 볼 수 있음 (무조건 호출)
+            // 1. 인기 검색어
             fetchKeywords(`${CONTEXT_PATH}/api/search/keywords/popular`)
                 .then(data => renderPopularList(data));
 
-            // 2. 최근 검색어는 로그인 여부 확인 후 호출
+            // 2. 최근 검색어
             const isLogin = document.cookie.split(';').some(v => v.trim().startsWith('loginYn=Y'));
-
             if (isLogin) {
-                // 로그인 상태: API 호출 (이때 fetchKeywords 안에서 토큰이 헤더에 들어감)
                 fetchKeywords(`${CONTEXT_PATH}/api/search/keywords/recent`)
                     .then(data => renderRecentList(data));
             } else {
-                // 비로그인 상태: API 호출 안 함 -> 빈 배열 처리
                 renderRecentList([]);
             }
         }
@@ -246,10 +309,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if(searchInput) {
                 searchInput.value = '';
+                // ✨ [추가] 모달 열 때 자동완성 숨기고 초기화
+                hideAutocomplete();
                 setTimeout(() => searchInput.focus(), 150);
             }
 
-            loadSearchData(); // 모달 열릴 때 실행
+            loadSearchData();
         };
 
         const closeModal = () => {
@@ -260,6 +325,32 @@ document.addEventListener("DOMContentLoaded", () => {
         };
 
         // --- 이벤트 리스너 등록 ---
+
+        // 1. 검색창 입력 이벤트 (디바운스 적용)
+        if (searchInput) {
+            const onInputHandler = debounce((e) => {
+                const keyword = e.target.value.trim();
+                fetchAutocomplete(keyword);
+            }, 300); // 0.3초 딜레이
+
+            searchInput.addEventListener('input', onInputHandler);
+
+            // 포커스 시에도 값이 있으면 자동완성 시도
+            searchInput.addEventListener('focus', () => {
+                if(searchInput.value.trim().length > 0) {
+                    fetchAutocomplete(searchInput.value.trim());
+                }
+            });
+        }
+
+        // 2. 외부 클릭 시 자동완성 닫기
+        document.addEventListener('click', (e) => {
+            // 검색 폼 외부를 클릭했을 때 자동완성 창만 닫기
+            if (searchForm && !searchForm.contains(e.target)) {
+                if(autocompleteList) autocompleteList.style.display = 'none';
+            }
+        });
+
         searchTrigger.addEventListener("click", (e) => {
             e.preventDefault();
             openModal();

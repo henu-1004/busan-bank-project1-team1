@@ -84,4 +84,12 @@ public class SearchController {
 
         }
     }
+
+    // 6. 검색어 자동 완성
+    @GetMapping("/autocomplete")
+    public List<String> getAutoCompletion(@RequestParam(name = "keyword") String keyword) {
+        return searchService.getAutoCompletion(keyword);
+    }
+    
+    
 }

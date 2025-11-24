@@ -2,12 +2,13 @@ package kr.co.api.flobankapi.document;
 
 import lombok.Data;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.elasticsearch.annotations.Document;
-import org.springframework.data.elasticsearch.annotations.Field;
-import org.springframework.data.elasticsearch.annotations.FieldType;
+import org.springframework.data.elasticsearch.annotations.*;
+
 
 @Data
 @Document(indexName = "product")
+@Setting(settingPath = "elastic/common-setting.json")
+@Mapping(mappingPath = "elastic/product-mapping.json")
 public class ProductDocument {
 
     @Id
@@ -21,4 +22,9 @@ public class ProductDocument {
 
     @Field(type = FieldType.Text, analyzer = "nori")
     private String dpstDescript; // 상품 상세 설명 (검색 필드로 사용)
+
+    // 자동완성을 위한 필드
+    @CompletionField(maxInputLength = 100, preserveSeparators = true)
+    private Completion suggest;
+
 }

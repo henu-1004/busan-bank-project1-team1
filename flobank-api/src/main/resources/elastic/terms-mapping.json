@@ -1,0 +1,16 @@
+{
+  "properties": {
+    "thistNo": { "type": "keyword" },
+    "termTitle": { "type": "text", "analyzer": "nori" },
+    "thistContent": { "type": "text", "analyzer": "nori" },
+    "thistVersion": { "type": "keyword" },
+    "thistRegDy": { "type": "date" },
+    "thistFile": { "type": "text", "analyzer": "nori" },
+    "suggest": {
+      "type": "completion",
+      "max_input_length": 100,
+      "analyzer": "standard",
+      "preserve_separators": true
+    }
+  }
+}

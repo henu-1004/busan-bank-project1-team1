@@ -2,16 +2,14 @@ package kr.co.api.flobankapi.document;
 
 import lombok.Data;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.elasticsearch.annotations.DateFormat;
-import org.springframework.data.elasticsearch.annotations.Document;
-import org.springframework.data.elasticsearch.annotations.Field;
-import org.springframework.data.elasticsearch.annotations.FieldType;
+import org.springframework.data.elasticsearch.annotations.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Data
 @Document(indexName = "notice")
+@Setting(settingPath = "elastic/common-setting.json")
+@Mapping(mappingPath = "elastic/notice-mapping.json")
 public class NoticeDocument {
 
     @Id
@@ -25,4 +23,8 @@ public class NoticeDocument {
 
     @Field(type = FieldType.Date, format = DateFormat.date)
     private LocalDate boardRegDt;
+
+    // 자동완성을 위한 필드
+    @CompletionField(maxInputLength = 100, preserveSeparators = true)
+    private Completion suggest;
 }
