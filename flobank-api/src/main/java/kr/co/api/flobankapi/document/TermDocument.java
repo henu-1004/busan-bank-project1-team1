@@ -1,11 +1,16 @@
 package kr.co.api.flobankapi.document;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.*;
 
 import java.time.LocalDate;
 
+@NoArgsConstructor
+@AllArgsConstructor
 @Data
 @Document(indexName = "docs")
 @Setting(settingPath = "elastic/common-setting.json")
@@ -28,7 +33,8 @@ public class TermDocument {
     @Field(type = FieldType.Date, format = DateFormat.date)
     private LocalDate thistRegDy;
 
-    @Field(type = FieldType.Text, analyzer = "nori")
+    @JsonProperty("thistFile")  // JSON에서 "thistFile"이라는 키를 강제로 매핑
+    @Field(name = "thistFile", type = FieldType.Keyword) // ES 필드명도 확실하게 지정
     private String thistFile;
 
     // 자동완성을 위한 필드

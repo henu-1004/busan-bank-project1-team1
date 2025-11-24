@@ -21,12 +21,14 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
 
         // 약관 PDF
-        String termsPath = filePathConfig.getPdfTermsPath();
-
-        String resourceLocation = Paths.get(termsPath).toUri().toString();
+        String termsPath = filePathConfig.getPdfTermsPath(); // 예: /app/uploads/terms
+        String termsLocation = Paths.get(termsPath).toUri().toString();
+        if (!termsLocation.endsWith("/")) {
+            termsLocation += "/";
+        }
 
         registry.addResourceHandler("/uploads/terms/**")
-                .addResourceLocations(resourceLocation);
+                .addResourceLocations(termsLocation);
 
 
 
