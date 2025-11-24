@@ -45,7 +45,7 @@
       <li th:each="term : ${termsList}">
         <label>
           <input type="checkbox" class="step1-checkbox">
-          <a th:href="@{'/deposit/terms/download'(termCate=${term.thistTermCate}, termOrder=${term.thistTermOrder})}" target="_blank">
+          <a th:href="@{'/deposit/terms/download'(thistTermCate=${term.thistTermCate}, thistTermOrder=${term.thistTermOrder})}" target="_blank">
             <span>[필수] [[${term.termTitle}]]</span>
             <i class="fa-solid fa-angle-right"></i>
           </a>

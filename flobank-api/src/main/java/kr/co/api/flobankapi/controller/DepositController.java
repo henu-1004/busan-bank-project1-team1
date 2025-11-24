@@ -59,6 +59,38 @@ public class DepositController {
         return "deposit/deposit_step1";
     }
 
+    @Value("${file.upload.pdf-terms-path}")
+    private String termsUploadPath;
+
+    @GetMapping("/terms/download")
+    public void downloadTerms(@RequestParam String thistTermOrder, @RequestParam String thistTermCate, HttpServletResponse response) throws IOException {
+
+        log.info("termUploadPath : " + termsUploadPath);
+
+        String termPath = depositService.getTermContent(thistTermOrder, thistTermCate).getThistFile();
+        String fileName = Paths.get(termPath).getFileName().toString();  // UUID_원본명.pdf
+        String fullPath = termsUploadPath + "/" + fileName;  // → /app/uploads/terms/UUID_원본명.pdf
+
+        Path path = Paths.get(fullPath);
+
+        if (!Files.exists(path)) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "파일을 찾을 수 없습니다.");
+            return;
+        }
+
+        response.setContentType("application/pdf");
+        response.setHeader("Content-Disposition",
+                "attachment; filename=\"" + fileName + "\"");
+        response.setHeader("Content-Length", String.valueOf(Files.size(path)));
+
+        // 4) 파일을 스트림으로 직접 내려보냄
+        try (OutputStream os = response.getOutputStream()) {
+            Files.copy(path, os);
+            os.flush();
+        }
+
+    }
+
     @GetMapping("/deposit_step2")
     public String deposit_step2(Model model, @RequestParam String dpstId, @AuthenticationPrincipal CustomUserDetails user){
         model.addAttribute("activeItem","product");
@@ -328,37 +360,6 @@ public class DepositController {
         return "deposit/deposit_step4";
     }
 
-    @Value("${file.upload.pdf-terms-path}")
-    private String termsUploadPath;
-
-    @GetMapping("/terms/download")
-    public void downloadTerms(@RequestParam String termOrder, @RequestParam String termCate, HttpServletResponse response) throws IOException {
-
-
-
-        String termPath = depositService.getTermContent(termOrder, termCate).getThistFile();
-        String fileName = Paths.get(termPath).getFileName().toString();  // UUID_원본명.pdf
-        String fullPath = termsUploadPath + "/" + fileName;  // → /app/uploads/terms/UUID_원본명.pdf
-
-        Path path = Paths.get(fullPath);
-
-        if (!Files.exists(path)) {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND, "파일을 찾을 수 없습니다.");
-            return;
-        }
-
-        response.setContentType("application/pdf");
-        response.setHeader("Content-Disposition",
-                "attachment; filename=\"" + fileName + "\"");
-        response.setHeader("Content-Length", String.valueOf(Files.size(path)));
-
-        // 4) 파일을 스트림으로 직접 내려보냄
-        try (OutputStream os = response.getOutputStream()) {
-            Files.copy(path, os);
-            os.flush();
-        }
-
-    }
 
     @GetMapping("/info")
     public String info(Model model){
