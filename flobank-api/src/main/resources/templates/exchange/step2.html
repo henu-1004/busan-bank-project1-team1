@@ -38,17 +38,21 @@
             <div class="exchange-swapper">
                 <div class="currency-box">
                     <label>보내실 때 (From)</label>
-                    <div class="input-group">
-                        <select id="fromCurrency" class="currency-select">
-                            <option value="KRW">KRW (원)</option>
-                            <option value="USD">USD (달러)</option>
-                            <option value="JPY">JPY (엔)</option>
-                            <option value="EUR">EUR (유로)</option>
-                            <option value="CNH">CNH (위안)</option>
-                            <option value="GBP">GBP (파운드)</option>
-                            <option value="AUD">AUD (호주달러)</option>
-                        </select>
-                        <input type="number" id="fromAmount" class="amount-input" placeholder="0">
+                    <div class="input-group-merged">
+                        <div class="select-prefix">
+                            <img id="fromFlag" class="flag-icon" src="/img/flags/usd.png" alt="flag">
+                            <select id="fromCurrency" class="hidden-select">
+                                <option value="KRW" th:data-flag="@{/images/krw.png}">KRW (대한민국 원)</option>
+                                <option value="USD" th:data-flag="@{/images/usd.png}">USD (미국 달러)</option>
+                                <option value="JPY" th:data-flag="@{/images/jpy.png}">JPY (일본 엔)</option>
+                                <option value="EUR" th:data-flag="@{/images/eur.png}">EUR (유럽 유로)</option>
+                                <option value="CNH" th:data-flag="@{/images/cnh.png}">CNH (중국 위안)</option>
+                                <option value="GBP" th:data-flag="@{/images/gbp.png}">GBP (영국 파운드)</option>
+                                <option value="AUD" th:data-flag="@{/images/aud.png}">AUD (호주 달러)</option>
+                            </select>
+                            <i class="fa-solid fa-caret-down select-arrow"></i>
+                        </div>
+                        <input type="number" id="fromAmount" class="amount-input-merged" placeholder="0">
                     </div>
                 </div>
 
@@ -58,12 +62,21 @@
 
                 <div class="currency-box">
                     <label>받으실 때 (To)</label>
-                    <div class="input-group">
-                        <select id="toCurrency" class="currency-select">
-                            <option value="USD" selected>USD (달러)</option>
-                            <option value="KRW">KRW (원)</option>
-                        </select>
-                        <input type="text" id="toAmount" class="amount-input" readonly placeholder="0">
+                    <div class="input-group-merged">
+                        <div class="select-prefix">
+                            <img id="toFlag" class="flag-icon" src="/img/flags/usd.png" alt="flag">
+                            <select id="toCurrency" class="hidden-select">
+                                <option value="USD" th:data-flag="@{/images/usd.png}">USD (미국 달러)</option>
+                                <option value="KRW" th:data-flag="@{/images/krw.png}">KRW (대한민국 원)</option>
+                                <option value="JPY" th:data-flag="@{/images/jpy.png}">JPY (일본 엔)</option>
+                                <option value="EUR" th:data-flag="@{/images/eur.png}">EUR (유럽 유로)</option>
+                                <option value="CNH" th:data-flag="@{/images/cnh.png}">CNH (중국 위안)</option>
+                                <option value="GBP" th:data-flag="@{/images/gbp.png}">GBP (영국 파운드)</option>
+                                <option value="AUD" th:data-flag="@{/images/aud.png}">AUD (호주 달러)</option>
+                            </select>
+                            <i class="fa-solid fa-caret-down select-arrow"></i>
+                        </div>
+                        <input type="text" id="toAmount" class="amount-input-merged" readonly placeholder="0">
                     </div>
                 </div>
             </div>
@@ -147,13 +160,40 @@
                     <label class="step2-label">수령희망지점</label>
                     <select id="receiveBranch" class="step2-select">
                         <option value="">지점을 선택해주세요</option>
-                        <optgroup label="공항/항만점">
-                            <option value="ICN_T1">인천국제공항 제1여객터미널</option>
-                            <option value="ICN_T2">인천국제공항 제2여객터미널</option>
+
+                        <optgroup label="✈️ 공항/항만 환전소 (365일 운영)">
+                            <option value="ICN_T1">인천국제공항 제1여객터미널 환전소</option>
+                            <option value="ICN_T2">인천국제공항 제2여객터미널 환전소</option>
+                            <option value="GMP_INT">김포국제공항 국제선청사</option>
+                            <option value="PUS_INT">김해국제공항(부산) 국제선청사</option>
+                            <option value="BUSAN_PORT">부산항 국제여객터미널</option>
                         </optgroup>
-                        <optgroup label="주요 영업점">
-                            <option value="SEOUL_ST">서울역점 (환전센터)</option>
-                            <option value="BUSAN_MAIN">부산은행 본점영업부</option>
+
+                        <optgroup label="🏢 서울 주요 영업점">
+                            <option value="HQ_YEOUIDO">플로뱅크 여의도 본점</option>
+                            <option value="SEOUL_ST">서울역 환전센터 (KTX 2층)</option>
+                            <option value="SEOUL_GANGNAM">강남파이낸스센터지점</option>
+                            <option value="SEOUL_MYEONG">명동역 외환센터</option>
+                            <option value="SEOUL_COEX">삼성동 무역센터지점</option>
+                            <option value="SEOUL_HONGDAE">홍대입구역지점</option>
+                            <option value="SEOUL_JAMSIL">잠실 롯데월드타워지점</option>
+                        </optgroup>
+
+                        <optgroup label="🌊 부산/경남 주요 영업점">
+                            <option value="BUSAN_MAIN">플로뱅크 부산금융센터 (문현동)</option>
+                            <option value="BUSAN_SEOMYEON">서면 1번가지점</option>
+                            <option value="BUSAN_HAEUNDAE">해운대 마린시티지점</option>
+                            <option value="BUSAN_NAMPODONG">남포동지점</option>
+                            <option value="ULSAN_MAIN">울산 삼산동지점</option>
+                        </optgroup>
+
+                        <optgroup label="🌐 기타 지역 거점">
+                            <option value="GYEONGGI_PANGYO">판교 테크노밸리지점</option>
+                            <option value="INCHEON_SONGDO">인천 송도국제도시지점</option>
+                            <option value="DAEGU_MAIN">대구 동성로지점</option>
+                            <option value="DAEJEON_MAIN">대전 둔산지점</option>
+                            <option value="GWANGJU_MAIN">광주 상무지점</option>
+                            <option value="JEJU_AIR">제주공항지점</option>
                         </optgroup>
                     </select>
                 </div>

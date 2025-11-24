@@ -4,7 +4,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.api.flobankapi.dto.CouponDTO;
 import kr.co.api.flobankapi.dto.CustAcctDTO;
+import kr.co.api.flobankapi.dto.FrgnExchTranDTO;
 import kr.co.api.flobankapi.dto.RateInfoDTO;
+import kr.co.api.flobankapi.mapper.CustAcctMapper;
 import kr.co.api.flobankapi.mapper.ExchangeMapper;
 import kr.co.api.flobankapi.mapper.MypageMapper;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +28,7 @@ public class ExchangeService {
     private final MypageMapper mypageMapper;
     private final ExchangeMapper exchangeMapper;
     private final PasswordEncoder passwordEncoder;
+    private final CustAcctMapper  custAcctMapper;
 
     public BigDecimal calculateExchange(String date, String targetCurrency, BigDecimal krwAmount) {
         try {
@@ -70,7 +73,18 @@ public class ExchangeService {
         return exchangeMapper.selectAllCoupon(custCode);
     }
 
+    // 환전 신청했을 때 환전 테이블 삽입, 계좌 잔액 업데이트, 계좌 이체 내역 테이블 삽입, 쿠폰 상태 업데이트
+    public void processExchange(FrgnExchTranDTO transDTO){
+        // 환전 테이블 insert
 
+
+        // 계좌 update
+        custAcctMapper.updateKoAcctBal(transDTO.getExchAmount(), transDTO.getExchAcctNo());
+
+
+        // 쿠폰 상태 업데이트
+
+    }
 
     // 환전하기 전 계좌 비밀번호 일치하는지 확인
     public boolean checkAccountPassword(String acctNo, String acctPass) {
