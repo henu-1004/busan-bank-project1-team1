@@ -78,100 +78,99 @@ public class ExchangeService {
     @Transactional
     public void processExchange(FrgnExchTranDTO transDTO) {
 
-        // 1. 환전 내역 테이블 INSERT (기존 값 그대로)
+        // 1. 환전 내역 INSERT
         exchangeMapper.insertExchange(transDTO);
 
-        // 2. 사용자 이름 가져오기 (거래내역 기록용)
+        // 2. 사용자 이름
         String custName = getAuthenticatedUserName();
 
-        // 3. 거래 유형별(BUY/SELL) 로직 분기
+        // 3. 로직 분기
         if ("KRW".equals(transDTO.getExchFromCurrency())) {
-            // ==========================================
-            // CASE A: 원화 -> 외화 (BUY)
-            // ==========================================
+            // [BUY] 원화 -> 외화
 
-            // 1) 원화 출금액 계산 (소수점 절사)
-            // 공식: 외화금액 * 적용환율
+            // 원화 출금액 계산 (절사)
             BigDecimal withdrawKrw = transDTO.getExchAmount()
                     .multiply(transDTO.getExchAppliedRate())
                     .setScale(0, RoundingMode.FLOOR);
 
-            // 2) 원화 계좌 잔액 차감 (출금)
+            // 원화 계좌 잔액 차감
             custAcctMapper.updateAcctBal(withdrawKrw, transDTO.getExchAcctNo());
 
-            // 3) 원화 계좌 거래내역 INSERT (출금)
-            // 적요: "환전(USD)"
+            // 원화 계좌 거래내역 (출금)
             insertTransactionHistory(
                     transDTO.getExchAcctNo(),
                     custName,
                     "환전(" + transDTO.getExchToCurrency() + ")",
                     withdrawKrw,
-                    2 // 2: 출금
+                    2,      // 출금
+                    "KRW"   // 통화
             );
 
         } else {
-            // ==========================================
-            // CASE B: 외화 -> 원화 (SELL)
-            // ==========================================
+            // [SELL] 외화 -> 원화
 
-            // 1) 외화 출금액 (소수점 유지)
+            // 외화 출금액
             BigDecimal withdrawForeign = transDTO.getExchAmount();
 
-            // 2) 원화 입금액 계산 (소수점 절사)
+            // 원화 입금액 (절사)
             BigDecimal depositKrw = withdrawForeign
                     .multiply(transDTO.getExchAppliedRate())
                     .setScale(0, RoundingMode.FLOOR);
 
-            // 3) 외화 계좌 잔액 차감 (출금)
-            // (주의: custAcct.xml에 updateFrgnAcctBal 쿼리가 있어야 함)
+            // 외화 계좌 잔액 차감
             frgnAcctMapper.updateFrgnAcctBal(
                     withdrawForeign,
                     transDTO.getExchAcctNo(),
-                    transDTO.getExchFromCurrency() // 예: "USD"
+                    transDTO.getExchFromCurrency()
             );
 
-            // 4) 원화 계좌 잔액 증가 (입금)
-            // 주소 필드("즉시입금:110-...")에서 입금 계좌번호 추출
-            String depositAcctNo = transDTO.getExchAddr().replace("즉시입금:", "").trim();
-            mypageMapper.updatePlusAcctBig(depositKrw, depositAcctNo);
+            // [추가] 외화 계좌 거래내역 (출금)
+            // 잔액은 계산하지 않고 기록만 남김
+            insertTransactionHistory(
+                    transDTO.getExchAcctNo(),                   // 외화 계좌번호
+                    custName,
+                    "환전(" + transDTO.getExchFromCurrency() + "→KRW)",
+                    withdrawForeign,                            // 외화 금액 (BigDecimal)
+                    2,                                          // 출금
+                    transDTO.getExchFromCurrency()              // 통화 (예: USD)
+            );
 
-            // 5) 원화 계좌 거래내역 INSERT (입금)
-            // 적요: "환전입금(USD)"
+            // 원화 계좌 입금
+            String depositAcctNo = transDTO.getExchAddr().replace("즉시입금:", "").trim();
+            mypageMapper.updatePlusAcct(depositKrw, depositAcctNo);
+
+            // 원화 계좌 거래내역 (입금)
             insertTransactionHistory(
                     depositAcctNo,
                     custName,
                     "환전입금(" + transDTO.getExchFromCurrency() + ")",
                     depositKrw,
-                    1 // 1: 입금
+                    1,      // 입금
+                    "KRW"   // 통화
             );
-
-            /* * [참고] 외화 계좌의 출금 내역 기록
-             * 외화는 소수점(센트)이 있으므로 정수형인 TB_CUST_TRAN_HIST에 넣으면 데이터가 손실됩니다.
-             * 별도의 외화 거래내역 테이블(TB_FRGN_TRAN_HIST 등)이 있다면 여기서 insert를 수행해야 합니다.
-             */
         }
 
-        // 4. 쿠폰 상태 업데이트 (사용 처리)
+        // 4. 쿠폰 사용 처리
         if (transDTO.getCouponNo() != null && transDTO.getCouponNo() > 0) {
             couponMapper.updateCouponStatus(transDTO.getCouponNo());
         }
     }
 
     // [Helper] 거래내역 기록 공통 메소드
-    private void insertTransactionHistory(String acctNo, String custName, String summary, BigDecimal amount, int type) {
+    private void insertTransactionHistory(String acctNo, String custName, String summary, BigDecimal amount, int type, String currency) {
         CustTranHistDTO histDTO = new CustTranHistDTO();
         histDTO.setTranAcctNo(acctNo);
-        histDTO.setTranCustName(custName); // 예: 홍길동
-        histDTO.setTranMemo(summary);      // 예: 환전(USD) -> 적요 필드가 있다면 여기에, 없으면 Name에 덮어쓰기 고려
-
-        // 만약 화면에 "환전(USD)"를 표시하고 싶다면 TranRecName(상대방명)이나 Memo에 넣어야 합니다.
-        // 여기서는 요청하신대로 "환전이라는 값이 출력될 수 있도록" TranRecName에 넣습니다.
-        histDTO.setTranRecName(summary);
-
+        histDTO.setTranCustName(custName);
+        histDTO.setTranRecName(summary);   // 적요
         histDTO.setTranType(type);         // 1:입금, 2:출금
-        histDTO.setTranAmount(amount); // 원화는 정수
 
-        // NULL 처리 (MyBatis 에러 방지용)
+        histDTO.setTranAmount(amount);     // 금액 (BigDecimal)
+        histDTO.setTranCurrency(currency); // 통화 (KRW, USD...)
+
+        // 잔액은 무시 (null로 들어감 -> DB에서 nullable이어야 함. 아니면 0으로 세팅)
+        histDTO.setTranBalance(0);
+
+        // NULL 처리 (MyBatis jdbcType 필수)
         histDTO.setTranRecAcctNo("");
         histDTO.setTranRecBkCode("");
         histDTO.setTranEsignYn("Y");
