@@ -219,6 +219,16 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     }
+
+
+    const curSelection = document.getElementById('curSelect');
+    const curSelectionName = document.getElementById("selectedCurName");
+    if (curSelection && curSelectionName) {
+        curSelection.addEventListener('change', function() {
+            const cur = this.options[this.selectedIndex].getAttribute("data-curName");
+            curSelectionName.value = cur;
+        });
+    }
 });
 
 
@@ -543,3 +553,5 @@ document.addEventListener("DOMContentLoaded", () => {
 function confirmBeforeBack() {
     return confirm("이전 단계로 이동하면 현재 입력한 정보가 모두 사라집니다.\n계속하시겠습니까?");
 }
+
+

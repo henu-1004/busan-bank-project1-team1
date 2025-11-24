@@ -18,4 +18,5 @@ public class DpstAcctDtlDTO {
     private String dpstDtlHdrNo;
     private String dpstDtlEsignYn;
     private LocalDateTime dpstDtlEsignDt;
+    private BigDecimal dpstDtlAppliedRate;
 }

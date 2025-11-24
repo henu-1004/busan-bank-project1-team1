@@ -319,6 +319,7 @@
     <insert id="insertDpstAcctDtl">
         INSERT INTO TB_DPST_ACCT_DTL (
         DPST_DTL_TYPE,
+        DPST_DTL_APPLIED_RATE,
         DPST_DTL_AMOUNT,
         DPST_TRAN_DT,
         DPST_DTL_HDR_NO,
@@ -329,6 +330,7 @@
         )
         VALUES (
         #{dpstDtlType},
+        #{dpstDtlAppliedRate},
         #{dpstDtlAmount},
         SYSDATE,
         #{dpstDtlHdrNo},

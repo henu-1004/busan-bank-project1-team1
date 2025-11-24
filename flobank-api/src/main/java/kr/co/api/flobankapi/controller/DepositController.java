@@ -185,6 +185,7 @@ public class DepositController {
         }
         model.addAttribute("appliedInterest",appliedInterest);
 
+
         model.addAttribute("dto", dto);
         model.addAttribute("dpstId", dpstId);
 
@@ -226,12 +227,22 @@ public class DepositController {
         dpstAcctHdrDTO.setDpstHdrStartDy(LocalDate.now().format(formatter));
         dpstAcctHdrDTO.setDpstHdrFinDy(LocalDate.now().plusMonths(dto.getDpstHdrMonth()).format(formatter));
         dpstAcctHdrDTO.setDpstHdrCurrency(dto.getDpstHdrCurrency());
-        dpstAcctHdrDTO.setDpstHdrBalance(dto.getDpstAmount());
+        if (product.getDpstType() == 1){
+            dpstAcctHdrDTO.setDpstHdrBalance(dto.getDpstAmount());
+        }else {
+            dpstAcctHdrDTO.setDpstHdrBalance(BigDecimal.valueOf(0));
+        }
         dpstAcctHdrDTO.setDpstHdrInterest(dto.getAppliedInterest());
-        dpstAcctHdrDTO.setDpstHdrRate(dto.getAppliedRate());
+        if (product.getDpstType() == 1 && product.getDpstRateType()==1) {
+            dpstAcctHdrDTO.setDpstHdrRate(dto.getAppliedRate());
+        } else{
+            dpstAcctHdrDTO.setDpstHdrRate(BigDecimal.valueOf(0));
+        }
         dpstAcctHdrDTO.setDpstHdrStatus(1);
-        if (product.getDpstRateType() == 1){
+        if (product.getDpstType() == 1){
             dpstAcctHdrDTO.setDpstHdrCurrencyExp(dto.getDpstHdrCurrency());
+        }else {
+            dpstAcctHdrDTO.setDpstHdrCurrencyExp("KRW");
         }
         dpstAcctHdrDTO.setDpstHdrLinkedAcctNo(
                 "krw".equals(dto.getWithdrawType()) ? dto.getAcctNo() : dto.getBalNo()
@@ -252,10 +263,17 @@ public class DepositController {
 
         // 첫 예금 거래 내역
         DpstAcctDtlDTO dtlDTO = new DpstAcctDtlDTO();
-        dtlDTO.setDpstDtlType(1);
-        dtlDTO.setDpstDtlAmount(dto.getDpstAmount());
-        dtlDTO.setDpstDtlEsignYn("y");
-        dtlDTO.setDpstDtlEsignDt(LocalDateTime.now());
+        if (product.getDpstType()==1){
+            dtlDTO.setDpstDtlType(1);
+            if (product.getDpstRateType() == 1){
+                dtlDTO.setDpstDtlAmount(dto.getDpstAmount());
+            }else {
+                dtlDTO.setDpstDtlAmount(dto.getKrwAmount());
+            }
+            dtlDTO.setDpstDtlEsignYn("y");
+            dtlDTO.setDpstDtlEsignDt(LocalDateTime.now());
+            dtlDTO.setDpstDtlAppliedRate(dto.getAppliedRate());
+        }
 
 
 
@@ -263,26 +281,35 @@ public class DepositController {
         // 내 계좌 거래내역
         CustTranHistDTO custTranHistDTO = new CustTranHistDTO();
 
-        custTranHistDTO.setTranCustName(user.getCustName());
-        custTranHistDTO.setTranType(2);
-        if (dto.getWithdrawType().equals("krw")) {
-            custTranHistDTO.setTranAmount(Integer.parseInt(String.valueOf(dto.getKrwAmount())));
-            custTranHistDTO.setTranCurrency("KRW");
-        }else {
-            custTranHistDTO.setTranAmount(Integer.parseInt(String.valueOf(dto.getDpstAmount())));
-            custTranHistDTO.setTranCurrency(dpstAcctHdrDTO.getDpstHdrCurrency());
-        }
+        if (product.getDpstType()==1){
+            custTranHistDTO.setTranCustName(user.getCustName());
+            custTranHistDTO.setTranType(2);
+            if (dto.getWithdrawType().equals("krw")) {
+                custTranHistDTO.setTranAmount(Integer.parseInt(String.valueOf(dto.getKrwAmount())));
+                custTranHistDTO.setTranCurrency("KRW");
+            }else {
+                custTranHistDTO.setTranAmount(Integer.parseInt(String.valueOf(dto.getDpstAmount())));
+                custTranHistDTO.setTranCurrency(dpstAcctHdrDTO.getDpstHdrCurrency());
+            }
 
-        custTranHistDTO.setTranRecName(user.getCustName());
-        custTranHistDTO.setTranRecBkCode("888");
-        custTranHistDTO.setTranEsignYn("Y");
-        DateTimeFormatter dt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
-        custTranHistDTO.setTranEsignDt(LocalDateTime.now().format(dt));
+            custTranHistDTO.setTranRecName(user.getCustName());
+            custTranHistDTO.setTranRecBkCode("888");
+            custTranHistDTO.setTranEsignYn("Y");
+            DateTimeFormatter dt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
+            custTranHistDTO.setTranEsignDt(LocalDateTime.now().format(dt));
+        }
 
 
         // 트랜잭션 처리
-        DpstAcctHdrDTO insertDTO = depositService.openDepositAcctTransaction(dpstAcctHdrDTO, dtlDTO, custTranHistDTO, dto.getWithdrawType());
+        DpstAcctHdrDTO insertDTO;
+        if (product.getDpstType()==1) {
+            insertDTO = depositService.openDepositAcctTransaction(dpstAcctHdrDTO, dtlDTO, custTranHistDTO, dto.getWithdrawType());
+        }else {
+            insertDTO = depositService.openDepositFreeAcctTransaction(dpstAcctHdrDTO);
+        }
+
         model.addAttribute("insertDTO", insertDTO);
+
         return "deposit/deposit_step4";
     }
 

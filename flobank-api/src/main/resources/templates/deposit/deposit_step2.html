@@ -50,13 +50,14 @@
                 <h3 class="step2-subtitle">출금계좌정보입력</h3>
 
                 <!-- 출금계좌선택 -->
-                <div class="form-group">
+                <div th:if="${product.dpstRateType == 1}" class="form-group">
                     <label class="form-label">출금계좌선택</label>
                     <div class="radio-group">
                         <label><input type="radio" name="withdrawType" value="krw" checked> 원화출금계좌</label>
                         <label><input type="radio" name="withdrawType" value="fx"> 외화출금계좌</label>
                     </div>
                 </div>
+                <input th:if="${product.dpstRateType == 2}" name="withdrawType" type="hidden" value="krw">
 
                 <div class="divider"></div>
 
@@ -137,11 +138,12 @@
                         >
                             [[${cur.curCode}]] ([[${cur.curName}]])</option>
                     </select>
+                    <input th:if="${product.dpstType == 2}" type="hidden" id="selectedCurName" name="selectedCurName">
                 </div>
 
-                <div class="divider"></div>
+                <div th:if="${product.dpstType == 1}" class="divider"></div>
 
-                <div class="form-group">
+                <div th:if="${product.dpstType == 1}" class="form-group">
                     <label class="form-label">신규금액
                         <i class="fa-regular fa-circle-question" title="입금할 신규 금액을 입력하세요."></i>
                     </label>

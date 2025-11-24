@@ -58,16 +58,16 @@
               <table class="step3-table">
                   <tr><th>예금명</th><td>[[${product.dpstName}]]</td></tr>
                   <tr><th>신규통화</th><td>[[${dto.dpstHdrCurrency}]] ([[${dto.selectedCurName}]])</td></tr>
-                  <tr><th>신규금액</th><td>[[${#numbers.formatDecimal(dto.dpstAmount, 0, 'COMMA', 2, 'POINT')}]] [[${dto.dpstHdrCurrency}]]</td></tr>
-                  <tr><th>입금회차</th><td>1</td></tr>
+                  <tr th:if="${product.dpstType ==1}"><th>신규금액</th><td>[[${#numbers.formatDecimal(dto.dpstAmount, 0, 'COMMA', 2, 'POINT')}]] [[${dto.dpstHdrCurrency}]]</td></tr>
+                  <tr th:if="${product.dpstType ==1}"><th>입금회차</th><td>1</td></tr>
                   <tr><th>예금금리</th><td>[[${appliedInterest}]]%</td></tr>
                   <tr><th>적용과세</th><td>일반</td></tr>
                   <tr><th>만기일</th><td>[[${#temporals.format(maturityDate, 'yyyy.MM.dd')}]]</td></tr>
                   <tr><th>예치기간</th><td>[[${dto.dpstHdrMonth}]]개월</td></tr>
                   <tr><th>출금계좌번호</th><td>[[${dto.withdrawType == 'krw' ? dto.acctNo : dto.frgnAcctNo}]]</td></tr>
                   <tr><th>출금통화</th><td>[[${dto.withdrawType == 'krw' ? 'KRW (한국 원)' : dto.dpstHdrCurrency + ' (' + dto.selectedCurName + ')'}]]</td></tr>
-                  <tr><th>출금적용환율</th><td>[[${dto.appliedRate}]]</td></tr>
-                  <tr><th>예금금액</th>
+                  <tr th:if="${product.dpstRateType == 1 && product.dpstType ==1}"><th>출금적용환율</th><td>[[${dto.appliedRate}]]</td></tr>
+                  <tr th:if="${product.dpstType ==1}"><th>예금금액</th>
                       <td>
                           <!-- 원화 계좌 출금 -->
                           <span th:if="${dto.withdrawType == 'krw'}">

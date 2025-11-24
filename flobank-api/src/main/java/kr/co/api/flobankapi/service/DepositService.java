@@ -270,6 +270,21 @@ public class DepositService {
         return insdto;
     }
 
+
+    @Transactional
+    public DpstAcctHdrDTO openDepositFreeAcctTransaction(
+            DpstAcctHdrDTO hdrDTO
+    ) {
+        // 예금 헤더 insert
+        depositMapper.insertDpstAcctHdr(hdrDTO);
+
+        DpstAcctHdrDTO insdto = depositMapper.selectInsertedAcct(hdrDTO.getDpstHdrCustCode(), hdrDTO.getDpstHdrDpstId());
+
+
+        // 4. 방금 생성된 예금계좌 다시 조회
+        return insdto;
+    }
+
 }
 
 
