@@ -354,7 +354,7 @@
 
 
 /* ============================================
-   4. 환전 2단계 (Step 2: 정보입력) - NEW
+   4. 환전 2단계 (Step 2: 정보입력)
    ============================================ */
 
 .step2-container {
@@ -437,73 +437,173 @@
     margin-bottom: 30px;
 }
 
-/* --- [좌우 배치 환전 박스] --- */
+/* --- [좌우 배치 환전 박스 (상하 배치로 변경)] --- */
 .exchange-swapper {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
+    flex-direction: column; /* [핵심] 가로(row) -> 세로(column) 변경 */
+    justify-content: center;
     background: #f8f9fa;
-    padding: 20px;
+    padding: 30px; /* 상하 배치 시 여백을 조금 더 줌 */
     border-radius: 12px;
     border: 1px solid #e9ecef;
-    margin-bottom: 0; /* 결과 박스와 붙이기 위해 0 */
-    gap: 10px;
+    margin-bottom: 0;
+    gap: 10px; /* 박스와 화살표 사이 간격 */
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
+    box-sizing: border-box;
 }
 
 .currency-box {
-    flex: 1;
+    width: 100%; /* 부모 박스 너비에 꽉 차게 설정 */
+    flex: none;  /* 상하 배치에서는 flex 비율보다는 width 100%가 중요 */
     display: flex;
     flex-direction: column;
     gap: 8px;
 }
 
 .currency-box label {
-    font-size: 13px;
+    font-size: 14px;
     color: #666;
     font-weight: bold;
 }
 
-.input-group {
+/* --- [입력 그룹 스타일 개선] --- */
+
+/* 통합 입력 그룹 (하나의 박스) */
+.input-group-merged {
     display: flex;
-    background: #fff;
-    border: 1px solid #ddd;
+    align-items: center;
+    border: 1px solid #dfe3e8; /* 기본은 연한 회색 */
     border-radius: 8px;
+    background-color: #fff;
+    padding: 0;
     overflow: hidden;
-    padding: 5px;
+    width: 100%;
+    height: 60px; /* 높이를 조금 더 키워 터치/클릭 영역 확보 */
+    transition: all 0.2s ease-in-out; /* 부드러운 전환 효과 */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
 }
 
-.currency-select {
+/* 마우스를 올렸을 때 */
+.input-group-merged:hover {
+    border-color: #2C5DE5; /* 플로뱅크 블루 */
+}
+
+/* 입력창을 클릭(포커스)했을 때 - 가장 중요한 부분 */
+.input-group-merged:focus-within {
+    border-color: #22304E; /* 플로뱅크 네이비 */
+    box-shadow: 0 0 0 3px rgba(44, 93, 229, 0.1); /* 파란색 은은한 번짐 효과 */
+    transform: translateY(-1px); /* 살짝 떠오르는 느낌 */
+}
+
+/* 왼쪽: 국기 + 드롭다운 영역 */
+.select-prefix {
+    display: flex;
+    align-items: center;
+    background-color: #f8f9fa; /* 아주 연한 배경색 */
+    padding: 0 15px; /* 내부 여백 확보 */
+    border-right: 1px solid #eee;
+    position: relative;
+    height: 100%;
+    flex-shrink: 0;
+    transition: background-color 0.2s;
+    cursor: pointer; /* 손가락 모양 커서 */
+}
+
+.input-group-merged:focus-within .select-prefix {
+    background-color: #fff; /* 포커스 시 배경 하얗게 */
+}
+
+/* 국기 이미지 */
+.flag-icon {
+    width: 28px;
+    height: 20px;
+    object-fit: cover;
+    border-radius: 3px;
+    margin-right: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* 국기에도 살짝 그림자 */
+}
+
+/* 드롭다운 (실제 select 태그) */
+.hidden-select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
     border: none;
     background: transparent;
-    font-weight: bold;
-    padding: 10px;
     font-size: 16px;
+    font-weight: 700; /* 굵게 */
+    color: #22304E;   /* 짙은 네이비 텍스트 */
+    padding: 0 24px 0 5px; /* 화살표 공간 넉넉히 확보 */
     cursor: pointer;
     outline: none;
-    min-width: 80px;
+    z-index: 2;
+    height: 100%;
+    line-height: 1.5;
 }
 
-.amount-input {
-    border: none;
-    width: 100%;
+/* 드롭다운 옵션 스타일 (브라우저 제한이 있지만 가능한 부분만 적용) */
+.hidden-select option {
     padding: 10px;
-    font-size: 18px;
-    text-align: right;
-    outline: none;
-}
-
-.amount-input:read-only {
     background-color: #fff;
     color: #333;
-    font-weight: bold;
+    font-weight: 500;
 }
 
+/* 커스텀 화살표 아이콘 */
+.select-arrow {
+    position: absolute;
+    right: 12px;
+    font-size: 12px;
+    color: #666;
+    pointer-events: none;
+    z-index: 1;
+    transition: transform 0.3s ease;
+}
+
+/* 드롭다운 클릭 시 화살표 회전 효과 (focus-within 활용) */
+.input-group-merged:focus-within .select-arrow {
+    transform: rotate(180deg);
+    color: #2C5DE5; /* 활성화 시 파란색으로 변경 */
+}
+
+/* 오른쪽: 금액 입력창 */
+.amount-input-merged {
+    flex-grow: 1;
+    border: none;
+    outline: none;
+    padding: 0 20px;
+    font-size: 22px; /* 금액은 더 크게 */
+    font-weight: 700;
+    text-align: right;
+    width: 50px;
+    color: #22304E; /* 숫자도 네이비 색상 */
+    height: 100%;
+    background: transparent;
+    letter-spacing: -0.5px;
+}
+
+.amount-input-merged::placeholder {
+    color: #cbd0d6;
+    font-weight: 400;
+}
+
+/* 닫혀있는(readonly) 상태의 입력창 스타일 (예: 받으실 때) */
+.amount-input-merged:read-only {
+    color: #22304E;
+    background-color: #fff; /* 회색 대신 흰색 배경 유지하여 깔끔하게 */
+    cursor: default;
+}
+
+/* 중앙 화살표 (오른쪽 화살표 아이콘을 아래로 회전) */
 .arrow-icon {
+    flex-shrink: 0;
     color: #adb5bd;
-    font-size: 20px;
-    padding: 0 10px;
+    font-size: 24px; /* 아이콘 크기 키움 */
+    padding: 5px 0;
+    width: 100%;
+    text-align: center; /* 가운데 정렬 */
+    transform: rotate(90deg); /* [핵심] 오른쪽 화살표를 90도 돌려서 아래로 향하게 함 */
 }
 
 /* --- [환전 결과 및 정보 박스] --- */

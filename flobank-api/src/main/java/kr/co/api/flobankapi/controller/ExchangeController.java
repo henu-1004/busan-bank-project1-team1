@@ -28,6 +28,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -164,17 +166,52 @@ public class ExchangeController {
         return "exchange/step2";
     }
 
-    // [추가] 환전 신청 처리 (DB 저장)
+    // [API] 환전 신청 처리 (최종 DB 저장)
     @ResponseBody
     @PostMapping("/process")
-    public ResponseEntity<?> processExchange(@RequestBody FrgnExchTranDTO transDTO) {
+    public ResponseEntity<?> processExchange(@RequestBody Map<String, Object> reqData) {
         Map<String, Object> response = new HashMap<>();
 
         try {
-            log.info("환전 신청 요청 데이터: {}", transDTO);
+            log.info("환전 신청 요청 데이터: {}", reqData);
 
-            // 서비스 호출하여 DB 저장
-            // exchangeService.processExchange(transDTO);
+            // 1. DTO 객체 생성 및 매핑
+            FrgnExchTranDTO transDTO = new FrgnExchTranDTO();
+
+            // 2. 공통 데이터 세팅
+            transDTO.setExchAcctNo((String) reqData.get("exchAcctNo"));
+            transDTO.setExchAmount(Integer.parseInt(String.valueOf(reqData.get("exchAmount")))); // 숫자 형변환 안전하게
+            transDTO.setExchAppliedRate(Double.parseDouble(String.valueOf(reqData.get("exchAppliedRate"))));
+            transDTO.setExchAddr((String) reqData.get("exchAddr"));
+            transDTO.setExchExpDy((String) reqData.get("exchExpDy"));
+            transDTO.setExchEsignYn((String) reqData.get("exchEsignYn"));
+
+            // 3. 날짜 세팅 (신청일시, 서명일시)
+            String nowStr = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+            transDTO.setExchReqDt(nowStr);
+            if("Y".equals(transDTO.getExchEsignYn())) {
+                transDTO.setExchEsignDt(nowStr);
+            }
+
+            // 4. [중요] 거래 유형(BUY/SELL)에 따른 통화 코드(From/To) 설정 로직
+            // JS에서는 'exchToCurrency'에 무조건 외화 코드를 담아 보냄
+            String exchType = (String) reqData.get("exchType");
+            String foreignCurrency = (String) reqData.get("exchToCurrency");
+
+            if ("BUY".equals(exchType)) {
+                // 살 때: 내 돈(KRW) -> 외화(USD)
+                transDTO.setExchFromCurrency("KRW");
+                transDTO.setExchToCurrency(foreignCurrency);
+            } else {
+                // 팔 때: 내 외화(USD) -> 원화(KRW)
+                transDTO.setExchFromCurrency(foreignCurrency);
+                transDTO.setExchToCurrency("KRW");
+            }
+
+            log.info("DB 저장용 DTO 변환 완료: {}", transDTO);
+
+            // 5. 서비스 호출 (DB 저장)
+            exchangeService.processExchange(transDTO);
 
             response.put("status", "success");
             response.put("message", "환전 신청이 완료되었습니다.");
