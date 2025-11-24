@@ -88,16 +88,20 @@ public class ExchangeController {
 
         try {
             // ✅ RateService를 통해 Redis에 있는 데이터를 뒤져서 환율을 가져옴
-            double rate = rateService.getCurrencyRate(currency);
+            Map<String, Double> rateData = rateService.getCurrencyRate(currency);
 
-            if (rate == 0.0) {
+            if (rateData == null) {
                 response.put("status", "error");
                 response.put("message", "현재 환율 정보를 불러올 수 없습니다. (휴일이거나 데이터 없음)");
                 // 실제 서비스에선 '최근 영업일' 데이터를 가져오는 로직을 Service에 추가해야 함
             } else {
                 response.put("status", "success");
-                response.put("rate", rate);
                 response.put("currency", currency);
+
+                // Service에서 가져온 데이터를 응답에 담음
+                response.put("rate", rateData.get("rate")); // 매매기준율
+                response.put("tts", rateData.get("tts"));   // 전신환매도율 (보내실 때)
+                response.put("ttb", rateData.get("ttb"));   // 전신환매입율 (받으실 때) 추가
             }
 
             return ResponseEntity.ok(response);
@@ -180,8 +184,11 @@ public class ExchangeController {
 
             // 2. 공통 데이터 세팅
             transDTO.setExchAcctNo((String) reqData.get("exchAcctNo"));
-            transDTO.setExchAmount(Integer.parseInt(String.valueOf(reqData.get("exchAmount")))); // 숫자 형변환 안전하게
-            transDTO.setExchAppliedRate(Double.parseDouble(String.valueOf(reqData.get("exchAppliedRate"))));
+            transDTO.setExchAmount(new BigDecimal(String.valueOf(reqData.get("exchAmount"))));
+            transDTO.setExchAppliedRate(new BigDecimal(String.valueOf(reqData.get("exchAppliedRate"))));
+            if (reqData.get("exchFee") != null) {
+                transDTO.setExchFee(new BigDecimal(String.valueOf(reqData.get("exchFee"))));
+            }
             transDTO.setExchAddr((String) reqData.get("exchAddr"));
             transDTO.setExchExpDy((String) reqData.get("exchExpDy"));
             transDTO.setExchEsignYn((String) reqData.get("exchEsignYn"));

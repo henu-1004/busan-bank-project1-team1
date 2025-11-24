@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -12,12 +14,12 @@ public class FrgnExchTranDTO {
     private String exchAcctNo;
     private String exchFromCurrency;
     private String exchToCurrency;
-    private Integer exchAmount;
-    private double exchAppliedRate;
+    private BigDecimal exchAmount;
+    private BigDecimal exchAppliedRate;
     private String exchReqDt;
     private String exchExpDy;
     private String exchAddr;
-    private double exchFee;
+    private BigDecimal exchFee;
     private String exchEsignYn;
     private String exchEsignDt;
 }

@@ -16,6 +16,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -63,7 +65,7 @@ public class RateService {
     }
 
     // 특정 통화의 환율만 추출
-    public double getCurrencyRate(String currency) {
+    public Map<String, Double> getCurrencyRate(String currency) {
         // 1. 조회 시작 날짜 계산 (토/일/월 오전 -> 금요일 등)
         LocalDate targetDate = getTargetDate();
         String formattedDate = targetDate.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
@@ -84,23 +86,40 @@ public class RateService {
             formattedDate = targetDate.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
         }
 
-        // 5일간 뒤져도 없으면 0.0 반환
+        // 5일간 뒤져도 없으면 null 반환
         if (jsonResponse == null || jsonResponse.isEmpty() || jsonResponse.equals("[]")) {
-            return 0.0;
+            return null;
         }
 
-        // 3. JSON 파싱 (기존 로직과 동일)
+        // 3. JSON 파싱
         try {
             JsonNode root = objectMapper.readTree(jsonResponse);
             if (root.isArray()) {
                 for (JsonNode node : root) {
                     String curUnit = node.path("cur_unit").asText();
+
+                    // JPY(100), IDR(100) 등 괄호 처리 포함
                     if (curUnit.equals(currency) || curUnit.startsWith(currency + "(")) {
+
+                        // (1) 매매기준율 (deal_bas_r) 파싱
                         String dealBasR = node.path("kftc_deal_bas_r").asText().replace(",", "");
-                        if(dealBasR.isEmpty() || dealBasR.equals("0")) {
+                        if (dealBasR.isEmpty() || dealBasR.equals("0")) {
                             dealBasR = node.path("deal_bas_r").asText().replace(",", "");
                         }
-                        return Double.parseDouble(dealBasR);
+
+                        // (2) 전신환매도율 (tts) 파싱 (보내실 때 환율 - 고객 매수)
+                        String tts = node.path("tts").asText().replace(",", "");
+
+                        // (3) 전신환매입율 (ttb) 파싱 (받으실 때 환율 - 고객 매도)
+                        String ttb = node.path("ttb").asText().replace(",", "");
+
+                        // Map에 담아서 반환
+                        Map<String, Double> result = new HashMap<>();
+                        result.put("rate", dealBasR.isEmpty() ? 0.0 : Double.parseDouble(dealBasR));
+                        result.put("tts", tts.isEmpty() ? 0.0 : Double.parseDouble(tts));
+                        result.put("ttb", ttb.isEmpty() ? 0.0 : Double.parseDouble(ttb)); // ✅ TTB 추가
+
+                        return result;
                     }
                 }
             }
@@ -108,7 +127,7 @@ public class RateService {
             log.error("JSON 파싱 에러", e);
         }
 
-        return 0.0;
+        return null;
     }
 
     // 영업일 기준 날짜 계산 로직

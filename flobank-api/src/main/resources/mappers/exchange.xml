@@ -9,4 +9,21 @@
         WHERE COUP_CUST_CODE = #{custCode}
         AND COUP_STATUS = 1
     </select>
+
+    <insert id="insertExchange" parameterType="kr.co.api.flobankapi.dto.FrgnExchTranDTO">
+        INSERT INTO TB_FRGN_EXCH_TRAN(
+            EXCH_ACCT_NO, EXCH_FROM_CURRENCY,
+            EXCH_TO_CURRENCY, EXCH_AMOUNT,
+            EXCH_APPLIED_RATE, EXCH_REQ_DT,
+            EXCH_EXP_DY, EXCH_ADDR,
+            EXCH_FEE, EXCH_ESIGN_YN, EXCH_ESIGN_DT
+        )
+        VALUES(
+            #{exchAcctNo}, #{exchFromCurrency},
+            #{exchToCurrency}, #{exchAmount},
+            #{exchAppliedRate}, #{exchReqDt},
+            #{exchExpDy}, #{exchAddr},
+            #{exchFee}, #{exchEsignYn}, #{exchEsignDt}
+        )
+    </insert>
 </mapper>

@@ -3,6 +3,7 @@ package kr.co.api.flobankapi.mapper;
 import kr.co.api.flobankapi.dto.*;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 

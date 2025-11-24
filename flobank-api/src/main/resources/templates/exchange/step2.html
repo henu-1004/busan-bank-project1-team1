@@ -8,7 +8,6 @@
     <link rel="stylesheet" th:href="@{/css/header.css}">
     <link rel="stylesheet" th:href="@{/css/footer.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" />
-
 </head>
 <body>
 <div th:replace="~{_template/_header.html}"></div>
@@ -95,14 +94,10 @@
                     </tr>
                     <tr>
                         <th>
-                            적용 환율 (우대 <span id="spreadRateDisplay">0</span>%)
+                            최종 적용 환율
                             <button type="button" id="couponBtn" class="coupon-btn" style="margin-left:5px; padding:2px 8px; font-size:11px;">쿠폰선택</button>
                         </th>
                         <td id="result-rate" style="font-weight:bold; color:#333;">-</td>
-                    </tr>
-                    <tr>
-                        <th>수수료 (할인적용)</th>
-                        <td id="result-fee">-</td>
                     </tr>
                     <tr style="border-top: 1px dashed #ccc;">
                         <th>최종 예상 금액</th> <td id="result-final" style="color:#00907f; font-size:1.2em; font-weight:bold;">0</td>
@@ -160,7 +155,6 @@
                     <label class="step2-label">수령희망지점</label>
                     <select id="receiveBranch" class="step2-select">
                         <option value="">지점을 선택해주세요</option>
-
                         <optgroup label="✈️ 공항/항만 환전소 (365일 운영)">
                             <option value="ICN_T1">인천국제공항 제1여객터미널 환전소</option>
                             <option value="ICN_T2">인천국제공항 제2여객터미널 환전소</option>
@@ -168,7 +162,6 @@
                             <option value="PUS_INT">김해국제공항(부산) 국제선청사</option>
                             <option value="BUSAN_PORT">부산항 국제여객터미널</option>
                         </optgroup>
-
                         <optgroup label="🏢 서울 주요 영업점">
                             <option value="HQ_YEOUIDO">플로뱅크 여의도 본점</option>
                             <option value="SEOUL_ST">서울역 환전센터 (KTX 2층)</option>
@@ -178,7 +171,6 @@
                             <option value="SEOUL_HONGDAE">홍대입구역지점</option>
                             <option value="SEOUL_JAMSIL">잠실 롯데월드타워지점</option>
                         </optgroup>
-
                         <optgroup label="🌊 부산/경남 주요 영업점">
                             <option value="BUSAN_MAIN">플로뱅크 부산금융센터 (문현동)</option>
                             <option value="BUSAN_SEOMYEON">서면 1번가지점</option>
@@ -186,7 +178,6 @@
                             <option value="BUSAN_NAMPODONG">남포동지점</option>
                             <option value="ULSAN_MAIN">울산 삼산동지점</option>
                         </optgroup>
-
                         <optgroup label="🌐 기타 지역 거점">
                             <option value="GYEONGGI_PANGYO">판교 테크노밸리지점</option>
                             <option value="INCHEON_SONGDO">인천 송도국제도시지점</option>
