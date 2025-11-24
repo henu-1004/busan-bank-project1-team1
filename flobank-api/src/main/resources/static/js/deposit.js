@@ -80,7 +80,6 @@ function fetchRateData(baseDate) {
 
 document.addEventListener("DOMContentLoaded", () => {
 
-
     const tabs = document.querySelectorAll('.view-tab');
     const contents = document.querySelectorAll('.view-content');
 
@@ -243,6 +242,33 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     }
+
+
+    const joinBtn = document.querySelector(".view-btn-primary"); // 가입하기 버튼
+    const listJoinBtn = document.querySelector(".list-join-btn"); // 가입하기 버튼
+    const today = new Date();
+    const day = today.getDay();
+
+    if (joinBtn) {
+        joinBtn.addEventListener("click", (e) => {
+            // 0:일, 6:토
+            if (day === 0 || day === 6) {
+                e.preventDefault(); // 이동 막기
+                alert("주말(비영업일)에는 예금 신규 가입이 불가능합니다.\n평일에 다시 시도해 주세요.");
+            }
+        });
+    }
+
+    if (listJoinBtn) {
+        listJoinBtn.addEventListener("click", (e) => {
+            if (day === 0 || day === 6) {
+                e.preventDefault(); // 이동 막기
+                alert("주말(비영업일)에는 예금 신규 가입이 불가능합니다.\n평일에 다시 시도해 주세요.");
+            }
+        });
+    }
+
+
 });
 
 
