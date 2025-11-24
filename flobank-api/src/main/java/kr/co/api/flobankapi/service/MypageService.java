@@ -1,6 +1,7 @@
 package kr.co.api.flobankapi.service;
 
 import kr.co.api.flobankapi.dto.*;
+import kr.co.api.flobankapi.mapper.DepositMapper;
 import kr.co.api.flobankapi.mapper.ExtAcctMapper;
 import kr.co.api.flobankapi.mapper.MemberMapper;
 import kr.co.api.flobankapi.mapper.MypageMapper;
@@ -282,6 +283,10 @@ public class MypageService {
         return mypageMapper.selectCouponList(custCode);
     }
 
+
+    public List<MypageDpstDTO> getDpstAcctHdrList(String dpstHdrCustCode) {
+        return mypageMapper.selectDpstAccts(dpstHdrCustCode);
+    }
 }
 
 

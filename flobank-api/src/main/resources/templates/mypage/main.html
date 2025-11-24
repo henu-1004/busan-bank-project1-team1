@@ -199,18 +199,39 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr>
-                    <td><a href="#" class="deposit-name" data-id="1">플로달러예금</a></td>
-                    <td>112-2188-1931-00</td>
-                    <td>$3,200</td>
-                    <td>2029.10.03 (D-159)</td>
+                <tr th:each="hdr : ${dpstList}">
+                    <td><a href="#" class="deposit-name"
+                           th:data-id="${hdr.dpstHdrAcctNo}"
+                           th:data-name="${hdr.dpstName}"
+                           th:data-type="${hdr.dpstType}"
+                           th:data-balance="${hdr.dpstHdrBalance}"
+                           th:data-start="${hdr.dpstHdrStartDy}"
+                           th:data-end="${hdr.dpstHdrFinDy}"
+                           th:data-expcurrency="${hdr.dpstHdrCurrencyExp}"
+                           th:data-currency="${hdr.dpstHdrCurrency}"
+                           th:data-rate="${hdr.dpstHdrRate}"
+                           th:data-autorenew="${hdr.dpstHdrAutoRenewYn}"
+                           th:data-autorenewterm="${hdr.dpstHdrAutoRenewTerm}"
+                           th:data-wdrwyn="${hdr.dpstPartWdrwYn}"
+                           th:data-wdrwcnt="${hdr.dpstHdrPartWdrwCnt}"
+                           th:data-wdrwmax="${hdr.wdrwMax}"
+                           th:data-month="${hdr.dpstHdrMonth}">
+                    [[${hdr.dpstName}]]</a></td>
+                    <td>[[${hdr.dpstHdrAcctNo}]]</td>
+                    <td><span th:switch="${hdr.dpstHdrCurrencyExp}">
+                        <span th:case="'USD'">$</span>
+                        <span th:case="'KRW'">₩</span>
+                        <span th:case="'AUD'">$</span>
+                        <span th:case="'CNH'">¥</span>  <!-- 위안화 - CNH 사용 시 -->
+                        <span th:case="'CNY'">¥</span>  <!-- 참고: CNY 코드 쓰는 경우도 대비 가능 -->
+                        <span th:case="'GBP'">£</span>
+                        <span th:case="'EUR'">€</span>
+                        <span th:case="'JPY'">¥</span>
+                        <span th:case="*">?</span> <!-- 혹시 모르는 경우 -->
+                    </span>[[${hdr.dpstHdrBalance}]]</td>
+                    <td th:text="|${hdr.dpstHdrFinDy.substring(0,4)}.${hdr.dpstHdrFinDy.substring(4,6)}.${hdr.dpstHdrFinDy.substring(6,8)}|">2029.10.03 (D-159)</td>
                 </tr>
-                <tr>
-                    <td><a href="#" class="deposit-name" data-id="2">글로벌유로예금</a></td>
-                    <td>112-5566-1823-00</td>
-                    <td>€1,800</td>
-                    <td>2027.06.22 (D-98)</td>
-                </tr>
+
                 </tbody>
             </table>
         </div>

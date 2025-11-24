@@ -161,4 +161,20 @@
         ORDER BY COUP_STATUS DESC, COUP_ISSUED_DY DESC
     </select>
 
+    <select id="selectDpstAccts" resultType="kr.co.api.flobankapi.dto.MypageDpstDTO">
+        SELECT
+        * FROM TB_DPST_ACCT_HDR th
+        JOIN TB_DPST_PROD_INFO ti ON th.DPST_HDR_DPST_ID = ti.DPST_ID
+        LEFT JOIN TB_DPST_PARTIAL_WDRW_INFO wi ON th.DPST_HDR_DPST_ID = wi.WDRW_DPST_ID
+        LEFT JOIN TB_DPST_PARTIAL_WDRW_AMT wa
+        ON wa.AMT_DPST_ID = th.DPST_HDR_DPST_ID
+        AND wa.AMT_CURRENCY = th.DPST_HDR_CURRENCY
+        WHERE dpst_hdr_cust_code=#{dpstHdrCustCode}
+    </select>
+
+    <select id="selectDpstAcctDtls" resultType="kr.co.api.flobankapi.dto.DpstAcctDtlDTO">
+        select * from TB_DPST_ACCT_DTL
+        where dpst_dtl_hdr_no=#{dpstDtlHdrNo}
+    </select>
+
 </mapper>
