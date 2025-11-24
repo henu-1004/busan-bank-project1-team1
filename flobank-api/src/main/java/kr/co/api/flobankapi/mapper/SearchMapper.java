@@ -15,6 +15,11 @@ public interface SearchMapper {
     // 2. 내 검색 기록 저장(로그인한 이용자만)
     void insertSearchLog(@Param("keyword") String keyword, @Param("custCode") String custCode);
 
+
+    // + 중복 검색어 삭제
+    void deleteDuplicateSearchLog(@Param("keyword") String keyword, @Param("custCode") String custCode);
+
+
     // 3. 인기 검색어 조회
     List<SearchLogDTO> selectPopularKeywords();
 

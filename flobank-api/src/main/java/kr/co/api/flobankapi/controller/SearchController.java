@@ -75,13 +75,13 @@ public class SearchController {
     public void deleteSearchKeyword(@RequestParam(name = "keyword") String keyword) {
         String custCode = getCurrentUserId();
 
-        System.out.println("🗑️ [Delete Request] 삭제 요청 옴! 키워드: [" + keyword + "], 사용자: [" + custCode + "]");
+
 
         if (custCode != null) {
             searchService.deleteSearchKeyword(keyword, custCode);
-            System.out.println("✅ [Delete Request] Service 호출 완료");
+
         } else {
-            System.out.println("⚠️ [Delete Request] 비로그인 상태라 삭제 불가");
+
         }
     }
 }

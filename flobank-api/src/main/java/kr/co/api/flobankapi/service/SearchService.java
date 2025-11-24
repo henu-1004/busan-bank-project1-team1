@@ -40,23 +40,17 @@ public class SearchService {
     public void saveSearchKeyword(String keyword, String custCode) {
         if (keyword == null || keyword.trim().isEmpty()) return;
 
-        try {
-            // 1. 인기 검색어용 토큰 저장
-            searchMapper.insertSearchToken(keyword.trim());
-//            System.out.println(" [SearchService] 인기 검색어 토큰 저장 완료: " + keyword);
+        // 1. 인기 검색어 저장
+        searchMapper.insertSearchToken(keyword.trim());
 
-            // 2. 내 검색 기록 저장 (조건 확인 로그)
-            if (custCode != null && !custCode.equals("ANONYMOUS") && !custCode.equals("null")) {
-//                System.out.println("[SearchService] 개인 기록 저장 시도 -> ID: " + custCode);
-                searchMapper.insertSearchLog(keyword.trim(), custCode);
-//                System.out.println("[SearchService] 개인 기록 저장 성공!");
-            } else {
-//                System.out.println(" [SearchService] 비로그인 상태이므로 개인 기록 저장 안 함. (ID: " + custCode + ")");
-            }
-        } catch (Exception e) {
-            //  에러 발생 시 콘솔에 빨갛게 출력
-//            System.err.println(" [SearchService] 검색어 저장 중 에러 발생!");
-            e.printStackTrace();
+        // 2. 로그인 사용자만 최근 검색어 저장
+        if (custCode != null && !custCode.equals("ANONYMOUS") && !custCode.equals("null")) {
+
+            // 기존 검색어 삭제 (중복 방지)
+            searchMapper.deleteDuplicateSearchLog(keyword.trim(), custCode);
+
+            // 최신 검색어로 INSERT (한 줄만 유지)
+            searchMapper.insertSearchLog(keyword.trim(), custCode);
         }
     }
 
@@ -276,7 +270,9 @@ public class SearchService {
 
     // 검색어 삭제 기능
     public void deleteSearchKeyword(String keyword, String custCode) {
-        searchMapper.deleteSearchLog(keyword, custCode);
-    }
+        if (keyword == null || keyword.trim().isEmpty()) return;
+        if (custCode == null) return;
 
+        searchMapper.deleteSearchLog(keyword.trim(), custCode);
+    }
 }

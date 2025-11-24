@@ -36,5 +36,13 @@
         DELETE FROM TB_SEARCH_LOG WHERE SEARCH_TXT = #{keyword} AND SEARCH_CUST_CODE = #{custCode}
     </delete>
 
+    <delete id="deleteDuplicateSearchLog">
+        DELETE FROM TB_SEARCH_LOG
+        WHERE SEARCH_CUST_CODE = #{custCode}
+          AND SEARCH_TXT = #{keyword}
+    </delete>
+
+
+
 
 </mapper>
