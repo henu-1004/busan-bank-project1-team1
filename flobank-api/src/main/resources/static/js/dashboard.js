@@ -246,13 +246,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 animation: true,
                 plugins: {
                     legend: {
-                        display: true,
+                        display: false,
                         position: 'top'
                     },
-                    title: {
-                        display: true,
-                        text: '오늘 환전·외화송금 거래 건수'
-                    }
                 },
                 scales: {
                     y: {
@@ -269,6 +265,11 @@ document.addEventListener('DOMContentLoaded', function () {
         console.warn('todayFxTxCounts 데이터가 비어 있습니다.');
     }
 
+    //----------------------------------------------------------------
+    //----------------------------------------------------------------
+    //----------------------------------------------------------------
+
+
     (function () {
         const dataObj = window.dashboardData || {};
 
@@ -277,14 +278,24 @@ document.addEventListener('DOMContentLoaded', function () {
         if (dailyJoinChartEl) {
             const array = Array.isArray(dataObj.dailyJoinStats) ? dataObj.dailyJoinStats : [];
 
-            const labels = array.map(item =>
-                item && item.baseDate ? item.baseDate : ''
-            );
+            const labels = array.map(item => {
+                if (!item || !item.baseDate) return '';
+                const raw = String(item.baseDate).replace(/"/g, '');
+                if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
+                    return raw.slice(5).replace('-','/');   // '11-24'
+                    // 만약 '11/24' 로 보이고 싶으면: return raw.slice(5).replace('-', '/');
+                }
+
+                // 3) YYYY-MM 형식이면 'MM'만
+                if (/^\d{4}-\d{2}$/.test(raw)) {
+                    return raw.slice(5);   // '11'
+                }
+                return raw;
+            });
             const data = array.map(item =>
                 item && typeof item.joinCount === 'number' ? item.joinCount : 0
             );
 
-            // 🔹 최대값 계산 (축 최대값용)
             const maxVal = data.length > 0 ? Math.max(...data) : 0;
 
             window.joindailyChartInstance = new Chart(dailyJoinChartEl.getContext('2d'), {
@@ -303,7 +314,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 },
                 options: {
                     scales: {
+                        x:{
+                            grid:{
+                                display: false
+                            }
+                        },
                         y: {
+                            display: true,
                             beginAtZero: true,
                             ticks: {
                                 stepSize: 1,
@@ -314,7 +331,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     },
                     plugins: {
                         legend: {
-                            display: true
+                            display: false
                         }
                     },
                     responsive: true,
@@ -324,7 +341,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         const weeklyJoinChartEl = document.getElementById('joinWeeklyChart');
         if (weeklyJoinChartEl) {
-            // 🔴 오타 수정: weelyJoinStats → weeklyJoinStats
             const weeklyArray = Array.isArray(dataObj.weeklyJoinStats) ? dataObj.weeklyJoinStats : [];
 
             const labels = weeklyArray.map(item =>
@@ -352,7 +368,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 },
                 options: {
                     scales: {
+                        x:{
+                            grid:{
+                                display: false
+                            }
+                        },
                         y: {
+                            display: true,
                             beginAtZero: true,
                             ticks: {
                                 stepSize: 1,
@@ -363,7 +385,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     },
                     plugins: {
                         legend: {
-                            display: true
+                            display: false
                         }
                     },
                     responsive: true,
@@ -375,9 +397,15 @@ document.addEventListener('DOMContentLoaded', function () {
         if (monthlyJoinChartEl) {
             const monthlyArray = Array.isArray(dataObj.monthlyJoinStats) ? dataObj.monthlyJoinStats : [];
 
-            const labels = monthlyArray.map(item =>
-                item && item.baseDate ? item.baseDate : ''
-            );
+            const labels = monthlyArray.map(item => {
+                if (!item || !item.baseDate) return '';
+
+                const raw = String(item.baseDate).replace(/"/g, '');
+                if (/^\d{4}-\d{2}$/.test(raw)) {
+                    return raw.substring(2).replace('-', '/');
+                }
+                return raw;
+            });
             const data = monthlyArray.map(item =>
                 item && typeof item.joinCount === 'number' ? item.joinCount : 0
             );
@@ -400,6 +428,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 },
                 options: {
                     scales: {
+                        x:{
+                            grid:{
+                                display: false
+                            }
+                        },
                         y: {
                             beginAtZero: true,
                             ticks: {
@@ -411,7 +444,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     },
                     plugins: {
                         legend: {
-                            display: true
+                            display: false
                         }
                     },
                     responsive: true,
@@ -419,8 +452,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             });
         }
-
-        // dataObj.weeklyJoinStats / monthlyJoinStats 사용해서 생성하면 끝
     })();
 
 

@@ -18,7 +18,7 @@ public interface DashboardMapper {
     int selectTodayExChangeTxCount();   //ㅎㅈ
 
 
-    // 가입자 통계
+    // 가입수 통계
     List<JoinStatsDTO> selectDailyJoinStats();
     List<JoinStatsDTO> selectWeeklyJoinStats();
     List<JoinStatsDTO> selectMonthlyJoinStats();
