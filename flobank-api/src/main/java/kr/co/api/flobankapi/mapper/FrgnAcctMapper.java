@@ -2,6 +2,7 @@ package kr.co.api.flobankapi.mapper;
 
 
 import kr.co.api.flobankapi.dto.CustFrgnAcctDTO;
+import kr.co.api.flobankapi.dto.CustTranHistDTO;
 import kr.co.api.flobankapi.dto.FrgnAcctBalanceDTO;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -21,5 +22,8 @@ public interface FrgnAcctMapper {
 
     // 외화 자식 계좌 출금
     void updateFrgnAcctBal(BigDecimal amount, String acctNo, String currency);
+
+    // 거래 내역
+    void insertTranHist(CustTranHistDTO custTranHistDTO);
 
 }

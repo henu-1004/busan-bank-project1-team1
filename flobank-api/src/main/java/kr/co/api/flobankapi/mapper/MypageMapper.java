@@ -38,7 +38,6 @@ public interface MypageMapper {
 
     // 입금
     void updatePlusAcct(BigDecimal amount, String acctNo);
-    void updatePlusAcctBig(BigDecimal amount, String acctNo);
 
     // 출금
     void updateMinusAcct(BigDecimal amount, String acctNo);
