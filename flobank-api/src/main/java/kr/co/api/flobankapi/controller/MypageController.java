@@ -1,5 +1,6 @@
 package kr.co.api.flobankapi.controller;
 
+import jakarta.servlet.http.HttpSession;
 import kr.co.api.flobankapi.dto.*;
 
 import kr.co.api.flobankapi.dto.SearchResDTO;
@@ -416,25 +417,39 @@ public class MypageController {
     }
 
     @PostMapping("/ko_transfer_3")
-    public String ko_transfer_3(@AuthenticationPrincipal CustomUserDetails userDetails, @ModelAttribute CustTranHistDTO custTranHistDTO, Model model) {
+    public String ko_transfer_3(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                @ModelAttribute CustTranHistDTO custTranHistDTO,
+                                Model model,
+                                HttpSession session) {
         // 전자서명 임시 승인 수정해야함
-        custTranHistDTO.setTranEsignYn("Y");
-        CustAcctDTO custAcctDTO = new CustAcctDTO();
 
-        if(custTranHistDTO.getTranEsignYn().equals("Y")) {
-            // 이체 내역 db에 반영
+        // 3. [검증 로직 추가] 세션에서 인증 완료 여부 확인 (CertController에서 저장한 값)
+        // CertController 로직에 따라 "CERT_STATUS" 또는 "IS_AUTH_COMPLETE" 키 사용
+        String certStatus = (String) session.getAttribute("CERT_STATUS"); // 예: "COMPLETE"
+        boolean isVerified = "COMPLETE".equals(certStatus);
+
+        if (isVerified) {
+            // 인증 성공 시에만 Y로 설정하고 진행
+            custTranHistDTO.setTranEsignYn("Y");
+
+            // 이체 실행 (Service 호출)
             mypageService.processCustAcctBal(custTranHistDTO);
-            model.addAttribute("custTranHistDTO", custTranHistDTO);
 
-            // 출력 위해 다시 계좌 정보 가져오기
-            custAcctDTO = mypageService.findCustAcct(custTranHistDTO.getTranAcctNo());
+            // 인증 정보 1회용이므로 삭제 (선택사항)
+            session.removeAttribute("CERT_STATUS");
+
+            model.addAttribute("custTranHistDTO", custTranHistDTO);
+            CustAcctDTO custAcctDTO = mypageService.findCustAcct(custTranHistDTO.getTranAcctNo());
             model.addAttribute("custAcctDTO", custAcctDTO);
             model.addAttribute("state", "정상");
         }else {
+            // 인증 실패 또는 건너뛰기 시도 시
+            custTranHistDTO.setTranEsignYn("N");
+
             model.addAttribute("custTranHistDTO", custTranHistDTO);
-            custAcctDTO = mypageService.findCustAcct(custTranHistDTO.getTranAcctNo());
+            CustAcctDTO custAcctDTO = mypageService.findCustAcct(custTranHistDTO.getTranAcctNo());
             model.addAttribute("custAcctDTO", custAcctDTO);
-            model.addAttribute("state", "실패");
+            model.addAttribute("state", "실패 (전자서명 미완료)");
         }
 
         return  "mypage/ko_transfer_3";

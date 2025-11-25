@@ -141,6 +141,7 @@ public class MypageService {
             tranHist.setTranRecName(custTranHistDTO.getTranCustName());
             tranHist.setTranRecBkCode("888");
             tranHist.setTranCurrency("KRW");
+            tranHist.setTranEsignYn(custTranHistDTO.getTranEsignYn());
             tranHist.setTranCustName(custTranHistDTO.getTranRecName());
 
             mypageMapper.insertTranHist(tranHist);

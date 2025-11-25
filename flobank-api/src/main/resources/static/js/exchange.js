@@ -65,7 +65,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let currentMode = 'BUY';
 
     // 1. 우리 플로은행의 기본 환율 수수료는 0.95 (95%)
-    const FLO_BASIC_FEE = 0.95;
+    const BASE_FEE_RATE  = 0.95;
 
     // 통화별 기본 우대율 설정
     // 이미지에 있는 통화별 우대율을 매핑 (달러 70%, 엔/유로 50%, 그외 30%)
@@ -384,51 +384,41 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // =========================================
-    // 5. 환전 신청 (서버 전송)
+    // 5. 환전 신청 버튼 클릭 이벤트
     // =========================================
     const nextBtnStep2 = document.querySelector(".step2-btn-next");
 
     if (nextBtnStep2) {
         nextBtnStep2.addEventListener("click", () => {
+            // 1. 기초 유효성 검사
             if (!fromAmount.value || fromAmount.value <= 0) { alert("금액을 입력해주세요."); return; }
             if (!pwInput.value) { alert("비밀번호를 입력해주세요."); return; }
 
             let selectedAccount = (currentMode === 'BUY') ? accountWon.value : accountForeign.value;
             if (!selectedAccount) { alert("출금 계좌를 선택해주세요."); return; }
 
-            const inputAmt = parseFloat(fromAmount.value); // 사용자가 입력한 금액
+            const inputAmt = parseFloat(fromAmount.value);
             let currentBalance = 0;
 
-            // -------------------------------------------------------------
-            // 잔액 비교 로직 시작
-            // -------------------------------------------------------------
+            // 2. 잔액 확인 로직 (먼저 수행)
             if (currentMode === 'BUY') {
-                // [원화 출금] HTML에 심어둔 data-balance 값 가져오기
                 const selectedOption = accountWon.options[accountWon.selectedIndex];
                 if (selectedOption) {
                     currentBalance = parseFloat(selectedOption.getAttribute('data-balance')) || 0;
                 }
             } else {
-                // [외화 출금] 전역 변수 frgnBalanceMap에서 잔액 조회
-                // SELL 모드일 때 fromCurrency는 외화 코드(USD 등)입니다.
                 const currencyCode = fromCurrency.value;
                 currentBalance = frgnBalanceMap[currencyCode] || 0;
             }
 
-            // 잔액 비교 (입력 금액이 잔액보다 크면 차단)
             if (inputAmt > currentBalance) {
-                // 통화 단위 포맷팅 (보기 좋게)
                 const formattedBalance = currentBalance.toLocaleString(undefined, { maximumFractionDigits: 2 });
                 const unit = (currentMode === 'BUY') ? '원' : fromCurrency.value;
-
                 alert(`출금 계좌의 잔액이 부족합니다.\n(현재 잔액: ${formattedBalance} ${unit})`);
-                return; // 다음 단계 진행 중단
+                return;
             }
-            // -------------------------------------------------------------
-            // 잔액 비교 로직 끝
-            // -------------------------------------------------------------
 
-            // 수령일 필수 선택 체크 (BUY 모드일 때만)
+            // 3. 수령일 확인 (BUY 모드일 때만)
             if (currentMode === 'BUY' && !receiveDateInput.value) {
                 alert("수령 희망일을 선택해주세요.");
                 return;
@@ -437,9 +427,10 @@ document.addEventListener("DOMContentLoaded", () => {
             const requestData = {
                 acctNo: selectedAccount,
                 acctPw: pwInput.value.trim(),
-                mode: currentMode // BUY 또는 SELL 정보 전송
+                mode: currentMode
             };
 
+            // 4. 계좌 비밀번호 확인 (서버 통신)
             fetch('/flobank/exchange/passcheck', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -448,7 +439,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 .then(res => res.json())
                 .then(data => {
                     if (data.status === 'success') {
-                        submitExchangeRequest(selectedAccount);
+                        // ★★★ [핵심 수정] ★★★
+                        // 비밀번호가 일치할 때만 -> 전자서명(CertManager) 실행
+                        CertManager.request(
+                            "해외송금/환전",
+                            fromAmount.value,
+                            function() {
+                                // 전자서명(팝업)이 완료된 후에만 -> 최종 환전 요청 실행
+                                submitExchangeRequest(selectedAccount);
+                            }
+                        );
                     } else {
                         alert(data.message || "비밀번호가 일치하지 않습니다.");
                         pwInput.value = "";
