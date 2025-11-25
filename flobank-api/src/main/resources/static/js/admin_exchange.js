@@ -17,6 +17,20 @@
     ----------------------------------------------------------------------- */
     const palette = ['#5c80c8', '#74b49b', '#f4a261', '#8e83c4', '#ff6b6b', '#2d6a4f', '#4d908e'];
 
+
+    // 파스텔 팔레트 추가
+    const pastelPalette = [
+        'rgba(111, 185, 255, 0.7)', // 진한 하늘블루
+        'rgba(140, 160, 255, 0.7)', // 라벤더-블루
+        'rgba(255, 160, 160, 0.7)', // 소프트 레드 (선명)
+        'rgba(255, 195, 125, 0.7)', // 오렌지-베이지 (따뜻함)
+        'rgba(135, 200, 255, 0.7)', // 아쿠아-블루 (선명)
+        'rgba(135, 225, 180, 0.7)', // 민트-그린 (쿨톤)
+        'rgba(180, 190, 255, 0.7)'  // 라일락-블루
+    ];
+
+
+
     // ✔ 표시할 모든 통화 7개
     const defaultCurrencies = ['USD', 'EUR', 'JPY', 'GBP', 'CNH', 'AUD', 'KRW'];
 
@@ -98,12 +112,12 @@
         const dates = [];
 
         (stats.currencyDailyAmounts || []).forEach(item => {
-            const normalized = normalizeDate(item.date);
+            const normalized = normalizeDate(item.baseDate);
             if (normalized) dates.push(normalized);
         });
 
         (stats.dailyTotals || []).forEach(item => {
-            const normalized = normalizeDate(item.date);
+            const normalized = normalizeDate(item.baseDate);
             if (normalized) dates.push(normalized);
         });
 
@@ -214,7 +228,7 @@
             : [];
 
         const targetDate = ensureSelectedDate();
-        const filteredByDate = currencyData.filter(item => normalizeDate(item.date) === targetDate);
+        const filteredByDate = currencyData.filter(item => normalizeDate(item.baseDate) === targetDate);
 
 
         const currencies = [...defaultCurrencies];
@@ -228,7 +242,7 @@
         const labels = activeCurrencies;
         const values = activeCurrencies.map((code) => {
             const found = filteredByDate.find(item => cleanCurrency(item.currency) === code);
-            return found ? Number(found.amount) : 0;
+            return found ? Number(found.amountKrw) : 0;
 
 
         });
@@ -236,7 +250,7 @@
         const datasets = [{
             label: "",
             data: values,
-            backgroundColor: activeCurrencies.map((_, idx) => palette[idx % palette.length]),
+            backgroundColor: activeCurrencies.map((_, idx) => pastelPalette[idx % pastelPalette.length]),
             borderRadius: 6,
             maxBarThickness: 44
         }];
@@ -301,20 +315,27 @@
         const canvas = document.getElementById('dailyTotalChart');
         if (!canvas || typeof Chart === 'undefined') return;
 
-        const totalData = Array.isArray(latestStats.dailyTotals)
+        // 최근 7일만 추출
+        let totalData = Array.isArray(latestStats.dailyTotals)
             ? latestStats.dailyTotals
             : [];
 
-        const labels = totalData.map(item => formatDateLabel(item.date));
-        const values = totalData.map(item => Number(item.amount));
+        if (totalData.length > 0) {
+            totalData.sort((a, b) => new Date(a.baseDate) - new Date(b.baseDate));
+            totalData = totalData.slice(-7);
+        }
+
+        const labels = totalData.map(item => formatDateLabel(item.baseDate));
+        const values = totalData.map(item => Number(item.amountKrw));
 
         const chartData = {
             labels,
             datasets: [{
                 data: values,
-                backgroundColor: '#202b44',
+                backgroundColor: 'rgba(79, 141, 231, 0.6)',
                 borderRadius: 6,
                 maxBarThickness: 40
+
             }]
         };
 
@@ -325,12 +346,13 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    layout: { padding: 0 },
                     plugins: {
                         legend: { display: false },
                         tooltip: {
                             callbacks: {
                                 title: (items) =>
-                                    latestStats.dailyTotals[items[0].dataIndex]?.date,
+                                    totalData[items[0].dataIndex]?.baseDate,
                                 label: (ctx) =>
                                     `${ctx.parsed.y.toLocaleString('ko-KR')}원`
                             }
@@ -367,12 +389,14 @@
     ----------------------------------------------------------------------- */
     async function fetchLatestStats() {
         try {
-            const res = await fetch('/admin/exchange/stats', { headers: { 'Accept': 'application/json' } });
+            const res = await fetch('/flobank/admin/exchange/stats', {
+                headers: { 'Accept': 'application/json' }
+            });
             const data = await res.json();
             latestStats = data;
 
             const normalized = normalizeDate(selectedDate);
-            const hasSelected = normalized && (data.currencyDailyAmounts || []).some(item => normalizeDate(item.date) === normalized);
+            const hasSelected = normalized && (data.currencyDailyAmounts || []).some(item => normalizeDate(item.baseDate) === normalized);
             if (!hasSelected) {
                 selectedDate = deriveLatestDateFromStats(data);
                 setDatePickerValue(selectedDate);
@@ -388,11 +412,12 @@
     ----------------------------------------------------------------------- */
     async function fetchDateStats(date) {
         try {
-            const res = await fetch(`/admin/exchange/stats?date=${date}`, { headers: { 'Accept': 'application/json' } });
+            const res = await fetch(`/flobank/admin/exchange/stats?date=${date}`, {
+                headers: { 'Accept': 'application/json' }
+            });
             const data = await res.json();
 
-            const hasData = (Array.isArray(data.currencyDailyAmounts) && data.currencyDailyAmounts.length > 0)
-                || (Array.isArray(data.dailyTotals) && data.dailyTotals.length > 0);
+            const hasData = (Array.isArray(data.currencyDailyAmounts) && data.currencyDailyAmounts.length > 0);
 
             if (!hasData) {
                 alert('선택한 날짜의 환전 거래가 없습니다.');
@@ -400,13 +425,20 @@
                 return;
             }
 
-            latestStats = data;
-            selectedDate = normalizeDate(date) || deriveLatestDateFromStats(data);
-            setDatePickerValue(selectedDate);            renderAll();
+            // 오른쪽 그래프 데이터는 유지해야 함 → dailyTotals는 유지!
+            latestStats.currencyDailyAmounts = data.currencyDailyAmounts;
+
+            // 날짜 갱신
+            selectedDate = normalizeDate(date) || deriveLatestDateFromStats(latestStats);
+            setDatePickerValue(selectedDate);
+
+            renderCurrencyChart();  // 왼쪽 그래프만 업데이트
+            updateBaseTimeText(data.lastUpdatedAt);  // 기준 시각 변경
         } catch (e) {
             console.error(e);
         }
     }
+
 
 
     /* -----------------------------------------------------------------------

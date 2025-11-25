@@ -194,6 +194,8 @@
     </th:block>
 
 <th:block th:fragment="script">
+
+
     <script th:inline="javascript">
         /*<![CDATA[*/
         window.exchangeStats = {
@@ -201,27 +203,30 @@
                 /*[# th:if="${stats != null && stats.currencyDailyAmounts != null}"]*/
                 /*[# th:each="row, iter : ${stats.currencyDailyAmounts}"]*/
                 {
-                    date: /*[[${row.baseDate}]]*/ '',
+                    baseDate: /*[[${row.baseDate}]]*/ '',
                     currency: '[[${row.currency}]]',
-                    amount: [[${row.amountKrw}]]
+                    amountKrw: [[${row.amountKrw}]]
                 }/*[# th:if="${!iter.last}"]*/,/*[/]*/
                 /*[/]*/
                 /*[/]*/
             ],
+
             dailyTotals: [
                 /*[# th:if="${stats != null && stats.dailyTotals != null}"]*/
                 /*[# th:each="row, iter : ${stats.dailyTotals}"]*/
                 {
-                    date: /*[[${row.baseDate}]]*/ '',
-                    amount: [[${row.amountKrw}]]
+                    baseDate: /*[[${row.baseDate}]]*/ '',
+                    amountKrw: [[${row.amountKrw}]]
                 }/*[# th:if="${!iter.last}"]*/,/*[/]*/
                 /*[/]*/
                 /*[/]*/
             ],
+
             lastUpdatedAt: '[[${stats != null ? stats.lastUpdatedAt : ''}]]'
         };
         /*]]>*/
     </script>
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script th:src="@{/js/admin_exchange.js}"></script>
 

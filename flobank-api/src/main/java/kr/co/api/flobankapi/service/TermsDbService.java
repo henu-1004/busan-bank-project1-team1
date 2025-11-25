@@ -35,7 +35,7 @@ public class TermsDbService {
     private final TermsDbMapper mapper;
     private final DateTimeFormatter FMT = DateTimeFormatter.ofPattern("yyyyMMdd");
 
-    private final FilePathConfig filePathConfig;      // ⭐ 추가됨
+    private final FilePathConfig filePathConfig;
 
 
     /** 전체 약관 목록 조회 */
@@ -69,7 +69,6 @@ public class TermsDbService {
     public void createTerms(int cate, String title, String content,
                             String adminId, MultipartFile file) throws Exception {
 
-        log.info("📁 [DEBUG] pdfTermsPath = {}", filePathConfig.getPdfTermsPath());
 
 
         String today = LocalDate.now().format(FMT);
@@ -87,13 +86,12 @@ public class TermsDbService {
         mapper.insertTermsMaster(master);
 
         /* ============================================================
-            ⭐ 파일 업로드 처리
+             파일 업로드 처리
         ============================================================ */
         String savedFilePath = null;
 
         if (file != null && !file.isEmpty()) {
-            savedFilePath = saveTermsPdf(file);    // ⭐ 파일 저장 실행
-            log.info("[PDF 저장 완료] {}", savedFilePath);
+            savedFilePath = saveTermsPdf(file);    //  파일 저장 실행
         }
 
           /* ============================================================
@@ -152,7 +150,6 @@ public class TermsDbService {
             dest = dest.getAbsoluteFile();
         }
 
-        log.info(" 실제 저장 시도 경로: {}", dest.getPath());
 
         //  [핵심] 저장하려는 '그 파일'의 부모 폴더가 없으면 생성
         if (!dest.getParentFile().exists()) {
@@ -187,7 +184,7 @@ public class TermsDbService {
         mapper.updateTermsMaster(master);
 
     /* ============================================================
-        🔥 DB 기준 최신 버전 조회 후 +1
+         DB 기준 최신 버전 조회 후 +1
         - currentVersion 파라미터는 이제 '참고용'이 되고,
           실제 저장되는 버전은 DB에 있는 최신 값 기반으로 계산
     ============================================================ */
@@ -295,7 +292,7 @@ public class TermsDbService {
             result.put("adminId", latest.getThistAdminId());
             result.put("content", latest.getThistContent());
             result.put("verMemo", latest.getThistVerMemo());
-            result.put("file", latest.getThistFile());     // ⭐ 파일도 포함
+            result.put("file", latest.getThistFile());     //  파일도 포함
         }
 
         return result;
@@ -325,19 +322,13 @@ public class TermsDbService {
 
         String storedPath = hist.getThistFile();
 
-        // 🔥 첫 번째 로그: DB에서 읽은 값
-        log.info("📁 DB 저장경로(storedPath) = [{}]", storedPath);
 
         try {
             Path filePath = resolveStoredPath(storedPath);
 
-            // 🔥 두 번째 로그: 변환된 실제 파일경로
-            log.info("📁 변환된 실제 파일경로(filePath) = [{}]", filePath);
 
-            // 🔥 세 번째 로그: 파일 존재 여부 + 읽기 가능 여부
-            log.info("📁 exists = {}, readable = {}",
-                    Files.exists(filePath),
-                    Files.isReadable(filePath));
+
+
 
             if (filePath == null) {
                 return null;

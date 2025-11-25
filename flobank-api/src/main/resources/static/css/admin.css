@@ -223,12 +223,7 @@ body {
   color: #777;
 }
 
-/* 그래프 이미지 영역 */
-.admin-graph-box {
-    min-height: 400px;
-    overflow: visible !important;
-    padding-bottom: 30px;
-}
+
 
 
 
@@ -2056,10 +2051,6 @@ input[type="file"] {
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
 
-.admin-exchange-graph-box {
-  margin-top: 15px;
-  text-align: center;
-}
 
 
 
@@ -2644,30 +2635,71 @@ input[type="file"] {
 }
 
 
-/*======================================*/
+/* ================================= */
 /* ===== 그래프 짤림 방지 최종 패치 ===== */
-.admin-exchange-graph-box {
-    min-height: 340px !important;
-    height: 340px !important;
-    overflow: hidden !important;
-    padding: 10px 12px 0 !important;
-    display: flex;
-    align-items: center;
-}
-
-.admin-exchange-graph-box--compact {
-    min-height: 300px !important;
-    height: 300px !important;
-}
-
-.admin-exchange-graph-box canvas {
-    width: 100% !important;
-    height: 100% !important;
-
-
-
-}
+/* ================================= */
 
 .admin-exchange-graph-box img {
     max-height: none !important;
+}
+
+.admin-exchange-graph-box {
+    min-height: 340px !important;
+    height: 340px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+    display: flex;
+    align-items: stretch !important;
+    justify-content: stretch !important;
+    position: relative;
+}
+
+/* 오른쪽 그래프 박스(—compact) 전용 패치 */
+.admin-exchange-graph-box--compact {
+    padding: 0 !important;
+    margin: 0 !important;
+    min-height: 340px !important;
+    height: 340px !important;
+    display: flex;
+    align-items: stretch !important;
+    justify-content: stretch !important;
+    overflow: hidden !important;
+}
+
+.admin-exchange-graph-box--compact canvas {
+    width: 100% !important;
+    height: 100% !important;
+    display: block !important;
+}
+
+
+/* ================================
+   두 그래프 카드 높이 통일
+================================ */
+.admin-stat-card {
+    height: 420px !important;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 그래프 박스 크기 동일 처리 */
+.admin-exchange-graph-box,
+.admin-exchange-graph-box--compact {
+    flex: 1 !important;
+    min-height: unset !important;
+    height: auto !important;
+}
+
+/* canvas 동일 높이 */
+.admin-exchange-graph-box canvas,
+.admin-exchange-graph-box--compact canvas {
+    width: 100% !important;
+    height: 100% !important;
+    display: block !important;
+}
+
+/* 오른쪽 그래프에 왼쪽과 동일한 상단 여백 추가 */
+.admin-exchange-card:nth-child(2) .admin-exchange-graph-box--compact {
+    margin-top: 75px !important; /* 필요하면 ± 10px 조절 */
 }
