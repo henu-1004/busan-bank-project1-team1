@@ -1,3 +1,5 @@
 security:
   remember-me:
     seconds: 604800 #1주일
+
+    # 하얗게 불태ㅜ웠다..,.
