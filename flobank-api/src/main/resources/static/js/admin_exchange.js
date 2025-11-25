@@ -315,15 +315,21 @@
         const canvas = document.getElementById('dailyTotalChart');
         if (!canvas || typeof Chart === 'undefined') return;
 
-        // 최근 7일만 추출
+        // 최근 7일(오늘 포함), 미래 데이터는 제외
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
         let totalData = Array.isArray(latestStats.dailyTotals)
             ? latestStats.dailyTotals
             : [];
 
-        if (totalData.length > 0) {
-            totalData.sort((a, b) => new Date(a.baseDate) - new Date(b.baseDate));
-            totalData = totalData.slice(-7);
-        }
+        totalData = totalData
+            .map(item => {
+                const parsedDate = new Date(`${item.baseDate}T00:00:00`);
+                return { ...item, parsedDate };
+            })
+            .filter(item => !isNaN(item.parsedDate) && item.parsedDate <= today)
+            .sort((a, b) => a.parsedDate - b.parsedDate)
+            .slice(-7);
 
         const labels = totalData.map(item => formatDateLabel(item.baseDate));
         const values = totalData.map(item => Number(item.amountKrw));
