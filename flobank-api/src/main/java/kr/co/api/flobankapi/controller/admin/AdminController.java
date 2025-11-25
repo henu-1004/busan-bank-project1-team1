@@ -1,20 +1,16 @@
 package kr.co.api.flobankapi.controller.admin;
 
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import kr.co.api.flobankapi.dto.BoardDTO;
+import kr.co.api.flobankapi.dto.FaqDTO;
 import kr.co.api.flobankapi.service.BoardService;
+import kr.co.api.flobankapi.service.FaqService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import kr.co.api.flobankapi.dto.BoardDTO;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import kr.co.api.flobankapi.service.FaqService;
-import kr.co.api.flobankapi.dto.FaqDTO;
-import java.util.List;
 
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -24,6 +20,7 @@ public class AdminController {
 
     private final BoardService boardService;
     private final FaqService faqService;
+
 
     /** 목록 */
     @GetMapping("/member")
@@ -68,12 +65,6 @@ public class AdminController {
         return "admin/products_view";
     }
 
-    /** 환전 관리 */
-    @GetMapping("/exchange")
-    public String exchange(Model model) {
-        model.addAttribute("activeItem", "exchange");
-        return "admin/exchange";
-    }
 
     /** 글 등록 */
     @PostMapping("/board/register")

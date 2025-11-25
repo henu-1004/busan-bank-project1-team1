@@ -1,0 +1,97 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.api.flobankapi.mapper.admin.ExchangeAdminMapper">
+
+    <select id="selectDailyCurrencyAmounts"
+            resultType="kr.co.api.flobankapi.dto.admin.exchange.CurrencyDailyAmountDTO">
+        SELECT
+            TO_CHAR(TRUNC(exch_req_dt), 'YYYY-MM-DD') AS baseDate,
+            CASE
+                WHEN exch_to_currency = 'KRW' THEN exch_from_currency
+                ELSE exch_to_currency
+                END AS currency,
+            SUM(NVL(exch_amount, 0) * NVL(exch_applied_rate, 0)) AS amountKrw
+        FROM TB_FRGN_EXCH_TRAN
+        WHERE exch_req_dt IS NOT NULL
+          AND exch_req_dt >= TRUNC(SYSDATE) - 6
+        GROUP BY TRUNC(exch_req_dt),
+                 CASE WHEN exch_to_currency = 'KRW' THEN exch_from_currency ELSE exch_to_currency END
+        ORDER BY TRUNC(exch_req_dt), currency
+    </select>
+
+    <select id="selectDailyTotalAmounts"
+            resultType="kr.co.api.flobankapi.dto.admin.exchange.DailyExchangeAmountDTO">
+        SELECT
+            TO_CHAR(TRUNC(exch_req_dt), 'YYYY-MM-DD') AS baseDate,
+            SUM(NVL(exch_amount, 0) * NVL(exch_applied_rate, 0)) AS amountKrw
+        FROM TB_FRGN_EXCH_TRAN
+        WHERE exch_req_dt IS NOT NULL
+          AND exch_req_dt >= TRUNC(SYSDATE) - 6
+        GROUP BY TRUNC(exch_req_dt)
+        ORDER BY TRUNC(exch_req_dt)
+    </select>
+
+    <select id="countExchangeHistory" resultType="int">
+        SELECT COUNT(*)
+        FROM TB_FRGN_EXCH_TRAN t
+        LEFT JOIN TB_CUST_INFO ci ON ci.CUST_CODE = t.EXCH_ACCT_NO
+        WHERE 1 = 1
+        <if test="searchType != null and searchType == 'customer' and keyword != null and keyword != ''">
+            AND NVL(ci.CUST_CODE, t.EXCH_ACCT_NO) LIKE '%' || #{keyword} || '%'
+        </if>
+        <if test="searchType != null and searchType == 'exchange' and keyword != null and keyword != ''">
+            AND TO_CHAR(t.EXCH_NO) LIKE '%' || #{keyword} || '%'
+        </if>
+    </select>
+
+    <select id="selectExchangeHistory" resultType="kr.co.api.flobankapi.dto.admin.exchange.ExchangeHistoryDTO">
+        SELECT *
+        FROM (
+        SELECT ROW_NUMBER() OVER (ORDER BY t.EXCH_REQ_DT DESC, t.EXCH_NO DESC) AS rnum,
+        t.EXCH_NO                                                    AS exchNo,
+        NVL(ci.CUST_CODE, t.EXCH_ACCT_NO)                            AS custCode,
+        t.EXCH_FROM_CURRENCY                                        AS exchFromCurrency,
+        t.EXCH_TO_CURRENCY                                          AS exchToCurrency,
+        t.EXCH_APPLIED_RATE                                         AS exchAppliedRate,
+        t.EXCH_REQ_DT                                               AS exchReqDt
+        FROM TB_FRGN_EXCH_TRAN t
+        LEFT JOIN TB_CUST_INFO ci ON ci.CUST_CODE = t.EXCH_ACCT_NO
+        WHERE 1 = 1
+        <if test="searchType != null and searchType == 'customer' and keyword != null and keyword != ''">
+            AND NVL(ci.CUST_CODE, t.EXCH_ACCT_NO) LIKE '%' || #{keyword} || '%'
+        </if>
+        <if test="searchType != null and searchType == 'exchange' and keyword != null and keyword != ''">
+            AND TO_CHAR(t.EXCH_NO) LIKE '%' || #{keyword} || '%'
+        </if>
+        )
+        WHERE rnum BETWEEN #{start} AND #{end}
+        ORDER BY rnum
+    </select>
+
+    <select id="selectStatsBaseTime" resultType="java.time.LocalDateTime">
+        SELECT MAX(exch_req_dt) FROM TB_FRGN_EXCH_TRAN
+    </select>
+
+    <select id="countCouponIssues" resultType="int">
+        SELECT COUNT(*)
+        FROM TB_COUPON
+    </select>
+
+    <select id="selectCouponIssues" resultType="kr.co.api.flobankapi.dto.admin.exchange.CouponIssueDTO">
+        SELECT *
+        FROM (
+                 SELECT ROW_NUMBER() OVER (ORDER BY coup_issued_dy DESC, coup_no DESC) AS rnum,
+                     coup_no                                                      AS couponNo,
+                        coup_cust_code                                               AS custCode,
+                        coup_rate                                                    AS coupRate,
+                        coup_issued_dy                                               AS issuedDate,
+                        coup_status                                                  AS coupStatus
+                 FROM TB_COUPON
+             )
+        WHERE rnum BETWEEN #{start} AND #{end}
+        ORDER BY rnum
+    </select>
+
+</mapper>
