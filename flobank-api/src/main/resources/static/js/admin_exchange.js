@@ -27,6 +27,9 @@
     let currencyChart;
     let totalChart;
 
+    // 선택된 날짜(yyyy-MM-dd)
+    let selectedDate = '';
+
     // 서버에서 Thymeleaf로 내려준 데이터
     let latestStats = window.exchangeStats || {};
 
@@ -80,8 +83,56 @@
 
 
     /* -----------------------------------------------------------------------
-       기준 시각 표기 (상단 타임스탬프)
+        날짜/시간 유틸
     ----------------------------------------------------------------------- */
+
+    function normalizeDate(dateInput) {
+        if (!dateInput) return '';
+        const text = String(dateInput);
+        const match = text.match(/\d{4}-\d{2}-\d{2}/);
+        return match ? match[0] : '';
+    }
+
+    function deriveLatestDateFromStats(stats) {
+        if (!stats) return '';
+        const dates = [];
+
+        (stats.currencyDailyAmounts || []).forEach(item => {
+            const normalized = normalizeDate(item.date);
+            if (normalized) dates.push(normalized);
+        });
+
+        (stats.dailyTotals || []).forEach(item => {
+            const normalized = normalizeDate(item.date);
+            if (normalized) dates.push(normalized);
+        });
+
+        const base = normalizeDate(stats.lastUpdatedAt);
+        if (base) dates.push(base);
+
+        if (!dates.length) return '';
+        return dates.sort().pop();
+    }
+
+    function setDatePickerValue(dateStr) {
+        const datePicker = document.getElementById('exchangeDatePicker');
+        if (datePicker && dateStr) {
+            datePicker.value = dateStr;
+        }
+    }
+
+    function ensureSelectedDate() {
+        const normalized = normalizeDate(selectedDate);
+        if (normalized) return normalized;
+
+        const latest = deriveLatestDateFromStats(latestStats);
+        selectedDate = latest;
+        setDatePickerValue(latest);
+        return latest;
+    }
+
+
+
     function formatBaseTime(baseTime) {
         if (!baseTime) return '-';
 
@@ -162,40 +213,40 @@
             ? latestStats.currencyDailyAmounts
             : [];
 
-        const dateLabels = [...new Set(currencyData.map(item => item.date))].sort();
+        const targetDate = ensureSelectedDate();
+        const filteredByDate = currencyData.filter(item => normalizeDate(item.date) === targetDate);
 
-        // ✔ DB 데이터의 통화값 정제
-        const rawCurrencies = currencyData.map(item => cleanCurrency(item.currency));
 
-        // ✔ 7개 통화 + 데이터 통화 → Set으로 중복 제거
-        const currencies = [...new Set([...defaultCurrencies, ...rawCurrencies])];
+        const currencies = [...defaultCurrencies];
 
-        // 필터 UI
+
         buildCurrencyFilter(currencies);
 
-        // 현재 선택된 통화만 표시
+
         const activeCurrencies = currencies.filter(c => selectedCurrencies.has(c));
 
-        const labels = dateLabels.map(d => formatDateLabel(d));
+        const labels = activeCurrencies;
+        const values = activeCurrencies.map((code) => {
+            const found = filteredByDate.find(item => cleanCurrency(item.currency) === code);
+            return found ? Number(found.amount) : 0;
 
-        const datasets = activeCurrencies.map((code, idx) => {
-            const values = dateLabels.map(d => {
-                const found = currencyData.find(item =>
-                    item.date === d && cleanCurrency(item.currency) === code
-                );
-                return found ? Number(found.amount) : 0;
-            });
 
-            return {
-                label: code,
-                data: values,
-                backgroundColor: palette[idx % palette.length],
-                borderRadius: 6,
-                maxBarThickness: 38
-            };
         });
 
-        return { labels, datasets };
+        const datasets = [{
+            label: "",
+            data: values,
+            backgroundColor: activeCurrencies.map((_, idx) => palette[idx % palette.length]),
+            borderRadius: 6,
+            maxBarThickness: 44
+        }];
+
+        return { labels, datasets, targetDate };
+
+
+
+
+
     }
 
 
@@ -206,7 +257,7 @@
         const canvas = document.getElementById('currencyDailyChart');
         if (!canvas || typeof Chart === 'undefined') return;
 
-        const { labels, datasets } = prepareCurrencyChartData();
+        const { labels, datasets, targetDate } = prepareCurrencyChartData();
 
         if (!currencyChart) {
             currencyChart = new Chart(canvas.getContext('2d'), {
@@ -216,20 +267,19 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: {
-                        legend: { position: 'bottom', labels: { usePointStyle: true } },
+                        legend: { display: false },
                         tooltip: {
                             callbacks: {
-                                title: (items) =>
-                                    latestStats.currencyDailyAmounts[items[0].dataIndex]?.date,
+                                title: () => formatDateLabel(targetDate),
+
                                 label: (ctx) =>
-                                    `${ctx.dataset.label}: ${ctx.parsed.y.toLocaleString('ko-KR')}원`
+                                    `${ctx.label}: ${ctx.parsed.y.toLocaleString('ko-KR')}원`
                             }
                         }
                     },
                     scales: {
-                        x: { stacked: true, offset: true },
+                        x: { offset: true },
                         y: {
-                            stacked: true,
                             beginAtZero: true,
                             ticks: { callback: v => `${compactNumber(v)}원` }
                         }
@@ -318,8 +368,15 @@
     async function fetchLatestStats() {
         try {
             const res = await fetch('/admin/exchange/stats', { headers: { 'Accept': 'application/json' } });
-            latestStats = await res.json();
-            renderAll();
+            const data = await res.json();
+            latestStats = data;
+
+            const normalized = normalizeDate(selectedDate);
+            const hasSelected = normalized && (data.currencyDailyAmounts || []).some(item => normalizeDate(item.date) === normalized);
+            if (!hasSelected) {
+                selectedDate = deriveLatestDateFromStats(data);
+                setDatePickerValue(selectedDate);
+            }            renderAll();
         } catch (e) {
             console.error(e);
         }
@@ -332,8 +389,20 @@
     async function fetchDateStats(date) {
         try {
             const res = await fetch(`/admin/exchange/stats?date=${date}`, { headers: { 'Accept': 'application/json' } });
-            latestStats = await res.json();
-            renderAll();
+            const data = await res.json();
+
+            const hasData = (Array.isArray(data.currencyDailyAmounts) && data.currencyDailyAmounts.length > 0)
+                || (Array.isArray(data.dailyTotals) && data.dailyTotals.length > 0);
+
+            if (!hasData) {
+                alert('선택한 날짜의 환전 거래가 없습니다.');
+                setDatePickerValue(ensureSelectedDate());
+                return;
+            }
+
+            latestStats = data;
+            selectedDate = normalizeDate(date) || deriveLatestDateFromStats(data);
+            setDatePickerValue(selectedDate);            renderAll();
         } catch (e) {
             console.error(e);
         }
@@ -347,13 +416,20 @@
 
         if (typeof Chart === 'undefined') return;
 
+        const datePicker = document.getElementById("exchangeDatePicker");
+        if (datePicker) {
+            selectedDate = normalizeDate(datePicker.value) || selectedDate;
+        }
+
         renderAll();
 
         // 날짜 선택 이벤트
-        const datePicker = document.getElementById("exchangeDatePicker");
         if (datePicker) {
             datePicker.addEventListener("change", function () {
-                fetchDateStats(this.value);
+                const nextDate = normalizeDate(this.value);
+                if (!nextDate) return;
+                fetchDateStats(nextDate);
+
             });
         }
 

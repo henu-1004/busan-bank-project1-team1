@@ -8,20 +8,19 @@
         <section class="admin-exchange-stats-row">
             <article class="admin-exchange-card admin-exchange-graph-card">
                 <h3>일자별 통화 환전금액
-                    <span class="exchange-base-time"
-                          th:text="|(${baseTime != null ? #temporals.format(baseTime,'MM.dd HH:mm:ss') : '-'} 기준)|">
-    </span>
+                       <span th:text="| ${#temporals.format(baseTime, 'yyyy.MM.dd HH:mm:ss')} 기준)|"></span>
                 </h3>
 
-                <!-- 🔽 날짜 선택 UI 추가 -->
+                <!--  날짜 선택 UI 추가 -->
                 <div class="admin-exchange-date-picker" style="margin-bottom:10px;">
-                    <input type="date" id="exchangeDatePicker" />
+                    <input type="date" id="exchangeDatePicker"
+                           th:value="${baseTime != null ? #temporals.format(baseTime,'yyyy-MM-dd') : ''}" />
                 </div>
 
-                <!-- 🔽 통화 필터 -->
+                <!-- 통화 필터 -->
                 <div class="admin-exchange-filter" id="currencyFilter"></div>
 
-                <!-- 🔽 통화별 환전 그래프 -->
+                <!--  통화별 환전 그래프 -->
                 <div class="admin-exchange-graph-box">
                     <canvas id="currencyDailyChart"></canvas>
                 </div>
@@ -33,16 +32,18 @@
 
             <article class="admin-exchange-card admin-exchange-graph-card">
                 <h3>일자별 환전액
-                    <span class="exchange-base-time" th:text="|(${baseTime != null ? #temporals.format(baseTime,'MM.dd HH:mm:ss') : '-'} 기준)|"></span>                </h3>
-                <div class="admin-exchange-graph-box">
+                    <span th:text="| ${#temporals.format(baseTime, 'yyyy.MM.dd HH:mm:ss')} 기준)|"></span>
+                </h3>
+                <div class="admin-exchange-graph-box admin-exchange-graph-box--compact">
                     <canvas id="dailyTotalChart"></canvas>
                 </div>
             </article>
         </section>
 
         <!-- 환전 이력 섹션 -->
-        <section class="admin-exchange-section">
-            <h2 class="admin-exchange-section-title">환전 이력</h2>
+    <section class="admin-exchange-section" id="exchangeHistorySection">
+        <h2 class="admin-exchange-section-title">환전 이력</h2>
+
 
             <!-- 검색 -->
             <form class="admin-exchange-search" th:action="@{/admin/exchange}" method="get">
@@ -83,7 +84,7 @@
                         <td th:text="${row.exchFromCurrency}">KRW</td>
                         <td th:text="${row.exchToCurrency}">USD</td>
                         <td th:text="${row.exchAppliedRate != null ? #numbers.formatDecimal(row.exchAppliedRate, 0, 4) : '-'}">1,470.59</td>
-                        <td th:text="${row.exchReqDt != null ? #temporals.format(row.exchReqDt, 'yyyy-MM-dd HH:mm:ss') : '-'}">2025-11-11 09:13:22</td>
+                        <td th:text="${row.lastUpdatedAt != null ? #temporals.format(row.lastUpdatedAt, 'yyyy-MM-dd HH:mm:ss') : '-'}">2025-11-11 09:13:22</td>
 
                     </tr>
 
@@ -91,22 +92,38 @@
                 </table>
             </div>
 
-            <!-- 페이지네이션 -->
-            <div class="pagination">
-
-                <a class="page-btn" th:classappend="${exchangePage <= 1} ? ' disabled'"
-                   th:href="@{|/admin/exchange?page=${exchangePage - 1 < 1 ? 1 : exchangePage - 1}&couponPage=${couponPage}&searchType=${searchType}&keyword=${keyword}|}">«</a>
-                <a class="page-btn" th:each="p : ${#numbers.sequence(1, exchangeTotalPage)}"
-                   th:classappend="${p} == ${exchangePage} ? ' active'"
-                   th:href="@{|/admin/exchange?page=${p}&couponPage=${couponPage}&searchType=${searchType}&keyword=${keyword}|}"
-                   th:text="${p}">1</a>
-                <a class="page-btn" th:classappend="${exchangePage >= exchangeTotalPage} ? ' disabled'"
-                   th:href="@{|/admin/exchange?page=${exchangePage + 1 > exchangeTotalPage ? exchangeTotalPage : exchangePage + 1}&couponPage=${couponPage}&searchType=${searchType}&keyword=${keyword}|}">»</a>
 
 
+        <!-- 페이지네이션 -->
+        <div class="pagination">
 
-            </div>
-        </section>
+            <!-- Prev -->
+            <a class="page-btn"
+               th:classappend="${exchangePage <= 1} ? ' disabled'"
+               th:href="@{|/admin/exchange?page=${exchangePage - 1 < 1 ? 1 : exchangePage - 1}&couponPage=${couponPage}&searchType=${searchType}&keyword=${keyword}#exchangeHistorySection|}">
+                «
+            </a>
+
+            <!-- Page numbers -->
+            <a class="page-btn"
+               th:each="p : ${#numbers.sequence(1, exchangeTotalPage)}"
+               th:classappend="${p} == ${exchangePage} ? ' active'"
+               th:href="@{|/admin/exchange?page=${p}&couponPage=${couponPage}&searchType=${searchType}&keyword=${keyword}#exchangeHistorySection|}"
+               th:text="${p}">
+            </a>
+
+            <!-- Next -->
+            <a class="page-btn"
+               th:classappend="${exchangePage >= exchangeTotalPage} ? ' disabled'"
+               th:href="@{|/admin/exchange?page=${exchangePage + 1 > exchangeTotalPage ? exchangeTotalPage : exchangePage + 1}&couponPage=${couponPage}&searchType=${searchType}&keyword=${keyword}#exchangeHistorySection|}">
+                »
+            </a>
+
+        </div>
+
+
+
+    </section>
 
         <!-- 환전 수수료 쿠폰 발급 현황 -->
     <section class="admin-exchange-section" id="couponSection">
@@ -145,37 +162,31 @@
             </div>
 
 
-            <div class="pagination">
+        <div class="pagination">
 
-                <!-- Prev -->
-                <a class="page-btn" th:classappend="${couponPage <= 1} ? ' disabled'"
-                   th:href="@{|/admin/exchange?
-            page=${exchangePage}
-            &couponPage=${couponPage - 1 < 1 ? 1 : couponPage - 1}
-            &searchType=${searchType}
-            &keyword=${keyword}#couponSection|}">«</a>
+            <!-- Prev -->
+            <a class="page-btn"
+               th:classappend="${couponPage <= 1} ? ' disabled'"
+               th:href="@{|/admin/exchange?page=${exchangePage}&couponPage=${couponPage - 1 < 1 ? 1 : couponPage - 1}&searchType=${searchType}&keyword=${keyword}#couponSection|}">
+                «
+            </a>
 
-                <!-- Page numbers -->
-                <a class="page-btn"
-                   th:each="p : ${#numbers.sequence(1, couponTotalPage)}"
-                   th:classappend="${p} == ${couponPage} ? ' active'"
-                   th:href="@{|/admin/exchange?
-            page=${exchangePage}
-            &couponPage=${p}
-            &searchType=${searchType}
-            &keyword=${keyword}#couponSection|}"
-                   th:text="${p}">1</a>
+            <!-- Page numbers -->
+            <a class="page-btn"
+               th:each="p : ${#numbers.sequence(1, couponTotalPage)}"
+               th:classappend="${p} == ${couponPage} ? ' active'"
+               th:href="@{|/admin/exchange?page=${exchangePage}&couponPage=${p}&searchType=${searchType}&keyword=${keyword}#couponSection|}"
+               th:text="${p}">
+            </a>
 
-                <!-- Next -->
-                <a class="page-btn"
-                   th:classappend="${couponPage >= couponTotalPage} ? ' disabled'"
-                   th:href="@{|/admin/exchange?
-            page=${exchangePage}
-            &couponPage=${couponPage + 1 > couponTotalPage ? couponTotalPage : couponPage + 1}
-            &searchType=${searchType}
-            &keyword=${keyword}#couponSection|}">»</a>
+            <!-- Next -->
+            <a class="page-btn"
+               th:classappend="${couponPage >= couponTotalPage} ? ' disabled'"
+               th:href="@{|/admin/exchange?page=${exchangePage}&couponPage=${couponPage + 1 > couponTotalPage ? couponTotalPage : couponPage + 1}&searchType=${searchType}&keyword=${keyword}#couponSection|}">
+                »
+            </a>
 
-            </div>
+        </div>
 
 
 

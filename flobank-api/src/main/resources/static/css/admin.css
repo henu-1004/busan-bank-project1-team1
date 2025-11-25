@@ -2643,12 +2643,29 @@ input[type="file"] {
     margin-top: 20px;
 }
 
+
+/*======================================*/
 /* ===== 그래프 짤림 방지 최종 패치 ===== */
 .admin-exchange-graph-box {
-    min-height: 420px !important;
-    height: auto !important;
-    overflow: visible !important;
-    padding-bottom: 30px; /* 여백도 유지 */
+    min-height: 340px !important;
+    height: 340px !important;
+    overflow: hidden !important;
+    padding: 10px 12px 0 !important;
+    display: flex;
+    align-items: center;
+}
+
+.admin-exchange-graph-box--compact {
+    min-height: 300px !important;
+    height: 300px !important;
+}
+
+.admin-exchange-graph-box canvas {
+    width: 100% !important;
+    height: 100% !important;
+
+
+
 }
 
 .admin-exchange-graph-box img {
