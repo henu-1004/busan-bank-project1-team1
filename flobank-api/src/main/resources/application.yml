@@ -20,8 +20,8 @@ spring:
 #  profiles:
 #    active: dev
 
-  elasticsearch:
-    uris: http://34.64.124.33:9200
+#  elasticsearch:
+#    uris: http://34.64.124.33:9200
 
   mail:
     host: smtp.gmail.com
