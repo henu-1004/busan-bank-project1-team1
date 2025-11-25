@@ -274,7 +274,8 @@
         DPST_HDR_CONTRACT_DT,
         DPST_HDR_RATE,
         DPST_HDR_CURRENCY_EXP,
-        DPST_HDR_EXP_ACCT_NO
+        DPST_HDR_EXP_ACCT_NO,
+        DPST_HDR_LINKED_ACCT_TYPE
         <if test="dpstHdrAutoRenewYn != null and dpstHdrAutoRenewYn.equalsIgnoreCase('y')">
             , DPST_HDR_AUTO_RENEW_TERM
             , DPST_HDR_AUTO_RENEW_CNT
@@ -299,7 +300,8 @@
         SYSDATE,
         #{dpstHdrRate},
         #{dpstHdrCurrencyExp},
-        #{dpstHdrExpAcctNo}
+        #{dpstHdrExpAcctNo},
+        #{dpstHdrLinkedAcctType}
         <if test="dpstHdrAutoRenewYn != null and dpstHdrAutoRenewYn.equalsIgnoreCase('y')">
             , #{dpstHdrAutoRenewTerm}
             , #{dpstHdrAutoRenewCnt}

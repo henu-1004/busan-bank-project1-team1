@@ -3147,6 +3147,34 @@ body.event-page {
   background-color: #f9fafc;
 }
 
+
+/* 예금자보호 안내 */
+.view-protection {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background-color: #f8f9fb;
+    border: 1px solid #e0e3e7;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-top: 25px;
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+.view-protection img {
+    width: 130px;
+    height: auto;
+    flex-shrink: 0;
+}
+
+.view-protection strong {
+    color: #2C5DE5; /* 남색 포인트 */
+    font-weight: 700;
+}
+
+
+
 /* 언어번역 */
 
 .language-dropdown {

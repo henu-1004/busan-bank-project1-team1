@@ -215,6 +215,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const depositHistoryTbody = document.getElementById("depositHistory");
         const depositModalHeader = document.getElementById("deposit-modal-header");
 
+
         // 날짜 포맷터 (YYYYMMDD → YYYY.MM.DD)
         function formatDate(yyyymmdd) {
             if (!yyyymmdd || yyyymmdd.length !== 8) return yyyymmdd || "";
@@ -261,13 +262,16 @@ document.addEventListener("DOMContentLoaded", function () {
                 const filteredHistory = histories.filter(h => h.dpstDtlHdrNo === id);
 
 
+
+
+
                 depositModalHeader.innerHTML = `
                     
                     <h1>${name}</h1>
             <div style="color: gray; font-size: 15px;">${id}</div>
-            <div>
+            <div style="display: flex; align-items: center;">
                 <span style="background-color: #304878; padding: 1px 6px; font-size: 13px; color: white; border-radius: 5px;">예금</span>
-                <span style="color: gray; line-height: 16px; font-size: 15px; margin-top: 2px;">${formatDate(endRaw || "")} 만기</span>
+                <span style="color: gray; line-height: 16px; margin-left: 4px; font-size: 15px;">${formatDate(endRaw || "")} 만기</span>
             </div>
             <br>
                 `;

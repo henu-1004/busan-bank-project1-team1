@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>원화 계좌이체 3</title>
+    <link rel="stylesheet" th:href="@{/css/mypage.css}">
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+    <link rel="stylesheet" th:href="@{/css/footer.css}">
+
+    <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+            crossorigin="anonymous"
+    />
+
+</head>
+<body>
+<div th:replace="~{_template/_header.html}"></div>
+<main class="transfer3-container">
+    <div class="transfer3-box">
+
+        <div class="transfer3-steps">
+            <div class="transfer3-step">
+                <span class="num">1</span><span class="text">정보입력</span>
+            </div>
+            <div class="transfer3-step">
+                <span class="num">2</span><span class="text">입력확인</span>
+            </div>
+            <div class="transfer3-step active">
+                <span class="num">3</span><span class="text">실행완료</span>
+            </div>
+        </div>
+
+        <section class="transfer3-complete-box">
+            <div class="transfer3-icon">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <div class="transfer3-complete-text">
+                <h2><strong>계좌이체</strong>가 정상적으로 완료되었습니다.</h2>
+                <p>계좌이체 처리결과를 확인해 주세요.</p>
+            </div>
+        </section>
+
+        <section class="transfer3-section">
+            <h3 class="transfer3-subtitle">이체결과</h3>
+            <table class="transfer3-table">
+                <colgroup>
+                    <col style="width: 15%;"> <col style="width: 20%;"> <col style="width: 12%;"> <col style="width: 10%;"> <col style="width: 13%;"> <col style="width: 20%;"> <col style="width: 10%;"> </colgroup>
+                <thead>
+                <tr>
+                    <th>출금 정보</th>
+                    <th>입금 정보 (받는분)</th>
+                    <th>이체 금액</th>
+                    <th>수수료</th>
+                    <th>거래후 잔액</th>
+                    <th>통장 표시 내용</th> <th>처리결과</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="cell-center">
+                        <div style="font-weight:bold; color:#333;">플로은행</div>
+                        <span th:text="${custTranHistDTO.tranAcctNo}">출금계좌번호</span>
+                    </td>
+
+                    <td class="cell-center">
+                        <div style="font-weight: bold; color: #333; margin-bottom: 2px;">
+                    <span th:switch="${custTranHistDTO.tranRecBkCode}">
+                        <span th:case="'032'">부산은행</span>
+                        <span th:case="'004'">국민은행</span>
+                        <span th:case="'020'">우리은행</span>
+                        <span th:case="'088'">신한은행</span>
+                        <span th:case="'888'">플로은행</span>
+                        <span th:case="*">기타은행</span>
+                    </span>
+                        </div>
+                        <span th:text="${custTranHistDTO.tranRecAcctNo}">입금계좌번호</span>
+                        <div style="margin-top: 4px;">
+                            <span style="font-size: 0.85rem; color: #666;">예금주:</span>
+                            <strong style="font-size: 1.1rem; color: #004085;" th:text="${custTranHistDTO.tranRecName}">상대방 이름</strong>
+                        </div>
+                    </td>
+
+                    <td class="cell-right">
+                        <strong th:text="${#numbers.formatInteger(custTranHistDTO.tranAmount, 0, 'COMMA')}">10,000</strong>원
+                    </td>
+
+                    <td class="cell-center">
+                        0원<br><span class="sub" style="font-size:0.8rem; color:#888;">(면제)</span>
+                    </td>
+
+                    <td class="cell-right"> <!-- 잔액 표시해야!!! -->
+                        <span th:text="${#numbers.formatInteger(5000, 0, 'COMMA')}">잔액</span>원
+                    </td>
+
+                    <td class="cell-left" style="text-align: left; padding-left: 15px;">
+                        <div style="margin-bottom: 4px;">
+                            <span style="background: #f1f3f5; padding: 2px 6px; border-radius: 4px; font-size: 0.8rem; margin-right: 4px;">나에게</span>
+                            <span th:text="${custTranHistDTO.tranCustName}">내 메모</span>
+                        </div>
+                    </td>
+
+                    <td class="cell-center">
+                        <span class="transfer3-success" style="color: #28a745; font-weight: bold;" th:text="${state}">정상</span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+        </section>
+
+        <div class="transfer3-actions">
+            <button class="transfer3-btn-main" th:onclick="|location.href='@{/mypage/main}'|">확인</button>
+        </div>
+
+    </div>
+</main>
+
+<div th:replace="~{_template/_footer.html}"></div>
+
+</body>
+</html>

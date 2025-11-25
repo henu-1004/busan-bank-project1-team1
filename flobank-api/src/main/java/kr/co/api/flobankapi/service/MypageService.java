@@ -291,6 +291,18 @@ public class MypageService {
     public List<DpstAcctDtlDTO> getDpstAcctHistList(String dpstHdrCustCode) {
         return mypageMapper.selectDpstAcctDtls(dpstHdrCustCode);
     }
+
+    public DpstAcctHdrDTO getDpstAcctHdr(String dpstHdrAcctNo) {
+        return mypageMapper.selectDpstAcctHdr(dpstHdrAcctNo);
+    }
+
+    public Double getKrwAcctBal(String dpstHdrAcctNo) {
+        return mypageMapper.selectAcctBal(dpstHdrAcctNo);
+    }
+
+    public FrgnAcctBalanceDTO getFrgnAcctBal(String dpstHdrAcctNo) {
+        return mypageMapper.selectFrgnAcctBal(dpstHdrAcctNo);
+    }
 }
 
 

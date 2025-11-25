@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,13 +42,13 @@ public class MypageController {
 
     private final PasswordEncoder passwordEncoder;
 
-    @GetMapping({"/main","/"})
+    @GetMapping({"/main", "/"})
     public String mypage(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
 
         String userCode = userDetails.getUsername();
         CustInfoDTO custInfo = mypageService.getCustInfo(userCode);
         List<CustAcctDTO> custAcctDTOList = mypageService.findAllAcct(userCode);
-        CustFrgnAcctDTO  custFrgnAcctDTO = mypageService.findFrgnAcct(userCode);
+        CustFrgnAcctDTO custFrgnAcctDTO = mypageService.findFrgnAcct(userCode);
 
         CustFrgnAcctDTO frgnAcct = mypageService.findFrgnAcct(userCode);
         List<FrgnAcctBalanceDTO> frgnBalanceList = new ArrayList<>();
@@ -63,8 +64,8 @@ public class MypageController {
         model.addAttribute("couponList", couponList);
         model.addAttribute("frgnBalanceList", frgnBalanceList);
         model.addAttribute("custInfo", custInfo);
-        model.addAttribute("custAcctDTOList",custAcctDTOList);
-        model.addAttribute("custFrgnAcctDTO",custFrgnAcctDTO);
+        model.addAttribute("custAcctDTOList", custAcctDTOList);
+        model.addAttribute("custFrgnAcctDTO", custFrgnAcctDTO);
 
 
         List<MypageDpstDTO> dpstList = mypageService.getDpstAcctHdrList(userCode);
@@ -93,9 +94,9 @@ public class MypageController {
                 return ResponseEntity.badRequest().body(response);
             }
 
-            if ("KRW".equals(requestDTO.getAcctType())){
+            if ("KRW".equals(requestDTO.getAcctType())) {
                 mypageService.modifyAcctName(requestDTO.getAcctName(), requestDTO.getAcctNo());
-            }else{
+            } else {
                 mypageService.modifyFrgnAcctName(requestDTO.getAcctName(), requestDTO.getAcctNo());
             }
 
@@ -135,7 +136,7 @@ public class MypageController {
     @GetMapping("/ko_account_open_2")
     public String ko_account_open_2(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
 
-        if(userDetails == null) {
+        if (userDetails == null) {
             return "redirect:/login";
         }
 
@@ -144,19 +145,19 @@ public class MypageController {
         CustInfoDTO custInfoDTO = mypageService.getCustInfo(userCode);
 
         // 보안 등급별 1회, 1일 이체한도 고시
-        if(custInfoDTO.getCustSecurityLevel().equals(1)) {
+        if (custInfoDTO.getCustSecurityLevel().equals(1)) {
             model.addAttribute("dayTrsfLmt", "5억");
             model.addAttribute("onceTrsfLmt", "1억");
-        }else if(custInfoDTO.getCustSecurityLevel().equals(2)) {
+        } else if (custInfoDTO.getCustSecurityLevel().equals(2)) {
             model.addAttribute("dayTrsfLmt", "5천만원");
             model.addAttribute("onceTrsfLmt", "1천만원");
-        } else if(custInfoDTO.getCustSecurityLevel().equals(3)) {
+        } else if (custInfoDTO.getCustSecurityLevel().equals(3)) {
             model.addAttribute("dayTrsfLmt", "1천만원");
             model.addAttribute("onceTrsfLmt", "1천만원");
         }
 
         // '남자', '여자'
-        if("M".equals(custInfoDTO.getCustGen())) {
+        if ("M".equals(custInfoDTO.getCustGen())) {
             model.addAttribute("gender", "남자");
         } else {
             model.addAttribute("gender", "여자");
@@ -178,7 +179,7 @@ public class MypageController {
     }
 
     @PostMapping("/ko_account_open_2")
-    public String createAcct(@ModelAttribute CustAcctDTO custAcctDTO, @AuthenticationPrincipal CustomUserDetails userDetails){
+    public String createAcct(@ModelAttribute CustAcctDTO custAcctDTO, @AuthenticationPrincipal CustomUserDetails userDetails) {
 
         log.info("custAcctDTO = " + custAcctDTO);
         mypageService.saveAcct(custAcctDTO);
@@ -197,9 +198,9 @@ public class MypageController {
         String userCode = userDetails.getUsername();
         log.info("userId = " + userCode);
         CustInfoDTO custInfoDTO = mypageService.getCustInfo(userCode);
-        if(mypageService.checkKoAcct(custInfoDTO.getCustCode())){
+        if (mypageService.checkKoAcct(custInfoDTO.getCustCode())) {
             return "redirect:/mypage/ko_account_open_1";
-        }else {
+        } else {
             redirectAttributes.addFlashAttribute("errorMessage",
                     "최근 1개월(30일) 이내에 원화 입출금 통장을 개설한 이력이 있어 신규 개설이 제한됩니다. (금융사기 예방 조치)");
             return "redirect:/mypage/account_open_main";
@@ -212,23 +213,22 @@ public class MypageController {
         String UserCode = userDetails.getUsername();
         log.info("UserCode = " + UserCode);
         CustInfoDTO custInfoDTO = mypageService.getCustInfo(UserCode);
-        if(mypageService.checkCntKoAcct(custInfoDTO.getCustCode()) >= 1){
+        if (mypageService.checkCntKoAcct(custInfoDTO.getCustCode()) >= 1) {
             int checkCnt = mypageService.checkEnAcct(UserCode);
-            if(checkCnt >= 1){
+            if (checkCnt >= 1) {
                 redirectAttributes.addFlashAttribute("errorMessage",
                         "이미 외화 입출금통장이 있습니다. 외화 입출금통장은 2개 이상 만들 수 없습니다.");
                 return "redirect:/mypage/account_open_main";
-            }else {
+            } else {
                 return "redirect:/mypage/en_account_open_1";
             }
-        }else{
+        } else {
             redirectAttributes.addFlashAttribute("errorMessage",
                     "원화 입출금 통장이 1개 이상 있어야 개설 가능합니다. 원화 입출금 통장을 먼저 만들어주세요.");
             return "redirect:/mypage/account_open_main";
         }
 
     }
-
 
 
     @GetMapping("/en_account_open_1")
@@ -258,13 +258,13 @@ public class MypageController {
         model.addAttribute("custFrgnAcctDTO", custFrgnAcctDTO);
 
         // 보안 등급 확인 후 1일, 1회 이체한도 보내기
-        if(custInfoDTO.getCustSecurityLevel().equals(3)) {
+        if (custInfoDTO.getCustSecurityLevel().equals(3)) {
             model.addAttribute("dayTrsfLmt", "7,000$");
             model.addAttribute("onceTrsfLmt", "7,000$");
-        }else if(custInfoDTO.getCustSecurityLevel().equals(2)) {
+        } else if (custInfoDTO.getCustSecurityLevel().equals(2)) {
             model.addAttribute("dayTrsfLmt", "35,000$");
             model.addAttribute("onceTrsfLmt", "7,000$");
-        }else if(custInfoDTO.getCustSecurityLevel().equals(1)) {
+        } else if (custInfoDTO.getCustSecurityLevel().equals(1)) {
             model.addAttribute("dayTrsfLmt", "350,000$");
             model.addAttribute("onceTrsfLmt", "70,000$");
         }
@@ -301,14 +301,14 @@ public class MypageController {
 
         // 이체 정보 받을 객체 보내기
         CustTranHistDTO custTranHistDTO = new CustTranHistDTO();
-            // 미리 설정할 거
+        // 미리 설정할 거
         custTranHistDTO.setTranType(2); // 출금 : 2
         custTranHistDTO.setTranAcctNo(acctNo); // 계좌번호
 
 
         model.addAttribute("custTranHistDTO", custTranHistDTO);
 
-        return  "mypage/ko_transfer_1";
+        return "mypage/ko_transfer_1";
     }
 
     @PostMapping("/ko_transfer_2")
@@ -359,7 +359,7 @@ public class MypageController {
 
         // 4. 나머지 데이터(메모 등) 처리
         // '내통장표시'가 비어있으면 -> 사용자 이름(보내는 사람) or 조회된 받는분 이름 등 정책에 따라 설정
-        if(custTranHistDTO.getTranCustName() == null || custTranHistDTO.getTranCustName().trim().isEmpty()){
+        if (custTranHistDTO.getTranCustName() == null || custTranHistDTO.getTranCustName().trim().isEmpty()) {
             // 예: 비어있으면 '나에게' 메모에는 '받는 사람 이름'을 기본으로 입력 등
             // 여기서는 기존 로직 유지 (로그인 유저 이름)
             custTranHistDTO.setTranCustName(userDetails.getCustName());
@@ -408,23 +408,23 @@ public class MypageController {
     public String ko_transfer_3(@AuthenticationPrincipal CustomUserDetails userDetails, @ModelAttribute CustTranHistDTO custTranHistDTO, Model model) {
         // 전자서명 임시 승인 수정해야함
         custTranHistDTO.setTranEsignYn("Y");
-        CustAcctDTO custAcctDTO = new  CustAcctDTO();
+        CustAcctDTO custAcctDTO = new CustAcctDTO();
 
-        if(custTranHistDTO.getTranEsignYn().equals("Y")) {
+        if (custTranHistDTO.getTranEsignYn().equals("Y")) {
             // 이체 내역 db에 반영
             mypageService.modifyCustAcctBal(custTranHistDTO);
             model.addAttribute("custTranHistDTO", custTranHistDTO);
             custAcctDTO = mypageService.findCustAcct(custTranHistDTO.getTranAcctNo());
             model.addAttribute("custAcctDTO", custAcctDTO);
             model.addAttribute("state", "정상");
-        }else {
+        } else {
             model.addAttribute("custTranHistDTO", custTranHistDTO);
             custAcctDTO = mypageService.findCustAcct(custTranHistDTO.getTranAcctNo());
             model.addAttribute("custAcctDTO", custAcctDTO);
             model.addAttribute("state", "실패");
         }
 
-        return  "mypage/ko_transfer_3";
+        return "mypage/ko_transfer_3";
     }
 
 
@@ -495,6 +495,106 @@ public class MypageController {
         }
 
         return response;
+    }
+
+
+
+
+
+
+    
+    //하나부터 열까지 다 수정해야 함
+
+    @GetMapping("/dpst_transfer_1")
+    public String dpst_transfer_1(Model model, @RequestParam("dpstHdrAcctNo") String dpstHdrAcctNo, @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        // 계좌 정보 보내기
+        DpstAcctHdrDTO dpstAcctDTO = mypageService.getDpstAcctHdr(dpstHdrAcctNo);
+        double balance;
+        if (dpstAcctDTO.getDpstHdrLinkedAcctType()==1){
+            // 원화계좌 잔액 불러오기
+            balance = mypageService.getKrwAcctBal(dpstAcctDTO.getDpstHdrLinkedAcctNo());
+        } else {
+            // 외화자식계좌 잔액, 부모계좌번호 불러오기
+            FrgnAcctBalanceDTO dto = mypageService.getFrgnAcctBal(dpstAcctDTO.getDpstHdrLinkedAcctNo());
+            balance = dto.getBalBalance();
+        }
+
+        dpstAcctDTO.setDpstHdrLinkedAcctBal(BigDecimal.valueOf(balance));
+
+
+        model.addAttribute("dpstAcctDTO", dpstAcctDTO);
+
+
+
+        // 이체 정보 받을 객체 보내기
+        CustTranHistDTO custTranHistDTO = new CustTranHistDTO();
+        // 미리 설정할 거
+        custTranHistDTO.setTranType(2); // 출금 : 2
+        custTranHistDTO.setTranRecAcctNo(dpstHdrAcctNo); // 수취계좌번호
+        custTranHistDTO.setTranRecBkCode("888");
+        custTranHistDTO.setTranCurrency(dpstAcctDTO.getDpstHdrCurrencyExp());
+        custTranHistDTO.setTranCustName(userDetails.getCustName());
+        custTranHistDTO.setTranAcctNo(dpstAcctDTO.getDpstHdrLinkedAcctNo());
+        custTranHistDTO.setTranRecName(userDetails.getCustName());
+        model.addAttribute("custTranHistDTO", custTranHistDTO);
+
+
+        return "mypage/dpst_transfer_1";
+    }
+
+    @PostMapping("/dpst_transfer_2")
+    public String dpst_transfer_2(Model model,
+                                @RequestParam String dpstHdrAcctNo,
+                                @ModelAttribute CustTranHistDTO custTranHistDTO,
+                                @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+
+
+
+        // 4. 나머지 데이터(메모 등) 처리
+        // '내통장표시'가 비어있으면 -> 사용자 이름(보내는 사람) or 조회된 받는분 이름 등 정책에 따라 설정
+        if (custTranHistDTO.getTranCustName() == null || custTranHistDTO.getTranCustName().trim().isEmpty()) {
+            // 예: 비어있으면 '나에게' 메모에는 '받는 사람 이름'을 기본으로 입력 등
+            // 여기서는 기존 로직 유지 (로그인 유저 이름)
+            custTranHistDTO.setTranCustName(userDetails.getCustName());
+        }
+        model.addAttribute("dpstHdrAcctNo", dpstHdrAcctNo);
+
+        model.addAttribute("custTranHistDTO", custTranHistDTO);
+
+        return "mypage/dpst_transfer_2";
+    }
+
+
+    @PostMapping("/dpst_transfer_3")
+    public String dpst_transfer_3(@AuthenticationPrincipal CustomUserDetails userDetails, @ModelAttribute CustTranHistDTO custTranHistDTO, Model model, @RequestParam String dpstHdrAcctNo) {
+        // 전자서명 임시 승인 수정해야함
+        custTranHistDTO.setTranEsignYn("Y");
+
+
+
+        /*
+        CustAcctDTO custAcctDTO = new CustAcctDTO();
+
+        if (custTranHistDTO.getTranEsignYn().equals("Y")) {
+            // 이체 내역 db에 반영
+            mypageService.modifyCustAcctBal(custTranHistDTO);
+            model.addAttribute("custTranHistDTO", custTranHistDTO);
+            custAcctDTO = mypageService.findCustAcct(custTranHistDTO.getTranAcctNo());
+            model.addAttribute("custAcctDTO", custAcctDTO);
+            model.addAttribute("state", "정상");
+        } else {
+            model.addAttribute("custTranHistDTO", custTranHistDTO);
+            custAcctDTO = mypageService.findCustAcct(custTranHistDTO.getTranAcctNo());
+            model.addAttribute("custAcctDTO", custAcctDTO);
+            model.addAttribute("state", "실패");
+        }
+         */
+        model.addAttribute("custTranHistDTO", custTranHistDTO);
+        model.addAttribute("state", "정상");
+
+        return "mypage/dpst_transfer_3";
     }
 
 

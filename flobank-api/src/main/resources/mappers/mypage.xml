@@ -203,4 +203,19 @@
         ORDER BY B.DPST_TRAN_DT DESC
     </select>
 
+    <select id="selectDpstAcctHdr" resultType="kr.co.api.flobankapi.dto.DpstAcctHdrDTO">
+        select * from TB_DPST_ACCT_HDR
+        where dpst_hdr_acct_no=#{dpstHdrAcctNo}
+    </select>
+
+    <select id="selectAcctBal" resultType="Double">
+        SELECT acct_balance FROM TB_CUST_ACCT
+        WHERE ACCT_NO = #{dpstHdrLinkedAcctNo}
+    </select>
+
+    <select id="selectFrgnAcctBal" resultType="kr.co.api.flobankapi.dto.FrgnAcctBalanceDTO">
+        SELECT bal_balance, bal_frgn_acct_no FROM TB_FRGN_ACCT_BALANCE
+        WHERE bal_no = #{dpstHdrLinkedAcctNo}
+    </select>
+
 </mapper>

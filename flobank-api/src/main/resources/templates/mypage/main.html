@@ -192,10 +192,10 @@
             <table class="deposit-table">
                 <thead>
                 <tr>
-                    <th>예금이름</th>
-                    <th>예금계좌</th>
+                    <th>상품명</th>
+                    <th>계좌번호</th>
                     <th>잔액</th>
-                    <th>만기일</th>
+                    <th>바로가기</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -231,7 +231,10 @@
                         <span th:case="'JPY'">¥</span>
                         <span th:case="*">?</span> <!-- 혹시 모르는 경우 -->
                     </span>[[${hdr.dpstHdrBalance}]]</td>
-                    <td th:text="|${hdr.dpstHdrFinDy.substring(0,4)}.${hdr.dpstHdrFinDy.substring(4,6)}.${hdr.dpstHdrFinDy.substring(6,8)}|">2029.10.03 (D-159)</td>
+                    <td>
+                        <a style="border: 0; font-size: 13px; padding: 3px 6px; background-color: #dadada; border-radius: 5px; color: #1c1e21; text-decoration: none">조회</a>
+                        <a th:href="@{/mypage/dpst_transfer_1(dpstHdrAcctNo=${hdr.dpstHdrAcctNo})}" style="border: 0; font-size: 13px; padding: 3px 6px; background-color: #dadada; border-radius: 5px; color: #1c1e21; text-decoration: none">입금</a>
+                    </td>
                 </tr>
 
                 </tbody>
@@ -604,6 +607,11 @@
             <tr><th>일부 출금</th><td id="detail-partial">불가능</td></tr>
             </tbody>
         </table>
+
+        <div class="view-protection" id="dpstProtect">
+            <img th:src="@{/images/deposit.png}" alt="예금자보호 로고">
+            <p>이 예금은 <strong>예금자보호법</strong>에 따라 원금과 소정의 이자를 합하여 <strong>1인당 “1억원까지”</strong> 보호됩니다.</p>
+        </div>
 
         <h3>거래 내역</h3>
         <table class="detail-table transaction-table">

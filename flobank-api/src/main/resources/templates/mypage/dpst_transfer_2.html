@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>원화 계좌이체 2</title>
+    <link rel="stylesheet" th:href="@{/css/mypage.css}">
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+    <link rel="stylesheet" th:href="@{/css/footer.css}">
+
+    <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+            crossorigin="anonymous"
+    />
+
+</head>
+<body>
+<div th:replace="~{_template/_header.html}"></div>
+<main class="transfer2-container">
+    <div class="transfer2-box">
+
+        <div class="transfer2-steps">
+            <div class="transfer2-step">
+                <span class="num">1</span><span class="text">정보입력</span>
+            </div>
+            <div class="transfer2-step active">
+                <span class="num">2</span><span class="text">입력확인</span>
+            </div>
+            <div class="transfer2-step">
+                <span class="num">3</span><span class="text">이체완료</span>
+            </div>
+        </div>
+
+        <h2 class="transfer2-title">이체확인</h2>
+
+        <div class="transfer2-info-box">
+            <p>
+                • 즉시이체는 최대 5건까지 동시에 처리 가능하며, 이체 수수료가 면제됩니다.<br>
+                • 오픈뱅킹 서비스 가입자는 등록된 금융기관 계좌를 출금계좌로 선택하여 단건 이체만 가능합니다.<br>
+                • 당행 계좌 이체의 경우, 이체 완료 후 즉시 반영됩니다.<br>
+                • 타행 계좌 이체 시 입력 정보를 정확히 확인 후 진행해주세요.<br>
+                • 피싱 등 금융사기를 예방하기 위해 의심스러운 거래는 반드시 확인 후 진행 바랍니다.
+            </p>
+        </div>
+
+        <section class="transfer2-section">
+            <h3 class="transfer2-subtitle">이체정보 확인</h3>
+            <table class="transfer2-table">
+                <colgroup>
+                    <col style="width: 25%;">
+                    <col style="width: 30%;">
+                    <col style="width: 20%;">
+                    <col style="width: 25%;">
+                </colgroup>
+                <thead>
+                <tr>
+                    <th>출금 정보</th>
+                    <th>입금 정보 (받는분)</th>
+                    <th>이체 금액</th>
+                    <th>통장 표시 내용</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="cell-center">
+                        <div style="font-weight:bold; color:#333;">플로은행</div>
+                        <span th:text="${custTranHistDTO.tranAcctNo}">출금계좌번호</span>
+                    </td>
+
+                    <td class="cell-center">
+                        <div style="font-weight: bold; color: #333; margin-bottom: 2px;">
+                            <span>플로은행</span>
+                        </div>
+
+                        <span th:text="${custTranHistDTO.tranRecAcctNo}">입금계좌번호</span>
+
+                        <div style="margin-top: 4px;">
+                            <span style="font-size: 0.85rem; color: #666;">예금주:</span>
+                            <strong style="font-size: 1.1rem; color: #004085;" th:text="${custTranHistDTO.tranRecName}">상대방 이름</strong>
+                        </div>
+                    </td>
+
+                    <td class="cell-right">
+                        <strong th:text="${#numbers.formatInteger(custTranHistDTO.tranAmount, 0, 'COMMA')}">금액</strong>원
+                        <div style="font-size: 0.8rem; color: #888;">수수료 면제</div>
+                    </td>
+
+                    <td class="cell-left" style="text-align: left; padding-left: 20px;">
+                        <div style="margin-bottom: 4px;">
+                            <span style="background: #f1f3f5; padding: 2px 6px; border-radius: 4px; font-size: 0.8rem;">나에게</span>
+                            <span>[[${custTranHistDTO.tranCustName}]]</span>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section class="transfer2-section">
+            <h3 class="transfer2-subtitle">인증 및 보안매체(보안카드, OTP) 입력 안내</h3>
+            <div class="transfer2-info-box small">
+                <p>
+                    • BNK이체서비스(비이용자) 또는 타행이체의 경우 인증서 인증이 필요합니다.<br>
+                    • 법인 및 외화 계좌 이체는 보안매체 인증이 필수입니다.<br>
+                    • 개인 고객은 1회 1천만원, 1일 1천만원 한도로 이체 가능합니다.
+                </p>
+            </div>
+        </section>
+
+        <div class="transfer2-actions">
+            <form th:action="@{/mypage/dpst_transfer_1(dpstHdrAcctNo=${dpstHdrAcctNo})}" method="post" style="display:inline;">
+                <input type="hidden" name="acctNo" th:value="${custTranHistDTO.tranAcctNo}">
+                <button type="submit" class="transfer2-btn-sub">이전</button>
+            </form>
+
+            <form th:action="@{/mypage/dpst_transfer_3(dpstHdrAcctNo=${dpstHdrAcctNo})}" th:object="${custTranHistDTO}" method="post" style="display:inline;">
+                <input type="hidden" th:field="*{tranAcctNo}">
+                <input type="hidden" th:field="*{tranCustName}">
+                <input type="hidden" th:field="*{tranRecAcctNo}">
+                <input type="hidden" th:field="*{tranRecName}">
+                <input type="hidden" th:field="*{tranAmount}">
+                <input type="hidden" th:field="*{tranRecBkCode}">
+                <input type="hidden" th:field="*{tranMemo}">
+                <input type="hidden" th:field="*{tranType}">
+
+                <button type="submit" class="transfer2-btn-main">이체실행</button>
+            </form>
+        </div>
+
+    </div>
+</main>
+<div th:replace="~{_template/_footer.html}"></div>
+
+</body>
+</html>

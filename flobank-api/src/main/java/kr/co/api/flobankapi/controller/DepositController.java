@@ -337,10 +337,16 @@ public class DepositController {
         dpstAcctHdrDTO.setDpstHdrExpAcctNo(
                 "krw".equals(dto.getWithdrawType()) ? dto.getAcctNo() : dto.getFrgnAcctNo()
         );
+
         dpstAcctHdrDTO.setDpstHdrAutoRenewYn("y".equals(dto.getAutoRenewYn()) ? "y" : "n");
         if ("y".equals(dto.getAutoRenewYn())) {
             dpstAcctHdrDTO.setDpstHdrAutoRenewTerm(dto.getAutoRenewTerm());
             dpstAcctHdrDTO.setDpstHdrAutoRenewCnt(0);
+        }
+        if ("krw".equals(dto.getWithdrawType()) || product.getDpstRateType()==2) {
+            dpstAcctHdrDTO.setDpstHdrLinkedAcctType(1);
+        }else{
+            dpstAcctHdrDTO.setDpstHdrLinkedAcctType(2);
         }
         dpstAcctHdrDTO.setDpstHdrPartWdrwCnt(0);
         dpstAcctHdrDTO.setDpstHdrInfoAgreeYn("y");

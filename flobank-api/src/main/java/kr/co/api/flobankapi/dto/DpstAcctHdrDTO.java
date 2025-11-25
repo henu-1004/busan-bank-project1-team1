@@ -29,6 +29,7 @@ public class DpstAcctHdrDTO {
 
     private String dpstHdrLinkedAcctNo;  // 출금 계좌번호 (원화 또는 외화)
     private String dpstHdrExpAcctNo;
+    private int dpstHdrLinkedAcctType;
 
     private String dpstHdrAutoRenewYn;   // 자동연장 여부 (Y/N)
     private Integer dpstHdrAutoRenewCnt; // 자동연장 횟수
@@ -43,4 +44,6 @@ public class DpstAcctHdrDTO {
     private String dpstHdrInfoAgreeYn;
     private LocalDateTime dpstHdrInfoAgreeDt;
     private LocalDateTime dpstHdrContractDt;
+
+    private BigDecimal dpstHdrLinkedAcctBal;
 }
