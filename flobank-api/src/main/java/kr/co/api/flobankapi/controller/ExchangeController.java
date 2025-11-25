@@ -186,8 +186,6 @@ public class ExchangeController {
         Map<String, Object> response = new HashMap<>();
 
         try {
-            log.info("환전 신청 요청 데이터: {}", reqData);
-
             // 1. DTO 객체 생성 및 매핑
             FrgnExchTranDTO transDTO = new FrgnExchTranDTO();
 
@@ -223,8 +221,6 @@ public class ExchangeController {
                 transDTO.setExchFromCurrency(foreignCurrency);
                 transDTO.setExchToCurrency("KRW");
             }
-
-            log.info("DB 저장용 DTO 변환 완료: {}", transDTO);
 
             // 쿠폰 번호 매핑
             if (reqData.get("couponNo") != null) {

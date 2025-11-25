@@ -1,27 +1,31 @@
-
-
 <header xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
     <div class="top-bar">
         <ul></ul>
         <div class="right-menu">
-            <!--
-             sec:authorize="isAnonymous()": 로그인하지 않은 사람에게만 보이는 영역.
-             sec:authorize="isAuthenticated()": 로그인 성공해서 SecurityContext에 인증 정보가 있는 사람에게만 보임.
-             sec:authentication="name": 토큰에 담긴 사용자 ID(Subject)를 화면에 출력.
-             -->
             <div sec:authorize="isAnonymous()">
                 <a th:href="@{/member/login}">로그인</a>
                 <a th:href="@{/member/terms}">회원가입</a>
             </div>
 
-            <div sec:authorize="isAuthenticated()">
+            <div sec:authorize="isAuthenticated()" style="display: flex; align-items: center;">
+                <span id="sessionTimerWrap" style="margin-right: 15px; font-size: 13px; color: #555;">
+                    <i class="fa-regular fa-clock"></i>
+                    <span id="timerDisplay" style="color: #e02f2f; font-weight: bold; margin: 0 3px;">20:00</span>
+                    <button type="button" onclick="extendSession()"
+                            style="cursor: pointer; border: 1px solid #ccc; background-color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 12px;">
+                        연장
+                    </button>
+                </span>
+
                 <a th:href="@{/mypage/main}">
-                <span sec:authentication="principal.custName">사용자ID</span>님 환영합니다!
+                    <span sec:authentication="principal.custName">사용자ID</span>님 환영합니다!
                 </a>
-                <form th:action="@{/member/logout}" method="post" style="display:inline;">
+
+                <form th:action="@{/member/logout}" method="post" style="display:inline; margin-left: 10px;">
                     <button type="submit" style="border:none; background:none; cursor:pointer;">로그아웃</button>
                 </form>
             </div>
+
             <div class="language-dropdown">
                 <a href="#" class="language-toggle">Language ▾</a>
                 <ul class="language-menu">
@@ -37,7 +41,7 @@
     <div class="main-nav">
         <div class="logo">
             <a th:href="@{/}">
-            <img th:src="@{/images/logo.png}" alt="FLOBANK 로고">
+                <img th:src="@{/images/logo.png}" alt="FLOBANK 로고">
             </a>
         </div>
 
@@ -83,4 +87,79 @@
             <a th:href="@{/customer/terms_download}">약관 다운로드</a>
         </div>
     </div>
+
+    <script>
+        let timerInterval;
+        const SESSION_TIME = 1200; // 20분 (초 단위)
+        let remainingTime = SESSION_TIME;
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const timerWrap = document.getElementById("sessionTimerWrap");
+            // 로그인 상태(타이머 요소 존재)라면 즉시 실행
+            if (timerWrap) {
+                // 1. [수정] 일단 화면의 타이머부터 즉시 시작 (UI 반응성 향상)
+                startTimer();
+
+                // 2. [수정] 백그라운드에서 서버 세션 연장 요청 (실패해도 타이머는 돌아감)
+                extendSession(true);
+            }
+        });
+
+        function startTimer() {
+            // 기존 인터벌 제거 (중복 실행 방지)
+            if (timerInterval) clearInterval(timerInterval);
+
+            remainingTime = SESSION_TIME; // 시간 초기화 (20분)
+            updateTimerDisplay(); // 화면 즉시 갱신
+
+            // 1초마다 감소 로직 시작
+            timerInterval = setInterval(function() {
+                remainingTime--;
+                updateTimerDisplay();
+
+                if (remainingTime <= 0) {
+                    clearInterval(timerInterval);
+                    alert("로그인 세션이 만료되었습니다.\n메인 페이지로 이동합니다.");
+
+                    fetch('/member/logout', { method: 'POST' })
+                        .then(() => { window.location.href = "/"; })
+                        .catch(() => { window.location.href = "/"; });
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const displayElement = document.getElementById("timerDisplay");
+            if (!displayElement) return;
+
+            let min = Math.floor(remainingTime / 60);
+            let sec = remainingTime % 60;
+
+            let minStr = min < 10 ? "0" + min : min;
+            let secStr = sec < 10 ? "0" + sec : sec;
+
+            displayElement.innerText = minStr + ":" + secStr;
+        }
+
+        function extendSession(isAuto = false) {
+            fetch('/member/extend', {
+                method: 'POST'
+            })
+                .then(response => {
+                    if (response.ok) {
+                        if(!isAuto) {
+                            alert("로그인 시간이 20분 연장되었습니다.");
+                            // 버튼으로 수동 연장했을 때만 타이머를 20분으로 리셋
+                            startTimer();
+                        }
+                        // 자동 연장(isAuto=true)일 때는 이미 startTimer()가 돌고 있으므로
+                        // 굳이 다시 리셋하지 않아도 됩니다. (선택 사항)
+                        console.log("세션 연장 성공");
+                    } else {
+                        console.log("세션 연장 실패 (서버 응답 오류)");
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+    </script>
 </header>
