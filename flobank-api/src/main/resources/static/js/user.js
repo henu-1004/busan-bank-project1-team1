@@ -213,6 +213,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const closeDepositBtn = depositModal.querySelector(".close-btn");
         const depositDetailTable = depositModal.querySelector(".detail-table tbody");
         const depositHistoryTbody = document.getElementById("depositHistory");
+        const depositModalHeader = document.getElementById("deposit-modal-header");
 
         // 날짜 포맷터 (YYYYMMDD → YYYY.MM.DD)
         function formatDate(yyyymmdd) {
@@ -230,6 +231,8 @@ document.addEventListener("DOMContentLoaded", function () {
             if (typeCode === "2") return "자유적립식";
             return typeCode || "";
         }
+
+        const histories = window.dpstHistList || [];
 
         // --- 예금 이름 클릭 시 모달 열기 ---
         document.querySelectorAll(".deposit-name").forEach(link => {
@@ -253,38 +256,61 @@ document.addEventListener("DOMContentLoaded", function () {
                 const wdrwMax = link.dataset.wdrwmax;
                 const wdrwCnt   = link.dataset.wdrwcnt;
                 const month     = link.dataset.month;
+                const interest = link.dataset.interest;
+                const custName = link.dataset.custname;
+                const filteredHistory = histories.filter(h => h.dpstDtlHdrNo === id);
+
+
+                depositModalHeader.innerHTML = `
+                    
+                    <h1>${name}</h1>
+            <div style="color: gray; font-size: 15px;">${id}</div>
+            <div>
+                <span style="background-color: #304878; padding: 1px 6px; font-size: 13px; color: white; border-radius: 5px;">예금</span>
+                <span style="color: gray; line-height: 16px; font-size: 15px; margin-top: 2px;">${formatDate(endRaw || "")} 만기</span>
+            </div>
+            <br>
+                `;
+
 
                 // 상세 테이블 HTML 구성
                 let html = `
-                <tr><th>예금이름</th><td>${name}</td></tr>
-                <tr><th>예금유형</th><td>${typeName}</td></tr>
-                <tr><th>예금계좌</th><td>${id}</td></tr>
-                <tr><th>잔액</th><td>${balance} ${expCurrency || ""}</td></tr>
-                <tr><th>가입일</th><td>${formatDate(startRaw || "")}</td></tr>
-                <tr><th>만기일</th><td>${formatDate(endRaw || "")}</td></tr>
-                <tr><th>가입 통화</th><td>${currency || ""}</td></tr>
-                <tr><th>적용 금리</th><td>${rate || ""}%</td></tr>
-                <tr><th>자동 재예치</th><td>${autorenew === "y" ? "예" : "아니오"}</td></tr>
+                
+                
+                <tr><th>예금주</th><td colspan="3">${custName}</td></tr>
+                <tr><th>현재 잔액</th><td colspan="3">${balance} ${expCurrency || ""}</td></tr>
+                <tr>
+                    <th>개설일</th><td colspan="3">${formatDate(startRaw || "")}</td>
+                 
+                </tr>
+               
+                <tr>
+                    <th>가입 통화</th><td>${currency || ""}</td>
+                    <th>예금유형</th><td>${typeName}</td>
+                </tr>
+                <tr><th>적용 금리</th><td colspan="3">${interest || ""}%</td></tr>
+                <tr><th>적용 환율</th><td colspan="3">${rate || ""}</td></tr>
+                <tr><th>자동 재예치</th><td colspan="3">${autorenew === "y" ? "Y" : "N"}</td></tr>
             `;
 
                 // 유형별로 추가 정보 (가능한 경우만)
                 if (autorenew === "y") {
-                    html += `<tr><th>자동 재예치 기간</th><td>${autorenewTerm}</td></tr>`
+                    html += `<tr><th>자동 재예치 기간</th><td colspan="3">${autorenewTerm}개월</td></tr>`
                 }
 
                 if (typeCode === "1") { // 거치식
                     if (month) {
-                        html += `<tr><th>예치 기간</th><td>${month}개월</td></tr>`;
+                        html += `<tr><th>예치 기간</th><td colspan="3">${month}개월</td></tr>`;
                     }
                     if (wdrwYn === 'Y' || wdrwYn === 'y') {
-                        html += `<tr><th>일부 인출 가능 횟수</th><td>${wdrwMax}회</td></tr>`;
+                        html += `<tr><th>일부 인출 가능 횟수</th><td colspan="3">${wdrwMax}회</td></tr>`;
                     }
                 } else if (typeCode === "2") { // 자유적립식
                     if (month) {
-                        html += `<tr><th>적립 기간</th><td>${month}개월</td></tr>`;
+                        html += `<tr><th>적립 기간</th><td colspan="3">${month}개월</td></tr>`;
                     }
                     if (wdrwYn === 'Y' || wdrwYn === 'y') {
-                        html += `<tr><th>일부 인출 가능 횟수</th><td>${wdrwMax}회</td></tr>`;
+                        html += `<tr><th>일부 인출 가능 횟수</th><td colspan="3">${wdrwMax}회</td></tr>`;
                     }
                 }
 
@@ -293,7 +319,19 @@ document.addEventListener("DOMContentLoaded", function () {
                 // 거래내역은 아직 서버/DB 연동 전이면 일단 비우기
                 if (depositHistoryTbody) {
                     depositHistoryTbody.innerHTML = "";
-                    // TODO: 나중에 계좌번호(id)를 기준으로 AJAX로 거래내역 불러와서 채우기
+                    if (!filteredHistory.length) {
+                        depositHistoryTbody.innerHTML = "<tr><td colspan='3'>거래내역 없음</td></tr>";
+                    } else {
+                        filteredHistory.forEach(r => {
+                            const tr = document.createElement("tr");
+                            tr.innerHTML = `
+                    <td>${r.dpstTranDt.replace('T', ' ')}</td>
+                    <td>${r.dpstDtlAmount} ${r.dpstHdrCurrencyExp}</td>
+                    <td>${r.dpstHdrBalance} ${r.dpstHdrCurrencyExp}</td>
+                `;
+                            depositHistoryTbody.appendChild(tr);
+                        });
+                    }
                 }
 
                 depositModal.style.display = "flex";

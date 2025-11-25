@@ -19,4 +19,10 @@ public class DpstAcctDtlDTO {
     private String dpstDtlEsignYn;
     private LocalDateTime dpstDtlEsignDt;
     private BigDecimal dpstDtlAppliedRate;
+
+    // 예금계좌 추가 필드
+    private String dpstHdrCustCode;
+    private String dpstHdrCurrencyExp;
+    private String dpstHdrBalance;
+
 }

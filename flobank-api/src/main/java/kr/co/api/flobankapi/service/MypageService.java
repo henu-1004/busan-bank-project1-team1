@@ -287,6 +287,10 @@ public class MypageService {
     public List<MypageDpstDTO> getDpstAcctHdrList(String dpstHdrCustCode) {
         return mypageMapper.selectDpstAccts(dpstHdrCustCode);
     }
+
+    public List<DpstAcctDtlDTO> getDpstAcctHistList(String dpstHdrCustCode) {
+        return mypageMapper.selectDpstAcctDtls(dpstHdrCustCode);
+    }
 }
 
 

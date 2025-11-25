@@ -69,6 +69,10 @@ public class MypageController {
 
         List<MypageDpstDTO> dpstList = mypageService.getDpstAcctHdrList(userCode);
         model.addAttribute("dpstList", dpstList);
+
+        List<DpstAcctDtlDTO> dpstHistList = mypageService.getDpstAcctHistList(userCode);
+        model.addAttribute("dpstHistList", dpstHistList);
+
         return "mypage/main";
     }
 

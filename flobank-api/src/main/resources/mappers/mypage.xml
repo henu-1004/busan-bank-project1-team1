@@ -184,8 +184,23 @@
     </select>
 
     <select id="selectDpstAcctDtls" resultType="kr.co.api.flobankapi.dto.DpstAcctDtlDTO">
-        select * from TB_DPST_ACCT_DTL
-        where dpst_dtl_hdr_no=#{dpstDtlHdrNo}
+        SELECT
+        B.DPST_DTL_NO,
+        B.DPST_DTL_TYPE,
+        B.DPST_DTL_AMOUNT,
+        B.DPST_TRAN_DT,
+        B.DPST_DTL_HDR_NO,
+        B.DPST_DTL_ESIGN_YN,
+        B.DPST_DTL_ESIGN_DT,
+        B.DPST_DTL_APPLIED_RATE,
+        A.DPST_HDR_CUST_CODE,
+        A.DPST_HDR_CURRENCY_EXP,
+        A.DPST_HDR_BALANCE
+        FROM TB_DPST_ACCT_HDR A
+        JOIN TB_DPST_ACCT_DTL B
+        ON A.DPST_HDR_ACCT_NO = B.DPST_DTL_HDR_NO
+        WHERE A.DPST_HDR_CUST_CODE = #{dpstHdrCustCode}
+        ORDER BY B.DPST_TRAN_DT DESC
     </select>
 
 </mapper>

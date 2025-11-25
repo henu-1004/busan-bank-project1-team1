@@ -202,6 +202,7 @@
                 <tr th:each="hdr : ${dpstList}">
                     <td><a href="#" class="deposit-name"
                            th:data-id="${hdr.dpstHdrAcctNo}"
+                           th:data-custname="${custInfo.custName}"
                            th:data-name="${hdr.dpstName}"
                            th:data-type="${hdr.dpstType}"
                            th:data-balance="${hdr.dpstHdrBalance}"
@@ -215,7 +216,8 @@
                            th:data-wdrwyn="${hdr.dpstPartWdrwYn}"
                            th:data-wdrwcnt="${hdr.dpstHdrPartWdrwCnt}"
                            th:data-wdrwmax="${hdr.wdrwMax}"
-                           th:data-month="${hdr.dpstHdrMonth}">
+                           th:data-month="${hdr.dpstHdrMonth}"
+                           th:data-interest="${hdr.dpstHdrInterest}">
                     [[${hdr.dpstName}]]</a></td>
                     <td>[[${hdr.dpstHdrAcctNo}]]</td>
                     <td><span th:switch="${hdr.dpstHdrCurrencyExp}">
@@ -577,6 +579,16 @@
         <span class="close-btn">&times;</span>
         <h2>예금 상세정보</h2>
 
+        <div id="deposit-modal-header">
+            <h1>우리ONE 복리 외화예금</h1>
+            <div style="color: gray; font-size: 15px;">104-33-3333-22</div>
+            <div>
+                <span style="background-color: #304878; padding: 1px 6px; font-size: 13px; color: white; border-radius: 5px;">예금</span>
+                <span style="color: gray; line-height: 16px; font-size: 15px; margin-top: 2px;">2025.11.04 만기</span>
+            </div>
+            <br>
+        </div>
+
         <table class="detail-table">
             <tbody>
             <tr><th>예금이름</th><td id="detail-name">플로달러예금</td></tr>
@@ -611,6 +623,10 @@
 
 <div th:replace="~{_template/_footer.html}"></div>
 <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+
+<script th:inline="javascript">
+    window.dpstHistList = /*[[${dpstHistList}]]*/ [];
+</script>
 <script th:src="@{/js/user.js}"></script>
 
 </body>
