@@ -8,6 +8,10 @@ services:
     restart: always
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - SPRING_PROFILES_ACTIVE=prod  #운영 프로파일 활성화
+
+    command: >
+      java -jar app.jar --spring.profiles.active=${SPRING_PROFILES_ACTIVE}
     volumes:
       - flobank_uploads:/app/uploads
 
