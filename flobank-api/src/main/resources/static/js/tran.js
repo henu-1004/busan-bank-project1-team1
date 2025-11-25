@@ -11,6 +11,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const tranAmountError = document.getElementById('tranAmountError');
     const tranRecAcctNoError = document.getElementById('tranRecAcctNoError');
 
+    const accountPwInput = document.getElementById('accountPw');
+    const accountPwError = document.getElementById('accountPwError');
+    const tranAcctNoHidden = document.getElementById('tranAcctNo'); // 출금 계좌번호
+
     // [기능 1] 폼 제출 시 유효성 검사 및 서버 계좌 확인
     form.addEventListener('submit', async function(event) {
         // 1. 일단 폼의 자동 제출을 막습니다.
@@ -29,6 +33,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         resetError(tranAmountInput, tranAmountError);
         resetError(tranRecAcctNoInput, tranRecAcctNoError);
+        resetError(accountPwInput, accountPwError);
 
         // --- [클라이언트 측 검사 시작] ---
 
@@ -73,6 +78,27 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (csrfTokenMeta && csrfHeaderMeta) {
                 headers[csrfHeaderMeta.content] = csrfTokenMeta.content;
+            }
+
+            // 비밀번호 검증 요청
+            const pwResponse = await fetch('/flobank/mypage/checkAcctPw', {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify({
+                    acctNo: tranAcctNoHidden.value, // 출금 계좌번호
+                    accountPw: accountPwInput.value // 입력한 비밀번호
+                })
+            });
+
+            if (!pwResponse.ok) throw new Error('비밀번호 확인 통신 오류');
+
+            const pwResult = await pwResponse.json();
+
+            // 비밀번호가 틀리면 여기서 중단
+            if (!pwResult.isPwCorrect) {
+                showError(accountPwInput, accountPwError, "비밀번호가 일치하지 않습니다.");
+                accountPwInput.focus();
+                return;
             }
 
             // 컨트롤러 URL 주의: 클래스 매핑(/mypage) + 메서드 매핑(/api/validate-account)

@@ -123,7 +123,8 @@
                 <select id="accountSelectWon" class="step2-select">
                     <option th:each="dto : ${custAcctDTOList}"
                             th:text="|${dto.acctNo} (잔액 ${#numbers.formatInteger(dto.acctBalance, 0, 'COMMA')}원)|"
-                            th:value="${dto.acctNo}">
+                            th:value="${dto.acctNo}"
+                            th:data-balance="${dto.acctBalance}">
                     </option>
                 </select>
                 <select id="accountSelectForeign" class="step2-select" style="display:none;">

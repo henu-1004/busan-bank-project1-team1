@@ -103,11 +103,16 @@ public class ExchangeService {
                     "환전(" + transDTO.getExchToCurrency() + ")",
                     withdrawKrw,
                     2,      // 출금
-                    "KRW"   // 통화
+                    "KRW",  // 통화
+                    "",     // 상대계좌 (없음)
+                    "888"   // 상대은행 (플로은행)
             );
 
         } else {
             // [SELL] 외화 -> 원화
+
+            // RecAcctNo에 저장할 값
+            String depositAcctNo = transDTO.getExchAddr().replace("즉시입금:", "").trim();
 
             // 외화 출금액
             BigDecimal withdrawForeign = transDTO.getExchAmount();
@@ -124,29 +129,32 @@ public class ExchangeService {
                     transDTO.getExchFromCurrency()
             );
 
-            // [추가] 외화 계좌 거래내역 (출금)
-            // 잔액은 계산하지 않고 기록만 남김
+            // 2. 외화 계좌 거래내역 (출금) 기록
             insertTransactionHistory(
-                    transDTO.getExchAcctNo(),                   // 외화 계좌번호
+                    transDTO.getExchAcctNo(),                   // 외화 계좌번호 (출금 주체)
                     custName,
                     "환전(" + transDTO.getExchFromCurrency() + "→KRW)",
-                    withdrawForeign,                            // 외화 금액 (BigDecimal)
+                    withdrawForeign,                            // 외화 금액
                     2,                                          // 출금
-                    transDTO.getExchFromCurrency()              // 통화 (예: USD)
+                    transDTO.getExchFromCurrency(),             // 통화
+                    depositAcctNo,                              // ★ 상대계좌 (입금받은 원화계좌)
+                    "888"                                       // ★ 상대은행코드
             );
 
             // 원화 계좌 입금
-            String depositAcctNo = transDTO.getExchAddr().replace("즉시입금:", "").trim();
             mypageMapper.updatePlusAcct(depositKrw, depositAcctNo);
 
-            // 원화 계좌 거래내역 (입금)
+            // 원화 계좌 거래내역 (입금) 기록
+            // 여기서는 돈이 들어온 출처(외화계좌)를 상대계좌로 적어주면 좋습니다.
             insertTransactionHistory(
                     depositAcctNo,
                     custName,
                     "환전입금(" + transDTO.getExchFromCurrency() + ")",
                     depositKrw,
                     1,      // 입금
-                    "KRW"   // 통화
+                    "KRW",  // 통화
+                    transDTO.getExchAcctNo(), // 상대계좌 (돈이 나간 외화계좌)
+                    "888"
             );
         }
 
@@ -157,7 +165,7 @@ public class ExchangeService {
     }
 
     // [Helper] 거래내역 기록 공통 메소드
-    private void insertTransactionHistory(String acctNo, String custName, String summary, BigDecimal amount, int type, String currency) {
+    private void insertTransactionHistory(String acctNo, String custName, String summary, BigDecimal amount, int type, String currency, String recAcctNo, String recBkCode) {
         CustTranHistDTO histDTO = new CustTranHistDTO();
         histDTO.setTranAcctNo(acctNo);
         histDTO.setTranCustName(custName);
@@ -170,9 +178,11 @@ public class ExchangeService {
         // 잔액은 무시 (null로 들어감 -> DB에서 nullable이어야 함. 아니면 0으로 세팅)
         histDTO.setTranBalance(0);
 
+        // 값 세팅
+        histDTO.setTranRecAcctNo(recAcctNo != null ? recAcctNo : "");
+        histDTO.setTranRecBkCode(recBkCode != null ? recBkCode : "888");
+
         // NULL 처리 (MyBatis jdbcType 필수)
-        histDTO.setTranRecAcctNo("");
-        histDTO.setTranRecBkCode("");
         histDTO.setTranEsignYn("Y");
 
         mypageMapper.insertTranHist(histDTO);

@@ -113,21 +113,46 @@ public class MypageService {
         return extAcctMapper.selectExtAcct(acctNo, bkCode);
     }
 
-    // 입금, 출금
+    // 원화 -> 원환 입금, 출금
     @Transactional
-    public void modifyCustAcctBal(CustTranHistDTO custTranHistDTO){
+    public void processCustAcctBal(CustTranHistDTO custTranHistDTO){
         BigDecimal amount = custTranHistDTO.getTranAmount();
         String acctNo = custTranHistDTO.getTranAcctNo();
+        // 출금 실행
         mypageMapper.updateMinusAcct(amount, acctNo);
 
-        // 출금을 플로뱅크로 했다면
+        // 원화 -> 원화이기에 고정 KRW
+        custTranHistDTO.setTranCurrency("KRW");
+
+        // 출금을 플로뱅크로 했다면 입금 로직 실행
         if("888".equals(custTranHistDTO.getTranRecBkCode())){
             String recAcctNo = custTranHistDTO.getTranRecAcctNo();
+            // 입급 실행
             mypageMapper.updatePlusAcct(amount, recAcctNo);
+
+            // 출금 이체 내역 삽입
+            mypageMapper.insertTranHist(custTranHistDTO);
+
+            // 입금 이체 내역 삽입
+            CustTranHistDTO tranHist =  new CustTranHistDTO();
+            tranHist.setTranAcctNo(custTranHistDTO.getTranRecAcctNo());
+            tranHist.setTranAmount(amount);
+            tranHist.setTranType(1);
+            tranHist.setTranRecAcctNo(recAcctNo);
+            tranHist.setTranRecName(custTranHistDTO.getTranCustName());
+            tranHist.setTranRecBkCode("888");
+            tranHist.setTranCurrency("KRW");
+            tranHist.setTranCustName(custTranHistDTO.getTranRecName());
+
+            mypageMapper.insertTranHist(tranHist);
+
+        }else{
+            // 출금 이체 내역 삽입
+            mypageMapper.insertTranHist(custTranHistDTO);
         }
 
-        // 이체 내역 삽입
-        mypageMapper.insertTranHist(custTranHistDTO);
+
+
     }
 
     // 외화 자식 계좌 조회
@@ -278,6 +303,15 @@ public class MypageService {
         return result;
     }
 
+    // 이체 전 계좌 비밀번호 확인
+    public boolean checkAcctPw(String acctNo, String inputPw) {
+        // 계좌번호로 계좌 정보 들고오기
+        CustAcctDTO custAcctDTO = findCustAcct(acctNo);
+
+        // 계좌 비밀번호 일치하는지 확인
+        return passwordEncoder.matches(inputPw, custAcctDTO.getAcctPw());
+
+    }
 
     public List<CouponDTO> getCouponList(String custCode) {
         return mypageMapper.selectCouponList(custCode);

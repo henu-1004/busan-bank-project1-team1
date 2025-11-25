@@ -64,8 +64,8 @@ document.addEventListener("DOMContentLoaded", () => {
     let currentTtbRate = 0;     // 전신환매입율 (받으실 때)
     let currentMode = 'BUY';
 
-    // 1. 우리 플로은행의 기본 환율 수수료는 0.05 (5%)
-    const FLO_BASIC_FEE = 0.05;
+    // 1. 우리 플로은행의 기본 환율 수수료는 0.95 (95%)
+    const FLO_BASIC_FEE = 0.95;
 
     // 통화별 기본 우대율 설정
     // 이미지에 있는 통화별 우대율을 매핑 (달러 70%, 엔/유로 50%, 그외 30%)
@@ -281,7 +281,9 @@ document.addEventListener("DOMContentLoaded", () => {
             });
     }
 
-    // [수정] 환율 계산 로직
+    // =========================================
+    // 환율 계산 로직 (calculateExchange)
+    // =========================================
     function calculateExchange() {
         if (!currentBaseRate || !fromAmount.value) {
             toAmount.value = '';
@@ -290,57 +292,51 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         const amount = parseFloat(fromAmount.value);
+        // 외화 코드가 무엇인지 확인 (USD, JPY 등)
         const foreignCode = (currentMode === 'BUY') ? toCurrency.value : fromCurrency.value;
 
-        // ----------------------------------------------------
-        // 1. 스프레드(차액) 계산 (모드별 분기)
-        // BUY (원->외): TTS - Rate
-        // SELL (외->원): Rate - TTB
-        // ----------------------------------------------------
+        // 1. 스프레드(Spread) 계산: 기준율과 고시환율의 차이
         let spread = 0;
         if (currentMode === 'BUY') {
             spread = currentTtsRate - currentBaseRate;
         } else {
-            // 외화 팔 때 (SELL)
             spread = currentBaseRate - currentTtbRate;
         }
-
         if (spread < 0) spread = 0; // 안전장치
 
-        // ----------------------------------------------------
-        // 2. 수수료율 계산 (동일)
-        // ----------------------------------------------------
-        let feeRate = FLO_BASIC_FEE * (1 - selectedCouponRate);
+        // 2. 적용 우대율 결정 (기본 우대율 vs 쿠폰 우대율)
+        // -> 쿠폰을 선택했다면 쿠폰 우대율을 적용, 아니면 통화별 기본 우대율 적용
+        let basePref = BASE_PREF_RATES[foreignCode] || BASE_PREF_RATES['OTHERS'];
+        let finalPrefRate = (selectedCouponRate > 0) ? selectedCouponRate : basePref;
 
-        // ----------------------------------------------------
-        // 3. 총 수수료 금액 (공식 동일)
-        // (차액) + (차액 * 수수료율)
-        // ----------------------------------------------------
-        let totalFeeAmount = spread + (spread * feeRate);
+        // 3. 개당 최종 수수료 계산
+        // 공식: 스프레드 * 수수료율(95%) * (1 - 우대율)
+        // 예: 스프레드 10원, 95% 수수료, 70% 우대
+        // -> 10 * 0.95 * (1 - 0.7) = 10 * 0.95 * 0.3 = 2.85원 (고객이 내는 돈)
+        let unitFee = spread * BASE_FEE_RATE * (1 - finalPrefRate);
 
-        // ----------------------------------------------------
         // 4. 최종 적용 환율 도출
-        // ----------------------------------------------------
         let appliedRate = 0;
-
         if (currentMode === 'BUY') {
-            // 살 때: 기준율 + 수수료 (고객이 비싸게 삼)
-            appliedRate = currentBaseRate + totalFeeAmount;
+            // 살 때: 기준율 + 수수료 (비싸게 삼)
+            appliedRate = currentBaseRate + unitFee;
         } else {
-            // 팔 때: 기준율 - 수수료 (고객이 싸게 팖)
-            appliedRate = currentBaseRate - totalFeeAmount;
+            // 팔 때: 기준율 - 수수료 (싸게 팖)
+            appliedRate = currentBaseRate - unitFee;
         }
 
-        // --- UI 표시 (기존 코드 유지) ---
+        // --- UI 표시 및 금액 계산 ---
         let convertVal = 0;
         if (currentMode === 'BUY') {
+            // 원화 -> 외화
             if (foreignCode === 'JPY' || foreignCode === 'CNH') {
-                convertVal = amount / (appliedRate / 100);
+                convertVal = amount / (appliedRate / 100); // 100단위 통화 처리
             } else {
                 convertVal = amount / appliedRate;
             }
             toAmount.value = convertVal.toFixed(2);
         } else {
+            // 외화 -> 원화
             if (foreignCode === 'JPY' || foreignCode === 'CNH') {
                 convertVal = amount * (appliedRate / 100);
             } else {
@@ -350,6 +346,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         resultBaseRate.innerText = `${currentBaseRate.toLocaleString()} 원`;
+        // 적용 환율 표시 (소수점 2자리)
         resultRate.innerText = `${appliedRate.toFixed(2)} 원`;
 
         if (currentMode === 'BUY') {
@@ -399,6 +396,38 @@ document.addEventListener("DOMContentLoaded", () => {
             let selectedAccount = (currentMode === 'BUY') ? accountWon.value : accountForeign.value;
             if (!selectedAccount) { alert("출금 계좌를 선택해주세요."); return; }
 
+            const inputAmt = parseFloat(fromAmount.value); // 사용자가 입력한 금액
+            let currentBalance = 0;
+
+            // -------------------------------------------------------------
+            // 잔액 비교 로직 시작
+            // -------------------------------------------------------------
+            if (currentMode === 'BUY') {
+                // [원화 출금] HTML에 심어둔 data-balance 값 가져오기
+                const selectedOption = accountWon.options[accountWon.selectedIndex];
+                if (selectedOption) {
+                    currentBalance = parseFloat(selectedOption.getAttribute('data-balance')) || 0;
+                }
+            } else {
+                // [외화 출금] 전역 변수 frgnBalanceMap에서 잔액 조회
+                // SELL 모드일 때 fromCurrency는 외화 코드(USD 등)입니다.
+                const currencyCode = fromCurrency.value;
+                currentBalance = frgnBalanceMap[currencyCode] || 0;
+            }
+
+            // 잔액 비교 (입력 금액이 잔액보다 크면 차단)
+            if (inputAmt > currentBalance) {
+                // 통화 단위 포맷팅 (보기 좋게)
+                const formattedBalance = currentBalance.toLocaleString(undefined, { maximumFractionDigits: 2 });
+                const unit = (currentMode === 'BUY') ? '원' : fromCurrency.value;
+
+                alert(`출금 계좌의 잔액이 부족합니다.\n(현재 잔액: ${formattedBalance} ${unit})`);
+                return; // 다음 단계 진행 중단
+            }
+            // -------------------------------------------------------------
+            // 잔액 비교 로직 끝
+            // -------------------------------------------------------------
+
             // 수령일 필수 선택 체크 (BUY 모드일 때만)
             if (currentMode === 'BUY' && !receiveDateInput.value) {
                 alert("수령 희망일을 선택해주세요.");
@@ -433,22 +462,23 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    // =========================================
+    // 서버 전송 함수 (submitExchangeRequest)
+    // =========================================
     function submitExchangeRequest(sourceAcctNo) {
-        // 1. 화면에서 최종 적용 환율 가져오기
+        // 1. 화면 값 가져오기
         const appliedRateText = document.getElementById("result-rate").innerText.replace(/[^0-9.]/g, "");
         const foreignCode = (currentMode === 'BUY') ? toCurrency.value : fromCurrency.value;
 
         // 2. 외화 금액 파싱
         let finalForeignAmt = 0;
         if(currentMode === 'BUY') {
-            // 살 때: 결과창의 외화 금액
             finalForeignAmt = parseFloat(document.getElementById("result-final").innerText.replace(/[^0-9.]/g, ""));
         } else {
-            // 팔 때: 입력창의 외화 금액
             finalForeignAmt = parseFloat(fromAmount.value);
         }
 
-        // 3. spread(차액) 변수 재계산
+        // 3. 스프레드 재계산
         let spread = 0;
         if (currentMode === 'BUY') {
             spread = currentTtsRate - currentBaseRate;
@@ -457,11 +487,31 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         if (spread < 0) spread = 0;
 
-        // 4. 총 수수료(원화) 계산
-        const feeRate = FLO_BASIC_FEE * (1 - selectedCouponRate);
-        const unitFee = spread + (spread * feeRate); // 1단위당 수수료
+        // 4. 우대율 및 수수료 재계산 (화면 로직과 동일하게)
+        let basePref = BASE_PREF_RATES[foreignCode] || BASE_PREF_RATES['OTHERS'];
+        let finalPrefRate = (selectedCouponRate > 0) ? selectedCouponRate : basePref;
 
-        let totalFeeKrw = unitFee * finalForeignAmt; // 전체 수수료 (원화)
+        // 개당 수수료 = 스프레드 * 0.95 * (1 - 우대율)
+        let unitFee = spread * BASE_FEE_RATE * (1 - finalPrefRate);
+
+        // 전체 수수료(원화) = 개당 수수료 * 외화금액
+        // (엔화/위안화 등 100단위 통화일 경우 조정 필요 여부 확인:
+        // 보통 spread가 100단위 기준이면 그대로 곱하면 되지만,
+        // 1단위 환율 기준이면 그대로 곱함. 여기서는 spread가 1단위 기준이라 가정)
+
+        let totalFeeKrw = 0;
+        if (foreignCode === 'JPY' || foreignCode === 'CNH') {
+            // JPY는 보통 spread가 100엔당 차액으로 계산되거나 1엔당 차액으로 계산됨.
+            // 위 로직에서 unitFee가 100엔당 수수료라면: unitFee * (finalForeignAmt / 100)
+            // 하지만 fetchRate에서 받아온 rate가 100엔당 환율이라면 unitFee도 100엔당 값임.
+            totalFeeKrw = unitFee * (finalForeignAmt / 100);
+
+            // ※ 주의: 만약 unitFee가 1엔당 수수료라면 그냥 곱하면 됨.
+            // 보통 은행 API는 JPY 환율을 100엔 단위로 줍니다. (예: 900.50원)
+            // 따라서 unitFee도 100엔당 수수료이므로, 100으로 나눠줘야 정확합니다.
+        } else {
+            totalFeeKrw = unitFee * finalForeignAmt;
+        }
 
         // 5. 데이터 세팅
         let exchangeData = {
@@ -471,7 +521,7 @@ document.addEventListener("DOMContentLoaded", () => {
             exchAppliedRate: parseFloat(appliedRateText),
             exchEsignYn: 'Y',
             exchType: currentMode,
-            exchFee: Math.floor(totalFeeKrw) // 소수점 절사
+            exchFee: Math.floor(totalFeeKrw)
         };
 
         // 6. 추가 정보 세팅 (수령지점 or 입금계좌)

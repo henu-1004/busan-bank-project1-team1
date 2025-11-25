@@ -311,6 +311,23 @@ public class MypageController {
         return  "mypage/ko_transfer_1";
     }
 
+    // 이체 전 비밀번호 확인
+    @PostMapping("/checkAcctPw")
+    @ResponseBody
+    public ResponseEntity<Map<String, Boolean>> checkAcctPw(@RequestBody Map<String, String> requestData) {
+
+        String acctNo = requestData.get("acctNo");
+        String inputPw = requestData.get("accountPw");
+
+        // DB에 저장된 해당 계좌의 비밀번호와 사용자가 입력한 inputPw를 비교하는 로직 수행
+        boolean matches = mypageService.checkAcctPw(acctNo, inputPw);
+
+        Map<String, Boolean> response = new HashMap<>();
+        response.put("isPwCorrect", matches);
+
+        return ResponseEntity.ok(response);
+    }
+
     @PostMapping("/ko_transfer_2")
     public String ko_transfer_2(Model model,
                                 @ModelAttribute CustTranHistDTO custTranHistDTO,
@@ -322,6 +339,7 @@ public class MypageController {
         String acctNo = custTranHistDTO.getTranRecAcctNo();
         String realOwnerName = ""; // 조회된 실제 예금주명
 
+        log.info("ko_transfer_2 @@ custTranHistDTO = " + custTranHistDTO);
         // 2. 은행 코드에 따른 분기 처리 (자행 vs 타행)
         try {
             if ("888".equals(bankCode)) { // 자행
@@ -408,12 +426,14 @@ public class MypageController {
     public String ko_transfer_3(@AuthenticationPrincipal CustomUserDetails userDetails, @ModelAttribute CustTranHistDTO custTranHistDTO, Model model) {
         // 전자서명 임시 승인 수정해야함
         custTranHistDTO.setTranEsignYn("Y");
-        CustAcctDTO custAcctDTO = new  CustAcctDTO();
+        CustAcctDTO custAcctDTO = new CustAcctDTO();
 
         if(custTranHistDTO.getTranEsignYn().equals("Y")) {
             // 이체 내역 db에 반영
-            mypageService.modifyCustAcctBal(custTranHistDTO);
+            mypageService.processCustAcctBal(custTranHistDTO);
             model.addAttribute("custTranHistDTO", custTranHistDTO);
+
+            // 출력 위해 다시 계좌 정보 가져오기
             custAcctDTO = mypageService.findCustAcct(custTranHistDTO.getTranAcctNo());
             model.addAttribute("custAcctDTO", custAcctDTO);
             model.addAttribute("state", "정상");

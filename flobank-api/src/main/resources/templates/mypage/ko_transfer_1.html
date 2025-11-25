@@ -34,7 +34,7 @@
         <form id="transferForm" th:action="@{/mypage/ko_transfer_2}" th:object="${custTranHistDTO}" method="post">
             <input type="hidden" id="accountBalance" th:value="${custAcctDTO.acctBalance}">
             <input type="hidden" th:field="*{tranType}">
-            <input type="hidden" th:field="*{tranAcctNo}">
+            <input type="hidden" id="tranAcctNo" th:field="*{tranAcctNo}">
 
             <section class="transfer1-section">
                 <h3 class="transfer1-subtitle">출금정보</h3>
@@ -73,6 +73,14 @@
                         </div>
                     </div>
                     <div id="tranAmountError" class="error-msg">이체 금액을 입력해주세요.</div>
+                </div>
+
+                <div class="transfer1-form-group">
+                    <label class="transfer1-label">계좌 비밀번호</label>
+
+                    <input type="password" id="accountPw" name="accountPw" class="transfer1-input" placeholder="비밀번호 입력">
+
+                    <div id="accountPwError" class="error-msg" style="display: none;">비밀번호가 일치하지 않습니다.</div>
                 </div>
 
                 <div class="transfer1-form-group">

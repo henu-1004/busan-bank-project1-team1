@@ -71,7 +71,7 @@
         TRAN_ACCT_NO, TRAN_CUST_NAME, TRAN_TYPE,
         TRAN_AMOUNT, TRAN_DT, TRAN_REC_ACCT_NO,
         TRAN_REC_NAME, TRAN_REC_BK_CODE,
-        TRAN_MEMO, TRAN_ESIGN_YN, TRAN_ESIGN_DT
+        TRAN_MEMO, TRAN_ESIGN_YN, TRAN_ESIGN_DT, TRAN_CURRENCY
         )
         VALUES (
         #{tranAcctNo}, #{tranCustName}, #{tranType}, #{tranAmount},
@@ -82,7 +82,7 @@
 
         #{tranMemo, jdbcType=VARCHAR},
 
-        #{tranEsignYn}, sysdate
+        #{tranEsignYn}, sysdate, #{tranCurrency}
         )
     </insert>
     
