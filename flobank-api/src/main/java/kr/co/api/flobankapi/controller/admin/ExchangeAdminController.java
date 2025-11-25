@@ -95,7 +95,7 @@ public class ExchangeAdminController {
      *
      * @return ExchangeStatsDTO (통화별 일자별 금액 + 전체 일자별 환전금액)
      */
-    @GetMapping("/admin/exchange/stats")
+    @GetMapping("/stats")
     @ResponseBody
     public ExchangeStatsDTO getStats(
             @RequestParam(value = "date", required = false) String date
@@ -103,8 +103,11 @@ public class ExchangeAdminController {
         if (date != null && !date.isEmpty()) {
             return exchangeAdminService.getExchangeStatsByDate(date);
         }
-        return exchangeAdminService.getStats();  // ✔ 수정됨
+        return exchangeAdminService.getStats();
     }
+
+
+
 
 
 

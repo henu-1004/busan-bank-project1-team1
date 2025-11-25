@@ -157,30 +157,22 @@ public class ExchangeAdminService {
     }
 
 
-    public ExchangeStatsDTO getStatsByDate(String date) {
+    public List<CurrencyDailyAmountDTO> getDailyCurrencyAmountsByDate(String date) {
+        return exchangeAdminMapper.selectDailyCurrencyAmountsByDate(date);
+    }
+
+    public List<DailyExchangeAmountDTO> getDailyTotalAmountsByDate(String date) {
+        return exchangeAdminMapper.selectDailyTotalAmountsByDate(date);
+    }
+
+    public ExchangeStatsDTO getExchangeStatsByDate(String date) {
 
         return ExchangeStatsDTO.builder()
                 .currencyDailyAmounts(exchangeAdminMapper.selectDailyCurrencyAmountsByDate(date))
                 .dailyTotals(exchangeAdminMapper.selectDailyTotalAmountsByDate(date))
-                .lastUpdatedAt(exchangeAdminMapper.selectStatsBaseTime()) // 또는 해당 날짜의 max()
+                .lastUpdatedAt(exchangeAdminMapper.selectStatsBaseTime())
                 .build();
     }
-
-    public ExchangeStatsDTO getExchangeStatsByDate(String date) {
-        ExchangeStatsDTO dto = new ExchangeStatsDTO();
-
-        List<CurrencyDailyAmountDTO> currency = exchangeAdminMapper.selectDailyCurrencyAmountsByDate(date);
-        List<DailyExchangeAmountDTO> total = exchangeAdminMapper.selectDailyTotalAmountsByDate(date);
-        LocalDateTime baseTime = exchangeAdminMapper.selectStatsBaseTime(); // 마지막 업데이트 시간
-
-        dto.setCurrencyDailyAmounts(currency);
-        dto.setDailyTotals(total);
-        dto.setLastUpdatedAt(baseTime);
-
-        return dto;
-    }
-
-
 
 
 }

@@ -18,5 +18,5 @@ public class ExchangeHistoryDTO {
     private String exchFromCurrency;
     private String exchToCurrency;
     private BigDecimal exchAppliedRate;
-    private LocalDateTime exchReqDt;
+    private LocalDateTime lastUpdatedAt;
 }
