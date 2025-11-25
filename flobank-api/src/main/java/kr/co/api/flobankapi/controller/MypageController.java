@@ -333,7 +333,6 @@ public class MypageController {
         String acctNo = custTranHistDTO.getTranRecAcctNo();
         String realOwnerName = ""; // 조회된 실제 예금주명
 
-        log.info("ko_transfer_2 @@ custTranHistDTO = " + custTranHistDTO);
         // 2. 은행 코드에 따른 분기 처리 (자행 vs 타행)
         try {
             if ("888".equals(bankCode)) { // 자행

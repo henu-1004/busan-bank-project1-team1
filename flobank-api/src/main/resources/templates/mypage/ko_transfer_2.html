@@ -121,12 +121,14 @@
                 <button type="submit" class="transfer2-btn-sub">이전</button>
             </form>
 
-            <form th:action="@{/mypage/ko_transfer_3}" th:object="${custTranHistDTO}" method="post" style="display:inline;">
+            <form id="transferForm" th:action="@{/mypage/ko_transfer_3}" th:object="${custTranHistDTO}" method="post" style="display:inline;">
                 <input type="hidden" th:field="*{tranAcctNo}">
                 <input type="hidden" th:field="*{tranCustName}">
                 <input type="hidden" th:field="*{tranRecAcctNo}">
                 <input type="hidden" th:field="*{tranRecName}">
-                <input type="hidden" th:field="*{tranAmount}">
+
+                <input type="hidden" id="hiddenTranAmount" th:field="*{tranAmount}">
+
                 <input type="hidden" th:field="*{tranRecBkCode}">
                 <input type="hidden" th:field="*{tranMemo}">
                 <input type="hidden" th:field="*{tranType}">
@@ -138,6 +140,8 @@
     </div>
 </main>
 <div th:replace="~{_template/_footer.html}"></div>
+<script th:src="@{/js/common_cert.js}"></script>
+<script th:src="@{/js/tran.js}"></script>
 
 </body>
 </html>

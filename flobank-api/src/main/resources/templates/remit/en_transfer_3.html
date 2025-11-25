@@ -130,11 +130,18 @@
 
         <div class="transfer2-actions">
             <a th:href="@{/remit/en_transfer_2}" class="transfer2-btn-sub">이전</a>
-            <form th:action="@{/remit/en_transfer_4}" method="post" th:object="${frgnRemtTranDTO}" style="display:inline;">
+
+            <form id="transferForm" th:action="@{/remit/en_transfer_4}" method="post" th:object="${frgnRemtTranDTO}" style="display:inline;">
 
                 <input type="hidden" th:field="*{remtAppliedRate}">
+                <input type="hidden" th:field="*{remtAcctNo}">
 
-                <input type="hidden" th:field="*{remtAcctNo}">      <input type="hidden" th:field="*{remtCurrency}">    <input type="hidden" th:field="*{remtAmount}">      <input type="hidden" th:field="*{remtFee}">         <input type="hidden" th:field="*{remtDt}">          <input type="hidden" th:field="*{remtCountry}">
+                <input type="hidden" id="hiddenRemtCurrency" th:field="*{remtCurrency}">
+                <input type="hidden" id="hiddenRemtAmount" th:field="*{remtAmount}">
+
+                <input type="hidden" th:field="*{remtFee}">
+                <input type="hidden" th:field="*{remtDt}">
+                <input type="hidden" th:field="*{remtCountry}">
                 <input type="hidden" th:field="*{remtCustName}">
                 <input type="hidden" th:field="*{remtRecName}">
                 <input type="hidden" th:field="*{remtAddr}">
@@ -143,7 +150,7 @@
                 <input type="hidden" th:field="*{remtRecBkCode}">
                 <input type="hidden" th:field="*{remtRecAccNo}">
 
-                <button type="submit" class="transfer2-btn-main">이체실행</button>
+                <button type="button" id="btnTransfer" class="transfer2-btn-main">이체실행</button>
             </form>
         </div>
 
@@ -153,6 +160,7 @@
 
 
 <div th:replace="~{_template/_footer.html}"></div>
+<script th:src="@{/js/common_cert.js}"></script>
 <script th:src ="@{/js/mypage.js}"></script>
 
 </body>

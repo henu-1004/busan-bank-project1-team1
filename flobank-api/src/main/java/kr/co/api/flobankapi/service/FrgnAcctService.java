@@ -14,8 +14,13 @@ public class FrgnAcctService {
     private final FrgnAcctMapper frgnAcctMapper;
 
     // custCode로 모체 외환 계좌 찾기
-    public CustFrgnAcctDTO getFrgnAcct(String custCode){
+    public CustFrgnAcctDTO getFrgnAcctByCode(String custCode){
         return frgnAcctMapper.selectFrgnAcctByCustCode(custCode);
+    }
+
+    // 계좌번호로 모체 외환 계좌 찾기
+    public CustFrgnAcctDTO getFrgnAcctByAcctNo(String acctNo){
+        return frgnAcctMapper.selectFrgnAcctByAcctNo(acctNo);
     }
 
     // 모체 외화 계좌번호로 자식 계좌 리스트 불러오기

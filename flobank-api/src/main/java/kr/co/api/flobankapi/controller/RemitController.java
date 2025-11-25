@@ -16,6 +16,7 @@ import kr.co.api.flobankapi.service.MypageService;
 import kr.co.api.flobankapi.service.RemitService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -85,6 +86,26 @@ public class RemitController {
         FrgnRemtTranDTO frgnRemtTranDTO = new FrgnRemtTranDTO();
         model.addAttribute("frgnRemtTranDTO", frgnRemtTranDTO);
         return  "remit/en_transfer_2";
+    }
+
+    /**
+     * 외화 계좌 비밀번호 검증 API
+     * 요청 URL: /flobank/remit/checkEnAcctPw
+     */
+    @PostMapping("/checkEnAcctPw")
+    @ResponseBody
+    public ResponseEntity<Map<String, Boolean>> checkEnAcctPw(@RequestBody Map<String, String> requestData) {
+
+        String acctNo = requestData.get("acctNo"); // 계좌번호
+        String acctPw = requestData.get("acctPw"); // 사용자가 입력한 비밀번호
+
+        // TODO: 서비스 로직 구현 (DB 조회 및 비밀번호 비교)
+        boolean isCorrect = remitService.checkEnAcctPw(acctNo, acctPw);
+
+        Map<String, Boolean> response = new HashMap<>();
+        response.put("isPwCorrect", isCorrect);
+
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/en_transfer_3")

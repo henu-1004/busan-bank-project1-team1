@@ -137,7 +137,7 @@ public class MypageService {
             tranHist.setTranAcctNo(custTranHistDTO.getTranRecAcctNo());
             tranHist.setTranAmount(amount);
             tranHist.setTranType(1);
-            tranHist.setTranRecAcctNo(recAcctNo);
+            tranHist.setTranRecAcctNo(acctNo);
             tranHist.setTranRecName(custTranHistDTO.getTranCustName());
             tranHist.setTranRecBkCode("888");
             tranHist.setTranCurrency("KRW");

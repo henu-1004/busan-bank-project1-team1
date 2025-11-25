@@ -165,7 +165,7 @@ public class ExchangeController {
         model.addAttribute("custAcctDTOList",custAcctDTOList);
 
         // 외화 계좌
-        CustFrgnAcctDTO custFrgnAcctDTO = frgnAcctService.getFrgnAcct(userCode);
+        CustFrgnAcctDTO custFrgnAcctDTO = frgnAcctService.getFrgnAcctByCode(userCode);
         model.addAttribute("custFrgnAcctDTO",custFrgnAcctDTO);
 
         // 자식 외화 계좌 리스트
