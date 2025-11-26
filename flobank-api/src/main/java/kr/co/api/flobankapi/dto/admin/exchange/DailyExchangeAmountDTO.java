@@ -14,4 +14,5 @@ import java.math.BigDecimal;
 public class DailyExchangeAmountDTO {
     private String baseDate;
     private BigDecimal amountKrw;
+
 }

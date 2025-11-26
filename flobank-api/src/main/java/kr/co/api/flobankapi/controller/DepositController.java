@@ -196,6 +196,10 @@ public class DepositController {
             isValidPw = passwordEncoder.matches(dto.getFrgnAcctPw(), pw);
         }
 
+        if (dto.getAutoRenewYn() == null){
+            dto.setAutoRenewYn("n");
+        }
+
         ProductDTO product = depositService.selectDpstProduct(dpstId);
         model.addAttribute("product",product);
         List<CustAcctDTO> accounts = depositService.getAcctList(user.getUsername());

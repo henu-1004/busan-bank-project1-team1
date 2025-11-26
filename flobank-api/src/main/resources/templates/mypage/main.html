@@ -217,7 +217,11 @@
                            th:data-wdrwcnt="${hdr.dpstHdrPartWdrwCnt}"
                            th:data-wdrwmax="${hdr.wdrwMax}"
                            th:data-month="${hdr.dpstHdrMonth}"
-                           th:data-interest="${hdr.dpstHdrInterest}">
+                           th:data-interest="${hdr.dpstHdrInterest}"
+                           th:data-ratetype="${hdr.dpstRateType}"
+                           th:data-accttype="${hdr.dpstHdrLinkedAcctType}"
+
+                    >
                     [[${hdr.dpstName}]]</a></td>
                     <td>[[${hdr.dpstHdrAcctNo}]]</td>
                     <td><span th:switch="${hdr.dpstHdrCurrencyExp}">
@@ -232,8 +236,17 @@
                         <span th:case="*">?</span> <!-- 혹시 모르는 경우 -->
                     </span>[[${hdr.dpstHdrBalance}]]</td>
                     <td>
-                        <a style="border: 0; font-size: 13px; padding: 3px 6px; background-color: #dadada; border-radius: 5px; color: #1c1e21; text-decoration: none">조회</a>
-                        <a th:href="@{/mypage/dpst_transfer_1(dpstHdrAcctNo=${hdr.dpstHdrAcctNo})}" style="border: 0; font-size: 13px; padding: 3px 6px; background-color: #dadada; border-radius: 5px; color: #1c1e21; text-decoration: none">입금</a>
+                        <a class="deposit-detail-info" style="border: 0; font-size: 13px; padding: 3px 6px; background-color: #dadada; border-radius: 5px; color: #1c1e21; text-decoration: none; cursor: pointer">조회</a>
+                        <a th:href="@{/mypage/dpst_transfer_1(dpstHdrAcctNo=${hdr.dpstHdrAcctNo})}"
+                           class="deposit-add-btn"
+                           th:data-type="${hdr.dpstType}"
+                           th:data-addpayyn="${hdr.dpstAddPayYn}"
+                           th:data-addpaycnt="${hdr.dpstHdrAddPayCnt}"
+                           th:data-addpaymax="${hdr.dpstAddPayMax}"
+                           th:data-acctno="${hdr.dpstHdrAcctNo}"
+                           style="border: 0; font-size: 13px; padding: 3px 6px; background-color: #dadada; border-radius: 5px; color: #1c1e21; text-decoration: none;">
+                            입금
+                        </a>
                     </td>
                 </tr>
 
@@ -624,6 +637,91 @@
             </thead>
             <tbody id="depositHistory">
             <tr><td>2025-10-10</td><td>$500</td><td>$3,200</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+
+
+<div id="depositInfoModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn">&times;</span>
+        <h2>예금 상세정보</h2>
+
+
+        <h3>기본정보</h3>
+        <table class="detail-table">
+            <tr>
+                <th>계좌번호</th>
+                <td colspan="3">112-2188-1931-55</td>
+            </tr>
+            <tr>
+                <th>상품명</th>
+                <td>끝내줌 예금</td>
+                <th>예금주</th>
+                <td>이다은</td>
+            </tr>
+            <tr>
+                <th>예금잔액</th>
+                <td>327498732</td>
+                <th>계약잔액</th>
+                <td>234234</td>
+            </tr>
+            <tr>
+                <th>가입통화</th>
+                <td>USD</td>
+                <th>예금유형</th>
+                <td>거치식</td>
+            </tr>
+
+        </table>
+
+
+        <h3>상세정보</h3>
+        <table class="detail-table">
+            <tbody>
+            <tr>
+                <th>신규일</th>
+                <td>2023-13-33</td>
+                <th>만기일</th>
+                <td>2024-13-11</td>
+            </tr>
+            <tr>
+                <th>최종거래일</th>
+                <td colspan="3">2025-11-11</td>
+            </tr>
+            <tr>
+                <th>추가납입 최대 제한</th>
+                <td>3회</td>
+                <th>현재 추납 횟수</th>
+                <td>1회</td>
+            </tr>
+            <tr>
+                <th>분할인출 최대 제한</th>
+                <td>5회</td>
+                <th>현재 인출 횟수</th>
+                <td>2회</td>
+            </tr>
+            <tr>
+                <th>납입회차</th>
+                <td colspan="3">2회</td>
+            </tr>
+            <tr>
+                <th>적용 금리</th>
+                <td colspan="3">3.35%</td>
+            </tr>
+            <tr>
+                <th>적용 환율</th>
+                <td colspan="3">1456.5</td> <!-- th:if rateType==1 && linkedAcctType==1 -->
+            </tr>
+            <tr>
+                <th>자동 재예치 여부</th> <!--  -->
+                <td>Y</td>
+                <th>자동 재예치 기간</th>
+                <td>6개월</td>
+            </tr>
             </tbody>
         </table>
     </div>

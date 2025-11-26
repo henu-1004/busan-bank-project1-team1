@@ -2635,6 +2635,12 @@ input[type="file"] {
 }
 
 
+/*=======================================*/
+/*=======================================*/
+/*=======================================*/
+/*여기부터 아래는 환전부분 일자별 통화 환전금액 / 일자별 환전액 수정*/
+
+
 /* ================================= */
 /* ===== 그래프 짤림 방지 최종 패치 ===== */
 /* ================================= */
@@ -2643,63 +2649,159 @@ input[type="file"] {
     max-height: none !important;
 }
 
-.admin-exchange-graph-box {
-    min-height: 340px !important;
-    height: 340px !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    overflow: hidden !important;
-    display: flex;
-    align-items: stretch !important;
-    justify-content: stretch !important;
-    position: relative;
-}
-
-/* 오른쪽 그래프 박스(—compact) 전용 패치 */
-.admin-exchange-graph-box--compact {
-    padding: 0 !important;
-    margin: 0 !important;
-    min-height: 340px !important;
-    height: 340px !important;
-    display: flex;
-    align-items: stretch !important;
-    justify-content: stretch !important;
-    overflow: hidden !important;
-}
-
-.admin-exchange-graph-box--compact canvas {
-    width: 100% !important;
-    height: 100% !important;
-    display: block !important;
-}
 
 
 /* ================================
    두 그래프 카드 높이 통일
 ================================ */
 .admin-stat-card {
-    height: 420px !important;
     display: flex;
     flex-direction: column;
 }
 
-/* 그래프 박스 크기 동일 처리 */
-.admin-exchange-graph-box,
-.admin-exchange-graph-box--compact {
-    flex: 1 !important;
-    min-height: unset !important;
-    height: auto !important;
-}
+
 
 /* canvas 동일 높이 */
-.admin-exchange-graph-box canvas,
-.admin-exchange-graph-box--compact canvas {
+.admin-exchange-graph-box canvas
+ {
     width: 100% !important;
     height: 100% !important;
     display: block !important;
 }
 
-/* 오른쪽 그래프에 왼쪽과 동일한 상단 여백 추가 */
-.admin-exchange-card:nth-child(2) .admin-exchange-graph-box--compact {
-    margin-top: 75px !important; /* 필요하면 ± 10px 조절 */
+/* ===========================
+   오른쪽 그래프(dailyTotalChart) 꽉 차기용 최종 패치
+=========================== */
+
+.admin-exchange-card {
+    display: flex;
+    flex-direction: column;
 }
+
+.admin-exchange-graph-box--compact {
+    flex: 1;
+    display: flex;
+    align-items: stretch;
+    justify-content: stretch;
+    padding: 0 !important;
+    margin: 0 !important;
+    height: auto !important;
+    min-height: 0 !important;
+
+    max-height: 460px;    /* 👉 핵심! 그래프 최대 높이 제한 */
+    overflow: hidden;
+}
+
+.admin-exchange-graph-box--compact canvas {
+    width: 100% !important;
+    height: 100% !important;
+    flex: 1;
+    display: block;
+}
+
+
+/* =============================== */
+/*   환전관리 날짜 선택 UI 정렬     */
+/* =============================== */
+
+.admin-exchange-date-row {
+    display: flex;
+    flex-wrap: wrap;   /* ← 추가 */
+    justify-content: flex-start;  /* ← 기존 space-between 교체 */
+    align-items: center;
+    margin-bottom: 12px;
+    gap: 12px 20px; /* 줄바꿈 시 자연스러운 간격 */
+}
+
+
+/* 왼쪽 날짜 */
+.date-left-group input[type="date"] {
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+/* 오른쪽 그룹 */
+.date-right-group {
+    display: flex;
+    flex-wrap: wrap;   /* ← 추가 */
+    align-items: center;
+    gap: 10px;
+    margin-left: auto;
+}
+
+
+
+
+/* 기간 구분자 */
+.admin-exchange-period-picker__divider {
+    font-size: 14px;
+    color: #555;
+}
+
+/* 버튼 디자인 (관리자 검색 버튼과 동일) */
+.admin-exchange-btn {
+    background-color: #2C5DE5;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 14px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.2s ease;
+    height: 36px;
+    display: flex;
+    align-items: center;
+}
+
+.admin-exchange-btn:hover {
+    background-color: #2045b8;
+}
+
+/* 초기화 버튼 */
+.admin-exchange-btn.reset-btn {
+    background-color: #777;
+}
+
+.admin-exchange-btn.reset-btn:hover {
+    background-color: #555;
+}
+
+
+/* 반응형 */
+@media (max-width: 900px) {
+    .admin-exchange-date-row {
+        flex-wrap: wrap;
+    }
+    .date-right-group {
+        flex-wrap: wrap;
+        margin-top: 8px;
+    }
+}
+
+/* 모든 날짜 input 디자인 통일 */
+.admin-exchange-date-row input[type="date"] {
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    height: 36px;
+    background-color: #fff;
+    color: #333;
+    box-sizing: border-box;
+}
+
+/* 캘린더 아이콘 위치도 통일 */
+.admin-exchange-date-row input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.7;
+}
+
+.admin-exchange-date-row input[type="date"]::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+}
+
+
+
+

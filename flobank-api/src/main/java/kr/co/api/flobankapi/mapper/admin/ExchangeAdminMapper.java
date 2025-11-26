@@ -95,4 +95,9 @@ public interface ExchangeAdminMapper {
     List<CurrencyDailyAmountDTO> selectDailyCurrencyAmountsByDate(@Param("date") String date);
     List<DailyExchangeAmountDTO> selectDailyTotalAmountsByDate(@Param("date") String date);
 
+    List<CurrencyDailyAmountDTO> selectCurrencyAmountsByPeriod(@Param("startDate") String startDate,
+                                                               @Param("endDate") String endDate);
+
+
+
 }

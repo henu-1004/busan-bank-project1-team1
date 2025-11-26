@@ -175,4 +175,24 @@ public class ExchangeAdminService {
     }
 
 
+    public ExchangeStatsDTO getExchangeStatsByPeriod(String startDate, String endDate) {
+
+        List<CurrencyDailyAmountDTO> amounts = exchangeAdminMapper.selectCurrencyAmountsByPeriod(startDate, endDate);
+        if (amounts == null) {
+            amounts = Collections.emptyList();
+        }
+
+        return ExchangeStatsDTO.builder()
+                .currencyDailyAmounts(amounts)
+                // 오른쪽 그래프는 기간 조회에 영향을 받지 않도록 빈 리스트 유지
+                .dailyTotals(Collections.emptyList())
+                .lastUpdatedAt(exchangeAdminMapper.selectStatsBaseTime())
+                .rangeLabel(String.format("%s ~ %s", startDate, endDate))
+                .build();
+    }
+
+
+
+
+
 }
