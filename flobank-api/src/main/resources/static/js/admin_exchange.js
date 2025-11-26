@@ -550,6 +550,8 @@ function getToday() {
         const applyRangeBtn = document.getElementById("exchangePeriodApply");
         const resetRangeBtn = document.getElementById("exchangePeriodReset");
 
+
+
         // 날짜 선택 이벤트
         if (datePicker) {
             datePicker.addEventListener("change", function () {

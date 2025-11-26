@@ -155,6 +155,7 @@ public class ExchangeAdminController {
                 "rangeLabel", stats.getRangeLabel(),
                 "lastUpdatedAt", stats.getLastUpdatedAt()
         );
+        
     }
 
 }
