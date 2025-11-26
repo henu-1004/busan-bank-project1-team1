@@ -219,6 +219,18 @@
         where dpst_hdr_acct_no=#{dpstHdrAcctNo}
     </select>
 
+    <select id="selectDpstKrwAcctHdr" resultType="kr.co.api.flobankapi.dto.DpstAcctHdrDTO">
+        select da.*, tca.ACCT_BALANCE as dpstHdrLinkedAcctBal from TB_DPST_ACCT_HDR da
+        JOIN TB_CUST_ACCT tca ON da.DPST_HDR_LINKED_ACCT_NO = tca.ACCT_NO
+        where dpst_hdr_acct_no=#{dpstHdrAcctNo}
+    </select>
+    <select id="selectDpstFrgnAcctHdr" resultType="kr.co.api.flobankapi.dto.DpstAcctHdrDTO">
+        select da.*, tfab.BAL_BALANCE as dpstHdrLinkedAcctBal from TB_DPST_ACCT_HDR da
+        JOIN TB_CUST_FRGN_ACCT tcfa ON da.DPST_HDR_EXP_ACCT_NO  = tcfa.FRGN_ACCT_NO
+        JOIN TB_FRGN_ACCT_BALANCE tfab ON tcfa.FRGN_ACCT_NO = tfab.BAL_FRGN_ACCT_NO
+        where dpst_hdr_acct_no=#{dpstHdrAcctNo} AND tfab.BAL_CURRENCY = #{dpstHdrCurrency}
+    </select>
+
     <select id="selectAcctBal" resultType="Double">
         SELECT acct_balance FROM TB_CUST_ACCT
         WHERE ACCT_NO = #{dpstHdrLinkedAcctNo}

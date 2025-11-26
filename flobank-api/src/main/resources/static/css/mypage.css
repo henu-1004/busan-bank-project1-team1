@@ -3490,3 +3490,24 @@ body.event-page {
 }
 
 
+
+
+/*
+    원화 -> 외화 환전 환율 계산하기 테이블
+*/
+.prod-amt-container{
+    background-color: #eaeaea;
+    border-radius: 5px;
+    width: 647px;
+    padding: 30px 25px;
+}
+
+.prod-amt-left{
+    text-align: start;
+    width: 400px;
+}
+.prod-amt-right{
+    text-align: end;
+
+}
+

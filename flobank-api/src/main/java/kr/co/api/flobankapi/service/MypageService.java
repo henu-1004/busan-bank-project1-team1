@@ -338,6 +338,14 @@ public class MypageService {
     public FrgnAcctBalanceDTO getFrgnAcctBal(String dpstHdrAcctNo) {
         return mypageMapper.selectFrgnAcctBal(dpstHdrAcctNo);
     }
+
+    public DpstAcctHdrDTO getDpstAcctHdrAndBal(String dpstHdrAcctNo, String dpstHdrCurrency) {
+        if ("KRW".equals(dpstHdrCurrency)){
+            return mypageMapper.selectDpstKrwAcctHdr(dpstHdrAcctNo);
+        }else {
+            return mypageMapper.selectDpstFrgnAcctHdr(dpstHdrAcctNo, dpstHdrCurrency);
+        }
+    }
 }
 
 

@@ -1,18 +1,25 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>원화 계좌이체 1</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>원화 계좌이체 1</title>
     <link rel="stylesheet" th:href="@{/css/mypage.css}">
     <link rel="stylesheet" th:href="@{/css/header.css}">
     <link rel="stylesheet" th:href="@{/css/footer.css}">
 
     <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-    crossorigin="anonymous"
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+            crossorigin="anonymous"
     />
+
+    <!--
+
+     외화계좌 -> 외화계좌 추가납입
+     잔액도 외화, 납입금액도 외화
+
+     -->
 
 </head>
 <body>
@@ -59,7 +66,7 @@
                            2. onkeyup 이벤트 추가 (입력 시 콤마 자동 생성)
                         -->
                         <input type="text" id="tranAmount" class="transfer1-input short"
-                               placeholder="금액 입력" onkeyup="inputNumberFormat(this)">
+                               placeholder="외화 금액 입력" onkeyup="inputNumberFormat(this)">
 
                         <!-- 실제 서버로 전송될 숫자 값 (Hidden) -->
                         <input type="hidden" id="hiddenTranAmount" th:field="*{tranAmount}">
