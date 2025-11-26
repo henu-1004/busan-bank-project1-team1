@@ -4,51 +4,70 @@
 
 <th:block th:fragment="content">
 
-<!-- 외화예금 상품 전체 컨테이너 -->
-<div class="product-container">
+    <div class="product-container">
 
-    <!-- 상품 등록 카드 -->
-    <section class="product-card">
-        <h2 class="product-title">외화예금 상품 등록</h2>
+        <!-- =======================
+             PDF 업로드 / AI 분석
+        ======================== -->
+        <section class="product-card">
+            <h2 class="product-title">외화예금 상품 등록</h2>
 
-        <form id="foreignDepositForm"
-              th:action="@{/admin/products/register}"
-              method="post"
-              enctype="multipart/form-data">
+            <form id="foreignDepositForm"
+                  th:action="@{/admin/products/register}"
+                  method="post"
+                  enctype="multipart/form-data">
 
-            <div class="form-section">
-                <h3>상품설명서 AI 분석 준비</h3>
-                <div class="form-group">
-                    <label for="dpstInfoPdfUpload">PDF 파일 선택</label>
-                    <div class="pdf-upload-controls">
-                        <input type="file" id="dpstInfoPdfUpload" accept=".pdf" />
-                        <button type="button" id="btnPdfUpload" class="btn-secondary">업로드</button>
+                <div class="form-section">
+                    <h3>상품설명서 AI 분석 준비</h3>
+
+                    <div class="form-group">
+                        <label for="dpstInfoPdfUpload">PDF 파일 선택</label>
+                        <div class="pdf-upload-controls">
+                            <input type="file" id="dpstInfoPdfUpload" accept=".pdf" />
+                            <button type="button" id="btnPdfUpload" class="btn-secondary">업로드</button>
+                        </div>
                     </div>
-                    <small class="helper-text">업로드 후 AI 분석 결과를 기다려 주세요.</small>
-                </div>
-                <div class="pdf-list">
-                    <div class="pdf-list-header">
-                        <span>업로드된 PDF 목록</span>
-                        <span class="status-legend">상태: wait / done / used</span>
-                    </div>
-                    <div class="pdf-list-body" id="pdfListBody"></div>
-                </div>
-                <div class="form-group">
-                    <label for="pdfSelector">AI 분석 완료 PDF 선택 (done만 선택 가능)</label>
-                    <select id="pdfSelector" name="donePdf" class="pdf-select">
-                        <option value="">선택하세요</option>
-                    </select>
-                </div>
-                <div class="ai-comment-box">
-                    <div class="ai-comment-header">
-                        <h4>AI 분석 코멘트</h4>
-                        <span class="ai-comment-status">AI 분석 코멘트 표시 예정</span>
-                    </div>
-                    <p class="ai-comment-placeholder">AI 분석이 완료되면 생성된 코멘트가 이 영역에 표시됩니다.</p>
-                </div>
-            </div>
 
-            <div class="form-section">
+                    <!-- 🔥 Progress Box 추가 -->
+                    <div id="pdf-progress-box"
+                         style="display:none; margin:10px 0; padding:10px; background:#f5f7fa; border-radius:6px;">
+                        <div style="font-weight:bold; margin-bottom:5px;">
+                            AI 분석 진행률:
+                            <span id="pdf-progress-text">0%</span>
+                        </div>
+                        <div style="width:100%; background:#e1e4e8; height:12px; border-radius:6px;">
+                            <div id="pdf-progress-bar"
+                                 style="width:0%; height:100%; background:#4A90E2; border-radius:6px; transition:width 0.3s;"></div>
+                        </div>
+                    </div>
+                    <!-- 🔥 Progress Box 끝 -->
+
+                    <div class="pdf-list">
+                        <div class="pdf-list-header">
+                            <span>업로드된 PDF 목록</span>
+                            <span class="status-legend">상태: wait / done / used</span>
+                        </div>
+                        <div class="pdf-list-body" id="pdfListBody">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="pdfSelector">AI 분석 완료 PDF 선택 (done만 선택 가능)</label>
+                        <select id="pdfSelector" name="donePdf" class="pdf-select">
+                            <option value="">선택하세요</option>
+                        </select>
+                    </div>
+
+                    <div class="ai-comment-box">
+                        <div class="ai-comment-header">
+                            <h4>AI 분석 코멘트</h4>
+                            <span class="ai-comment-status">AI 분석 코멘트 표시 예정</span>
+                        </div>
+                        <p class="ai-comment-placeholder">AI 분석이 완료되면 생성된 코멘트가 이 영역에 표시됩니다.</p>
+                    </div>
+                </div>
+
+                <div class="form-section">
                 <h3>기본정보</h3>
                 <div class="form-group">
                     <label for="dpstName">상품명</label>
@@ -315,84 +334,141 @@
 
 <th:block th:fragment="script">
 
-<!-- ==========================
-     📌 PDF 업로드 & 목록 조회 JS
-=========================== -->
-<script>
-    // ==========================
-    // PDF 업로드
-    // ==========================
-    document.getElementById("btnPdfUpload").addEventListener("click", async () => {
+    <script>
+        /* ============================
+           SSE 전역 변수
+        ============================= */
+        let currentEventSource = null;
 
-        const input = document.getElementById("dpstInfoPdfUpload");
+        /* ============================
+           📡 SSE 연결 함수
+        ============================= */
+        function connectProgressSSE(pdfId) {
 
-        if (input.files.length === 0) {
-            alert("PDF 파일을 선택하세요.");
-            return;
-        }
-
-        const form = new FormData();
-        form.append("file", input.files[0]);
-
-        const res = await fetch("/flobank/admin/pdf-ai/upload", {
-            method: "POST",
-            body: form
-        });
-
-        if (!res.ok) {
-            alert("업로드 실패");
-            return;
-        }
-
-        alert("업로드 성공!");
-        loadPdfList();
-    });
-
-
-    // ==========================
-    // PDF 목록 조회
-    // ==========================
-    async function loadPdfList() {
-        const res = await fetch("/flobank/admin/pdf-ai/list");
-        const list = await res.json();
-
-        const body = document.getElementById("pdfListBody");
-        const selector = document.getElementById("pdfSelector");
-
-        body.innerHTML = "";
-        selector.innerHTML = `<option value="">선택하세요</option>`;
-
-        list.forEach(item => {
-
-            // 목록 출력
-            body.innerHTML += `
-                <div class="pdf-list-item">
-                    <div>
-                        <strong>${item.orgFileName}</strong>
-                        <div class="pdf-meta">${item.createdAt || ''}</div>
-                    </div>
-                    <span class="status-chip status-${item.status}">${item.status}</span>
-                </div>
-            `;
-
-            // done만 드롭다운에 넣기
-            if (item.status === "done") {
-                selector.innerHTML += `
-                    <option value="${item.pdfId}">
-                        ${item.orgFileName} (done)
-                    </option>
-                `;
+            if (currentEventSource) {
+                currentEventSource.close();
             }
+
+            const url = `/pdf-ai/progress/${pdfId}`;
+            console.log("🔌 SSE 연결:", url);
+
+            const box = document.getElementById("pdf-progress-box");
+            const bar = document.getElementById("pdf-progress-bar");
+            const text = document.getElementById("pdf-progress-text");
+
+            box.style.display = "block";
+
+            currentEventSource = new EventSource(url);
+
+            currentEventSource.onmessage = function (event) {
+
+                const progress = Number(event.data);
+                console.log("📡 SSE Progress:", progress);
+
+                bar.style.width = `${progress}%`;
+                text.textContent = `${progress}%`;
+
+                // 100% → 자동 종료
+                if (progress >= 100) {
+                    setTimeout(() => {
+                        box.style.display = "none";
+                        bar.style.width = "0%";
+                        text.textContent = "0%";
+                        currentEventSource.close();
+                    }, 3000);
+                }
+
+                // 에러 (-1)
+                if (progress === -1) {
+                    text.textContent = "에러 발생";
+                    bar.style.background = "red";
+                }
+            };
+
+            currentEventSource.onerror = function () {
+                console.log("❌ SSE 오류 → 연결 종료");
+                currentEventSource.close();
+            };
+        }
+
+
+        /* ============================
+           📤 PDF 업로드
+        ============================= */
+        document.getElementById("btnPdfUpload").addEventListener("click", async () => {
+            const fileInput = document.getElementById("dpstInfoPdfUpload");
+
+            if (fileInput.files.length === 0) {
+                alert("PDF 파일을 선택하세요.");
+                return;
+            }
+
+            const form = new FormData();
+            form.append("file", fileInput.files[0]);
+
+            const res = await fetch("/flobank/admin/pdf-ai/upload", {
+                method: "POST",
+                body: form
+            });
+
+            if (!res.ok) {
+                alert("업로드 실패");
+                return;
+            }
+
+            const result = await res.json();
+            console.log("📦 업로드 응답:", result);
+
+            alert("업로드 성공!");
+            loadPdfList();
+
+            // 🔥 SSE 연결 시작
+            connectProgressSSE(result.pdfId);
         });
-    }
-
-    // 페이지 로딩 시 초기 목록
-    document.addEventListener("DOMContentLoaded", loadPdfList);
-</script>
 
 
-<script th:src="@{/js/product1.js}"></script>
-<script th:src="@{/js/product2.js}"></script>
+        /* ============================
+           📄 PDF 목록 불러오기
+        ============================= */
+        async function loadPdfList() {
+
+            const res = await fetch("/flobank/admin/pdf-ai/list");
+            const list = await res.json();
+
+            const body = document.getElementById("pdfListBody");
+            const selector = document.getElementById("pdfSelector");
+
+            body.innerHTML = "";
+            selector.innerHTML = `<option value="">선택하세요</option>`;
+
+            list.forEach(item => {
+
+                body.innerHTML += `
+            <div class="pdf-list-item">
+                <div>
+                    <strong>${item.orgFileName}</strong>
+                    <div class="pdf-meta">${item.createdAt || ''}</div>
+                </div>
+                <span class="status-chip status-${item.status}">${item.status}</span>
+            </div>
+        `;
+
+                if (item.status === "done") {
+                    selector.innerHTML += `
+                <option value="${item.pdfId}">
+                    ${item.orgFileName} (done)
+                </option>
+            `;
+                }
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", loadPdfList);
+    </script>
+
+    <script th:src="@{/js/product1.js}"></script>
+    <script th:src="@{/js/product2.js}"></script>
 
 </th:block>
+
 </html>
