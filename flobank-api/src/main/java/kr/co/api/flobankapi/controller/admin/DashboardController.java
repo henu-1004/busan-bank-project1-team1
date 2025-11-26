@@ -4,6 +4,7 @@ package kr.co.api.flobankapi.controller.admin;
 import kr.co.api.flobankapi.dto.admin.dashboard.DashboardDTO;
 import kr.co.api.flobankapi.service.admin.DashboardService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.time.LocalDateTime;
 
+@Slf4j
 @Controller
 @RequestMapping("/admin")
 @RequiredArgsConstructor
@@ -20,7 +22,7 @@ public class DashboardController {
 
     @GetMapping({"", "/", "/index"})
     public String adminHome(Model model) {
-
+        log.info("▶ [ADMIN DASHBOARD] /admin 진입");
         DashboardDTO stats = dashboardService.getStats();
         if (stats == null) {
             stats = new DashboardDTO();  // NPE 방지용

@@ -16,7 +16,7 @@ import java.util.Map;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor // ApRequestService만 주입됩니다.
+@RequiredArgsConstructor
 public class MemberService {
 
     private static final String API_MEMBER_REGISTER   = "MEMBER_REGISTER";
@@ -65,8 +65,6 @@ public class MemberService {
 
         if (!StringUtils.hasText(d.getCustHp()))
             return ApResponseDTO.fail("휴대폰 번호를 입력하세요.");
-
-        // 필요 시 휴대폰/이메일 포맷, 약관동의 등의 추가 검증을 여기에.
 
         return null; // 검증 통과
     }

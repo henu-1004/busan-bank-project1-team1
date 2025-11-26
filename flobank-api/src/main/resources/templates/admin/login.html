@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -135,11 +135,11 @@
 <div class="login-container">
     <h2>관리자 로그인</h2>
 
-    <form action="/admin/login" method="post">
+    <form th:action="@{/admin/login}" method="post">
 
         <!-- 행번 -->
         <label for="adminId">행번</label>
-        <input type="text" id="adminId" name="adminId" placeholder="행번 입력" required>
+        <input type="text" id="adminId" name="adminId" placeholder="행번 입력" required th:value="${adminId}">
 
         <!-- 비밀번호 -->
         <label for="adminPw">비밀번호</label>
@@ -148,8 +148,8 @@
         <!-- 휴대폰 번호 -->
         <label for="phone">휴대폰 번호</label>
         <div class="phone-area">
-            <input type="text" id="phone" name="phone" placeholder="01012345678" required>
-            <button type="button" class="send-code-btn">
+            <input type="text" id="phone" name="adminPh" placeholder="01012345678" required  th:value="${adminPh}">
+            <button type="button" id="btnSendCode" class="send-code-btn">
                 인증번호 발송
             </button>
         </div>
@@ -158,7 +158,7 @@
         <label for="code">인증번호</label>
         <div class="code-area">
             <input type="text" id="code" name="code" placeholder="인증번호 입력">
-            <button type="button" class="verify-code-btn">인증</button>
+            <button type="button" id="btnVerifyCode" class="verify-code-btn">인증</button>
         </div>
 
         <!-- 로그인 버튼 -->
@@ -168,5 +168,6 @@
     </form>
 
 </div>
+<script th:src="@{/js/admin_login.js}"></script>
 </body>
 </html>

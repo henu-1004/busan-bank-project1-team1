@@ -43,11 +43,11 @@ public class SecurityConfig {
                                         "/mypage/chatbot",
                                         "/remit/info",
                                         "/admin/login"
+
                         ).permitAll()
-
-                        //.requestMatchers("/admin/**").hasAuthority("ADMIN")
-                        .requestMatchers("/admin/**").permitAll()
-
+                        .requestMatchers("/admin/login").permitAll()
+                        //.requestMatchers("/admin/**").hasRole("ADMIN")  //이따 주석 풀고
+                        .requestMatchers("/admin/**").permitAll()   //이거 주석 ㄱㄱ
                         .requestMatchers("/mypage/**").authenticated() // 마이페이지는 로그인 필요
                         .requestMatchers("/remit/**").authenticated()
                         .requestMatchers("/exchange/step1").authenticated()
@@ -60,12 +60,7 @@ public class SecurityConfig {
                         .requestMatchers("/customer/qna_write").authenticated()
                         .requestMatchers("/customer/qna_edit").authenticated()
                         .requestMatchers("/uploads/**").permitAll()
-                        .requestMatchers("/admin/login").permitAll()
                         .anyRequest().permitAll() // 일단 나머지는 다 허용 (개발 편의상)
-                )
-                .rememberMe(remember -> remember
-                        .key("flobank-remember-me-key")
-                        .tokenValiditySeconds(rememberMeSeconds)
                 )
                 // 우리가 만든 필터를 UsernamePasswordAuthenticationFilter 앞에 끼워넣기
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
