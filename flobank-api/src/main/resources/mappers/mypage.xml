@@ -174,7 +174,18 @@
 
     <select id="selectDpstAccts" resultType="kr.co.api.flobankapi.dto.MypageDpstDTO">
         SELECT
-        * FROM TB_DPST_ACCT_HDR th
+        th.*,
+        ti.DPST_ID            AS dpstId,
+        ti.DPST_NAME          AS dpstName,
+        ti.DPST_TYPE          AS dpstType,
+        ti.DPST_RATE_TYPE     AS dpstRateType,
+        ti.DPST_PART_WDRW_YN  AS dpstPartWdrwYn,
+        ti.DPST_ADD_PAY_YN    AS dpstAddPayYn,
+        ti.DPST_ADD_PAY_MAX    AS dpstAddPayMax,
+        wi.WDRW_MIN_MONTH     AS wdrwMinMonth,
+        wi.WDRW_MAX           AS wdrwMax,
+        wa.AMT_MIN            AS amtMin
+        FROM TB_DPST_ACCT_HDR th
         JOIN TB_DPST_PROD_INFO ti ON th.DPST_HDR_DPST_ID = ti.DPST_ID
         LEFT JOIN TB_DPST_PARTIAL_WDRW_INFO wi ON th.DPST_HDR_DPST_ID = wi.WDRW_DPST_ID
         LEFT JOIN TB_DPST_PARTIAL_WDRW_AMT wa
