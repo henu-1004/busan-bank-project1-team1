@@ -94,5 +94,5 @@ deepl:
     key: 3df6a572-c72c-4544-8cd2-c5bfd6a27b53:fx
 
 ai-server:
-  url: http://34.64.221.67:8000
+  url: http://34.64.84.82:8000
 
