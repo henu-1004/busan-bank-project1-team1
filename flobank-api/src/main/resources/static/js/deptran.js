@@ -175,6 +175,7 @@ document.addEventListener('DOMContentLoaded', function() {
         event.preventDefault();
         const hiddenTranAmount = document.getElementById('hiddenTranAmount'); // 실제 전송용 (Hidden)
         const frgnAmountInput = document.getElementById('foreignAmount');      // 보여지는 입력창 (Text)
+        const tranAmt = document.getElementById('hiddenTranAmount');
 
         let isValid = true;
 
@@ -182,7 +183,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // 입력창의 값에서 콤마를 제거하고 숫자로 변환
         if (frgnAmountInput){
-            const rawAmountStr = Number(frgnAmountInput.value);
+            const rawAmountStr = Number(tranAmt.value);
             const inputAmount = Number(rawAmountStr);
 
             // Hidden 필드에 실제 숫자값 동기화 (전송용)
@@ -294,10 +295,9 @@ function addAmount(amount) {
         return;
     }
 
-    input.value = comma(newVal);
-    document.getElementById('hiddenTranAmount').value = newVal;
 
-    input.classList.remove('input-error');
+
+
     if(errorDiv) errorDiv.style.display = 'none';
 }
 
