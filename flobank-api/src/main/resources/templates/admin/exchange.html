@@ -8,7 +8,7 @@
         <section class="admin-exchange-stats-row">
             <article class="admin-exchange-card admin-exchange-graph-card">
                 <h3>일자별 통화 환전금액
-                       <span th:text="| ${#temporals.format(baseTime, 'yyyy.MM.dd HH:mm:ss')} 기준)|"></span>
+                       <span th:text="| (${#temporals.format(baseTime, 'yyyy.MM.dd HH:mm:ss')} 기준)|"></span>
                 </h3>
 
                 <!--  날짜 선택 UI 추가 -->
@@ -53,7 +53,7 @@
 
             <article class="admin-exchange-card admin-exchange-graph-card">
                 <h3>일자별 환전액
-                    <span th:text="| ${#temporals.format(baseTime, 'yyyy.MM.dd HH:mm:ss')} 기준)|"></span>
+                    <span th:text="| (${#temporals.format(baseTime, 'yyyy.MM.dd HH:mm:ss')} 기준)|"></span>
                 </h3>
                 <div class="admin-exchange-graph-box admin-exchange-graph-box--compact">
                     <canvas id="dailyTotalChart"></canvas>
