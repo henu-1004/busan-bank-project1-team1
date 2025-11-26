@@ -109,34 +109,42 @@ jobs:
           --project=${{ secrets.GCP_PROJECT_ID }} \
           --zone=asia-northeast3-a
 
-    # 3-2.5. 설정 파일 및 Elastic 폴더 복사
+    # 3-2.5. 설정 파일 및 Elastic 폴더를 임시 폴더(/tmp)로 복사
     - name: bnk-ap-server 설정 파일(docker-compose, elastic) 복사
       run: |
-        # 1. docker-compose.yml 복사
+        # 1. docker-compose.yml -> /tmp로 복사 (권한 문제 회피)
         gcloud beta compute scp flobank-ap/docker-compose.yml \
-          bnk-ap-server:/opt/flobank-ap/docker-compose.yml \
+          bnk-ap-server:/tmp/docker-compose.yml \
           --project=${{ secrets.GCP_PROJECT_ID }} \
           --zone=asia-northeast3-a
         
-        # 2. elastic 폴더 (Dockerfile 포함) 통째로 복사
-        # --recurse 옵션은 폴더를 복사할 때 사용합니다.
+        # 2. elastic 폴더 -> /tmp로 복사
         gcloud beta compute scp --recurse flobank-ap/elastic \
-          bnk-ap-server:/opt/flobank-ap/ \
+          bnk-ap-server:/tmp/elastic \
           --project=${{ secrets.GCP_PROJECT_ID }} \
           --zone=asia-northeast3-a
 
-    # 3-3. [실행]
+    # 3-3. 실행 단계에서 sudo로 파일 이동 및 컨테이너 실행
     - name: bnk-ap-server (flobank-ap) 재시작 및 정리
       run: |
         gcloud beta compute ssh bnk-ap-server \
           --project=${{ secrets.GCP_PROJECT_ID }} \
           --zone=asia-northeast3-a \
           --command="
+            # 1. JAR 파일 이동
             sudo rm -rf /opt/flobank-ap/app.jar && \
             sudo mv /tmp/app.jar /opt/flobank-ap/app.jar && \
+            
+            # 2. docker-compose.yml 이동
+            sudo mv /tmp/docker-compose.yml /opt/flobank-ap/docker-compose.yml && \
+            
+            # 3. elastic 폴더 이동 (기존 폴더 삭제 후 이동)
+            sudo rm -rf /opt/flobank-ap/elastic && \
+            sudo mv /tmp/elastic /opt/flobank-ap/ && \
+            
+            # 4. 실행
             cd /opt/flobank-ap && \
             sudo docker-compose down && \
-            # --build 옵션이 있어야 복사된 Dockerfile로 이미지를 새로 만듭니다.
             sudo docker-compose up -d --build && \
             sudo docker system prune -a -f
           "
