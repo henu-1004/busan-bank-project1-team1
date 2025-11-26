@@ -30,7 +30,7 @@ import java.util.Date;
 public class JwtTokenProvider {
 
     private Key key;
-    private final long tokenValidityInMilliseconds = 1000 * 60 * 60; // 1시간
+    private final long tokenValidityInMilliseconds = 1000 * 60 * 20; // 20분
 
     @Value("${jwt.secret}")
     private String secretKey;

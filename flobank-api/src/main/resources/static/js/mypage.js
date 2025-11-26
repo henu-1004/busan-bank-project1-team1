@@ -483,6 +483,48 @@ document.addEventListener("DOMContentLoaded", () => {
         updateTransferableAmount();
     }
 
+    ////////////////////////////////////////////////////////////////////////////
+    // 1️⃣3️⃣ [추가] 외화 계좌이체 Step 3 - 전자서명 연동
+    ////////////////////////////////////////////////////////////////////////////
+    const btnTransfer = document.getElementById('btnTransfer');
+    const transferForm = document.getElementById('transferForm');
+    const hiddenRemtAmount = document.getElementById('hiddenRemtAmount');
+    const hiddenRemtCurrency = document.getElementById('hiddenRemtCurrency');
+
+    if (btnTransfer && transferForm) {
+        btnTransfer.addEventListener('click', function() {
+            // 1. 송금 정보 구성 (팝업에 보여줄 내용)
+            let displayAmount = '0';
+            let currency = 'USD'; // 기본값
+
+            if (hiddenRemtAmount) {
+                // 숫자 -> 3자리 콤마 포맷팅
+                displayAmount = Number(hiddenRemtAmount.value).toLocaleString();
+            }
+            if (hiddenRemtCurrency) {
+                currency = hiddenRemtCurrency.value;
+            }
+
+            const title = "해외송금 실행";
+            const infoText = `${displayAmount} ${currency}`; // 예: 1,000 USD
+
+            // 2. 전자서명 모듈 호출 (CertManager는 common_cert.js에 정의됨)
+            if (typeof CertManager !== 'undefined') {
+                CertManager.request(
+                    title,      // 인증창 제목
+                    infoText,   // 인증창 금액/내용
+                    function() {
+                        // 3. [콜백] 인증 성공 시 폼 제출
+                        transferForm.submit();
+                    }
+                );
+            } else {
+                alert("인증 모듈(CertManager)이 로드되지 않았습니다.");
+                // 개발 단계에서는 강제 제출 허용 가능: transferForm.submit();
+            }
+        });
+    }
+
 }); // DOMContentLoaded 끝
 
 ////////////////////////////////////////////////////////////////////////////
@@ -495,7 +537,7 @@ function setQuestion(text) {
 }
 
 // 폼 전송 전 데이터 정제 및 필수 입력값 검증 함수
-function submitTransferForm() {
+async function submitTransferForm() {
     const form = document.getElementById('transferForm');
     if (!form) return;
 
@@ -509,7 +551,15 @@ function submitTransferForm() {
     if (!cleanAmount || isNaN(cleanAmount) || parseFloat(cleanAmount) <= 0) {
         alert("송금할 금액을 입력해주세요.");
         visibleAmount.focus();
-        visibleAmount.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        visibleAmount.scrollIntoView({behavior: 'smooth', block: 'center'});
+        return;
+    }
+
+    // [수정됨] 비밀번호 입력 확인 (HTML에 id="input-account-pw"가 있어야 동작함)
+    const pwInput = document.getElementById('input-account-pw');
+    if (!pwInput || pwInput.value.trim().length !== 4) {
+        alert("계좌 비밀번호 4자리를 입력해주세요.");
+        if (pwInput) pwInput.focus();
         return;
     }
 
@@ -518,7 +568,7 @@ function submitTransferForm() {
     if (recName && !recName.value.trim()) {
         alert("수취인 성명(영문)을 입력해주세요.");
         recName.focus();
-        recName.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        recName.scrollIntoView({behavior: 'smooth', block: 'center'});
         return;
     }
 
@@ -527,7 +577,7 @@ function submitTransferForm() {
     if (recBkCode && !recBkCode.value.trim()) {
         alert("은행 코드를 입력해주세요.");
         recBkCode.focus();
-        recBkCode.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        recBkCode.scrollIntoView({behavior: 'smooth', block: 'center'});
         return;
     }
 
@@ -536,38 +586,80 @@ function submitTransferForm() {
     if (recAccNo && !recAccNo.value.trim()) {
         alert("수취인 계좌번호를 입력해주세요.");
         recAccNo.focus();
-        recAccNo.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        recAccNo.scrollIntoView({behavior: 'smooth', block: 'center'});
         return;
     }
 
     // ==========================================
-    // 2. 데이터 정제 및 조합 (검사 통과 후 실행)
+    // 2. 서버 비밀번호 검증 (AJAX Fetch)
     // ==========================================
+    const accountSelect = document.getElementById('account-select');
+    // [수정된 부분] 선택된 옵션에서 모체 계좌번호 가져오기
+    const selectedOption = accountSelect.options[accountSelect.selectedIndex];
+    const parentAcctNoAttr = selectedOption.getAttribute('data-parent-acct-no');
 
-    // (1) 금액 및 환율 히든 필드 설정
-    const hiddenAmountInput = document.getElementById('hidden-remt-amount');
-    if (hiddenAmountInput) hiddenAmountInput.value = cleanAmount;
+    // data-parent-acct-no가 있으면(외화계좌) 그 값을 사용, 없으면(원화계좌) value 사용
+    const selectedAcctNo = parentAcctNoAttr ? parentAcctNoAttr : accountSelect.value;
+    const inputPw = pwInput.value;              // 입력된 비밀번호
 
-    const hiddenRateInput = document.getElementById('hidden-applied-rate');
-    if (hiddenRateInput) {
-        hiddenRateInput.value = (typeof currentExchangeRate !== 'undefined' && currentExchangeRate > 0)
-            ? currentExchangeRate : 0;
+    try {
+        const csrfTokenMeta = document.querySelector('meta[name="_csrf"]');
+        const csrfHeaderMeta = document.querySelector('meta[name="_csrf_header"]');
+        const headers = {'Content-Type': 'application/json'};
+
+        if (csrfTokenMeta && csrfHeaderMeta) {
+            headers[csrfHeaderMeta.content] = csrfTokenMeta.content;
+        }
+
+        const response = await fetch('/flobank/remit/checkEnAcctPw', {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify({
+                acctNo: selectedAcctNo,
+                acctPw: inputPw
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error('서버 통신 오류가 발생했습니다.');
+        }
+
+        const result = await response.json();
+
+        if (!result.isPwCorrect) {
+            alert("비밀번호가 일치하지 않습니다.");
+            pwInput.value = '';
+            pwInput.focus();
+            return;
+        }
+
+        // ==========================================
+        // 3. 데이터 정제 및 폼 제출 (비밀번호 검증 통과 시)
+        // ==========================================
+
+        const hiddenAmountInput = document.getElementById('hidden-remt-amount');
+        if (hiddenAmountInput) hiddenAmountInput.value = cleanAmount;
+
+        const hiddenRateInput = document.getElementById('hidden-applied-rate');
+        if (hiddenRateInput) {
+            hiddenRateInput.value = (typeof currentExchangeRate !== 'undefined' && currentExchangeRate > 0)
+                ? currentExchangeRate : 0;
+        }
+
+        const zipInput = document.getElementById('input-zip-code');
+        const addrInput = document.querySelector('input[name="remtAddr"]');
+        if (zipInput && addrInput && zipInput.value.trim() !== "") {
+            if (!addrInput.value.startsWith('[')) {
+                addrInput.value = `[${zipInput.value.trim()}] ${addrInput.value.trim()}`;
+            }
+        }
+
+        form.submit();
+
+    } catch (error) {
+        console.error("Password Check Error:", error);
+        alert("계좌 확인 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.");
     }
-
-    // (2) 우편번호 + 주소 병합 (요청하신 포맷: [우편번호] 주소)
-    const zipInput = document.getElementById('input-zip-code');
-    const addrInput = document.querySelector('input[name="remtAddr"]');
-
-    if (zipInput && addrInput && zipInput.value.trim() !== "") {
-        // 기존 값이 중복되지 않게 초기화(혹시 모를 중복 방지)하거나, 입력된 값 그대로 사용
-        // 포맷 변경: "609" + "47336" -> "[47336] 609"
-        addrInput.value = `[${zipInput.value.trim()}] ${addrInput.value.trim()}`;
-    }
-
-    // ==========================================
-    // 3. 폼 제출
-    // ==========================================
-    form.submit();
 }
 
 ////////////////////////////////////////////////////////////////////////////

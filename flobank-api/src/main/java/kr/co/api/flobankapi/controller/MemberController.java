@@ -22,6 +22,8 @@ import kr.co.api.flobankapi.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -122,7 +124,7 @@ public class MemberController {
             cookie.setHttpOnly(true); // 자바스크립트 접근 차단 (보안 필수)
             cookie.setSecure(false); // https 적용 시 true로 변경
             cookie.setPath("/"); // 모든 경로에서 접근 가능
-            cookie.setMaxAge(3600); // 1시간(토큰 만료시간과 맞춤)
+            cookie.setMaxAge(1200); // 20분(토큰 만료시간과 맞춤)
 
             // 4. 응답에 쿠키 추가
             response.addCookie(cookie);
@@ -131,7 +133,7 @@ public class MemberController {
             Cookie loginFlag = new Cookie("loginYn", "Y");
             loginFlag.setHttpOnly(false); // JS에서 읽을 수 있게
             loginFlag.setPath("/");
-            loginFlag.setMaxAge(3600);
+            loginFlag.setMaxAge(1200);
             response.addCookie(loginFlag);
 
             custInfoService.saveLastLogin(custInfoDTO.getCustId());
@@ -140,6 +142,45 @@ public class MemberController {
         }else {
             return "redirect:/member/login?error"; // 로그인 실패
         }
+    }
+
+    // [추가] 세션 연장 API (AJAX 요청용)
+    @PostMapping("/extend")
+    @ResponseBody
+    public ResponseEntity<?> extendSession(@AuthenticationPrincipal User user, HttpServletResponse response) {
+        // user는 SecurityConfig에서 설정한 UserDetails 객체입니다.
+        // 현재 SecurityContext에 인증된 사용자 정보가 있다면 토큰을 재발급합니다.
+
+        if (user != null) {
+            // 편의상 custCode를 username으로 간주하고 토큰 생성 (실제 로직에 맞게 조정 필요)
+            // JWT 토큰 내의 정보를 꺼내서 다시 만드는 것이 가장 정확합니다.
+            // 여기서는 예시로 user.getUsername()을 사용합니다.
+
+            // ★ 중요: 실제로는 custInfoService를 통해 DB에서 최신 정보를 가져오거나
+            // 현재 토큰의 Claims를 복호화해서 정보를 그대로 사용하는 것이 좋습니다.
+            // 여기서는 흐름만 보여드립니다.
+
+            String newToken = jwtTokenProvider.createToken(user.getUsername(), "USER", user.getUsername());
+
+            // 1. 액세스 토큰 쿠키 재발급
+            Cookie cookie = new Cookie("accessToken", newToken);
+            cookie.setHttpOnly(true);
+            cookie.setSecure(false);
+            cookie.setPath("/");
+            cookie.setMaxAge(1200); // 20분 리셋
+            response.addCookie(cookie);
+
+            // 2. 로그인 플래그 쿠키 재발급
+            Cookie loginFlag = new Cookie("loginYn", "Y");
+            loginFlag.setHttpOnly(false);
+            loginFlag.setPath("/");
+            loginFlag.setMaxAge(1200); // 20분 리셋
+            response.addCookie(loginFlag);
+
+            return ResponseEntity.ok().body("extended");
+        }
+
+        return ResponseEntity.status(401).body("Unauthorized");
     }
 
     @PostMapping("/logout")

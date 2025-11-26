@@ -7,6 +7,7 @@ import kr.co.api.flobankapi.mapper.MypageMapper;
 import kr.co.api.flobankapi.mapper.RemitMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +20,8 @@ import java.math.RoundingMode;
 public class RemitService {
     private final RemitMapper remitMapper;
     private final MypageMapper mypageMapper;
+    private final FrgnAcctService frgnAcctService;
+    private final PasswordEncoder passwordEncoder;
 
     // 외화 이체
     @Transactional
@@ -59,6 +62,14 @@ public class RemitService {
         }
 
         return true;
+    }
+
+    // 계좌 비밀번호 비교
+    public boolean checkEnAcctPw(String acctNo, String acctPw) {
+        log.info("acctNo = {}, acctPw = {}", acctNo, acctPw);
+        CustFrgnAcctDTO custFrgnAcctDTO = frgnAcctService.getFrgnAcctByAcctNo(acctNo);
+        log.info("계좌 비밀번호 custFrgnAcctDTO = {}",  custFrgnAcctDTO);
+        return passwordEncoder.matches(acctPw, custFrgnAcctDTO.getFrgnAcctPw());
     }
 
     // 모체 계좌번호 가져오기

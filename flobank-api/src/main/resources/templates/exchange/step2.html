@@ -241,6 +241,11 @@
 -->
 <script th:inline="javascript">
     /*<![CDATA[*/
+
+    // [추가] 서버의 Context Path를 동적으로 가져옵니다. (예: "/" 또는 "/flobank")
+    // Thymeleaf가 알아서 현재 프로젝트의 루트 경로를 넣어줍니다.
+    const contextPath = /*[[@{/}]]*/ '/';
+
     window.exchData = {
         balanceList: /*[[${frgnAcctBalanceDTOList}]]*/ [],
         frgnAcctNo: ''
@@ -252,6 +257,7 @@
     /*]]>*/
 </script>
 
+<script th:src="@{/js/common_cert.js}"></script>
 <script th:src="@{/js/exchange.js}"></script>
 
 </body>

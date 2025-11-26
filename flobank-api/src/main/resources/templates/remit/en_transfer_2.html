@@ -67,6 +67,7 @@
 
                         <option selected
                                 th:value="${custFrgnAcctDTO.frgnAcctNo}"
+                                th:data-parent-acct-no="${custFrgnAcctDTO.frgnAcctNo}"
                                 data-type="FRGN"
                                 th:text="${custFrgnAcctDTO.frgnAcctName}"
 
@@ -138,6 +139,11 @@
                         ※ 송금 가능 금액을 초과할 수 없습니다.
                     </p>
                     <p class="transfer1-guide-text">※ 모든 금액은 선택한 통화 기준으로 표시됩니다.</p>
+                </div>
+
+                <div class="transfer1-form-group">
+                    <label class="transfer1-label">계좌 비밀번호</label>
+                    <input type="password" id="input-account-pw" name="acctPw" class="transfer1-input short" placeholder="비밀번호 4자리" maxlength="4">
                 </div>
 
                 <div class="transfer1-form-group">
