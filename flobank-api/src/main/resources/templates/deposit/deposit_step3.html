@@ -81,7 +81,7 @@
                       </td>
                   </tr>
                   <tr th:if="${product.dpstAutoRenewYn.equals('Y')}"><th>자동연장신청 여부</th><td>[[${dto.autoRenewYn == 'y' ? '신청' : '미신청'}]]</td></tr>
-                  <tr th:if="${dto.autoRenewYn.equals('y')}"><th>자동연장주기</th><td>[[${dto.autoRenewTerm}]]개월</td></tr>
+                  <tr th:if="${'y'.equals(dto.autoRenewYn)}"><th>자동연장주기</th><td>[[${dto.autoRenewTerm}]]개월</td></tr>
                   <!-- <tr><th>자동해지신청 여부</th><td>예</td></tr> -->
               </table>
           </section>
