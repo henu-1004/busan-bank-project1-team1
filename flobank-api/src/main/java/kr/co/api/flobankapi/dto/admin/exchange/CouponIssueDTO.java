@@ -15,4 +15,5 @@ public class CouponIssueDTO {
     private Integer coupRate;
     private String issuedDate;
     private Integer coupStatus;
+
 }

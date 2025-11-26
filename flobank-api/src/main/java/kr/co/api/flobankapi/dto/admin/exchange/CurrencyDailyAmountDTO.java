@@ -15,4 +15,5 @@ public class CurrencyDailyAmountDTO {
     private String baseDate;
     private String currency;
     private BigDecimal amountKrw;
+
 }

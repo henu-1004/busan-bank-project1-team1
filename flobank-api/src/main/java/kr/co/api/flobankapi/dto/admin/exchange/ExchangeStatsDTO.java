@@ -18,4 +18,5 @@ public class ExchangeStatsDTO {
     private LocalDateTime lastUpdatedAt;
     private String rangeLabel;
 
+
 }
