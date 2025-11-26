@@ -82,7 +82,7 @@
                     </td>
 
                     <td class="cell-right">
-                        <strong th:text="${dpstAcctDTO.formattedCurrency + #numbers.formatInteger(custTranHistDTO.tranAmount, 0, 'COMMA')}">금액</strong>
+                        <strong th:text="${dpstAcctDTO.formattedCurrency + #numbers.formatInteger(custTranHistDTO.dpstDtlAmount, 0, 'COMMA')}">금액</strong>
                         <div style="font-size: 0.8rem; color: #888;">수수료 면제</div>
                     </td>
 
@@ -125,6 +125,8 @@
                 <input type="hidden" th:field="*{tranType}">
                 <input type="hidden" th:field="*{tranExpAcctNo}">
                 <input type="hidden" th:field="*{tranCurrency}">
+                <input type="hidden" th:field="*{dpstDtlAmount}">
+                <input type="hidden" th:field="*{dpstDtlAppliedRate}">
 
                 <button type="submit" class="transfer2-btn-main">이체실행</button>
             </form>

@@ -665,7 +665,10 @@ public class MypageController {
                                 @AuthenticationPrincipal CustomUserDetails userDetails) {
 
 
-
+        log.info("CustTranHistDTO:{}", custTranHistDTO.toString());
+        if (custTranHistDTO.getDpstDtlAmount()==null){
+            custTranHistDTO.setDpstDtlAmount(custTranHistDTO.getTranAmount());
+        }
 
         // 4. 나머지 데이터(메모 등) 처리
         // '내통장표시'가 비어있으면 -> 사용자 이름(보내는 사람) or 조회된 받는분 이름 등 정책에 따라 설정

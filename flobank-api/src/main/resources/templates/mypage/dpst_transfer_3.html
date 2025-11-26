@@ -83,7 +83,7 @@
                     </td>
 
                     <td class="cell-right">
-                        <strong th:text="${dpstAcctDTO.formattedCurrency+#numbers.formatInteger(custTranHistDTO.tranAmount, 0, 'COMMA')}">10,000</strong>
+                        <strong th:text="${dpstAcctDTO.formattedCurrency+#numbers.formatInteger(custTranHistDTO.dpstDtlAmount, 0, 'COMMA')}">10,000</strong>
                     </td>
 
                     <td class="cell-center">
