@@ -44,7 +44,9 @@ public class SecurityConfig {
                                         "/remit/info",
                                         "/admin/login"
                         ).permitAll()
-//                        .requestMatchers("/admin/**").hasAuthority("ADMIN")
+
+                        .requestMatchers("/admin/**").hasAuthority("ADMIN")
+
                         .requestMatchers("/mypage/**").authenticated() // 마이페이지는 로그인 필요
                         .requestMatchers("/remit/**").authenticated()
                         .requestMatchers("/exchange/step1").authenticated()
@@ -57,7 +59,7 @@ public class SecurityConfig {
                         .requestMatchers("/customer/qna_write").authenticated()
                         .requestMatchers("/customer/qna_edit").authenticated()
                         .requestMatchers("/uploads/**").permitAll()
-//                        .requestMatchers("/admin/login").permitAll()
+                        .requestMatchers("/admin/login").permitAll()
                         .anyRequest().permitAll() // 일단 나머지는 다 허용 (개발 편의상)
                 )
                 .rememberMe(remember -> remember

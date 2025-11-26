@@ -8,7 +8,7 @@ services:
     restart: always
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
-     # - SPRING_ELASTICSEARCH_URIS=http://34.64.225.88:9200
+      - SPRING_ELASTICSEARCH_URIS=http://34.64.225.88:9200
     volumes:
       - flobank_uploads:/app/uploads
 

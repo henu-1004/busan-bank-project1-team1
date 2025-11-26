@@ -21,6 +21,7 @@ public class MypageDpstDTO {
     private BigDecimal dpstHdrRate;
     private int dpstHdrStatus;
     private String dpstHdrLinkedAcctNo;
+    private int dpstHdrLinkedAcctType;
     private String dpstHdrAutoRenewYn;
     private int dpstHdrAutoRenewCnt;
     private int dpstHdrAutoRenewTerm;
@@ -34,6 +35,8 @@ public class MypageDpstDTO {
     private String dpstType;
     private int dpstRateType;
     private String dpstPartWdrwYn;
+    private String dpstAddPayYn;
+    private int dpstAddPayMax;
 
     // 예금 상품 중도인출 정보
     private int wdrwMinMonth;

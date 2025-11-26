@@ -43,7 +43,6 @@ jobs:
         ./gradlew build -x test
 
     # 2-2. [복사] 빌드된 JAR 파일을 bnk-api-server VM으로 복사
-    # /tmp/app.jar 로 복사하도록 수정됨 (잘하셨습니다!)
     - name: bnk-api-server (flobank-api)에 JAR 파일 복사
       run: |
         JAR_FILE=$(find flobank-api/build/libs -name "*.jar" ! -name "*-plain.jar")
@@ -93,58 +92,70 @@ jobs:
         chmod +x ./gradlew
         ./gradlew build -x test
 
-    # 3-2. [복사] 빌드된 JAR 파일을 bnk-ap-server VM으로 복사
-    # /tmp/app.jar 로 복사하도록 수정됨 (잘하셨습니다!)
-    - name: bnk-ap-server (flobank-ap)에 JAR 파일 복사
+    # 3-2. [이미지 빌드 & Push] Elasticsearch 이미지를 만들어서 구글 저장소로 업로드
+    - name: Elasticsearch 이미지 빌드 및 Push
+      run: |
+        # 1. GCP Docker 인증
+        gcloud auth configure-docker asia-northeast3-docker.pkg.dev --quiet
+        
+        # 2. 이미지 빌드 (nori 플러그인 포함)
+        # 주의: docker build 명령은 Dockerfile이 있는 폴더(flobank-ap/elastic)를 지정해야 합니다.
+        docker build -t asia-northeast3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/flobank-repo/flobank-elasticsearch:latest ./flobank-ap/elastic
+        
+        # 3. 이미지 업로드 (Push)
+        docker push asia-northeast3-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/flobank-repo/flobank-elasticsearch:latest
+
+    # 3-3. [파일 복사] JAR 파일, docker-compose.yml, Dockerfile 복사
+    - name: bnk-ap-server 파일 복사
       run: |
         JAR_FILE=$(find flobank-ap/build/libs -name "*.jar" ! -name "*-plain.jar")
         
-        if [ -z "$JAR_FILE" ]; then
-          echo "ERROR: 실행 가능한 JAR 파일을 flobank-ap/build/libs 에서 찾을 수 없습니다."
-          exit 1
-        fi
-        
+        # 1. JAR 파일 전송
         gcloud beta compute scp "$JAR_FILE" \
           bnk-ap-server:/tmp/app.jar \
           --project=${{ secrets.GCP_PROJECT_ID }} \
           --zone=asia-northeast3-a
-
-    # 3-2.5. 설정 파일 및 Elastic 폴더를 임시 폴더(/tmp)로 복사
-    - name: bnk-ap-server 설정 파일(docker-compose, elastic) 복사
-      run: |
-        # 1. docker-compose.yml -> /tmp로 복사 (권한 문제 회피)
+          
+        # 2. docker-compose.yml 전송
         gcloud beta compute scp flobank-ap/docker-compose.yml \
           bnk-ap-server:/tmp/docker-compose.yml \
           --project=${{ secrets.GCP_PROJECT_ID }} \
           --zone=asia-northeast3-a
-        
-        # 2. elastic 폴더 -> /tmp로 복사
-        gcloud beta compute scp --recurse flobank-ap/elastic \
-          bnk-ap-server:/tmp/elastic \
+
+        # 3. App용 Dockerfile 전송 (혹시 없을 경우를 대비해 안전하게 복사)
+        gcloud beta compute scp flobank-ap/Dockerfile \
+          bnk-ap-server:/tmp/Dockerfile \
           --project=${{ secrets.GCP_PROJECT_ID }} \
           --zone=asia-northeast3-a
 
-    # 3-3. 실행 단계에서 sudo로 파일 이동 및 컨테이너 실행
+    # 3-4. [실행] 서버는 이미지를 다운로드(Pull)만 해서 실행
     - name: bnk-ap-server (flobank-ap) 재시작 및 정리
       run: |
         gcloud beta compute ssh bnk-ap-server \
           --project=${{ secrets.GCP_PROJECT_ID }} \
           --zone=asia-northeast3-a \
           --command="
-            # 1. JAR 파일 이동
-            sudo rm -rf /opt/flobank-ap/app.jar && \
-            sudo mv /tmp/app.jar /opt/flobank-ap/app.jar && \
+            # 1. GCP Docker 인증
+            gcloud auth configure-docker asia-northeast3-docker.pkg.dev --quiet
+
+            # 2. 파일 이동
+            sudo rm -rf /opt/flobank-ap/app.jar
+            sudo mv /tmp/app.jar /opt/flobank-ap/app.jar
+            sudo mv /tmp/docker-compose.yml /opt/flobank-ap/docker-compose.yml
+            sudo mv /tmp/Dockerfile /opt/flobank-ap/Dockerfile
             
-            # 2. docker-compose.yml 이동
-            sudo mv /tmp/docker-compose.yml /opt/flobank-ap/docker-compose.yml && \
+            # 3. 컨테이너 재시작
+            cd /opt/flobank-ap
+            sudo docker-compose down
             
-            # 3. elastic 폴더 이동 (기존 폴더 삭제 후 이동)
-            sudo rm -rf /opt/flobank-ap/elastic && \
-            sudo mv /tmp/elastic /opt/flobank-ap/ && \
+            # [핵심 1] Elasticsearch 최신 이미지 다운로드
+            sudo docker-compose pull
             
-            # 4. 실행
-            cd /opt/flobank-ap && \
-            sudo docker-compose down && \
-            sudo docker-compose up -d --build && \
-            sudo docker system prune -a -f
+            # [핵심 2] 실행
+            # --build 옵션이 있어야 'flobank-ap'는 새 JAR로 다시 빌드되고,
+            # 'elasticsearch'는 위에서 받은 이미지를 그대로 사용합니다.
+            sudo docker-compose up -d --build
+            
+            # 불필요한 이미지 정리
+            sudo docker image prune -f
           "

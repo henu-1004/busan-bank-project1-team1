@@ -50,7 +50,7 @@
                 <h3 class="step2-subtitle">출금계좌정보입력</h3>
 
                 <!-- 출금계좌선택 -->
-                <div th:if="${product.dpstRateType == 1}" class="form-group">
+                <div th:if="${product.dpstRateType == 1 or product.dpstRateType == 3}" class="form-group">
                     <label class="form-label">출금계좌선택</label>
                     <div class="radio-group">
                         <label><input type="radio" name="withdrawType" value="krw" checked> 원화출금계좌</label>

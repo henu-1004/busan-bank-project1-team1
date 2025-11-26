@@ -206,6 +206,43 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     // -------------------------------------------------------------
+    // 예금 추가납입 제한
+    // -------------------------------------------------------------
+    document.querySelectorAll(".deposit-add-btn").forEach(btn => {
+        btn.addEventListener("click", function (e) {
+            e.preventDefault(); // 기본 페이지 이동 막음
+
+            const type = this.dataset.type;               // 예금 유형
+            const addPayYn = this.dataset.addpayyn;       // 추가납입 가능 여부
+            const addPayCnt = Number(this.dataset.addpaycnt); // 현재 추가납입 횟수
+            const addPayMax = Number(this.dataset.addpaymax); // 허용된 추가납입 최대횟수
+            const acctNo = this.dataset.acctno;           // 예금계좌번호
+
+            // DPST_TYPE=1이고 추가납입 불가(N) → 차단
+            if (type === "1" && addPayYn === "N") {
+                alert("이 상품은 추가 납입이 불가능합니다.");
+                return;
+            }
+
+            // 추가납입 가능(Y)이지만 횟수 초과 → 차단
+            if (type === "1" && addPayYn === "Y" && addPayCnt >= addPayMax) {
+                alert(`추가 납입 가능 횟수를 초과했습니다. (최대 ${addPayMax}회)`);
+                return;
+            }
+
+            // 통과했을 경우 정상 페이지 이동
+            window.location.href = this.href;
+        });
+    });
+
+
+
+
+
+
+
+
+    // -------------------------------------------------------------
     // 예금 상세정보 모달 (depositModal)
     // -------------------------------------------------------------
     const depositModal = document.getElementById("depositModal");
@@ -260,9 +297,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 const interest = link.dataset.interest;
                 const custName = link.dataset.custname;
                 const filteredHistory = histories.filter(h => h.dpstDtlHdrNo === id);
-
-
-
+                const rateType = link.dataset.ratetype;
+                const acctType = link.dataset.accttype;
 
 
                 depositModalHeader.innerHTML = `
@@ -275,46 +311,48 @@ document.addEventListener("DOMContentLoaded", function () {
             </div>
             <br>
                 `;
-
-
+                const currencySymbolMap = { USD:'$', KRW:'₩', AUD:'$', CNH:'¥', CNY:'¥', GBP:'£', EUR:'€', JPY:'¥' };
+                const curSign = currencySymbolMap[link.dataset.currency] || '?';
                 // 상세 테이블 HTML 구성
                 let html = `
-                
-                
-                <tr><th>예금주</th><td colspan="3">${custName}</td></tr>
-                <tr><th>현재 잔액</th><td colspan="3">${balance} ${expCurrency || ""}</td></tr>
-                <tr>
-                    <th>개설일</th><td colspan="3">${formatDate(startRaw || "")}</td>
-                 
-                </tr>
-               
-                <tr>
-                    <th>가입 통화</th><td>${currency || ""}</td>
-                    <th>예금유형</th><td>${typeName}</td>
-                </tr>
-                <tr><th>적용 금리</th><td colspan="3">${interest || ""}%</td></tr>
-                <tr><th>적용 환율</th><td colspan="3">${rate || ""}</td></tr>
-                <tr><th>자동 재예치</th><td colspan="3">${autorenew === "y" ? "Y" : "N"}</td></tr>
-            `;
+<tr><th>예금주</th><td colspan="3">${custName}</td></tr>
+<tr><th>현재 잔액</th><td colspan="3">${curSign} ${balance}</td></tr>
+<tr>
+    <th>개설일</th><td colspan="3">${formatDate(startRaw || "")}</td>
+</tr>
+`;
 
-                // 유형별로 추가 정보 (가능한 경우만)
-                if (autorenew === "y") {
-                    html += `<tr><th>자동 재예치 기간</th><td colspan="3">${autorenewTerm}개월</td></tr>`
+// 🔥 조건 분기
+                if (rateType === "1" && acctType === "1") {
+                    html += `
+        <tr>
+            <th>가입 통화</th><td>${currency || ""}</td>
+            <th>적용 환율</th><td>${rate || ""}</td>
+        </tr>
+    `;
+                } else {
+                    html += `
+        <tr>
+            <th>가입 통화</th><td colspan="3">${currency || ""}</td>
+        </tr>
+    `;
                 }
+
+                html += `
+<tr><th>예금유형</th><td colspan="3">${typeName}</td></tr>
+<tr><th>적용 금리</th><td colspan="3">${interest || ""}%</td></tr>
+`;
+
+
 
                 if (typeCode === "1") { // 거치식
                     if (month) {
                         html += `<tr><th>예치 기간</th><td colspan="3">${month}개월</td></tr>`;
                     }
-                    if (wdrwYn === 'Y' || wdrwYn === 'y') {
-                        html += `<tr><th>일부 인출 가능 횟수</th><td colspan="3">${wdrwMax}회</td></tr>`;
-                    }
+
                 } else if (typeCode === "2") { // 자유적립식
                     if (month) {
                         html += `<tr><th>적립 기간</th><td colspan="3">${month}개월</td></tr>`;
-                    }
-                    if (wdrwYn === 'Y' || wdrwYn === 'y') {
-                        html += `<tr><th>일부 인출 가능 횟수</th><td colspan="3">${wdrwMax}회</td></tr>`;
                     }
                 }
 
@@ -350,6 +388,61 @@ document.addEventListener("DOMContentLoaded", function () {
         window.addEventListener("click", (e) => {
             if (e.target === depositModal) {
                 depositModal.style.display = "none";
+            }
+        });
+    }
+
+
+
+
+
+
+
+    const depositInfoModal = document.getElementById("depositInfoModal");
+    if (depositInfoModal) {
+        const closeDepositBtn = depositInfoModal.querySelector(".close-btn");
+        const depositDetailTable = depositInfoModal.querySelector(".detail-table tbody");
+        const depositHistoryTbody = document.getElementById("depositHistory");
+        const depositModalHeader = document.getElementById("deposit-modal-header");
+
+
+        // 날짜 포맷터 (YYYYMMDD → YYYY.MM.DD)
+        function formatDate(yyyymmdd) {
+            if (!yyyymmdd || yyyymmdd.length !== 8) return yyyymmdd || "";
+            return (
+                yyyymmdd.substring(0, 4) + "." +
+                yyyymmdd.substring(4, 6) + "." +
+                yyyymmdd.substring(6, 8)
+            );
+        }
+
+        // 예금유형 코드 → 한글
+        function getDpstTypeName(typeCode) {
+            if (typeCode === "1") return "거치식";
+            if (typeCode === "2") return "자유적립식";
+            return typeCode || "";
+        }
+
+        const histories = window.dpstHistList || [];
+
+        // --- 예금 이름 클릭 시 모달 열기 ---
+        document.querySelectorAll(".deposit-detail-info").forEach(link => {
+            link.addEventListener("click", e => {
+                e.preventDefault();
+
+
+                depositInfoModal.style.display = "flex";
+            });
+        });
+
+        if (closeDepositBtn) {
+            closeDepositBtn.addEventListener("click", () => {
+                depositInfoModal.style.display = "none";
+            });
+        }
+        window.addEventListener("click", (e) => {
+            if (e.target === depositInfoModal) {
+                depositInfoModal.style.display = "none";
             }
         });
     }
