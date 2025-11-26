@@ -8,6 +8,13 @@
      ✔ 5분 자동 새로고침
      ✔ Chart.js 기반 stacked bar chart
 ============================================================================ */
+function getToday() {
+    const d = new Date();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${d.getFullYear()}-${mm}-${dd}`;
+}
+
 
 (function () {
 
@@ -43,6 +50,13 @@
 
     // 선택된 날짜(yyyy-MM-dd)
     let selectedDate = '';
+
+    // 기간 선택 상태
+    let rangeMode = false;
+    let rangeStartDate = '';
+    let rangeEndDate = '';
+    let rangeLabel = '';
+
 
     // 서버에서 Thymeleaf로 내려준 데이터
     let latestStats = window.exchangeStats || {};
@@ -169,6 +183,12 @@
     }
 
 
+    function formatRangeOrDate(label) {
+        if (!label) return '';
+        return label.includes('~') ? label : formatDateLabel(label);
+    }
+
+
     /* -----------------------------------------------------------------------
        ✔ 필터 UI 구성 (7개 통화만 출력)
     ----------------------------------------------------------------------- */
@@ -227,10 +247,14 @@
             ? latestStats.currencyDailyAmounts
             : [];
 
-        const targetDate = ensureSelectedDate();
-        const filteredByDate = currencyData.filter(item => normalizeDate(item.baseDate) === targetDate);
+        const useRange = rangeMode && rangeStartDate && rangeEndDate;
+        const targetLabel = useRange
+            ? (rangeLabel || `${rangeStartDate} ~ ${rangeEndDate}`)
+            : ensureSelectedDate();
 
-
+        const workingData = useRange
+            ? currencyData
+            : currencyData.filter(item => normalizeDate(item.baseDate) === targetLabel);
         const currencies = [...defaultCurrencies];
 
 
@@ -241,8 +265,7 @@
 
         const labels = activeCurrencies;
         const values = activeCurrencies.map((code) => {
-            const found = filteredByDate.find(item => cleanCurrency(item.currency) === code);
-            return found ? Number(found.amountKrw) : 0;
+            const found = workingData.find(item => cleanCurrency(item.currency) === code);            return found ? Number(found.amountKrw) : 0;
 
 
         });
@@ -255,7 +278,7 @@
             maxBarThickness: 44
         }];
 
-        return { labels, datasets, targetDate };
+        return { labels, datasets, targetLabel };
 
 
 
@@ -271,7 +294,7 @@
         const canvas = document.getElementById('currencyDailyChart');
         if (!canvas || typeof Chart === 'undefined') return;
 
-        const { labels, datasets, targetDate } = prepareCurrencyChartData();
+        const { labels, datasets, targetLabel } = prepareCurrencyChartData();
 
         if (!currencyChart) {
             currencyChart = new Chart(canvas.getContext('2d'), {
@@ -284,7 +307,7 @@
                         legend: { display: false },
                         tooltip: {
                             callbacks: {
-                                title: () => formatDateLabel(targetDate),
+                                itle: () => formatRangeOrDate(targetLabel),
 
                                 label: (ctx) =>
                                     `${ctx.label}: ${ctx.parsed.y.toLocaleString('ko-KR')}원`
@@ -399,6 +422,15 @@
                 headers: { 'Accept': 'application/json' }
             });
             const data = await res.json();
+
+            if (rangeMode) {
+                latestStats.dailyTotals = data.dailyTotals;
+                latestStats.lastUpdatedAt = data.lastUpdatedAt;
+                renderTotalChart();
+                updateBaseTimeText(data.lastUpdatedAt);
+                return;
+            }
+
             latestStats = data;
 
             const normalized = normalizeDate(selectedDate);
@@ -406,7 +438,8 @@
             if (!hasSelected) {
                 selectedDate = deriveLatestDateFromStats(data);
                 setDatePickerValue(selectedDate);
-            }            renderAll();
+            }
+            renderAll();
         } catch (e) {
             console.error(e);
         }
@@ -416,8 +449,19 @@
     /* -----------------------------------------------------------------------
        ✔ 날짜별 통계 조회
     ----------------------------------------------------------------------- */
+
+    function clearRangeMode() {
+        rangeMode = false;
+        rangeStartDate = '';
+        rangeEndDate = '';
+        rangeLabel = '';
+    }
+
+
     async function fetchDateStats(date) {
         try {
+            clearRangeMode();
+
             const res = await fetch(`/flobank/admin/exchange/stats?date=${date}`, {
                 headers: { 'Accept': 'application/json' }
             });
@@ -446,6 +490,38 @@
     }
 
 
+    /* -----------------------------------------------------------------------
+   ✔ 기간 통계 조회 (왼쪽 그래프 전용)
+----------------------------------------------------------------------- */
+    async function fetchRangeStats(startDate, endDate) {
+        try {
+            const res = await fetch(`/flobank/admin/exchange/stats/range?startDate=${startDate}&endDate=${endDate}`, {
+                headers: { 'Accept': 'application/json' }
+            });
+            const data = await res.json();
+
+            const hasData = (Array.isArray(data.currencyDailyAmounts) && data.currencyDailyAmounts.length > 0);
+
+            if (!hasData) {
+                alert('선택한 기간의 환전 거래가 없습니다.');
+                return;
+            }
+
+            rangeMode = true;
+            rangeStartDate = startDate;
+            rangeEndDate = endDate;
+            rangeLabel = data.rangeLabel || `${startDate} ~ ${endDate}`;
+
+            latestStats.currencyDailyAmounts = data.currencyDailyAmounts;
+            latestStats.lastUpdatedAt = data.lastUpdatedAt;
+
+            renderCurrencyChart();  // 왼쪽 그래프만 업데이트
+            updateBaseTimeText(data.lastUpdatedAt);  // 기준 시각 변경
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
 
     /* -----------------------------------------------------------------------
        페이지 로드시 실행
@@ -454,25 +530,86 @@
 
         if (typeof Chart === 'undefined') return;
 
+        const today = getToday();
+
+        // 오늘 날짜로 datePicker 설정
         const datePicker = document.getElementById("exchangeDatePicker");
         if (datePicker) {
-            selectedDate = normalizeDate(datePicker.value) || selectedDate;
+            datePicker.value = today;
+            selectedDate = today;
         }
 
+        // 가장 먼저 오늘 날짜 기준으로 데이터 가져오기
+        fetchDateStats(today);
+
+        // 그래프 렌더링
         renderAll();
+
+        const startPicker = document.getElementById("exchangeStartDatePicker");
+        const endPicker = document.getElementById("exchangeEndDatePicker");
+        const applyRangeBtn = document.getElementById("exchangePeriodApply");
+        const resetRangeBtn = document.getElementById("exchangePeriodReset");
 
         // 날짜 선택 이벤트
         if (datePicker) {
             datePicker.addEventListener("change", function () {
                 const nextDate = normalizeDate(this.value);
                 if (!nextDate) return;
-                fetchDateStats(nextDate);
 
+                //  왼쪽 날짜 선택 → 오른쪽 기간 자동 초기화
+                const startPicker = document.getElementById("exchangeStartDatePicker");
+                const endPicker = document.getElementById("exchangeEndDatePicker");
+
+                if (startPicker) startPicker.value = "";
+                if (endPicker) endPicker.value = "";
+
+                // 기간 모드도 종료
+                rangeMode = false;
+
+                fetchDateStats(nextDate);
+            });
+        }
+
+
+        if (applyRangeBtn) {
+            applyRangeBtn.addEventListener("click", () => {
+                const startDate = normalizeDate(startPicker?.value);
+                const endDate = normalizeDate(endPicker?.value);
+
+                if (!startDate || !endDate) {
+                    alert('시작일과 종료일을 모두 선택해주세요.');
+                    return;
+                }
+
+                if (startDate > endDate) {
+                    alert('시작일은 종료일보다 이후일 수 없습니다.');
+                    return;
+                }
+
+                // 오른쪽 날짜 선택시 왼쪽 초기화
+                const singleDateInput = document.getElementById("exchangeDatePicker");
+                if (singleDateInput) {
+                    singleDateInput.value = "";   // → placeholder 상태로 돌아감
+                }
+
+                fetchRangeStats(startDate, endDate);
+            });
+        }
+
+        if (resetRangeBtn) {
+            resetRangeBtn.addEventListener("click", () => {
+                clearRangeMode();
+                if (startPicker) startPicker.value = '';
+                if (endPicker) endPicker.value = '';
+
+                const fallbackDate = normalizeDate(datePicker?.value) || today;
+                fetchDateStats(fallbackDate);
             });
         }
 
         // 5분 자동 갱신
         setInterval(fetchLatestStats, 5 * 60 * 1000);
     });
+
 
 })();

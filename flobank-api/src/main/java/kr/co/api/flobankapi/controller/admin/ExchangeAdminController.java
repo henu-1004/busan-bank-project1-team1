@@ -131,4 +131,33 @@ public class ExchangeAdminController {
                 "lastUpdatedAt", stats.getLastUpdatedAt()
         );
     }
+
+
+    @GetMapping("/stats/range")
+    @ResponseBody
+    public Map<String, Object> getRangeStats(
+            @RequestParam("startDate") String startDate,
+            @RequestParam("endDate") String endDate
+    ) {
+
+        ExchangeStatsDTO stats = exchangeAdminService.getExchangeStatsByPeriod(startDate, endDate);
+
+        if (stats == null || stats.getCurrencyDailyAmounts() == null || stats.getCurrencyDailyAmounts().isEmpty()) {
+            return Map.of(
+                    "currencyDailyAmounts", List.of(),
+                    "rangeLabel", stats != null ? stats.getRangeLabel() : null,
+                    "lastUpdatedAt", stats != null ? stats.getLastUpdatedAt() : null
+            );
+        }
+
+        return Map.of(
+                "currencyDailyAmounts", stats.getCurrencyDailyAmounts(),
+                "rangeLabel", stats.getRangeLabel(),
+                "lastUpdatedAt", stats.getLastUpdatedAt()
+        );
+    }
+
 }
+
+
+

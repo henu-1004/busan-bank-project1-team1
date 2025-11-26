@@ -212,5 +212,28 @@
     </select>
 
 
+    <select id="selectCurrencyAmountsByPeriod"
+            resultType="kr.co.api.flobankapi.dto.admin.exchange.CurrencyDailyAmountDTO">
+        SELECT
+            -- 기간 라벨을 baseDate에 담아서 클라이언트 툴팁에 활용
+            TO_CHAR(TO_DATE(#{startDate}, 'YYYY-MM-DD'), 'YYYY-MM-DD') || ' ~ ' ||
+            TO_CHAR(TO_DATE(#{endDate}, 'YYYY-MM-DD'), 'YYYY-MM-DD')    AS baseDate,
+
+            CASE
+                WHEN exch_to_currency = 'KRW' THEN exch_from_currency
+                ELSE exch_to_currency
+                END                                                   AS currency,
+
+            SUM(NVL(exch_amount, 0) * NVL(exch_applied_rate, 0))      AS amountKrw
+        FROM TB_FRGN_EXCH_TRAN
+        WHERE TRUNC(exch_req_dt) BETWEEN TO_DATE(#{startDate}, 'YYYY-MM-DD')
+                  AND TO_DATE(#{endDate}, 'YYYY-MM-DD')
+        GROUP BY CASE
+                     WHEN exch_to_currency = 'KRW' THEN exch_from_currency
+                     ELSE exch_to_currency
+                     END
+    </select>
+
+
 
 </mapper>

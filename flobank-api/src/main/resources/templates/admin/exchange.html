@@ -12,10 +12,31 @@
                 </h3>
 
                 <!--  날짜 선택 UI 추가 -->
-                <div class="admin-exchange-date-picker" style="margin-bottom:10px;">
-                    <input type="date" id="exchangeDatePicker"
-                           th:value="${baseTime != null ? #temporals.format(baseTime,'yyyy-MM-dd') : ''}" />
+                <div class="admin-exchange-date-row">
+
+                    <!-- 왼쪽: 단일 날짜 -->
+                    <div class="date-left-group">
+                        <input type="date" id="exchangeDatePicker" />
+                    </div>
+
+                    <!-- 오른쪽: 기간 + 버튼 -->
+                    <div class="date-right-group">
+                        <input type="date" id="exchangeStartDatePicker" />
+                        <span class="admin-exchange-period-picker__divider">~</span>
+                        <input type="date" id="exchangeEndDatePicker" />
+
+                        <button type="button" class="admin-exchange-btn" id="exchangePeriodApply">기간 적용</button>
+                        <button type="button" class="admin-exchange-btn reset-btn" id="exchangePeriodReset">초기화</button>
+                    </div>
+
                 </div>
+
+
+
+
+
+
+
 
                 <!-- 통화 필터 -->
                 <div class="admin-exchange-filter" id="currencyFilter"></div>

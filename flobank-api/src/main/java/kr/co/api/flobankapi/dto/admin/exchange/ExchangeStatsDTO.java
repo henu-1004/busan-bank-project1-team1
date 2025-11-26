@@ -16,4 +16,6 @@ public class ExchangeStatsDTO {
     private List<CurrencyDailyAmountDTO> currencyDailyAmounts;
     private List<DailyExchangeAmountDTO> dailyTotals;
     private LocalDateTime lastUpdatedAt;
+    private String rangeLabel;
+
 }
