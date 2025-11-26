@@ -74,4 +74,8 @@ public interface MypageMapper {
     public DpstAcctHdrDTO selectDpstAcctHdr(String dpstHdrAcctNo);
     public Double selectAcctBal(String dpstHdrLinkedAcctNo);
     public FrgnAcctBalanceDTO selectFrgnAcctBal(String dpstHdrAcctNo);
+
+    public DpstAcctHdrDTO selectDpstKrwAcctHdr(String dpstHdrAcctNo);
+    public DpstAcctHdrDTO selectDpstFrgnAcctHdr(String dpstHdrAcctNo, String dpstHdrCurrency);
+
 }

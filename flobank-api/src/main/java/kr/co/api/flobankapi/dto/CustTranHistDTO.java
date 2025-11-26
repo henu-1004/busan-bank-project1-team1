@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.text.NumberFormat;
 
 @Data
 @AllArgsConstructor
@@ -27,5 +28,25 @@ public class CustTranHistDTO {
 
 
     private Integer tranBalance;
+
+    // 예금 이체화면 출력용
+    private String tranExpAcctNo;
+
+    // 추가납입용
+    private BigDecimal dpstDtlAmount;
+    private BigDecimal dpstDtlAppliedRate;
+
+    public String getFormattedCurrency() {
+        String symbol = switch (tranCurrency) {
+            case "KRW" -> "₩";
+            case "USD", "AUD" -> "$";
+            case "CNH", "CNY", "JPY" -> "¥";
+            case "GBP" -> "£";
+            case "EUR" -> "€";
+            default -> "?";
+        };
+        return symbol;
+    }
+
 
 }
