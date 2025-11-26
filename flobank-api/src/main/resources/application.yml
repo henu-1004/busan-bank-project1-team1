@@ -21,6 +21,8 @@ spring:
 #    active: dev
   elasticsearch:
     uris: http://34.64.225.88:9200
+    username: elastic
+    password: bnk1234!
 
   mail:
     host: smtp.gmail.com
