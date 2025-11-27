@@ -26,25 +26,15 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-
-        HttpServletRequest httpRequest = (HttpServletRequest) request;
-        String uri = httpRequest.getRequestURI();
-        System.out.println("▶ [JWT FILTER] uri = " + uri);
-
         // 1. 쿠키에서 토큰 추출
         String token = jwtTokenProvider.resolveToken((HttpServletRequest) request);
-        System.out.println("▶ [JWT FILTER] token = " + token);
-
 
         // 2. 토큰 유효성 검사
         if (token != null && jwtTokenProvider.validateToken(token)) {
             // 3. 유효하면 인증 객체를 만들어 시큐리티 컨텍스트에 저장 (로그인 처리 완료)
             Authentication authentication = jwtTokenProvider.getAuthentication(token);
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            System.out.println("▶ [JWT FILTER] 인증 성공 - " + authentication.getName());
-        }  else {
-            System.out.println("▶ [JWT FILTER] 토큰 없음 또는 유효하지 않음");
-        }
+            }
 
         // 4. 다음 필터로 이동
         chain.doFilter(request, response);

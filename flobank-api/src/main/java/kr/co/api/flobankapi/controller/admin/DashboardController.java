@@ -22,7 +22,6 @@ public class DashboardController {
 
     @GetMapping({"", "/", "/index"})
     public String adminHome(Model model) {
-        log.info("▶ [ADMIN DASHBOARD] /admin 진입");
         DashboardDTO stats = dashboardService.getStats();
         if (stats == null) {
             stats = new DashboardDTO();  // NPE 방지용

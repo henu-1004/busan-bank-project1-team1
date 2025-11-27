@@ -231,12 +231,10 @@ public class AdminController {
         try {
             // ★ 여기서 TB_ADMIN_INFO 조회 + 비번/휴대폰/인증번호 검증 + JWT 발급 + 쿠키 세팅
             adminAuthService.login(adminId, adminPw, adminPh, code, response);
-            log.info("▶ [ADMIN LOGIN] SUCCESS - {}", adminId);
             // 로그인 성공 → 관리자 대시보드로
-            return "redirect:/admin";
+            return "redirect:/admin/index";
 
         } catch (BadCredentialsException | IllegalArgumentException e) {
-            log.info("▶ [ADMIN LOGIN] FAIL - id={}, reason={}", adminId, e.getMessage());
             // 로그인 실패 → 에러 메시지와 함께 다시 로그인 화면으로
             redirectAttributes.addFlashAttribute("loginError", e.getMessage());
             redirectAttributes.addFlashAttribute("adminId", adminId);

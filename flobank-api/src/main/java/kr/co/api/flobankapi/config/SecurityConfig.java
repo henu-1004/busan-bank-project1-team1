@@ -41,13 +41,11 @@ public class SecurityConfig {
                                         "/css/**",
                                         "/js/**", "/images/**",
                                         "/mypage/chatbot",
-                                        "/remit/info"
-                                       // "/admin/login"
-
+                                        "/remit/info",
+                                        "/admin/login"
                         ).permitAll()
-                        .requestMatchers("/admin/login").permitAll()
-                        .requestMatchers("/admin/**").hasRole("ADMIN")  //이따 주석 풀고
-                        //.requestMatchers("/admin/**").permitAll()   //이거 주석 ㄱㄱ
+                        .requestMatchers("/admin/**").hasRole("ADMIN")  //이게 걸린거
+                        //.requestMatchers("/admin/**").permitAll()   //이게 안걸린거 (개발용)
                         .requestMatchers("/mypage/**").authenticated() // 마이페이지는 로그인 필요
                         .requestMatchers("/remit/**").authenticated()
                         .requestMatchers("/exchange/step1").authenticated()
