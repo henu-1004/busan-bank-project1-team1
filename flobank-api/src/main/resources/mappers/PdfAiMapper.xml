@@ -5,6 +5,33 @@
 
 <mapper namespace="kr.co.api.flobankapi.mapper.PdfAiMapper">
 
+    <resultMap id="PdfAiResultMap" type="kr.co.api.flobankapi.dto.PdfAiDTO">
+        <id property="pdfId" column="PDF_ID" />
+        <result property="orgFileName" column="ORG_FILE_NAME" />
+        <result property="storedFileName" column="STORED_FILE_NAME" />
+        <result property="filePath" column="FILE_PATH" />
+        <result property="extractedText" column="EXTRACTED_TEXT" />
+        <result property="aiComment" column="AI_COMMENT" />
+        <result property="aiOverallRisk" column="AI_OVERALL_RISK" />
+        <result property="status" column="STATUS" />
+        <result property="errorMessage" column="ERROR_MESSAGE" />
+        <result property="productName" column="PRODUCT_NAME" />
+        <result property="productShortDesc" column="PRODUCT_SHORT_DESC" />
+        <result property="productFeatures" column="PRODUCT_FEATURES" />
+        <result property="depositType" column="DEPOSIT_TYPE" />
+        <result property="currencies" column="CURRENCIES" />
+        <result property="exchangeRatePolicy" column="EXCHANGE_RATE_POLICY" />
+        <result property="termType" column="TERM_TYPE" />
+        <result property="minMonth" column="MIN_MONTH" />
+        <result property="maxMonth" column="MAX_MONTH" />
+        <result property="eligibility" column="ELIGIBILITY" />
+        <result property="partialWithdrawal" column="PARTIAL_WITHDRAWAL" />
+        <result property="autoRenewal" column="AUTO_RENEWAL" />
+        <result property="additionalDeposit" column="ADDITIONAL_DEPOSIT" />
+        <result property="createdAt" column="CREATED_AT" />
+        <result property="updatedAt" column="UPDATED_AT" />
+    </resultMap>
+
     <!-- 1) Insert -->
     <insert id="insertPdf" parameterType="kr.co.api.flobankapi.dto.PdfAiDTO">
         INSERT INTO TB_PDF_AI (
@@ -32,7 +59,7 @@
 
 
     <!-- 2) 상태별 조회 -->
-    <select id="findByStatus" resultType="kr.co.api.flobankapi.dto.PdfAiDTO">
+    <select id="findByStatus" resultMap="PdfAiResultMap">
         SELECT *
         FROM TB_PDF_AI
         WHERE STATUS = #{status}
@@ -40,7 +67,7 @@
     </select>
 
     <!-- 3) ID 조회 -->
-    <select id="findById" resultType="kr.co.api.flobankapi.dto.PdfAiDTO">
+    <select id="findById" resultMap="PdfAiResultMap">
         SELECT *
         FROM TB_PDF_AI
         WHERE PDF_ID = #{pdfId}
@@ -54,7 +81,7 @@
         WHERE PDF_ID = #{pdfId}
     </update>
 
-    <select id="findAll" resultType="kr.co.api.flobankapi.dto.PdfAiDTO">
+    <select id="findAll" resultMap="PdfAiResultMap">
         SELECT *
         FROM TB_PDF_AI
         ORDER BY CREATED_AT DESC

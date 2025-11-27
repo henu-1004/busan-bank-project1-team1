@@ -7,6 +7,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Map;
+
 @Controller
 @RequestMapping("/admin/pdf-ai")
 @RequiredArgsConstructor
@@ -19,7 +21,7 @@ public class PdfAiController {
     public ResponseEntity<?> uploadPdf(@RequestParam("file") MultipartFile file) {
         try {
             Long pdfId = pdfAiService.savePdf(file);
-            return ResponseEntity.ok(pdfId);
+            return ResponseEntity.ok(Map.of("pdfId", pdfId));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("업로드 실패: " + e.getMessage());
         }
@@ -29,5 +31,15 @@ public class PdfAiController {
     @GetMapping("/list")
     public ResponseEntity<?> getPdfList() {
         return ResponseEntity.ok(pdfAiService.getAllPdfs());
+    }
+
+    // PDF 상세 (done 상태만)
+    @GetMapping("/{pdfId}")
+    public ResponseEntity<?> getPdf(@PathVariable Long pdfId) {
+        try {
+            return ResponseEntity.ok(pdfAiService.getDonePdf(pdfId));
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }

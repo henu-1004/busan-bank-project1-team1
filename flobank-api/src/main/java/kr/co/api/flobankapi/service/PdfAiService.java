@@ -33,6 +33,20 @@ public class PdfAiService {
         return pdfAiMapper.findAll();
     }
 
+    public PdfAiDTO getDonePdf(Long pdfId) {
+        PdfAiDTO pdf = pdfAiMapper.findById(pdfId);
+
+        if (pdf == null) {
+            throw new IllegalArgumentException("PDF 정보를 찾을 수 없습니다.");
+        }
+
+        if (!"done".equalsIgnoreCase(pdf.getStatus())) {
+            throw new IllegalStateException("AI 분석이 완료된 PDF만 사용할 수 있습니다.");
+        }
+
+        return pdf;
+    }
+
     // 파일 저장 + DB 저장 + AI 서버 Webhook 전송
     public Long savePdf(MultipartFile file) throws Exception {
 
