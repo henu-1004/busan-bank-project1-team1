@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>예금계좌 해지 2</title>
+    <link rel="stylesheet" th:href="@{/css/mypage.css}">
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+    <link rel="stylesheet" th:href="@{/css/footer.css}">
+
+    <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+            crossorigin="anonymous"
+    />
+
+</head>
+<body>
+<div th:replace="~{_template/_header.html}"></div>
+<main class="transfer2-container">
+    <div class="transfer2-box">
+
+        <div class="transfer2-steps">
+            <div class="transfer2-step">
+                <span class="num">1</span><span class="text">해지정보조회</span>
+            </div>
+            <div class="transfer2-step">
+                <span class="num">2</span><span class="text">정보입력</span>
+            </div>
+            <div class="transfer2-step active">
+                <span class="num">3</span><span class="text">해지완료</span>
+            </div>
+        </div>
+
+        <section class="transfer3-complete-box">
+            <div class="transfer3-icon">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <div class="transfer3-complete-text">
+                <h2><strong>적립/거치식통장해지</strong>가 정상적으로 완료되었습니다.</h2>
+                <p>통장해지 처리결과를 확인해 주세요.</p>
+            </div>
+        </section>
+
+
+
+        <div id="terminateInfo">
+
+
+            <section class="transfer2-section">
+                <h3 class="terminate-subtitle">해지내역</h3>
+                <table class="terminate-table">
+                    <colgroup>
+                        <col style="width: 25%;">
+                        <col style="width: 30%;">
+                        <col style="width: 20%;">
+                        <col style="width: 25%;">
+                    </colgroup>
+                    <tr>
+                        <th>해지구분</th>
+                        <td>만기해지</td>
+                        <th>해지예정일</th>
+                        <td>2024-11-11</td>
+                    </tr>
+                    <tr>
+                        <th>신규일자</th>
+                        <td>2024-11-24</td>
+                        <th>만기일자</th>
+                        <td>2025-11-24</td>
+                    </tr>
+                    <tr>
+                        <th>해지원금 ①</th>
+                        <td>2,560,000원</td>
+                        <th>해지이자 ②</th>
+                        <td>88,320원</td>
+                    </tr>
+                    <tr>
+                        <th>만기후이자 ③</th>
+                        <td>129원</td>
+                        <th>환입이자 ④</th>
+                        <td>0원</td>
+                    </tr>
+                    <tr>
+                        <th>정수세금 ⑤</th>
+                        <td>13,610원</td>
+                        <th>지방소득세</th>
+                        <td>1,230원</td>
+                    </tr>
+                    <tr>
+                        <th>소득/법인세</th>
+                        <td>12,380원</td>
+                        <th>농특세</th>
+                        <td>0원</td>
+                    </tr>
+                    <tr>
+                        <th>환출세액</th>
+                        <td>0원</td>
+                        <th>대출상환금액</th>
+                        <td>0원</td>
+                    </tr>
+                    <tr>
+                        <th>차감지급액<br>(①+②+③−④−⑤)</th>
+                        <td colspan="3">2,634,839원</td>
+                    </tr>
+                    <tr>
+                        <th>실입금금액</th>
+                        <td colspan="3">43246823원</td>
+                    </tr>
+                    <tr>
+                        <th>입금계좌번호</th>
+                        <td colspan="3">112-2333-3333-33</td>
+                    </tr>
+                </table>
+            </section>
+
+
+            <div class="terminate-actions">
+                    <button class="terminate-btn-main" style="margin-left: 0px" th:onclick="|location.href='@{/mypage/main}'|">확인</button>
+            </div>
+
+
+        </div>
+
+    </div>
+</main>
+<script th:src ="@{/js/deptran.js}"></script>
+<div th:replace="~{_template/_footer.html}"></div>
+
+</body>
+</html>

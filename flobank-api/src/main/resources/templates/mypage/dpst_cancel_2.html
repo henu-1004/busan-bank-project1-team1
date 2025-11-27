@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>예금계좌 해지 2</title>
+    <link rel="stylesheet" th:href="@{/css/mypage.css}">
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+    <link rel="stylesheet" th:href="@{/css/footer.css}">
+
+    <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+            crossorigin="anonymous"
+    />
+
+</head>
+<body>
+<div th:replace="~{_template/_header.html}"></div>
+<main class="transfer2-container">
+    <div class="transfer2-box">
+
+        <div class="transfer2-steps">
+            <div class="transfer2-step">
+                <span class="num">1</span><span class="text">해지정보조회</span>
+            </div>
+            <div class="transfer2-step active">
+                <span class="num">2</span><span class="text">정보입력</span>
+            </div>
+            <div class="transfer2-step">
+                <span class="num">3</span><span class="text">해지완료</span>
+            </div>
+        </div>
+
+        <h2 class="terminate-title">적립/거치식통장해지</h2>
+
+
+
+        <div id="terminateInfo">
+
+
+            <section class="transfer2-section">
+                <h3 class="terminate-subtitle">해지정보 확인</h3>
+                <table class="terminate-table">
+                    <colgroup>
+                        <col style="width: 25%;">
+                        <col style="width: 30%;">
+                        <col style="width: 20%;">
+                        <col style="width: 25%;">
+                    </colgroup>
+                    <tr>
+                        <th>해지구분</th>
+                        <td>만기해지</td>
+                        <th>해지예정일</th>
+                        <td>2024-11-11</td>
+                    </tr>
+                    <tr>
+                        <th>신규일자</th>
+                        <td>2024-11-24</td>
+                        <th>만기일자</th>
+                        <td>2025-11-24</td>
+                    </tr>
+                    <tr>
+                        <th>해지원금 ①</th>
+                        <td>2,560,000원</td>
+                        <th>해지이자 ②</th>
+                        <td>88,320원</td>
+                    </tr>
+                    <tr>
+                        <th>만기후이자 ③</th>
+                        <td>129원</td>
+                        <th>환입이자 ④</th>
+                        <td>0원</td>
+                    </tr>
+                    <tr>
+                        <th>정수세금 ⑤</th>
+                        <td>13,610원</td>
+                        <th>지방소득세</th>
+                        <td>1,230원</td>
+                    </tr>
+                    <tr>
+                        <th>소득/법인세</th>
+                        <td>12,380원</td>
+                        <th>농특세</th>
+                        <td>0원</td>
+                    </tr>
+                    <tr>
+                        <th>환출세액</th>
+                        <td>0원</td>
+                        <th>대출상환금액</th>
+                        <td>0원</td>
+                    </tr>
+                    <tr>
+                        <th>차감지급액<br>(①+②+③−④−⑤)</th>
+                        <td colspan="3">2,634,839원</td>
+                    </tr>
+                    <tr>
+                        <th>실입금금액</th>
+                        <td colspan="3">43246823원</td>
+                    </tr>
+                </table>
+            </section>
+
+
+            <br>
+            <br>
+            <section class="transfer2-section">
+                <!-- <h3 class="terminate-subtitle">이체정보 확인</h3> -->
+                <table class="terminate-table">
+                    <colgroup>
+                        <col style="width: 25%;">
+                        <col style="width: 30%;">
+                        <col style="width: 20%;">
+                        <col style="width: 25%;">
+                    </colgroup>
+                    <tr>
+                        <th>입금계좌번호</th>
+                        <td colspan="3">112-2333-3333-33</td>
+                    </tr>
+
+                </table>
+            </section>
+
+
+            <br>
+
+            <section class="transfer2-section">
+                <h3 class="terminate-subtitle">인증 수단 선택</h3>
+                <table class="terminate-table">
+                    <colgroup>
+                        <col style="width: 25%;">
+                        <col style="width: 30%;">
+                        <col style="width: 20%;">
+                        <col style="width: 25%;">
+                    </colgroup>
+                    <tr>
+                        <th>고객 구분</th>
+                        <td colspan="3">
+                            <input type="radio" value="dom" name="sel"> 국내고객
+                            <input type="radio" value="frgn" name="sel"> 해외거주고객
+                        </td>
+                    </tr>
+
+                </table>
+            </section>
+
+            <div class="terminate-actions">
+                <button type="button" class="terminate-btn-sub">취소</button>
+                <form method="post" style="display:inline;">
+                    <input type="hidden" name="acctNo" >
+                    <button type="submit" class="terminate-btn-sub" style="background-color: #1a253a; color: white">다음</button>
+                </form>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+</main>
+<div id="terminateInfoModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn">&times;</span>
+        <h2>추가본인인증</h2>
+
+        <div>* 등록된 전화번호가 없을 경우 고객정보 변경 후 진행하여 주시기 바랍니다.</div>
+
+        <h3>본인확인</h3>
+        <table class="detail-table">
+            <tr>
+                <th>이름(실명)</th>
+                <td colspan="3">i<input type="text" value="이다은"></td>
+            </tr>
+
+            <tr>
+                <th>주민등록번호</th>
+                <td colspan="3">041125-*******</td>
+            </tr>
+        </table>
+
+
+        <h3>인증수단선택</h3>
+        <table class="detail-table detail-info">
+            <tbody>
+            <tr>
+                <th>추가인증수단</th>
+                <td colspan="3"><input type="radio" checked> 2채널인증(전화인증) [무료]</td>
+            </tr>
+            <tr>
+                <th>인증전화번호</th>
+                <td colspan="3">010-334*-444*</td>
+            </tr>
+            </tbody>
+
+        </table>
+
+        <div>* 2채널인증(전화인증)은 ARS 안내에 따라 인증을 수행하시면 인증이 완료됩니다.</div>
+
+        <a th:href="@{/mypage/dpst_cancel_3}" class="cancel-link">해지하기</a>
+    </div>
+</div>
+
+<script th:src ="@{/js/deptran.js}"></script>
+<div th:replace="~{_template/_footer.html}"></div>
+
+</body>
+</html>

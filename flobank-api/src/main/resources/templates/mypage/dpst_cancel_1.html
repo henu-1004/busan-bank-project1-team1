@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>예금계좌 해지 1</title>
+    <link rel="stylesheet" th:href="@{/css/mypage.css}">
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+    <link rel="stylesheet" th:href="@{/css/footer.css}">
+
+    <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+            crossorigin="anonymous"
+    />
+
+</head>
+<body>
+<div th:replace="~{_template/_header.html}"></div>
+<main class="transfer2-container">
+    <div class="transfer2-box">
+
+        <div class="transfer2-steps">
+            <div class="transfer2-step active">
+                <span class="num">1</span><span class="text">해지정보조회</span>
+            </div>
+            <div class="transfer2-step">
+                <span class="num">2</span><span class="text">정보입력</span>
+            </div>
+            <div class="transfer2-step">
+                <span class="num">3</span><span class="text">해지완료</span>
+            </div>
+        </div>
+
+        <h2 class="terminate-title">적립/거치식통장해지</h2>
+
+        <div class="terminate-info-box">
+            <p>
+                • 본 거래는 취소가 불가능하오니 유의하시기 바랍니다.<br>
+                • 대출을 받은 경우에는 해지금액이 대출금액보다 큰 경우에만 해지가 가능합니다.<br>
+                • 인터넷뱅킹에서 신규한 계좌를 해지하실 경우에는 입금하신 출금계좌로 입금됩니다.<br>
+                • 인터넷뱅킹에서 예금(신탁)구좌 출금처리(입출금) 통장을 해지한 경우에는 영업점에서 실행하신 후 해지(출금) 가능합니다.<br>
+                • 예·적금 대출 또는 담보 예·적금 만기 시 해당 담보 예·적금에 대해 5건 이하의 대출을 받은 경우에 한하여 상계처리 가능합니다.
+            </p>
+        </div>
+
+        <section class="transfer2-section">
+            <!-- <h3 class="terminate-subtitle">이체정보 확인</h3> -->
+            <table class="terminate-table">
+                <colgroup>
+                    <col style="width: 25%;">
+                    <col style="width: 30%;">
+                    <col style="width: 20%;">
+                    <col style="width: 25%;">
+                </colgroup>
+                <tr>
+                    <th>해지계좌번호</th>
+                    <td colspan="3">112-2333-3333-33</td>
+                </tr>
+                <tr>
+                    <th>해지예정일</th>
+                    <td colspan="3">2025-11-11</td>
+                </tr>
+            </table>
+        </section>
+        <br><br>
+        <button type="button" id="showTerminateInfo" class="terminate-btn-sub" style="background-color: #1a253a; color: white">조회</button>
+
+        <div id="terminateInfo" style="display: none;">
+
+
+            <section class="transfer2-section">
+                <h3 class="terminate-subtitle">해지정보 확인</h3>
+                <table class="terminate-table">
+                    <colgroup>
+                        <col style="width: 25%;">
+                        <col style="width: 30%;">
+                        <col style="width: 20%;">
+                        <col style="width: 25%;">
+                    </colgroup>
+                    <tr>
+                        <th>해지구분</th>
+                        <td>만기해지</td>
+                        <th>해지예정일</th>
+                        <td>2024-11-11</td>
+                    </tr>
+                    <tr>
+                        <th>신규일자</th>
+                        <td>2024-11-24</td>
+                        <th>만기일자</th>
+                        <td>2025-11-24</td>
+                    </tr>
+                    <tr>
+                        <th>해지원금 ①</th>
+                        <td>2,560,000원</td>
+                        <th>해지이자 ②</th>
+                        <td>88,320원</td>
+                    </tr>
+                    <tr>
+                        <th>만기후이자 ③</th>
+                        <td>129원</td>
+                        <th>환입이자 ④</th>
+                        <td>0원</td>
+                    </tr>
+                    <tr>
+                        <th>정수세금 ⑤</th>
+                        <td>13,610원</td>
+                        <th>지방소득세</th>
+                        <td>1,230원</td>
+                    </tr>
+                    <tr>
+                        <th>소득/법인세</th>
+                        <td>12,380원</td>
+                        <th>농특세</th>
+                        <td>0원</td>
+                    </tr>
+                    <tr>
+                        <th>환출세액</th>
+                        <td>0원</td>
+                        <th>대출상환금액</th>
+                        <td>0원</td>
+                    </tr>
+                    <tr>
+                        <th>차감지급액<br>(①+②+③−④−⑤)</th>
+                        <td colspan="3">2,634,839원</td>
+                    </tr>
+                    <tr>
+                        <th>실입금금액</th>
+                        <td colspan="3">43246823원</td>
+                    </tr>
+                </table>
+            </section>
+
+            <section class="transfer2-section">
+                <h3 class="terminate-subtitle">인증 및 보안매체(보안카드, OTP) 입력 안내</h3>
+                <div class="terminate-info-box small">
+                    <p>
+                        • 보이스피싱 피해 예방 등 고객님의 소중한 재산보호를 위하여 예적금 해지 실행 전 휴대폰 인증 절차를 진행합니다.<br>
+                        • <span style="color: #1E1EAC">검찰, 경찰, 금융감독원이나 모르는 사람이 전화로 또는 대출받기 위한 수수료, 기존대출금 상환 등에 필요하다고 계좌 해지를 요청하는 경우에는 보이스피싱에 해당할 수 있으므로 그 내용을 확인하여 주시기 바라며, 본인 요청에 따라 해지함을 확인합니다.</span><br>
+                        • 신속한 처리를 위하여 고객님의 정확한 연락처를 확인하여 주시기 바랍니다.
+                    </p>
+                </div>
+            </section>
+
+            <div style="text-align: right; color: gray; font-size: 15px">
+                <span>위의 내용에 동의하십니까? </span>
+                <input type="radio" name="agree" value="y"> 동의함
+                <input type="radio" name="agree" value="n" checked> 동의하지 않음
+            </div>
+
+            <div class="terminate-actions">
+                <button type="button" class="terminate-btn-sub">취소</button>
+                <form method="post" style="display:inline;">
+                    <input type="hidden" name="acctNo" >
+                    <button type="submit" class="terminate-btn-sub" style="background-color: #1a253a; color: white">다음</button>
+                </form>
+
+            </div>
+            <br>
+
+
+        </div>
+
+    </div>
+</main>
+<script th:src ="@{/js/deptran.js}"></script>
+<div th:replace="~{_template/_footer.html}"></div>
+
+</body>
+</html>

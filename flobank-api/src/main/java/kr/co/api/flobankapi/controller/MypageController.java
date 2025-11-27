@@ -764,4 +764,19 @@ public class MypageController {
     }
 
 
+    @GetMapping("/dpst_cancel_1")
+    public String dpst_cancel_1() {
+        return "mypage/dpst_cancel_1";
+    }
+
+    @GetMapping("/dpst_cancel_2")
+    public String dpst_cancel_2() {
+        return "mypage/dpst_cancel_2";
+    }
+
+    @GetMapping("/dpst_cancel_3")
+    public String dpst_cancel_3() {
+        return "mypage/dpst_cancel_3";
+    }
+
 }

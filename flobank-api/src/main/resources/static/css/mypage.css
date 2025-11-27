@@ -3096,7 +3096,19 @@ body.event-page {
   background: #999;
 }
 
-
+#depositInfoModal .cancel-link {
+    width: 90px;
+    display: block;
+    float: right;
+    padding: 5px 7px;
+    font-weight: bold;
+    text-align: center;
+    text-decoration: none;
+    color: #dadada;
+    font-size: 15px;
+    background-color: #1a253a;
+    border-radius: 3px;
+}
 
 /*
     외화예금 상세
@@ -3525,4 +3537,116 @@ body.event-page {
     background-color: #aaa;
     color: #1c1e21;
     pointer-events: none;
+}
+
+
+
+/* 제목 */
+.terminate-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--main-color);
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+/* 안내문 */
+.terminate-info-box {
+    background: #fafafa;
+    border: 1px solid var(--border-light);
+    border-radius: 8px;
+    text-align: left;
+    font-size: 14px;
+    color: var(--text-gray);
+    padding: 15px 20px;
+    line-height: 1.6;
+    margin-bottom: 25px;
+}
+
+.terminate-info-box.small {
+    background: #fefefe;
+    font-size: 13px;
+    padding: 12px 18px;
+}
+
+/* 구역 제목 */
+.terminate-subtitle {
+    text-align: left;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--main-color);
+    margin: 25px 0 15px;
+    border-left: 4px solid var(--main-color);
+    padding-left: 10px;
+}
+
+/* 테이블 */
+.terminate-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    text-align: center;
+    border-top: 3px solid #9799a1;
+}
+
+.terminate-table th {
+    background: #f5f8fa;
+    color: var(--text-dark);
+    font-weight: 600;
+    padding: 10px;
+    /* border-bottom: 2px solid #ddd; */
+}
+
+.terminate-table td {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+    color: var(--text-dark);
+}
+
+.terminate-table .sub {
+    color: #777;
+    font-size: 12px;
+}
+
+
+.terminate-actions {
+    text-align: center;
+    margin-top: 40px;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.terminate-btn-main {
+    background: var(--main-color);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 12px 36px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 3px 8px rgba(34,48,78,0.25);
+    transition: all 0.25s ease;
+}
+
+.terminate-btn-main:hover {
+    background: var(--highlight);
+    transform: translateY(-2px);
+}
+
+.terminate-btn-sub {
+    background: #f1f1f1;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 12px 30px;
+    margin-left: 15px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.terminate-btn-sub:hover {
+    background: #e5e5e5;
 }
