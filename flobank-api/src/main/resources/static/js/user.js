@@ -157,6 +157,13 @@ document.addEventListener("DOMContentLoaded", function () {
                                     amountColor = "red";
                                     amountPrefix = "-";
                                     beforeBalance = h.tranBalance + h.tranAmount;
+
+                                } else if (h.tranType === 3) {
+                                    typeStr = "환전";
+                                    typeColor = "#009900";     // 환전 색상(원하면 변경 가능)
+                                    amountColor = "#009900";
+                                    amountPrefix = "";          // 환전은 +, - 없음
+                                    beforeBalance = h.tranBalance;
                                 }
 
                                 // 3. HTML 조립

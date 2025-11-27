@@ -520,19 +520,47 @@ public class MypageController {
         String acctNo = requestData.get("acctNo");
 
         try {
-            // 서비스 호출 (잔액 계산된 내역 가져오기)
             Map<String, Object> data = mypageService.getAcctDetailWithHistory(acctNo);
+
+            CustAcctDTO account = (CustAcctDTO) data.get("account");
+            List<CustTranHistDTO> histList = (List<CustTranHistDTO>) data.get("history");
+
+            //  JSON 직렬화용 리스트
+            List<Map<String, Object>> convertedList = new ArrayList<>();
+
+            for (CustTranHistDTO h : histList) {
+                Map<String, Object> row = new HashMap<>();
+
+                row.put("tranDt", h.getTranDt());
+                row.put("tranType", h.getTranType());
+                row.put("tranMemo", h.getTranMemo());
+                row.put("tranRecName", h.getTranRecName());
+                row.put("tranRecAcctNo", h.getTranRecAcctNo());
+                row.put("tranBalance", h.getTranBalance());
+
+                // BigDecimal → Integer 변환 (핵심)
+                BigDecimal amt = h.getTranAmount();
+                int amount = (amt != null) ? amt.intValue() : 0;
+                row.put("tranAmount", amount);
+
+                convertedList.add(row);
+            }
+
+            Map<String, Object> sendData = new HashMap<>();
+            sendData.put("account", account);
+            sendData.put("history", convertedList);
+
             response.put("status", "success");
-            response.put("data", data);
+            response.put("data", sendData);
 
         } catch (Exception e) {
+            e.printStackTrace();
             response.put("status", "error");
             response.put("message", "서버 오류가 발생했습니다.");
         }
 
         return response;
     }
-
 
 
     // UI 나누기 위해!! dpst_transfer_1 매핑 새로 한다!!!!!
