@@ -236,15 +236,39 @@
                         <span th:case="*">?</span> <!-- 혹시 모르는 경우 -->
                     </span>[[${hdr.dpstHdrBalance}]]</td>
                     <td>
-                        <a class="deposit-detail-info" style="border: 0; font-size: 13px; padding: 3px 6px; background-color: #dadada; border-radius: 5px; color: #1c1e21; text-decoration: none; cursor: pointer">조회</a>
+                        <a class="deposit-detail-info"
+                           th:data-id="${hdr.dpstHdrAcctNo}"
+                           th:data-custname="${custInfo.custName}"
+                           th:data-name="${hdr.dpstName}"
+                           th:data-type="${hdr.dpstType}"
+                           th:data-balance="${hdr.dpstHdrBalance}"
+                           th:data-start="${hdr.dpstHdrStartDy}"
+                           th:data-end="${hdr.dpstHdrFinDy}"
+                           th:data-expcurrency="${hdr.dpstHdrCurrencyExp}"
+                           th:data-currency="${hdr.dpstHdrCurrency}"
+                           th:data-rate="${hdr.dpstHdrRate}"
+                           th:data-autorenew="${hdr.dpstHdrAutoRenewYn}"
+                           th:data-autorenewterm="${hdr.dpstHdrAutoRenewTerm}"
+                           th:data-wdrwyn="${hdr.dpstPartWdrwYn}"
+                           th:data-wdrwcnt="${hdr.dpstHdrPartWdrwCnt}"
+                           th:data-wdrwmax="${hdr.wdrwMax}"
+                           th:data-month="${hdr.dpstHdrMonth}"
+                           th:data-interest="${hdr.dpstHdrInterest}"
+                           th:data-ratetype="${hdr.dpstRateType}"
+                           th:data-accttype="${hdr.dpstHdrLinkedAcctType}"
+                           th:data-addyn="${hdr.dpstAddPayYn}"
+                           th:data-addmax="${hdr.dpstAddPayMax}"
+                           th:data-addcnt="${hdr.dpstHdrAddPayCnt}"
+                           style="border: 0; font-size: 13px; padding: 3px 6px; background-color: #dadada; border-radius: 5px; color: #1c1e21; text-decoration: none; cursor: pointer">조회</a>
                         <a th:href="@{/mypage/dpst_addpay_1(dpstHdrAcctNo=${hdr.dpstHdrAcctNo})}"
                            class="deposit-add-btn"
+                           th:classappend="${hdr.dpstType == 1 and ((hdr.dpstAddPayYn == 'N') or (hdr.dpstHdrAddPayCnt >= hdr.dpstAddPayMax))} ? ' disabled-btn' : ''"
                            th:data-type="${hdr.dpstType}"
                            th:data-addpayyn="${hdr.dpstAddPayYn}"
                            th:data-addpaycnt="${hdr.dpstHdrAddPayCnt}"
                            th:data-addpaymax="${hdr.dpstAddPayMax}"
                            th:data-acctno="${hdr.dpstHdrAcctNo}"
-                           style="border: 0; font-size: 13px; padding: 3px 6px; background-color: #dadada; border-radius: 5px; color: #1c1e21; text-decoration: none;">
+                           style="">
                             입금
                         </a>
                     </td>
@@ -708,7 +732,7 @@
 
 
         <h3>상세정보</h3>
-        <table class="detail-table">
+        <table class="detail-table detail-info">
             <tbody>
             <tr>
                 <th>신규일</th>
