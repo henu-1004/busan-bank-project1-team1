@@ -11,6 +11,8 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,6 +33,46 @@ public class PdfAiService {
 
     public List<PdfAiDTO> getAllPdfs() {
         return pdfAiMapper.findAll();
+    }
+
+    public PdfAiDTO getDonePdf(Long pdfId) {
+        PdfAiDTO pdf = pdfAiMapper.findById(pdfId);
+
+        if (pdf == null) {
+            throw new IllegalArgumentException("PDF 정보를 찾을 수 없습니다.");
+        }
+
+        if (!"done".equalsIgnoreCase(pdf.getStatus())) {
+            throw new IllegalStateException("AI 분석이 완료된 PDF만 사용할 수 있습니다.");
+        }
+
+        return pdf;
+    }
+
+    public void markPdfAsUsed(Long pdfId) {
+        if (pdfId == null) return;
+        pdfAiMapper.updateStatus(pdfId, "used");
+    }
+
+    public void deletePdf(Long pdfId) {
+        PdfAiDTO pdf = pdfAiMapper.findById(pdfId);
+
+        if (pdf == null) {
+            throw new IllegalArgumentException("PDF 정보를 찾을 수 없습니다.");
+        }
+
+        if (pdf.getFilePath() != null && !pdf.getFilePath().isBlank()) {
+            Path targetPath = Path.of(pdf.getFilePath());
+            try {
+                if (Files.exists(targetPath)) {
+                    Files.delete(targetPath);
+                }
+            } catch (Exception e) {
+                log.error("PDF 파일 삭제 실패: {}", e.getMessage());
+            }
+        }
+
+        pdfAiMapper.deleteById(pdfId);
     }
 
     // 파일 저장 + DB 저장 + AI 서버 Webhook 전송
