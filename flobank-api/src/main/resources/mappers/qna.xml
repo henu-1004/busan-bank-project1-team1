@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.api.flobankapi.mapper.QnaMapper">
+
+    <resultMap id="QnaResultMap" type="kr.co.api.flobankapi.dto.QnaDTO">
+        <id property="qnaNo" column="QNA_NO"/>
+        <result property="qnaCustCode" column="QNA_CUST_CODE"/>
+        <result property="qnaTitle" column="QNA_TITLE"/>
+        <result property="qnaContent" column="QNA_CONTENT"/>
+        <result property="qnaDraft" column="QNA_DRAFT"/>
+        <result property="qnaReply" column="QNA_REPLY"/>
+        <result property="qnaDt" column="QNA_DT" jdbcType="TIMESTAMP"/>
+        <result property="qnaViewCnt" column="QNA_VIEW_CNT"/>
+        <result property="qnaCustName" column="CUST_NAME"/>
+    </resultMap>
+
+    <select id="countQna" resultType="int">
+        SELECT COUNT(*)
+        FROM TB_QNA_HDR
+        <where>
+            <if test="status == 'pending'">
+                (QNA_REPLY IS NULL OR QNA_REPLY = '')
+            </if>
+            <if test="status == 'complete'">
+                QNA_REPLY IS NOT NULL AND QNA_REPLY <> ''
+            </if>
+        </where>
+    </select>
+
+    <select id="selectQnaPage" resultMap="QnaResultMap">
+        SELECT *
+        FROM (
+            SELECT
+                ROW_NUMBER() OVER (ORDER BY QNA_NO DESC) AS RNUM,
+                Q.QNA_NO,
+                Q.QNA_CUST_CODE,
+                Q.QNA_TITLE,
+                Q.QNA_CONTENT,
+                Q.QNA_DRAFT,
+                Q.QNA_REPLY,
+                Q.QNA_DT,
+                Q.QNA_VIEW_CNT,
+                C.CUST_NAME
+            FROM TB_QNA_HDR Q
+            LEFT JOIN TB_CUST_INFO C ON Q.QNA_CUST_CODE = C.CUST_CODE
+            <where>
+                <if test="status == 'pending'">
+                    (Q.QNA_REPLY IS NULL OR Q.QNA_REPLY = '')
+                </if>
+                <if test="status == 'complete'">
+                    Q.QNA_REPLY IS NOT NULL AND Q.QNA_REPLY <> ''
+                </if>
+            </where>
+        ) A
+        WHERE A.RNUM BETWEEN #{start} AND #{end}
+        ORDER BY A.QNA_NO DESC
+    </select>
+
+    <select id="selectQnaByNo" resultMap="QnaResultMap">
+        SELECT
+            Q.QNA_NO,
+            Q.QNA_CUST_CODE,
+            Q.QNA_TITLE,
+            Q.QNA_CONTENT,
+            Q.QNA_DRAFT,
+            Q.QNA_REPLY,
+            Q.QNA_DT,
+            Q.QNA_VIEW_CNT,
+            C.CUST_NAME
+        FROM TB_QNA_HDR Q
+        LEFT JOIN TB_CUST_INFO C ON Q.QNA_CUST_CODE = C.CUST_CODE
+        WHERE Q.QNA_NO = #{qnaNo}
+    </select>
+
+    <update id="updateQnaViewCnt">
+        UPDATE TB_QNA_HDR
+        SET QNA_VIEW_CNT = NVL(QNA_VIEW_CNT, 0) + 1
+        WHERE QNA_NO = #{qnaNo}
+    </update>
+
+    <insert id="insertQna">
+        INSERT INTO TB_QNA_HDR
+        (QNA_CUST_CODE, QNA_TITLE, QNA_CONTENT, QNA_DRAFT, QNA_REPLY, QNA_DT, QNA_VIEW_CNT)
+        VALUES
+        (#{qnaCustCode, jdbcType=VARCHAR},
+        #{qnaTitle, jdbcType=VARCHAR},
+        #{qnaContent, jdbcType=VARCHAR},
+        #{qnaDraft, jdbcType=VARCHAR},
+        #{qnaReply, jdbcType=VARCHAR},
+        SYSDATE,
+        0)
+    </insert>
+
+    <update id="updateQna">
+        UPDATE TB_QNA_HDR
+        SET
+            QNA_TITLE = #{qnaTitle},
+            QNA_CONTENT = #{qnaContent},
+            QNA_DT = SYSDATE
+        WHERE QNA_NO = #{qnaNo}
+    </update>
+
+    <update id="updateQnaReply">
+        UPDATE TB_QNA_HDR
+        SET
+            QNA_REPLY = #{reply},
+            QNA_DT = SYSDATE
+        WHERE QNA_NO = #{qnaNo}
+    </update>
+
+    <delete id="deleteQna">
+        DELETE FROM TB_QNA_HDR
+        WHERE QNA_NO = #{qnaNo}
+    </delete>
+
+</mapper>

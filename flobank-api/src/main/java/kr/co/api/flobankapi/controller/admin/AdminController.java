@@ -4,9 +4,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import kr.co.api.flobankapi.dto.AdminInfoDTO;
 import kr.co.api.flobankapi.dto.BoardDTO;
 import kr.co.api.flobankapi.dto.FaqDTO;
+import kr.co.api.flobankapi.dto.QnaDTO;
 import kr.co.api.flobankapi.dto.admin.dashboard.DashboardDTO;
 import kr.co.api.flobankapi.service.BoardService;
 import kr.co.api.flobankapi.service.FaqService;
+import kr.co.api.flobankapi.service.QnaService;
 import kr.co.api.flobankapi.service.admin.AdminAuthService;
 import kr.co.api.flobankapi.service.admin.DashboardService;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 import java.util.Map;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 @Slf4j
 @Controller
@@ -28,6 +32,7 @@ public class AdminController {
 
     private final BoardService boardService;
     private final FaqService faqService;
+    private final QnaService qnaService;
     private final AdminAuthService adminAuthService;
     private final DashboardService dashboardService;
 
@@ -36,6 +41,8 @@ public class AdminController {
     @GetMapping("/member")
     public String member(@RequestParam(defaultValue = "1") int page,
                          @RequestParam(name = "faqPage", defaultValue = "1") int faqPage,
+                         @RequestParam(name = "qnaPage", defaultValue = "1") int qnaPage,
+                         @RequestParam(name = "qnaStatus", defaultValue = "all") String qnaStatus,
                          Model model,
                          @ModelAttribute("msg") String msg) {
 
@@ -58,6 +65,16 @@ public class AdminController {
         model.addAttribute("totalFaqPage", faqPageData.get("totalFaqPage"));
         model.addAttribute("totalFaqCount", faqPageData.get("totalFaqCount"));
         model.addAttribute("faqEditMode", false); // FAQ 등록 모드 기본
+
+        // 3) QNA 페이징
+        Map<String, Object> qnaPageData = qnaService.getAdminQnaPage(qnaPage, qnaStatus);
+
+        model.addAttribute("qnaList", qnaPageData.get("list"));
+        model.addAttribute("qnaPage", qnaPageData.get("page"));
+        model.addAttribute("qnaPageSize", qnaPageData.get("pageSize"));
+        model.addAttribute("totalQnaPage", qnaPageData.get("totalPage"));
+        model.addAttribute("totalQnaCount", qnaPageData.get("totalCount"));
+        model.addAttribute("qnaStatus", qnaPageData.get("status"));
 
         model.addAttribute("activeItem", "member");
 
@@ -213,6 +230,45 @@ public class AdminController {
         return "redirect:/admin/member?faqPage=" + faqPage + "#faq-list";
     }
 
+    @GetMapping("/qna/{qnaNo}")
+    public String viewQna(@PathVariable Long qnaNo,
+                          @RequestParam(name = "qnaPage", defaultValue = "1") int qnaPage,
+                          @RequestParam(name = "qnaStatus", defaultValue = "all") String qnaStatus,
+                          Model model,
+                          @ModelAttribute("msg") String msg) {
+
+        QnaDTO qna = qnaService.findQna(qnaNo);
+        if (qna == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+
+        model.addAttribute("qna", qna);
+        model.addAttribute("qnaPage", qnaPage);
+        model.addAttribute("qnaStatus", normalizeStatus(qnaStatus));
+        model.addAttribute("msg", msg);
+        model.addAttribute("activeItem", "member");
+
+        return "admin/qna_view";
+    }
+
+    @PostMapping("/qna/{qnaNo}/reply")
+    public String updateQnaReply(@PathVariable Long qnaNo,
+                                 @RequestParam(name = "reply", required = false) String reply,
+                                 @RequestParam(name = "qnaPage", defaultValue = "1") int qnaPage,
+                                 @RequestParam(name = "qnaStatus", defaultValue = "all") String qnaStatus,
+                                 RedirectAttributes redirectAttributes) {
+
+        QnaDTO qna = qnaService.findQna(qnaNo);
+        if (qna == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+
+        qnaService.updateQnaReply(qnaNo, reply);
+        redirectAttributes.addFlashAttribute("msg", "답변이 저장되었습니다.");
+
+        return "redirect:/admin/qna/" + qnaNo + "?qnaPage=" + qnaPage + "&qnaStatus=" + normalizeStatus(qnaStatus);
+    }
+
 
 
     @GetMapping("/login")
@@ -247,6 +303,21 @@ public class AdminController {
     }
 
 
+
+
+
+
+
+
+    private String normalizeStatus(String status) {
+        if ("pending".equalsIgnoreCase(status)) {
+            return "pending";
+        }
+        if ("complete".equalsIgnoreCase(status)) {
+            return "complete";
+        }
+        return "all";
+    }
 
 
 
