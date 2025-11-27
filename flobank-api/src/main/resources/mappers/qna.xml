@@ -25,7 +25,7 @@
                 (QNA_REPLY IS NULL OR QNA_REPLY = '')
             </if>
             <if test="status == 'complete'">
-                QNA_REPLY IS NOT NULL AND QNA_REPLY <> ''
+                QNA_REPLY IS NOT NULL AND QNA_REPLY &lt;&gt; ''
             </if>
         </where>
     </select>
@@ -51,7 +51,7 @@
                     (Q.QNA_REPLY IS NULL OR Q.QNA_REPLY = '')
                 </if>
                 <if test="status == 'complete'">
-                    Q.QNA_REPLY IS NOT NULL AND Q.QNA_REPLY <> ''
+                    Q.QNA_REPLY IS NOT NULL AND Q.QNA_REPLY &lt;&gt; ''
                 </if>
             </where>
         ) A

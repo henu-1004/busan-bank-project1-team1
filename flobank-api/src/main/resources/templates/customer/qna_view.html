@@ -36,13 +36,22 @@
       </p>
     </div>
 
-    <!-- 🔹 내용 -->
-    <div class="view-body">
-      <p th:if="${qna.qnaContent}" th:utext="${#strings.replace(#strings.escapeXml(qna.qnaContent), '\n', '<br/>')}">
-        내용
-      </p>
-      <p th:if="${!qna.qnaContent}" class="empty">등록된 내용이 없습니다.</p>
-    </div>
+      <!-- 🔹 내용 -->
+
+      <div class="view-body">
+          <!-- 여길 교체해야 함 -->
+          <p th:if="${qna.qnaContent != null and !#strings.isEmpty(qna.qnaContent)}"
+             th:utext="${#strings.replace(#strings.escapeXml(qna.qnaContent), '\n', '<br/>')}">
+          </p>
+
+          <p th:if="${qna.qnaContent == null or #strings.isEmpty(qna.qnaContent)}" class="empty">
+              등록된 내용이 없습니다.
+          </p>
+      </div>
+
+
+
+
 
     <!-- 🔹 답변 (선택) -->
     <div class="view-answer">
