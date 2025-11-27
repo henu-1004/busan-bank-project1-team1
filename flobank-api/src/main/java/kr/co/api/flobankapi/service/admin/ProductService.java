@@ -3,6 +3,7 @@ package kr.co.api.flobankapi.service.admin;
 import kr.co.api.flobankapi.config.FilePathConfig;
 import kr.co.api.flobankapi.dto.*;
 import kr.co.api.flobankapi.mapper.admin.ProductMapper;
+import kr.co.api.flobankapi.service.PdfAiService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -11,6 +12,9 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 
 @Slf4j
@@ -20,6 +24,7 @@ public class ProductService {
 
     private final ProductMapper productMapper;
     private final FilePathConfig filePathConfig;
+    private final PdfAiService pdfAiService;
 
     /**
      * 상품 등록 (파일 업로드 포함)
@@ -30,7 +35,10 @@ public class ProductService {
                               List<ProductPeriodDTO> periods,
                               ProductWithdrawRuleDTO wdrwInfo,
                               List<ProductWithdrawAmtDTO> withdrawAmts,
-                              MultipartFile pdfFile) throws Exception {
+                              MultipartFile pdfFile,
+                              String selectedPdfPath,
+                              String selectedPdfName,
+                              Long selectedPdfId) throws Exception {
 
         // 1. 파일 업로드 처리
         dto.setDpstInfoPdf(null); // 초기화
@@ -38,6 +46,10 @@ public class ProductService {
         if (pdfFile != null && !pdfFile.isEmpty()) {
             String savedPath = saveProductPdf(pdfFile);
             dto.setDpstInfoPdf(savedPath);
+        } else if (StringUtils.hasText(selectedPdfPath) && StringUtils.hasText(selectedPdfName)) {
+            String savedPath = copyAiPdfToProducts(selectedPdfPath, selectedPdfName);
+            dto.setDpstInfoPdf(savedPath);
+            pdfAiService.markPdfAsUsed(selectedPdfId);
         }
 
         // 2. 상품 기본 정보 DB 저장 (여기서 dpstId 생성됨)
@@ -89,13 +101,7 @@ public class ProductService {
      * 파일 저장 로직 (내부용)
      */
     private String saveProductPdf(MultipartFile file) throws Exception {
-
-        String basePath = filePathConfig.getPdfProductsPath();
-
-        // yml 설정이 없을 경우 비상용 경로
-        if (basePath == null || basePath.isBlank()) {
-            basePath = "C:/app/uploads/pdf_products";
-        }
+        String basePath = resolveProductsBasePath();
 
         String original = file.getOriginalFilename();
         String safeName = StringUtils.cleanPath(original);
@@ -113,7 +119,34 @@ public class ProductService {
 
         file.transferTo(dest);
 
-        return "/uploads/products/" + storedName;
+        return "/uploads/pdf_products/" + storedName;
+    }
+
+    private String copyAiPdfToProducts(String sourcePath, String storedFileName) throws Exception {
+        String basePath = resolveProductsBasePath();
+
+        Path targetDir = Path.of(basePath);
+        Files.createDirectories(targetDir);
+
+        Path sourceFile = Path.of(sourcePath);
+        if (!Files.exists(sourceFile)) {
+            throw new IllegalArgumentException("선택한 AI PDF 파일을 찾을 수 없습니다.");
+        }
+
+        Path targetFile = targetDir.resolve(storedFileName);
+        Files.copy(sourceFile, targetFile, StandardCopyOption.REPLACE_EXISTING);
+
+        return "/uploads/pdf_products/" + storedFileName;
+    }
+
+    private String resolveProductsBasePath() {
+        String basePath = filePathConfig.getPdfProductsPath();
+
+        if (basePath == null || basePath.isBlank()) {
+            basePath = "/app/uploads/pdf_products";
+        }
+
+        return basePath;
     }
 
     // --- 조회 메서드들 ---

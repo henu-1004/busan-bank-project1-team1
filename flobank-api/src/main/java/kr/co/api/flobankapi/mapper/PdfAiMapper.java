@@ -21,4 +21,6 @@ public interface PdfAiMapper {
 
     void updateStatus(@Param("pdfId") Long pdfId,
                       @Param("status") String status);
+
+    void deleteById(Long pdfId);
 }

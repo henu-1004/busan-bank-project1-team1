@@ -43,8 +43,11 @@
                     <!-- 🔥 Progress Box 끝 -->
 
                     <div class="pdf-list">
-                        <div class="pdf-list-header">
-                            <span>업로드된 PDF 목록</span>
+                        <div class="pdf-list-header" id="pdfListHeader">
+                            <div class="pdf-list-title">
+                                <span class="pdf-list-arrow" id="pdfListArrow">▲</span>
+                                <span>업로드된 PDF 목록</span>
+                            </div>
                             <span class="status-legend">상태: wait / done / used</span>
                         </div>
                         <div class="pdf-list-body" id="pdfListBody">
@@ -58,12 +61,22 @@
                         </select>
                     </div>
 
+                    <input type="hidden" id="selectedPdfPath" name="selectedPdfPath" />
+                    <input type="hidden" id="selectedPdfName" name="selectedPdfName" />
+                    <input type="hidden" id="selectedPdfId" name="selectedPdfId" />
+                    <div id="selectedPdfNotice" class="selected-pdf-notice" style="display:none;"></div>
+
                     <div class="ai-comment-box">
+                        <div id="aiRiskBlockMessage" class="risk-block-message" style="display:none;">
+                            위험 상품설명서 → 상품 등록 불가
+                        </div>
                         <div class="ai-comment-header">
                             <h4>AI 분석 코멘트</h4>
-                            <span class="ai-comment-status">AI 분석 코멘트 표시 예정</span>
+                            <span class="ai-comment-status" id="aiRiskBadge">AI 분석 코멘트 표시 예정</span>
                         </div>
-                        <p class="ai-comment-placeholder">AI 분석이 완료되면 생성된 코멘트가 이 영역에 표시됩니다.</p>
+                        <div id="aiCommentContent" class="ai-comment-content">
+                            <p class="ai-comment-placeholder">AI 분석이 완료되면 생성된 코멘트가 이 영역에 표시됩니다.</p>
+                        </div>
                     </div>
                 </div>
 
@@ -340,10 +353,13 @@
         ============================= */
         let currentEventSource = null;
 
+        const AI_PLACEHOLDER = "AI 분석이 완료되면 생성된 코멘트가 이 영역에 표시됩니다.";
+
         /* ============================
            📡 SSE 연결 함수
         ============================= */
         function connectProgressSSE(pdfId) {
+            if (!pdfId) return;
 
             if (currentEventSource) {
                 currentEventSource.close();
@@ -391,6 +407,269 @@
             };
         }
 
+        /* ============================
+           📑 헬퍼 함수
+        ============================= */
+        function formatDateTime(value) {
+            if (!value) return "";
+            const date = new Date(value);
+            if (isNaN(date.getTime())) return value;
+            return date.toLocaleString("ko-KR", {
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit"
+            });
+        }
+
+        function resetAiCommentBox() {
+            const badge = document.getElementById("aiRiskBadge");
+            const content = document.getElementById("aiCommentContent");
+
+            if (badge) {
+                badge.textContent = "AI 분석 코멘트 표시 예정";
+                badge.className = "ai-comment-status";
+            }
+
+            if (content) {
+                content.innerHTML = `<p class="ai-comment-placeholder">${AI_PLACEHOLDER}</p>`;
+            }
+
+            updateRiskGuard(null);
+            updateSelectedPdfInputs();
+        }
+
+        function parseAiComments(aiComment, aiOverallRisk) {
+            let overallRisk = aiOverallRisk || null;
+            let comments = [];
+
+            if (aiComment) {
+                try {
+                    const parsed = JSON.parse(aiComment);
+                    overallRisk = parsed.overall_risk || parsed.overallRisk || overallRisk;
+                    if (Array.isArray(parsed.comments)) {
+                        comments = parsed.comments;
+                    }
+                } catch (e) {
+                    comments = [aiComment];
+                }
+            }
+
+            return { overallRisk, comments };
+        }
+
+        function updateSelectedPdfInputs(pdf) {
+            const pathInput = document.getElementById("selectedPdfPath");
+            const nameInput = document.getElementById("selectedPdfName");
+            const idInput = document.getElementById("selectedPdfId");
+            const noticeEl = document.getElementById("selectedPdfNotice");
+
+            if (!pdf) {
+                if (pathInput) pathInput.value = "";
+                if (nameInput) nameInput.value = "";
+                if (idInput) idInput.value = "";
+                if (noticeEl) {
+                    noticeEl.style.display = "none";
+                    noticeEl.textContent = "";
+                }
+                return;
+            }
+
+            if (pathInput) pathInput.value = pdf.filePath || "";
+            if (nameInput) nameInput.value = pdf.storedFileName || "";
+            if (idInput) idInput.value = pdf.pdfId || "";
+
+            if (noticeEl) {
+                const filename = pdf.orgFileName || pdf.storedFileName || "선택한 PDF";
+                noticeEl.style.display = "block";
+                noticeEl.textContent = `${filename}가 자동으로 등록 파일에 연결되었습니다.`;
+            }
+        }
+
+        function updateRiskGuard(risk) {
+            const submitBtn = document.querySelector(".btn-submit");
+            const blockMessage = document.getElementById("aiRiskBlockMessage");
+
+            const normalized = (risk || "").toString().toLowerCase();
+            const isDanger = normalized.includes("danger") || normalized.includes("위험");
+
+            if (submitBtn) {
+                submitBtn.disabled = isDanger;
+            }
+
+            if (blockMessage) {
+                blockMessage.style.display = isDanger ? "block" : "none";
+            }
+        }
+
+        function buildCommentItem(comment) {
+            const item = document.createElement("div");
+            item.classList.add("ai-comment-item");
+
+            if (typeof comment === "string") {
+                const text = document.createElement("p");
+                text.classList.add("ai-comment-text");
+                text.textContent = comment;
+                item.appendChild(text);
+                return item;
+            }
+
+            const phrase = comment.risky_phrase || comment.riskyPhrase;
+            const reason = comment.violation_reason || comment.violationReason;
+            const suggestion = comment.improvement_suggestion || comment.improvementSuggestion;
+
+            const rows = [
+                { label: "위험 문구", value: phrase, className: "ai-comment-phrase" },
+                { label: "위반/분석", value: reason, className: "ai-comment-reason" },
+                { label: "개선 방향", value: suggestion, className: "ai-comment-suggestion" }
+            ];
+
+            rows.forEach(row => {
+                if (!row.value) return;
+                const rowEl = document.createElement("div");
+                rowEl.className = "ai-comment-row";
+
+                const labelEl = document.createElement("div");
+                labelEl.className = "ai-comment-label";
+                labelEl.textContent = row.label;
+
+                const valueEl = document.createElement("div");
+                valueEl.className = row.className;
+                valueEl.textContent = row.value;
+
+                rowEl.appendChild(labelEl);
+                rowEl.appendChild(valueEl);
+                item.appendChild(rowEl);
+            });
+
+            if (!phrase && !reason && !suggestion) {
+                const fallback = document.createElement("p");
+                fallback.classList.add("ai-comment-text");
+                fallback.textContent = "추가 코멘트 없음";
+                item.appendChild(fallback);
+            }
+
+            return item;
+        }
+
+        function renderAiComments(pdf) {
+            const badge = document.getElementById("aiRiskBadge");
+            const content = document.getElementById("aiCommentContent");
+
+            if (!badge || !content) return;
+
+            const { overallRisk, comments } = parseAiComments(pdf.aiComment, pdf.aiOverallRisk);
+
+            const riskText = overallRisk || "분석 대기";
+            const riskClass = riskText.toLowerCase().replace(/\s+/g, "");
+            badge.textContent = `위험도: ${riskText}`;
+            badge.className = `ai-comment-status ai-risk-${riskClass}`;
+            updateRiskGuard(overallRisk);
+
+            content.innerHTML = "";
+
+            if (!comments || comments.length === 0) {
+                content.innerHTML = `<p class="ai-comment-placeholder">${AI_PLACEHOLDER}</p>`;
+                return;
+            }
+
+            comments.forEach(comment => content.appendChild(buildCommentItem(comment)));
+        }
+
+        function setRadioValue(name, value) {
+            if (!value) return;
+            const target = document.querySelector(`input[name="${name}"][value="${value}"]`);
+            if (target) {
+                target.checked = true;
+                target.dispatchEvent(new Event("change", { bubbles: true }));
+            }
+        }
+
+        function applyPdfDataToForm(pdf) {
+            if (!pdf) return;
+
+            updateSelectedPdfInputs(pdf);
+
+            const nameInput = document.getElementById("dpstName");
+            const infoInput = document.getElementById("dpstInfo");
+            const descriptInput = document.getElementById("dpstDescript");
+
+            if (pdf.productName && nameInput) nameInput.value = pdf.productName;
+            if (pdf.productShortDesc && infoInput) infoInput.value = pdf.productShortDesc;
+            if (pdf.productFeatures && descriptInput) descriptInput.value = pdf.productFeatures;
+
+            /* 예금 유형 */
+            const depositValue = (pdf.depositType || "").includes("거치") ? "1" : (pdf.depositType ? "2" : null);
+            setRadioValue("dpstType", depositValue);
+
+            /* 통화 */
+            const currencyText = pdf.currencies || "";
+            const currencyCodes = currencyText.split(/[,\s]+/).map(c => c.trim()).filter(Boolean);
+            const currencyBoxes = document.querySelectorAll('input[name="dpstCurrency"]');
+            currencyBoxes.forEach(box => {
+                box.checked = currencyCodes.includes(box.value);
+                box.dispatchEvent(new Event("change", { bubbles: true }));
+            });
+
+            /* 환율 정책 */
+            const policy = (pdf.exchangeRatePolicy || "").replace(/\s/g, "").toLowerCase();
+            let rateValue = null;
+
+            if (policy.includes("납입")) {
+                rateValue = "3";
+            } else if (policy.includes("만기")) {
+                rateValue = "2";
+            } else if (policy.includes("가입")) {
+                rateValue = "1";
+            }
+
+            setRadioValue("dpstRateType", rateValue);
+
+            /* 가입 기간 */
+            const termText = pdf.termType || "";
+            let joinType = null;
+
+            if (pdf.minMonth != null || pdf.maxMonth != null || termText.includes("자유")) {
+                joinType = "1";
+            } else if (termText) {
+                joinType = "2";
+            }
+
+            setRadioValue("dpstPeriodType", joinType);
+
+            const minMonths = document.querySelector('input[name="minMonths"]');
+            const maxMonths = document.querySelector('input[name="maxMonths"]');
+            if (minMonths && pdf.minMonth != null) minMonths.value = pdf.minMonth;
+            if (maxMonths && pdf.maxMonth != null) maxMonths.value = pdf.maxMonth;
+
+            const fixedMonthsInput = document.querySelector('input[name="fixedMonths"]');
+            if (fixedMonthsInput && joinType === "2") {
+                const monthsFromText = termText.match(/\d+/g);
+                if (monthsFromText && monthsFromText.length > 0) {
+                    fixedMonthsInput.value = monthsFromText.join(",");
+                } else if (termText) {
+                    fixedMonthsInput.value = termText;
+                }
+                fixedMonthsInput.dispatchEvent(new Event("change", { bubbles: true }));
+            }
+
+            /* 추가 납입 / 자동 연장 / 분할 인출 */
+            const yesNo = (value) => {
+                if (!value) return null;
+                const cleaned = value.trim();
+                if (cleaned.includes("가능")) return "Y";
+                if (cleaned.includes("없음") || cleaned.includes("불가") || cleaned.includes("불가능")) return "N";
+                return null;
+            };
+
+            setRadioValue("dpstAddPayYn", yesNo(pdf.additionalDeposit));
+            setRadioValue("dpstAutoRenewYn", yesNo(pdf.autoRenewal));
+            setRadioValue("dpstPartWdrwYn", yesNo(pdf.partialWithdrawal));
+
+            renderAiComments(pdf);
+        }
+
 
         /* ============================
            📤 PDF 업로드
@@ -428,42 +707,137 @@
 
 
         /* ============================
+           ✅ PDF 선택 시 자동 대입
+        ============================= */
+        async function handlePdfSelection(event) {
+            const selectedId = event.target.value;
+
+            if (!selectedId) {
+                resetAiCommentBox();
+                return;
+            }
+
+            try {
+                const res = await fetch(`/flobank/admin/pdf-ai/${selectedId}`);
+
+                if (!res.ok) {
+                    const message = await res.text();
+                    alert(message || "PDF 정보를 불러오지 못했습니다.");
+                    event.target.value = "";
+                    resetAiCommentBox();
+                    return;
+                }
+
+                const data = await res.json();
+                applyPdfDataToForm(data);
+            } catch (error) {
+                console.error(error);
+                alert("PDF 정보를 불러오는 중 오류가 발생했습니다.");
+            }
+        }
+
+
+        /* ============================
            📄 PDF 목록 불러오기
         ============================= */
         async function loadPdfList() {
-
-            const res = await fetch("/flobank/admin/pdf-ai/list");
-            const list = await res.json();
-
-            const body = document.getElementById("pdfListBody");
-            const selector = document.getElementById("pdfSelector");
-
-            body.innerHTML = "";
-            selector.innerHTML = `<option value="">선택하세요</option>`;
-
-            list.forEach(item => {
-
-                body.innerHTML += `
-            <div class="pdf-list-item">
-                <div>
-                    <strong>${item.orgFileName}</strong>
-                    <div class="pdf-meta">${item.createdAt || ''}</div>
-                </div>
-                <span class="status-chip status-${item.status}">${item.status}</span>
-            </div>
-        `;
-
-                if (item.status === "done") {
-                    selector.innerHTML += `
-                <option value="${item.pdfId}">
-                    ${item.orgFileName} (done)
-                </option>
-            `;
+            try {
+                const res = await fetch("/flobank/admin/pdf-ai/list");
+                if (!res.ok) {
+                    throw new Error("PDF 목록을 불러오지 못했습니다.");
                 }
+
+                const list = await res.json();
+
+                const body = document.getElementById("pdfListBody");
+                const selector = document.getElementById("pdfSelector");
+
+                body.innerHTML = "";
+                selector.innerHTML = `<option value="">선택하세요</option>`;
+
+                list.forEach(item => {
+                    const createdAt = formatDateTime(item.createdAt);
+                    const riskLabel = item.aiOverallRisk ? `<span class="ai-risk-chip ai-risk-${(item.aiOverallRisk || '').toLowerCase()}">${item.aiOverallRisk}</span>` : "";
+
+                    body.innerHTML += `
+                <div class="pdf-list-item" data-pdf-id="${item.pdfId}">
+                    <div>
+                        <strong>${item.orgFileName}</strong>
+                        <div class="pdf-meta">${createdAt}</div>
+                    </div>
+                    <div class="pdf-status-cluster">
+                        <span class="status-chip status-${item.status}">${item.status}</span>
+                        ${riskLabel}
+                        <button type="button" class="pdf-delete-btn" data-pdf-id="${item.pdfId}">×</button>
+                    </div>
+                </div>
+            `;
+
+                    if (item.status === "done") {
+                        selector.innerHTML += `
+                    <option value="${item.pdfId}">
+                        ${item.orgFileName} (done)
+                    </option>
+                `;
+                    }
+                });
+
+                bindPdfDeleteButtons();
+            } catch (error) {
+                console.error(error);
+                alert(error.message || "PDF 목록을 불러오는 중 오류가 발생했습니다.");
+            }
+        }
+
+        function bindPdfDeleteButtons() {
+            const container = document.getElementById("pdfListBody");
+            if (!container) return;
+
+            container.querySelectorAll(".pdf-delete-btn").forEach(btn => {
+                btn.addEventListener("click", async (event) => {
+                    event.stopPropagation();
+                    const pdfId = btn.getAttribute("data-pdf-id");
+
+                    if (!pdfId) return;
+
+                    if (!confirm("PDF를 삭제하시겠습니까?")) return;
+
+                    const res = await fetch(`/flobank/admin/pdf-ai/${pdfId}`, { method: "DELETE" });
+
+                    if (!res.ok) {
+                        const message = await res.text();
+                        alert(message || "PDF 삭제에 실패했습니다.");
+                        return;
+                    }
+
+                    alert("삭제되었습니다.");
+                    loadPdfList();
+                });
             });
         }
 
-        document.addEventListener("DOMContentLoaded", loadPdfList);
+        function initPdfAccordion() {
+            const header = document.getElementById("pdfListHeader");
+            const body = document.getElementById("pdfListBody");
+            const arrow = document.getElementById("pdfListArrow");
+
+            if (!header || !body || !arrow) return;
+
+            header.addEventListener("click", () => {
+                const isHidden = body.style.display === "none";
+                body.style.display = isHidden ? "flex" : "none";
+                arrow.textContent = isHidden ? "▲" : "▼";
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            initPdfAccordion();
+            loadPdfList();
+            const selector = document.getElementById("pdfSelector");
+            if (selector) {
+                selector.addEventListener("change", handlePdfSelection);
+            }
+        });
     </script>
 
     <script th:src="@{/js/product1.js}"></script>
