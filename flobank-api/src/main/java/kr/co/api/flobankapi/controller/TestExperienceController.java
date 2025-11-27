@@ -18,13 +18,4 @@ public class TestExperienceController {
         return "event/event_lounge";
     }
 
-    @GetMapping("/followers")
-    public String followerInsight() {
-        return "test/follower_insight";
-    }
-
-    @GetMapping("/events")
-    public String eventCampaign() {
-        return "test/event_campaign";
-    }
 }
