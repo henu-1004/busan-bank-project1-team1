@@ -92,7 +92,7 @@
                     </td>
 
                     <td class="cell-right"> <!-- 잔액 표시해야!!! -->
-                        <span th:text="${dpstAcctDTO.formattedCurrency + #numbers.formatInteger(dpstAcctDTO.dpstHdrBalance+custTranHistDTO.dpstDtlAmount, 0, 'COMMA')}">잔액</span>
+                        <span th:text="${dpstAcctDTO.formattedCurrency + #numbers.formatInteger(dpstAcctDTO.dpstHdrBalance, 0, 'COMMA')}">잔액</span>
                     </td>
 
                     <td class="cell-left" style="text-align: left; padding-left: 15px;">

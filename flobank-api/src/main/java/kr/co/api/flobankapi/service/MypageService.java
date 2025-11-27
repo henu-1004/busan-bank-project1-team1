@@ -346,6 +346,61 @@ public class MypageService {
             return mypageMapper.selectDpstFrgnAcctHdr(dpstHdrAcctNo, dpstHdrCurrency);
         }
     }
+    private final DepositMapper depositMapper;
+    public FrgnAcctBalanceDTO getBalAcctByBalNo(String balNo){
+        FrgnAcctBalanceDTO dto = depositMapper.selectFrgnAcctBalance(balNo);
+        dto.setBalNo(balNo);
+        return dto;
+    }
+
+    public void addPayFrgnToFrgn(FrgnAcctBalanceDTO balAcct,
+                                 DpstAcctHdrDTO dpstAcctHdrDTO,
+                                 CustTranHistDTO custTranHistDTO,
+                                 DpstAcctDtlDTO dpstDtlDTO){
+        // 외화계좌 잔액 변화
+        balAcct.setBalBalance(balAcct.getBalBalance() - custTranHistDTO.getTranAmount().doubleValue());
+        // 예금계좌 추납카운트, 잔액 변화
+        dpstAcctHdrDTO.setDpstHdrAddPayCnt(dpstAcctHdrDTO.getDpstHdrAddPayCnt() + 1);
+        dpstAcctHdrDTO.setDpstHdrBalance(dpstAcctHdrDTO.getDpstHdrBalance().add(custTranHistDTO.getDpstDtlAmount()));
+        // 예금계좌 거래내역
+        dpstDtlDTO.setDpstDtlType(1);
+        dpstDtlDTO.setDpstDtlAmount(custTranHistDTO.getDpstDtlAmount());
+        dpstDtlDTO.setDpstDtlHdrNo(dpstAcctHdrDTO.getDpstHdrAcctNo());
+
+        // 전자서명 임의로 y로 세팅
+        dpstDtlDTO.setDpstDtlEsignYn("Y");
+        dpstDtlDTO.setDpstDtlAppliedRate(BigDecimal.valueOf(0));
+
+        mypageMapper.insertDpstCustTranHist(custTranHistDTO);
+        mypageMapper.insertDpstAcctDtl(dpstDtlDTO);
+        mypageMapper.updateDpstAcctHdr(dpstAcctHdrDTO);
+        mypageMapper.updateFrgnAcctBal(balAcct);
+    }
+
+    public void addPayKrwToFrgn(CustAcctDTO custAcct,
+                                 DpstAcctHdrDTO dpstAcctHdrDTO,
+                                 CustTranHistDTO custTranHistDTO,
+                                 DpstAcctDtlDTO dpstDtlDTO){
+        // 원화계좌 잔액 변화
+        custAcct.setAcctBalance(custAcct.getAcctBalance() - custTranHistDTO.getTranAmount().intValue());
+        // 예금계좌 추납카운트, 잔액 변화
+        dpstAcctHdrDTO.setDpstHdrAddPayCnt(dpstAcctHdrDTO.getDpstHdrAddPayCnt() + 1);
+        dpstAcctHdrDTO.setDpstHdrBalance(dpstAcctHdrDTO.getDpstHdrBalance().add(custTranHistDTO.getDpstDtlAmount()));
+        // 예금계좌 거래내역
+        dpstDtlDTO.setDpstDtlType(1);
+        dpstDtlDTO.setDpstDtlAmount(custTranHistDTO.getDpstDtlAmount());
+        dpstDtlDTO.setDpstDtlHdrNo(dpstAcctHdrDTO.getDpstHdrAcctNo());
+
+        // 전자서명 임의로 y로 세팅
+        dpstDtlDTO.setDpstDtlEsignYn("Y");
+        dpstDtlDTO.setDpstDtlAppliedRate(BigDecimal.valueOf(0));
+        custTranHistDTO.setTranEsignYn("Y");
+
+        mypageMapper.insertDpstCustTranHist(custTranHistDTO);
+        mypageMapper.insertDpstAcctDtl(dpstDtlDTO);
+        mypageMapper.updateDpstAcctHdr(dpstAcctHdrDTO);
+        mypageMapper.updateKrwAcctBal(custAcct);
+    }
 }
 
 

@@ -78,4 +78,11 @@ public interface MypageMapper {
     public DpstAcctHdrDTO selectDpstKrwAcctHdr(String dpstHdrAcctNo);
     public DpstAcctHdrDTO selectDpstFrgnAcctHdr(String dpstHdrAcctNo, String dpstHdrCurrency);
 
+    public void insertDpstCustTranHist(CustTranHistDTO custTranHistDTO);
+    public void insertDpstAcctDtl(DpstAcctDtlDTO dpstDtlDTO);
+    public void updateDpstAcctHdr(DpstAcctHdrDTO dpstAcctHdrDTO);
+    public void updateKrwAcctBal(CustAcctDTO custAcct);
+    public void updateFrgnAcctBal(FrgnAcctBalanceDTO balAcct);
+
+
 }

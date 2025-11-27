@@ -241,4 +241,76 @@
         WHERE bal_no = #{dpstHdrLinkedAcctNo}
     </select>
 
+    <insert id="insertDpstCustTranHist">
+        insert into TB_CUST_TRAN_HIST
+        (tran_acct_no,
+        tran_cust_name,
+        tran_type,
+        tran_amount,
+        tran_dt,
+        tran_rec_acct_no,
+        tran_rec_name,
+        tran_rec_bk_code,
+        tran_esign_yn,
+        tran_esign_dt,
+        tran_currency)
+        values
+        (
+        #{tranAcctNo},
+        #{tranCustName},
+        #{tranType},
+        #{tranAmount},
+        SYSDATE,
+        #{tranRecAcctNo},
+        #{tranRecName},
+        #{tranRecBkCode},
+        #{tranEsignYn},
+        SYSDATE,
+        #{tranCurrency}
+        )
+    </insert>
+
+    <insert id="insertDpstAcctDtl">
+        insert into TB_DPST_ACCT_DTL
+        (dpst_dtl_type,
+        dpst_dtl_amount,
+        dpst_tran_dt,
+        dpst_dtl_hdr_no,
+        dpst_dtl_esign_yn,
+        dpst_dtl_esign_dt,
+        dpst_dtl_applied_rate
+        )
+        values
+        (
+        #{dpstDtlType},
+        #{dpstDtlAmount},
+        SYSDATE,
+        #{dpstDtlHdrNo},
+        #{dpstDtlEsignYn},
+        SYSDATE,
+        #{dpstDtlAppliedRate}
+        )
+    </insert>
+
+    <update id="updateDpstAcctHdr">
+        update TB_DPST_ACCT_HDR
+        set
+        DPST_HDR_ADD_PAY_CNT=#{dpstHdrAddPayCnt},
+        DPST_HDR_BALANCE=#{dpstHdrBalance}
+        where
+        DPST_HDR_ACCT_NO=#{dpstHdrAcctNo}
+    </update>
+
+    <update id="updateKrwAcctBal">
+        update TB_CUST_ACCT
+        set acct_balance=#{acctBalance}
+        where acct_no=#{acctNo}
+    </update>
+
+    <update id="updateFrgnAcctBal">
+        update TB_FRGN_ACCT_BALANCE
+        set bal_balance=#{balBalance}
+        where bal_no=#{balNo}
+    </update>
+
 </mapper>

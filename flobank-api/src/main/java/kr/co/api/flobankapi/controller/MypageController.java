@@ -555,9 +555,10 @@ public class MypageController {
         ProductDTO product = depositService.selectDpstProduct(dpstAcctDTO.getDpstHdrDpstId());
 
         CustTranHistDTO dto = new CustTranHistDTO();
-        dto.setTranType(5); // 예금 추가납입 (거래 유형 정의 필요 시)
+
         dto.setTranRecAcctNo(dpstHdrAcctNo);
         dto.setTranRecBkCode("888");
+        dto.setTranType(2);
         dto.setTranAcctNo(dpstAcctDTO.getDpstHdrLinkedAcctNo());
         if (dpstAcctDTO.getDpstHdrLinkedAcctType()==1){
             dto.setTranCurrency("KRW");
@@ -694,6 +695,21 @@ public class MypageController {
 
         log.info(custTranHistDTO.toString());
 
+        DpstAcctHdrDTO dpstAcctDTO = mypageService.getDpstAcctHdr(dpstHdrAcctNo);
+        DpstAcctDtlDTO dpstDtlDTO = new DpstAcctDtlDTO();
+        // 계좌 잔액 업데이트
+        CustAcctDTO custAcct;
+        FrgnAcctBalanceDTO balAcct;
+
+        if ("KRW".equals(custTranHistDTO.getTranCurrency())){
+            custAcct  = mypageService.findCustAcct(custTranHistDTO.getTranAcctNo());
+            mypageService.addPayKrwToFrgn(custAcct, dpstAcctDTO, custTranHistDTO, dpstDtlDTO);
+        }else {
+            balAcct = mypageService.getBalAcctByBalNo(custTranHistDTO.getTranAcctNo());
+            log.info("balAcct:{}", balAcct.toString());
+            mypageService.addPayFrgnToFrgn(balAcct,  dpstAcctDTO, custTranHistDTO, dpstDtlDTO);
+        }
+
         /*
         CustAcctDTO custAcctDTO = new CustAcctDTO();
 
@@ -711,7 +727,7 @@ public class MypageController {
             model.addAttribute("state", "실패");
         }
          */
-        DpstAcctHdrDTO dpstAcctDTO = mypageService.getDpstAcctHdr(dpstHdrAcctNo);
+
         model.addAttribute("dpstAcctDTO", dpstAcctDTO);
         model.addAttribute("custTranHistDTO", custTranHistDTO);
         model.addAttribute("state", "정상");
