@@ -28,42 +28,43 @@
   <div class="qna-view">
     <!-- 🔹 제목/정보 -->
     <div class="view-header">
-      <h3>해외송금 수수료는 얼마인가요?</h3>
+      <h3 th:text="${qna.qnaTitle}">제목</h3>
       <p class="meta">
-        작성자 <strong>홍길동</strong> | 등록일 <span>2025-11-06</span> | 조회수 <span>32</span>
+        작성자 <strong th:text="${qna.qnaCustCode}"></strong> |
+        등록일 <span th:text="${qna.qnaDt != null ? #temporals.format(qna.qnaDt, 'yyyy-MM-dd HH:mm') : ''}"></span> |
+        조회수 <span th:text="${qna.qnaHit}"></span>
       </p>
     </div>
 
     <!-- 🔹 내용 -->
     <div class="view-body">
-      <p>
-        해외송금 시 수수료는 거래 금액과 국가에 따라 다릅니다.<br>
-        자세한 내용은 ‘외화송금안내’ 페이지에서 확인 가능합니다.
+      <p th:utext="${#strings.replace(qna.qnaContent, '\n', '<br/>')}">
+        문의 내용
       </p>
     </div>
 
+    <!-- 🔹 초안 -->
+    <div class="view-answer" th:if="${qna.qnaDraft}">
+      <h4><i class="fa-solid fa-pen-nib"></i> 작성 초안</h4>
+      <div class="answer-box">
+        <p th:utext="${#strings.replace(qna.qnaDraft, '\n', '<br/>')}"></p>
+      </div>
+    </div>
+
     <!-- 🔹 답변 (선택) -->
-    <div class="view-answer">
+    <div class="view-answer" th:if="${qna.qnaReply}">
       <h4><i class="fa-solid fa-comment-dots"></i> 답변</h4>
       <div class="answer-box">
-        <p>
-          고객님, 안녕하세요.<br>
-          해외송금 수수료는 송금 금액과 국가에 따라 다르게 적용됩니다.<br>
-          인터넷뱅킹 또는 모바일 앱에서 “송금 시뮬레이션”을 통해 수수료를 확인하실 수 있습니다.<br>
-          감사합니다.
-        </p>
+        <p th:utext="${#strings.replace(qna.qnaReply, '\n', '<br/>')}"></p>
       </div>
     </div>
 
     <!-- 🔹 버튼 -->
     <div class="view-footer">
-      <a href="qnaEdit.html" class="btn-submit">
+      <a th:if="${canModify}" th:href="@{/customer/qna_edit}" class="btn-submit">
         <i class="fa-solid fa-pen-to-square"></i> 수정
       </a>
-      <a href="#" class="btn-delete">
-        <i class="fa-solid fa-trash"></i> 삭제
-      </a>
-      <a href="qnaList.html" class="btn-cancel">
+      <a th:href="@{/customer/qna_list}" class="btn-cancel">
         <i class="fa-solid fa-list"></i> 목록
       </a>
     </div>
