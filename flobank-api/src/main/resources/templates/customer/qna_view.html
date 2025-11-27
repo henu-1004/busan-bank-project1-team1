@@ -25,45 +25,56 @@
 <section class="customer-content">
   <h2>질문과 답변(Q&A)</h2>
 
-  <div class="qna-view">
+  <div class="qna-view" th:if="${qna}">
     <!-- 🔹 제목/정보 -->
     <div class="view-header">
-      <h3>해외송금 수수료는 얼마인가요?</h3>
+      <h3 th:text="${qna.qnaTitle}">질문 제목</h3>
       <p class="meta">
-        작성자 <strong>홍길동</strong> | 등록일 <span>2025-11-06</span> | 조회수 <span>32</span>
+        작성자 <strong th:text="${qna.qnaCustName != null ? qna.qnaCustName : qna.qnaCustCode}">작성자</strong>
+        | 등록일 <span th:text="${qna.qnaDt != null ? #temporals.format(qna.qnaDt, 'yyyy-MM-dd HH:mm') : ''}">0000-00-00</span>
+        | 조회수 <span th:text="${qna.qnaViewCnt != null ? qna.qnaViewCnt : 0}">0</span>
       </p>
     </div>
 
-    <!-- 🔹 내용 -->
-    <div class="view-body">
-      <p>
-        해외송금 시 수수료는 거래 금액과 국가에 따라 다릅니다.<br>
-        자세한 내용은 ‘외화송금안내’ 페이지에서 확인 가능합니다.
-      </p>
-    </div>
+      <!-- 🔹 내용 -->
+
+      <div class="view-body">
+          <!-- 여길 교체해야 함 -->
+          <p th:if="${qna.qnaContent != null and !#strings.isEmpty(qna.qnaContent)}"
+             th:utext="${#strings.replace(#strings.escapeXml(qna.qnaContent), '\n', '<br/>')}">
+          </p>
+
+          <p th:if="${qna.qnaContent == null or #strings.isEmpty(qna.qnaContent)}" class="empty">
+              등록된 내용이 없습니다.
+          </p>
+      </div>
+
+
+
+
 
     <!-- 🔹 답변 (선택) -->
     <div class="view-answer">
       <h4><i class="fa-solid fa-comment-dots"></i> 답변</h4>
-      <div class="answer-box">
-        <p>
-          고객님, 안녕하세요.<br>
-          해외송금 수수료는 송금 금액과 국가에 따라 다르게 적용됩니다.<br>
-          인터넷뱅킹 또는 모바일 앱에서 “송금 시뮬레이션”을 통해 수수료를 확인하실 수 있습니다.<br>
-          감사합니다.
-        </p>
+      <div class="answer-box" th:if="${qna.qnaReply != null and !#strings.isEmpty(qna.qnaReply)}">
+        <p th:utext="${#strings.replace(#strings.escapeXml(qna.qnaReply), '\n', '<br/>')}">답변 내용</p>
+      </div>
+      <div class="answer-box" th:if="${qna.qnaReply == null or #strings.isEmpty(qna.qnaReply)}">
+        <p>답변 준비 중입니다. 빠르게 확인하여 안내드리겠습니다.</p>
       </div>
     </div>
 
     <!-- 🔹 버튼 -->
     <div class="view-footer">
-      <a href="qnaEdit.html" class="btn-submit">
+      <a th:if="${isOwner}" th:href="@{/customer/qna_edit/{no}(no=${qna.qnaNo})}" class="btn-submit">
         <i class="fa-solid fa-pen-to-square"></i> 수정
       </a>
-      <a href="#" class="btn-delete">
-        <i class="fa-solid fa-trash"></i> 삭제
-      </a>
-      <a href="qnaList.html" class="btn-cancel">
+      <form th:if="${isOwner}" th:action="@{/customer/qna_delete/{no}(no=${qna.qnaNo})}" method="post" style="display:inline;">
+        <button type="submit" class="btn-delete" onclick="return confirm('정말로 삭제하시겠습니까?');">
+          <i class="fa-solid fa-trash"></i> 삭제
+        </button>
+      </form>
+      <a th:href="@{/customer/qna_list}" class="btn-cancel">
         <i class="fa-solid fa-list"></i> 목록
       </a>
     </div>
@@ -72,11 +83,9 @@
 
 
 
-   
 
 </main>
 
 <div th:replace="~{_template/_footer.html}"></div>
 </body>
 </html>
-

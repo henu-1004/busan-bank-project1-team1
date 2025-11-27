@@ -43,4 +43,10 @@ public class MypageDpstDTO {
     private int wdrwMax;
     private int amtMin;
 
+    // 최초 계약 잔액
+    private BigDecimal dpstDtlInitialbal;
+    private String firstTranDt;
+    private int tranCnt;
+    private String lastTranDt;
+
 }

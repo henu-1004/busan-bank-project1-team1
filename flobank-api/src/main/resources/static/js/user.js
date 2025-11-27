@@ -329,7 +329,7 @@ document.addEventListener("DOMContentLoaded", function () {
 </tr>
 `;
 
-// 🔥 조건 분기
+// 조건 분기
                 if (rateType === "1" && acctType === "1") {
                     html += `
         <tr>
@@ -414,7 +414,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const depositModalHeader = document.getElementById("deposit-modal-header");
 
 
-        // 날짜 포맷터 (YYYYMMDD → YYYY.MM.DD)
+        // (YYYYMMDD → YYYY.MM.DD)
         function formatDate(yyyymmdd) {
             if (!yyyymmdd || yyyymmdd.length !== 8) return yyyymmdd || "";
             return (
@@ -462,6 +462,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 const filteredHistory = histories.filter(h => h.dpstDtlHdrNo === id);
                 const rateType = link.dataset.ratetype;
                 const acctType = link.dataset.accttype;
+                const initialBal = link.dataset.initialbal;
+                const tranCnt = link.dataset.trancnt;
+                const lastTranDt = link.dataset.lasttrandt || "-";
 
                 depositDetailTable.innerHTML = `
                     <tr>
@@ -478,7 +481,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 <th>예금잔액</th>
                 <td>${balance}</td>
                 <th>계약잔액</th>
-                <td>234234</td>
+                <td>${initialBal}</td>
             </tr>
             <tr>
                 <th>가입통화</th>
@@ -498,7 +501,7 @@ document.addEventListener("DOMContentLoaded", function () {
             </tr>
             <tr>
                 <th>최종거래일</th>
-                <td colspan="3">2025-11-27</td>
+                <td colspan="3">${lastTranDt}</td>
             </tr>
             ${
                     (addYn === "N" || typeCode==="2")
@@ -527,7 +530,7 @@ document.addEventListener("DOMContentLoaded", function () {
            
             <tr>
                 <th>납입회차</th>
-                <td colspan="3">2회</td>
+                <td colspan="3">${tranCnt}회</td>
             </tr>
             <tr>
                 <th>적용 금리</th>

@@ -259,6 +259,9 @@
                            th:data-addyn="${hdr.dpstAddPayYn}"
                            th:data-addmax="${hdr.dpstAddPayMax}"
                            th:data-addcnt="${hdr.dpstHdrAddPayCnt}"
+                           th:data-initialbal="${hdr.dpstType == 1 ? hdr.dpstDtlInitialbal : 0}"
+                           th:data-trancnt="${hdr.tranCnt}"
+                           th:data-lasttrandt="${hdr.lastTranDt}"
                            style="border: 0; font-size: 13px; padding: 3px 6px; background-color: #dadada; border-radius: 5px; color: #1c1e21; text-decoration: none; cursor: pointer">조회</a>
                         <a th:href="@{/mypage/dpst_addpay_1(dpstHdrAcctNo=${hdr.dpstHdrAcctNo})}"
                            class="deposit-add-btn"

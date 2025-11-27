@@ -25,24 +25,21 @@
 <section class="customer-content">
   <h2>질문 수정</h2>
 
-  <form class="qna-form">
+  <form class="qna-form" th:action="@{/customer/qna_edit/{no}(no=${qna.qnaNo})}" method="post">
     <label for="title">제목</label>
-    <input id="title" type="text" value="해외송금 수수료는 얼마인가요?">
+    <input id="title" name="title" type="text" th:value="${qna.qnaTitle}" required>
 
     <label for="writer">작성자</label>
-    <input id="writer" type="text" value="홍길동" readonly>
+    <input id="writer" type="text" th:value="${writerName}" readonly>
 
     <label for="content">내용</label>
-    <textarea id="content" rows="8">
-해외송금 시 수수료는 거래 금액과 국가에 따라 다릅니다.
-자세한 내용은 ‘외화송금안내’ 페이지에서 확인 가능합니다.
-    </textarea>
+    <textarea id="content" name="content" rows="8" th:text="${qna.qnaContent}" required></textarea>
 
     <div class="form-buttons">
       <button type="submit" class="btn-submit">
         <i class="fa-solid fa-pen-to-square"></i> 수정 완료
       </button>
-      <a href="qnaList.html" class="btn-cancel">
+      <a th:href="@{/customer/qna_view/{no}(no=${qna.qnaNo})}" class="btn-cancel">
         <i class="fa-solid fa-rotate-left"></i> 취소
       </a>
     </div>
@@ -52,7 +49,6 @@
 
 
 
-   
 
 </main>
 
@@ -60,4 +56,3 @@
 
 </body>
 </html>
-
