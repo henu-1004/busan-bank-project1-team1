@@ -34,14 +34,18 @@ public class AdminAuthService {
             throw new BadCredentialsException("존재하지 않는 관리자입니다.");
         }
 
-        // 2. 비밀번호 검증
+        // 비밀번호 검증
         if (!rawPassword.equals(admin.getAdminPw())) {
             throw new BadCredentialsException("비밀번호가 일치하지 않습니다.");
         }
 
-        // 4. ADMIN_TYPE 1 = 슈퍼, 2 = 일반 → 둘 다 관리자 권한 부여
-        //    인가 기준은 모두 ROLE_ADMIN 으로 통일
-        String role = "ROLE_ADMIN";
+        // ★ adminType에 따라 role 결정
+        String role;
+        if (admin.getAdminType() != null && admin.getAdminType() == 1) {
+            role = "ROLE_ADMIN";   // 슈퍼 관리자
+        } else {
+            throw new BadCredentialsException("관리자 권한이 없습니다."); // 일반 관리자는 접근 불가
+        }
 
         // JwtTokenProvider에 맞는 createToken(...) 사용
         // (이미 userId, role, custName 구조로 만들기로 했으니 그대로 사용)

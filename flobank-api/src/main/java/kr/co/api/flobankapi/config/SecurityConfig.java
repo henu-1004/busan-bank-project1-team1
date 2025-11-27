@@ -33,6 +33,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http, CustomAuthenticationEntryPoint customAuthenticationEntryPoint) throws Exception {
         http
                 .csrf(csrf -> csrf.disable()) // JWT 사용 시 CSRF 비활성화 가능 (쿠키 사용 시엔 켜는 게 좋지만, 지금은 복잡도 줄이기 위해 끔)
+                .formLogin(form -> form.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 세션 안 씀
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/",
@@ -44,7 +45,7 @@ public class SecurityConfig {
                                         "/remit/info",
                                         "/admin/login"
                         ).permitAll()
-                        //.requestMatchers("/admin/**").hasRole("ADMIN")  //이게 걸린거
+//                        .requestMatchers("/admin/**").hasRole("ADMIN")  //이게 걸린거
                         .requestMatchers("/admin/**").permitAll()   //이게 안걸린거 (개발용)
                         .requestMatchers("/mypage/**").authenticated() // 마이페이지는 로그인 필요
                         .requestMatchers("/remit/**").authenticated()
