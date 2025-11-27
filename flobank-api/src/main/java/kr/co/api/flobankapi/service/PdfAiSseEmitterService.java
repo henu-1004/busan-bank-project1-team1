@@ -26,9 +26,9 @@ public class PdfAiSseEmitterService {
 
         if (emitter != null) {
             try {
+                // 🔥 이벤트 이름 삭제 → default message 이벤트로 전송됨
                 emitter.send(
                         SseEmitter.event()
-                                .name("progress")
                                 .data(progress)
                 );
             } catch (Exception e) {
