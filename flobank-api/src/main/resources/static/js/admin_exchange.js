@@ -270,6 +270,8 @@ function getToday() {
 
         });
 
+        const maxVal = values.length > 0 ? Math.max(...values) : 0;
+
         const datasets = [{
             label: "",
             data: values,
@@ -294,7 +296,7 @@ function getToday() {
         const canvas = document.getElementById('currencyDailyChart');
         if (!canvas || typeof Chart === 'undefined') return;
 
-        const { labels, datasets, targetLabel } = prepareCurrencyChartData();
+        const { labels, datasets, targetLabel, maxVal } = prepareCurrencyChartData();
 
         if (!currencyChart) {
             currencyChart = new Chart(canvas.getContext('2d'), {
@@ -307,8 +309,7 @@ function getToday() {
                         legend: { display: false },
                         tooltip: {
                             callbacks: {
-                                itle: () => formatRangeOrDate(targetLabel),
-
+                                title: () => formatRangeOrDate(targetLabel),
                                 label: (ctx) =>
                                     `${ctx.label}: ${ctx.parsed.y.toLocaleString('ko-KR')}원`
                             }
@@ -318,6 +319,7 @@ function getToday() {
                         x: { offset: true },
                         y: {
                             beginAtZero: true,
+                            suggestedMax: maxVal === 0 ? 1 : maxVal * 1.1,
                             ticks: { callback: v => `${compactNumber(v)}원` }
                         }
                     }
@@ -326,6 +328,8 @@ function getToday() {
         } else {
             currencyChart.data.labels = labels;
             currencyChart.data.datasets = datasets;
+            currencyChart.options.scales.y.suggestedMax =
+                maxVal === 0 ? 1 : maxVal * 1.1;
             currencyChart.update();
         }
     }
@@ -598,16 +602,43 @@ function getToday() {
             });
         }
 
+        /*초기화 버튼 클릭시 동작*/
         if (resetRangeBtn) {
             resetRangeBtn.addEventListener("click", () => {
+
+                // 1) 기간 모드 해제
                 clearRangeMode();
                 if (startPicker) startPicker.value = '';
                 if (endPicker) endPicker.value = '';
 
-                const fallbackDate = normalizeDate(datePicker?.value) || today;
-                fetchDateStats(fallbackDate);
+                // 2) 날짜를 오늘로 리셋
+                if (datePicker) {
+                    datePicker.value = today;
+                }
+                selectedDate = today;
+
+                // 3) 체크박스 선택 상태 → USD만 선택하도록 강제 리셋
+                selectedCurrencies.clear();
+                selectedCurrencies.add("USD");
+
+                // 4) 필터 UI를 USD만 체크된 상태로 재생성
+                buildCurrencyFilter(defaultCurrencies);
+
+                // 5) 오늘 데이터 불러오기
+                fetchDateStats(today);
+
+                // 6) 그래프 다시 렌더링
+                renderCurrencyChart();
+
+                // 7) 토스트 메시지 있으면 표시
+                if (typeof showToast === "function") {
+                    showToast("초기화 완료");
+                }
             });
         }
+
+
+
 
         // 5분 자동 갱신
         setInterval(fetchLatestStats, 5 * 60 * 1000);
