@@ -66,17 +66,23 @@ public class JwtTokenProvider {
             custName = "Unknown";
         }
 
-        // 시큐리티 admin > hasRole
+        // 관리자 로그인 시큐리티 admin > hasRole
         String role = claims.get("role", String.class);
         List<GrantedAuthority> authorities = new ArrayList<>();
         if(role != null && !role.isBlank()) {
             authorities.add(new SimpleGrantedAuthority(role));
         }
 
-        // CustomUserDetails 객체 생성
-        CustomUserDetails userDetails = new CustomUserDetails(claims.getSubject(), "", Collections.emptyList(), custName);
 
-        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+        // CustomUserDetails 객체 생성
+        String username = claims.getSubject();
+        //CustomUserDetails userDetails = new CustomUserDetails(claims.getSubject(), "", Collections.emptyList(), custName);
+        //return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+        CustomUserDetails userDetails =
+                new CustomUserDetails(username, "", authorities, custName);
+
+        return new UsernamePasswordAuthenticationToken(userDetails, "", authorities);
+
     }
 
     // 3. 쿠키에서 토큰 추출
@@ -98,7 +104,7 @@ public class JwtTokenProvider {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
             return true;
         } catch (JwtException | IllegalArgumentException e) {
-            log.error("유효하지 않은 JWT 토큰입니다: {}", e.getMessage());
+            //log.error("유효하지 않은 JWT 토큰입니다: {}", e.getMessage());
             return false;
         }
     }

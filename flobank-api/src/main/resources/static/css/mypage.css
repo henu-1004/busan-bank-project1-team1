@@ -3511,3 +3511,18 @@ body.event-page {
 
 }
 
+.deposit-add-btn{
+    border: 0;
+    font-size: 13px;
+    padding: 3px 6px;
+    background-color: #dadada;
+    border-radius: 5px;
+    color: #1c1e21;
+    text-decoration: none;
+}
+
+.disabled-btn {
+    background-color: #aaa;
+    color: #1c1e21;
+    pointer-events: none;
+}

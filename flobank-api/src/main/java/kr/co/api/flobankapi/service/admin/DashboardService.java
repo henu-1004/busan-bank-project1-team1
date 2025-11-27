@@ -26,7 +26,7 @@ public class DashboardService {
         refreshStats();
     }
 
-    @Scheduled(fixedRate = 5 * 60 * 1000) // 5분마다
+    @Scheduled(fixedRate = 5 * 60 * 1000) // 5분마다 r갱신
     public void refreshStats() {
         log.info("Refreshing dashboard stats...");
 

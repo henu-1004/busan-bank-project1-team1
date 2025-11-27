@@ -98,9 +98,10 @@ public class RemitController {
 
         String acctNo = requestData.get("acctNo"); // 계좌번호
         String acctPw = requestData.get("acctPw"); // 사용자가 입력한 비밀번호
+        String acctType = requestData.get("acctType"); // 계좌타입 (KRW / FRGN)
 
         // TODO: 서비스 로직 구현 (DB 조회 및 비밀번호 비교)
-        boolean isCorrect = remitService.checkEnAcctPw(acctNo, acctPw);
+        boolean isCorrect = remitService.checkEnAcctPw(acctNo, acctPw, acctType);
 
         Map<String, Boolean> response = new HashMap<>();
         response.put("isPwCorrect", isCorrect);

@@ -102,7 +102,7 @@
                         <td>
                             <!-- 인라인 수정을 위한 wrapper 추가 -->
                             <div class="acct-name-wrapper">
-                                <span class="acct-name-display" th:text="${acct.acctName}">FLO 입출금통장1</span>
+                                <span class="acct-name-display" th:text="${acct.acctName}"></span>
                                 <input type="text" class="acct-name-input" th:value="${acct.acctName}" style="display:none;" />
 
                                 <button class="edit-btn js-edit-name"
@@ -236,15 +236,42 @@
                         <span th:case="*">?</span> <!-- 혹시 모르는 경우 -->
                     </span>[[${hdr.dpstHdrBalance}]]</td>
                     <td>
-                        <a class="deposit-detail-info" style="border: 0; font-size: 13px; padding: 3px 6px; background-color: #dadada; border-radius: 5px; color: #1c1e21; text-decoration: none; cursor: pointer">조회</a>
+                        <a class="deposit-detail-info"
+                           th:data-id="${hdr.dpstHdrAcctNo}"
+                           th:data-custname="${custInfo.custName}"
+                           th:data-name="${hdr.dpstName}"
+                           th:data-type="${hdr.dpstType}"
+                           th:data-balance="${hdr.dpstHdrBalance}"
+                           th:data-start="${hdr.dpstHdrStartDy}"
+                           th:data-end="${hdr.dpstHdrFinDy}"
+                           th:data-expcurrency="${hdr.dpstHdrCurrencyExp}"
+                           th:data-currency="${hdr.dpstHdrCurrency}"
+                           th:data-rate="${hdr.dpstHdrRate}"
+                           th:data-autorenew="${hdr.dpstHdrAutoRenewYn}"
+                           th:data-autorenewterm="${hdr.dpstHdrAutoRenewTerm}"
+                           th:data-wdrwyn="${hdr.dpstPartWdrwYn}"
+                           th:data-wdrwcnt="${hdr.dpstHdrPartWdrwCnt}"
+                           th:data-wdrwmax="${hdr.wdrwMax}"
+                           th:data-month="${hdr.dpstHdrMonth}"
+                           th:data-interest="${hdr.dpstHdrInterest}"
+                           th:data-ratetype="${hdr.dpstRateType}"
+                           th:data-accttype="${hdr.dpstHdrLinkedAcctType}"
+                           th:data-addyn="${hdr.dpstAddPayYn}"
+                           th:data-addmax="${hdr.dpstAddPayMax}"
+                           th:data-addcnt="${hdr.dpstHdrAddPayCnt}"
+                           th:data-initialbal="${hdr.dpstType == 1 ? hdr.dpstDtlInitialbal : 0}"
+                           th:data-trancnt="${hdr.tranCnt}"
+                           th:data-lasttrandt="${hdr.lastTranDt}"
+                           style="border: 0; font-size: 13px; padding: 3px 6px; background-color: #dadada; border-radius: 5px; color: #1c1e21; text-decoration: none; cursor: pointer">조회</a>
                         <a th:href="@{/mypage/dpst_addpay_1(dpstHdrAcctNo=${hdr.dpstHdrAcctNo})}"
                            class="deposit-add-btn"
+                           th:classappend="${hdr.dpstType == 1 and ((hdr.dpstAddPayYn == 'N') or (hdr.dpstHdrAddPayCnt >= hdr.dpstAddPayMax))} ? ' disabled-btn' : ''"
                            th:data-type="${hdr.dpstType}"
                            th:data-addpayyn="${hdr.dpstAddPayYn}"
                            th:data-addpaycnt="${hdr.dpstHdrAddPayCnt}"
                            th:data-addpaymax="${hdr.dpstAddPayMax}"
                            th:data-acctno="${hdr.dpstHdrAcctNo}"
-                           style="border: 0; font-size: 13px; padding: 3px 6px; background-color: #dadada; border-radius: 5px; color: #1c1e21; text-decoration: none;">
+                           style="">
                             입금
                         </a>
                     </td>
@@ -347,25 +374,25 @@
                     <strong th:switch="${bal.balCurrency}">
 
                         <span th:case="'USD'"
-                              th:text="|$${(bal.balBalance % 1 == 0) ? #numbers.formatInteger(bal.balBalance, 1, 'COMMA') : #numbers.formatDecimal(bal.balBalance, 1, 'COMMA', 2, 'POINT')}|">
+                              th:text="|${'$'}${(bal.balBalance % 1 == 0) ? #numbers.formatInteger(bal.balBalance, 1, 'COMMA') : #numbers.formatDecimal(bal.balBalance, 1, 'COMMA', 2, 'POINT')}|">
                         </span>
                         <span th:case="'AUD'"
-                              th:text="|$${(bal.balBalance % 1 == 0) ? #numbers.formatInteger(bal.balBalance, 1, 'COMMA') : #numbers.formatDecimal(bal.balBalance, 1, 'COMMA', 2, 'POINT')}|">
+                              th:text="|${'$'}${(bal.balBalance % 1 == 0) ? #numbers.formatInteger(bal.balBalance, 1, 'COMMA') : #numbers.formatDecimal(bal.balBalance, 1, 'COMMA', 2, 'POINT')}|">
                         </span>
 
                         <span th:case="'JPY'"
-                              th:text="|¥${(bal.balBalance % 1 == 0) ? #numbers.formatInteger(bal.balBalance, 1, 'COMMA') : #numbers.formatDecimal(bal.balBalance, 1, 'COMMA', 2, 'POINT')}|">
+                              th:text="|${'¥'}${(bal.balBalance % 1 == 0) ? #numbers.formatInteger(bal.balBalance, 1, 'COMMA') : #numbers.formatDecimal(bal.balBalance, 1, 'COMMA', 2, 'POINT')}|">
                         </span>
                         <span th:case="'CNH'"
-                              th:text="|¥${(bal.balBalance % 1 == 0) ? #numbers.formatInteger(bal.balBalance, 1, 'COMMA') : #numbers.formatDecimal(bal.balBalance, 1, 'COMMA', 2, 'POINT')}|">
+                              th:text="|${'¥'}${(bal.balBalance % 1 == 0) ? #numbers.formatInteger(bal.balBalance, 1, 'COMMA') : #numbers.formatDecimal(bal.balBalance, 1, 'COMMA', 2, 'POINT')}|">
                         </span>
 
                         <span th:case="'EUR'"
-                              th:text="|€${(bal.balBalance % 1 == 0) ? #numbers.formatInteger(bal.balBalance, 1, 'COMMA') : #numbers.formatDecimal(bal.balBalance, 1, 'COMMA', 2, 'POINT')}|">
+                              th:text="|${'€'}${(bal.balBalance % 1 == 0) ? #numbers.formatInteger(bal.balBalance, 1, 'COMMA') : #numbers.formatDecimal(bal.balBalance, 1, 'COMMA', 2, 'POINT')}|">
                         </span>
 
                         <span th:case="'GBP'"
-                              th:text="|£${(bal.balBalance % 1 == 0) ? #numbers.formatInteger(bal.balBalance, 1, 'COMMA') : #numbers.formatDecimal(bal.balBalance, 1, 'COMMA', 2, 'POINT')}|">
+                              th:text="|${'£'}${(bal.balBalance % 1 == 0) ? #numbers.formatInteger(bal.balBalance, 1, 'COMMA') : #numbers.formatDecimal(bal.balBalance, 1, 'COMMA', 2, 'POINT')}|">
                         </span>
 
                     </strong>
@@ -578,12 +605,40 @@
             </tr>
             </thead>
 
-            <tbody id="history-tbody">
-            <tr>
-                <td colspan="6" style="text-align: center; padding: 20px;">
-                    계좌번호를 선택하면 내역이 표시됩니다.
+                <tbody id="history-tbody">
+
+                <tr th:each="tran : ${tranList}"
+                    th:classappend="${tran.tranRecAcctNo == null} ? 'fx-row' : ''">
+
+                    <!-- 거래일시 -->
+                    <td th:text="${tran.tranDt}"></td>
+
+                <!-- 구분 -->
+                <td>
+                    <span th:if="${tran.tranRecAcctNo == null}"
+                          class="fx-type">
+                        환전
+                    </span>
+
+                                <span th:unless="${tran.tranRecAcctNo == null}"
+                                      th:text="${tran.tranType}">
+                    </span>
                 </td>
+
+                <!-- 거래전 금액 -->
+                <td th:text="${#numbers.formatInteger(tran.tranBefore, 0, 'COMMA')}"></td>
+
+                <!-- 거래금액 -->
+                <td th:text="${#numbers.formatInteger(tran.tranAmount, 0, 'COMMA')}"></td>
+
+                <!-- 거래 후 잔액 -->
+                <td th:text="${#numbers.formatInteger(tran.tranBalance, 0, 'COMMA')}"></td>
+
+                <!-- 메모 (TB_CUST_TRAN_HIST.TRAN_MEMO 그대로) -->
+                <td th:text="${tran.tranMemo}"></td>
+
             </tr>
+
             </tbody>
         </table>
     </div>
@@ -680,7 +735,7 @@
 
 
         <h3>상세정보</h3>
-        <table class="detail-table">
+        <table class="detail-table detail-info">
             <tbody>
             <tr>
                 <th>신규일</th>

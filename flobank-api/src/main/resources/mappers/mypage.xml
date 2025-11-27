@@ -184,13 +184,33 @@
         ti.DPST_ADD_PAY_MAX    AS dpstAddPayMax,
         wi.WDRW_MIN_MONTH     AS wdrwMinMonth,
         wi.WDRW_MAX           AS wdrwMax,
-        wa.AMT_MIN            AS amtMin
+        wa.AMT_MIN            AS amtMin,
+
+        TO_CHAR(dt.LAST_TRAN_DT, 'YYYY.MM.DD') AS lastTranDt,
+        dt.FIRST_TRAN_AMT     AS dpstDtlInitialbal,
+        dt.TRAN_CNT           AS tranCnt
+
         FROM TB_DPST_ACCT_HDR th
         JOIN TB_DPST_PROD_INFO ti ON th.DPST_HDR_DPST_ID = ti.DPST_ID
         LEFT JOIN TB_DPST_PARTIAL_WDRW_INFO wi ON th.DPST_HDR_DPST_ID = wi.WDRW_DPST_ID
         LEFT JOIN TB_DPST_PARTIAL_WDRW_AMT wa
         ON wa.AMT_DPST_ID = th.DPST_HDR_DPST_ID
         AND wa.AMT_CURRENCY = th.DPST_HDR_CURRENCY
+
+        LEFT JOIN (
+        SELECT
+        d.DPST_DTL_HDR_NO,
+
+        COUNT(*) AS TRAN_CNT,
+        MAX(d.DPST_TRAN_DT) AS LAST_TRAN_DT,
+
+        MIN(d.DPST_DTL_AMOUNT)
+        KEEP (DENSE_RANK FIRST ORDER BY d.DPST_TRAN_DT) AS FIRST_TRAN_AMT
+        FROM TB_DPST_ACCT_DTL d
+        GROUP BY d.DPST_DTL_HDR_NO
+        ) dt
+        ON dt.DPST_DTL_HDR_NO = th.DPST_HDR_ACCT_NO
+
         WHERE dpst_hdr_cust_code=#{dpstHdrCustCode}
     </select>
 

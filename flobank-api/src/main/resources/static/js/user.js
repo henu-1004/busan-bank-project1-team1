@@ -157,6 +157,13 @@ document.addEventListener("DOMContentLoaded", function () {
                                     amountColor = "red";
                                     amountPrefix = "-";
                                     beforeBalance = h.tranBalance + h.tranAmount;
+
+                                } else if (h.tranType === 3) {
+                                    typeStr = "환전";
+                                    typeColor = "#009900";     // 환전 색상(원하면 변경 가능)
+                                    amountColor = "#009900";
+                                    amountPrefix = "";          // 환전은 +, - 없음
+                                    beforeBalance = h.tranBalance;
                                 }
 
                                 // 3. HTML 조립
@@ -322,7 +329,7 @@ document.addEventListener("DOMContentLoaded", function () {
 </tr>
 `;
 
-// 🔥 조건 분기
+// 조건 분기
                 if (rateType === "1" && acctType === "1") {
                     html += `
         <tr>
@@ -402,11 +409,12 @@ document.addEventListener("DOMContentLoaded", function () {
     if (depositInfoModal) {
         const closeDepositBtn = depositInfoModal.querySelector(".close-btn");
         const depositDetailTable = depositInfoModal.querySelector(".detail-table tbody");
+        const depositDetailInfoTable = depositInfoModal.querySelector(".detail-info tbody");
         const depositHistoryTbody = document.getElementById("depositHistory");
         const depositModalHeader = document.getElementById("deposit-modal-header");
 
 
-        // 날짜 포맷터 (YYYYMMDD → YYYY.MM.DD)
+        // (YYYYMMDD → YYYY.MM.DD)
         function formatDate(yyyymmdd) {
             if (!yyyymmdd || yyyymmdd.length !== 8) return yyyymmdd || "";
             return (
@@ -429,6 +437,130 @@ document.addEventListener("DOMContentLoaded", function () {
         document.querySelectorAll(".deposit-detail-info").forEach(link => {
             link.addEventListener("click", e => {
                 e.preventDefault();
+                // HTML data-* 에서 값 꺼내기
+                const id        = link.dataset.id;
+                const name      = link.dataset.name;
+                const typeCode  = link.dataset.type;
+                const typeName  = getDpstTypeName(typeCode);
+                const balance   = link.dataset.balance;
+                const startRaw  = link.dataset.start; // YYYYMMDD 형태라고 가정
+                const endRaw    = link.dataset.end;
+                const expCurrency = link.dataset.expcurrency
+                const currency  = link.dataset.currency;
+                const rate      = link.dataset.rate;
+                const autorenew = link.dataset.autorenew;
+                const autorenewTerm = link.dataset.autorenewterm;
+                const wdrwYn = link.dataset.wdrwyn;
+                const wdrwMax = link.dataset.wdrwmax;
+                const wdrwCnt   = link.dataset.wdrwcnt;
+                const addYn = link.dataset.addyn;
+                const addMax = link.dataset.addmax;
+                const addCnt   = link.dataset.addcnt;
+                const month     = link.dataset.month;
+                const interest = link.dataset.interest;
+                const custName = link.dataset.custname;
+                const filteredHistory = histories.filter(h => h.dpstDtlHdrNo === id);
+                const rateType = link.dataset.ratetype;
+                const acctType = link.dataset.accttype;
+                const initialBal = link.dataset.initialbal;
+                const tranCnt = link.dataset.trancnt;
+                const lastTranDt = link.dataset.lasttrandt || "-";
+
+                depositDetailTable.innerHTML = `
+                    <tr>
+                <th>계좌번호</th>
+                <td colspan="3">${id}</td>
+            </tr>
+            <tr>
+                <th>상품명</th>
+                <td>${name}</td>
+                <th>예금주</th>
+                <td>${custName}</td>
+            </tr>
+            <tr>
+                <th>예금잔액</th>
+                <td>${balance}</td>
+                <th>계약잔액</th>
+                <td>${initialBal}</td>
+            </tr>
+            <tr>
+                <th>가입통화</th>
+                <td>${currency}</td>
+                <th>예금유형</th>
+                <td>${typeName}</td>
+            </tr>
+                    
+                `;
+
+                depositDetailInfoTable.innerHTML = `
+                    <tr>
+                <th>신규일</th>
+                <td>${formatDate(startRaw || "")}</td>
+                <th>만기일</th>
+                <td>${formatDate(endRaw || "")}</td>
+            </tr>
+            <tr>
+                <th>최종거래일</th>
+                <td colspan="3">${lastTranDt}</td>
+            </tr>
+            ${
+                    (addYn === "N" || typeCode==="2")
+                        ? ""  // 추납 불가능 → 보여주지 않음
+                        : `
+        <tr>
+            <th>추가납입 최대 제한</th>
+            <td>${addMax}회</td>
+            <th>현재 추납 횟수</th>
+            <td>${addCnt}회</td>
+        </tr>
+        `
+                }
+            ${
+                    (wdrwYn === "N")
+                        ? ""  // 추납 불가능 → 보여주지 않음
+                        : `
+        <tr>
+                <th>분할인출 최대 제한</th>
+                <td>${wdrwMax}회</td>
+                <th>현재 인출 횟수</th>
+                <td>${wdrwCnt}회</td>
+            </tr>
+        `
+                }
+           
+            <tr>
+                <th>납입회차</th>
+                <td colspan="3">${tranCnt}회</td>
+            </tr>
+            <tr>
+                <th>적용 금리</th>
+                <td colspan="3">${interest}%</td>
+            </tr>
+            ${
+                    (rateType === "1" && acctType === "1")
+                        ? `
+<tr>
+    <th>적용 환율</th>
+    <td colspan="3">${rate}</td> <!-- 가입시점 환율 / 예금계좌 연동 -->
+</tr>
+        `
+                        : (rateType === "3")
+                            ? `
+<tr>
+    <th>적용 환율</th>
+    <td colspan="3">※ 납입시점 환율 적용</td>
+</tr>
+            `
+                            : ""
+                }
+            
+            <tr>
+                <th>자동 재예치 여부</th> <!--  -->
+                <td>Y</td>
+                <th>자동 재예치 기간</th>
+                <td>6개월</td>
+            </tr>
+                `;
 
 
                 depositInfoModal.style.display = "flex";

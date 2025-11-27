@@ -10,12 +10,12 @@ public class TestExperienceController {
 
     @GetMapping({"", "/"})
     public String overview() {
-        return "test/creator_portal";
+        return "event/product_dashboard";
     }
 
-    @GetMapping("/creator")
+    @GetMapping("/lounge")
     public String creatorHub() {
-        return "test/creator_portal";
+        return "event/event_lounge";
     }
 
     @GetMapping("/followers")
