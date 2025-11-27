@@ -87,6 +87,9 @@ public class ProductController {
             @RequestParam(value="fixedMonths", required = false) String fixedMonths,
             @RequestParam(value="withdrawAfterMonths", required = false) Integer withdrawAfterMonths,
             @RequestParam(value="withdrawCount", required = false) Integer withdrawCount,
+            @RequestParam(value = "selectedPdfPath", required = false) String selectedPdfPath,
+            @RequestParam(value = "selectedPdfName", required = false) String selectedPdfName,
+            @RequestParam(value = "selectedPdfId", required = false) Long selectedPdfId,
             HttpServletRequest request
     ) throws Exception {
 
@@ -213,7 +216,7 @@ public class ProductController {
     /* -----------------------------
        최종 저장
     ------------------------------ */
-        productService.insertProduct(dto, limits, periods, wdrwInfo, withdrawAmts, pdfFile);
+        productService.insertProduct(dto, limits, periods, wdrwInfo, withdrawAmts, pdfFile, selectedPdfPath, selectedPdfName, selectedPdfId);
 
         return "redirect:/admin/products";
     }

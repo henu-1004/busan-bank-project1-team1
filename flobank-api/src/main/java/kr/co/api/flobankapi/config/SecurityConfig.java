@@ -57,6 +57,7 @@ public class SecurityConfig {
                         .requestMatchers("/deposit/deposit_step4").authenticated()
                         .requestMatchers("/customer/qna_write").authenticated()
                         .requestMatchers("/customer/qna_edit").authenticated()
+                        .requestMatchers("/member/**").permitAll()
                         .requestMatchers("/uploads/**").permitAll()
                         .anyRequest().permitAll() // 일단 나머지는 다 허용 (개발 편의상)
                 )

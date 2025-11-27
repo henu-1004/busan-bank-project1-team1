@@ -61,7 +61,7 @@
                 <tr>
                     <td class="cell-center">
                         <div style="font-weight:bold; color:#333;">플로은행</div>
-                        <span th:text="${custTranHistDTO.tranAcctNo}">출금계좌번호</span>
+                        <span th:text="${custTranHistDTO.tranExpAcctNo}">출금계좌번호</span>
                     </td>
 
                     <td class="cell-center">
@@ -83,15 +83,16 @@
                     </td>
 
                     <td class="cell-right">
-                        <strong th:text="${#numbers.formatInteger(custTranHistDTO.tranAmount, 0, 'COMMA')}">10,000</strong>원
+                        <strong th:text="${dpstAcctDTO.formattedCurrency+#numbers.formatInteger(custTranHistDTO.dpstDtlAmount, 0, 'COMMA')}">10,000</strong>
                     </td>
 
                     <td class="cell-center">
-                        0원<br><span class="sub" style="font-size:0.8rem; color:#888;">(면제)</span>
+                    0<br><span class="sub" style="font-size:0.8rem; color:#888;">(면제)</span>
+
                     </td>
 
                     <td class="cell-right"> <!-- 잔액 표시해야!!! -->
-                        <span th:text="${#numbers.formatInteger(5000, 0, 'COMMA')}">잔액</span>원
+                        <span th:text="${dpstAcctDTO.formattedCurrency + #numbers.formatInteger(dpstAcctDTO.dpstHdrBalance, 0, 'COMMA')}">잔액</span>
                     </td>
 
                     <td class="cell-left" style="text-align: left; padding-left: 15px;">

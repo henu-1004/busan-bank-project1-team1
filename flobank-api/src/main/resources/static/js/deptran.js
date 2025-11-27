@@ -1,8 +1,166 @@
 document.addEventListener('DOMContentLoaded', function() {
+    const calcBtn = document.getElementById("calcBtn");
+    if (calcBtn) {
+        calcBtn.addEventListener("click", async () => {
+
+            const rateType = document.getElementById("rateType").value;   // 🔥 추가
+            const currencyCode = document.getElementById("productCurrency").value;
+            const dpstAcctNo = document.getElementById("dpstAcctNo").value;
+            const foreignAmount = document.getElementById("foreignAmount").value;
+
+
+
+            try {
+                let url = "";
+
+                let body ;
+                if (rateType === "1") {
+                    // 가입시점 환율 (db)
+                    url = `/flobank/mypage/calcRate`;
+                    body = JSON.stringify({
+                        amount: foreignAmount,
+                        currency : currencyCode,
+                        dpstAcctNo : dpstAcctNo
+                    })
+                } else {
+                    // 납입시점 환율 (api)
+                    url = `/flobank/deposit/calc`;
+                    body = JSON.stringify({
+                        amount: foreignAmount,
+                        currency : currencyCode
+                    })
+                }
+
+                const res = await fetch(url, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: body
+                });
+
+                const data = await res.json();
+                if (rateType==="3"){
+                    updateTable(data, foreignAmount, currencyCode);
+                }else {
+                    updateStTable(data, foreignAmount, currencyCode);
+                }
+
+            } catch (e) {
+                alert("환율 계산 중 오류 발생");
+            }
+        });
+    }
+
+    function numberFormat(value) {
+        if (value === null || value === undefined) return "0";
+        return Number(value).toLocaleString("ko-KR");
+    }
+
+    function updateTable(data, foreignAmount, curName) {
+        const table = document.getElementById("calcResultTable");
+
+        table.innerHTML = `
+           <input type="hidden" name="selectedCurName" value="${curName}">
+        <tr>
+                <td class="prod-amt-left">
+                    송금보내실때환율
+                </td>
+                <td class="prod-amt-right">
+                    ${numberFormat(data.baseRate)} 원
+                </td>
+            </tr>
+            <tr>
+                <td class="prod-amt-left">
+                    우대적용환율
+                </td>
+                <td class="prod-amt-right">
+                    <input type="hidden" name="dpstDtlAppliedRate" value="${Number(data.appliedRate)}">
+                    ${numberFormat(data.appliedRate)} 원
+                </td>
+            </tr>
+            <tr>
+                <td class="prod-amt-left">
+                    우대율
+                </td>
+                <td class="prod-amt-right">
+                    ${data.prefRate}%
+                </td>
+            </tr>
+            <tr>
+                <td class="prod-amt-left">
+                    우대받는금액
+                </td>
+                <td class="prod-amt-right">
+                    ${numberFormat(Number(data.spreadHalfPref) * Number(foreignAmount))} 원
+                </td>
+            </tr>
+            <tr>
+                <td class="prod-amt-left">
+                    예상원화금액
+                </td>
+                <td class="prod-amt-right" style="color: #ef0909; font-weight: bold">
+                    <input type="hidden" id="hiddenTranAmount" name="tranAmount" value="${Number(data.krwAmount)}">
+                    ${numberFormat(data.krwAmount)} 원
+                </td>
+            </tr>
+            <tr>
+                <td class="prod-amt-left" colspan="2" style="color: gray">
+                    상기 예상금액은 실제 가입 시점의 환율 변동에 따라 달라질 수 있습니다.(수수료 미포함)
+                </td>
+            </tr>
+        `;
+
+
+        // 테이블 표시
+        table.style.display = "table";
+    }
+
+    function updateStTable(data, foreignAmount, curName) {
+        const table = document.getElementById("calcResultTable");
+
+        table.innerHTML = `
+           <input type="hidden" name="selectedCurName" value="${curName}">
+            <tr>
+                <td class="prod-amt-left">
+                    가입시점환율
+                </td>
+                <td class="prod-amt-right">
+                    <input type="hidden" name="dpstDtlAppliedRate" value="${Number(data.appliedRate)}">
+                    ${numberFormat(data.appliedRate)} 원
+                </td>
+            </tr>
+
+            <tr>
+                <td class="prod-amt-left">
+                    예상원화금액
+                </td>
+                <td class="prod-amt-right" style="color: #ef0909; font-weight: bold">
+                    <input type="hidden" id="hiddenTranAmount" name="tranAmount" value="${Number(data.krwAmount)}">
+                    ${numberFormat(data.krwAmount)} 원
+                </td>
+            </tr>
+            <tr>
+                <td class="prod-amt-left" colspan="2" style="color: gray">
+                    상기 예상금액은 실제 가입 시점의 환율 변동에 따라 달라질 수 있습니다.(수수료 미포함)
+                </td>
+            </tr>
+        `;
+
+
+        // 테이블 표시
+        table.style.display = "table";
+    }
+
+
+
+
+
+
+
+
 
     const form = document.getElementById('transferForm');
-    const tranAmountInput = document.getElementById('tranAmount');      // 보여지는 입력창 (Text)
-    const hiddenTranAmount = document.getElementById('hiddenTranAmount'); // 실제 전송용 (Hidden)
+
+
     const tranRecAcctNoInput = document.getElementById('tranRecAcctNo');
     const tranRecBkCodeInput = document.getElementById('tranRecBkCode'); // [추가] 은행 코드 선택값 가져오기 위함
 
@@ -15,31 +173,36 @@ document.addEventListener('DOMContentLoaded', function() {
     form.addEventListener('submit', async function(event) {
         // 1. 일단 폼의 자동 제출을 막습니다.
         event.preventDefault();
+        const hiddenTranAmount = document.getElementById('hiddenTranAmount'); // 실제 전송용 (Hidden)
+        const frgnAmountInput = document.getElementById('foreignAmount');      // 보여지는 입력창 (Text)
+        const tranAmt = document.getElementById('hiddenTranAmount');
 
         let isValid = true;
 
         const balance = accountBalanceInput ? Number(accountBalanceInput.value) : 0;
 
         // 입력창의 값에서 콤마를 제거하고 숫자로 변환
-        const rawAmountStr = uncomma(tranAmountInput.value);
-        const inputAmount = Number(rawAmountStr);
+        if (frgnAmountInput){
+            const rawAmountStr = Number(tranAmt.value);
+            const inputAmount = Number(rawAmountStr);
 
-        // Hidden 필드에 실제 숫자값 동기화 (전송용)
-        hiddenTranAmount.value = rawAmountStr;
+            // Hidden 필드에 실제 숫자값 동기화 (전송용)
+            hiddenTranAmount.value = rawAmountStr;
 
-        resetError(tranAmountInput, tranAmountError);
-        resetError(tranRecAcctNoInput, tranRecAcctNoError);
+            resetError(frgnAmountInput, tranAmountError);
+            resetError(tranRecAcctNoInput, tranRecAcctNoError);
 
-        // --- [클라이언트 측 검사 시작] ---
+            // --- [클라이언트 측 검사 시작] ---
 
-        // 1. 이체 금액 확인
-        if (!rawAmountStr || inputAmount <= 0) {
-            showError(tranAmountInput, tranAmountError, "이체하실 금액을 입력해주세요.");
-            isValid = false;
-        }
-        else if (inputAmount > balance) {
-            showError(tranAmountInput, tranAmountError, "이체 금액이 잔액을 초과할 수 없습니다.");
-            isValid = false;
+            // 1. 이체 금액 확인
+            if (!rawAmountStr || inputAmount <= 0) {
+                showError(frgnAmountInput, tranAmountError, "이체하실 금액을 입력해주세요.");
+                isValid = false;
+            }
+            else if (inputAmount > balance) {
+                showError(frgnAmountInput, tranAmountError, "이체 금액이 잔액을 초과할 수 없습니다.");
+                isValid = false;
+            }
         }
 
         // 2. 입금 계좌번호 입력 확인
@@ -58,8 +221,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // --- [서버 측 계좌 실존 여부 확인 (AJAX)] ---
 
-        const bankCode = tranRecBkCodeInput.value;
-        const acctNo = tranRecAcctNoInput.value;
+
 
         try {
             // CSRF 토큰 가져오기 (Spring Security 사용 시 필수)
@@ -83,20 +245,15 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // [기능 2] 에러 숨기기 (입력 시)
-    tranAmountInput.addEventListener('input', function() {
-        inputNumberFormat(this); // 콤마 포맷팅
-        const currentVal = Number(uncomma(this.value));
-        if (currentVal > 0) {
-            resetError(this, tranAmountError);
-        }
-    });
 
-    tranRecAcctNoInput.addEventListener('input', function() {
-        if (this.value.trim()) {
-            resetError(this, tranRecAcctNoError);
-        }
-    });
+
+    if (tranRecAcctNoInput){
+        tranRecAcctNoInput.addEventListener('input', function() {
+            if (this.value.trim()) {
+                resetError(this, tranRecAcctNoError);
+            }
+        });
+    }
 });
 
 // --- [콤마 관련 유틸리티 함수] ---
@@ -138,10 +295,9 @@ function addAmount(amount) {
         return;
     }
 
-    input.value = comma(newVal);
-    document.getElementById('hiddenTranAmount').value = newVal;
 
-    input.classList.remove('input-error');
+
+
     if(errorDiv) errorDiv.style.display = 'none';
 }
 

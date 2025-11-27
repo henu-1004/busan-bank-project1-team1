@@ -32,7 +32,7 @@ public class MypageDpstDTO {
     // 예금 상품 정보
     private String dpstId;
     private String dpstName;
-    private String dpstType;
+    private int dpstType;
     private int dpstRateType;
     private String dpstPartWdrwYn;
     private String dpstAddPayYn;

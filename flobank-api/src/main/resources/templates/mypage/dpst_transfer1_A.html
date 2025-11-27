@@ -1,18 +1,26 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>원화 계좌이체 1</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>원화 계좌이체 1</title>
     <link rel="stylesheet" th:href="@{/css/mypage.css}">
     <link rel="stylesheet" th:href="@{/css/header.css}">
     <link rel="stylesheet" th:href="@{/css/footer.css}">
 
     <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-    crossorigin="anonymous"
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+            crossorigin="anonymous"
     />
+
+    <!--
+
+     원화계좌 연결된 예금계좌들 추가납입
+     잔액은 원화
+     납입금액은 외화
+
+     -->
 
 </head>
 <body>
@@ -46,27 +54,63 @@
                     <label class="transfer1-label">출금계좌</label>
 
                     <input type="text" class="transfer1-input readonly"
-                           th:value="|플로은행 ${dpstAcctDTO.dpstHdrExpAcctNo} (잔액 ${custTranHistDTO.formattedCurrency}${#numbers.formatInteger(dpstAcctDTO.dpstHdrLinkedAcctBal, 0, 'COMMA')})|"
+                           th:value="|플로은행 ${dpstAcctDTO.dpstHdrLinkedAcctNo} (잔액 ${#numbers.formatInteger(dpstAcctDTO.dpstHdrLinkedAcctBal, 0, 'COMMA')}원)|"
+                           readonly>
+                </div>
+                <div class="transfer1-form-group">
+                    <label class="transfer1-label">납입 통화</label>
+
+                    <input type="text" class="transfer1-input readonly"
+                           th:value="${dpstAcctDTO.dpstHdrCurrency}"
                            readonly>
                 </div>
 
                 <div class="transfer1-form-group">
                     <label class="transfer1-label">이체금액</label>
                     <div class="transfer1-flex">
+                        <input type="hidden" id="rateType" th:value="${product.dpstRateType}">
+                        <input type="hidden" id="productCurrency" th:value="${dpstAcctDTO.dpstHdrCurrency}">
+                        <input type="hidden" id="dpstAcctNo" th:value="${dpstAcctDTO.dpstHdrAcctNo}">
 
                         <!--
                            1. type="number" -> type="text" (콤마 표시를 위해)
                            2. onkeyup 이벤트 추가 (입력 시 콤마 자동 생성)
                         -->
-                        <input type="text" id="tranAmount" class="transfer1-input short"
-                               placeholder="금액 입력" onkeyup="inputNumberFormat(this)">
+                        <input type="text" name="dpstDtlAmount" id="foreignAmount" class="transfer1-input short"
+                               placeholder="추가납입 외화 입력" onkeyup="inputNumberFormat(this)">
 
-                        <!-- 실제 서버로 전송될 숫자 값 (Hidden) -->
-                        <!-- <input type="hidden" id="hiddenTranAmount" th:field="*{tranAmount}">
-                        -->
+                        <button type="button" id="calcBtn" class="transfer1-btn-calc" style="border-radius: 5px; background-color: #1f2d3d; color: white; width: 140px; height: 42px; font-weight: bold; display: block">계산하기</button>
+
 
                     </div>
                     <div id="tranAmountError" class="error-msg">이체 금액을 입력해주세요.</div>
+
+
+                    <table id="calcResultTable" class="prod-amt-container" style="display: none; margin-top: 5px">
+                        <tr>
+                            <td class="prod-amt-left"> 송금보내실때환율 </td>
+                            <td class="prod-amt-right"> 1482 원 </td>
+                        </tr>
+                        <tr>
+                            <td class="prod-amt-left"> 우대적용환율 </td>
+                            <td class="prod-amt-right"> 1482 원 </td>
+                        </tr>
+                        <tr>
+                            <td class="prod-amt-left"> 우대율 </td>
+                            <td class="prod-amt-right"> 70% </td>
+                        </tr>
+                        <tr>
+                            <td class="prod-amt-left"> 우대받는금액 </td>
+                            <td class="prod-amt-right"> 62 원 </td>
+                        </tr>
+                        <tr>
+                            <td class="prod-amt-left"> 예상원화금액 </td>
+                            <td class="prod-amt-right" style="color: #ef0909; font-weight: bold"> 1482 원 </td>
+                        </tr>
+                        <tr>
+                            <td class="prod-amt-left" colspan="2" style="color: gray"> 상기 예상금액은 실제 가입 시점의 환율 변동에 따라 달라질 수 있습니다.(수수료 미포함) </td>
+                        </tr>
+                    </table>
                 </div>
 
                 <div class="transfer1-form-group">

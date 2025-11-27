@@ -594,8 +594,12 @@ async function submitTransferForm() {
     // 2. 서버 비밀번호 검증 (AJAX Fetch)
     // ==========================================
     const accountSelect = document.getElementById('account-select');
-    // [수정된 부분] 선택된 옵션에서 모체 계좌번호 가져오기
+    // 선택된 옵션에서 모체 계좌번호 가져오기
     const selectedOption = accountSelect.options[accountSelect.selectedIndex];
+    // 계좌 타입(data-type) 가져오기 (FRGN 또는 KRW)
+    const accountType = selectedOption.getAttribute('data-type');
+
+    // 선택된 옵션에서 모체 계좌번호 가져오기
     const parentAcctNoAttr = selectedOption.getAttribute('data-parent-acct-no');
 
     // data-parent-acct-no가 있으면(외화계좌) 그 값을 사용, 없으면(원화계좌) value 사용
@@ -616,7 +620,8 @@ async function submitTransferForm() {
             headers: headers,
             body: JSON.stringify({
                 acctNo: selectedAcctNo,
-                acctPw: inputPw
+                acctPw: inputPw,
+                acctType: accountType
             })
         });
 

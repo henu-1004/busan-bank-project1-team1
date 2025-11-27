@@ -22,6 +22,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -519,12 +520,41 @@ public class MypageController {
         String acctNo = requestData.get("acctNo");
 
         try {
-            // 서비스 호출 (잔액 계산된 내역 가져오기)
             Map<String, Object> data = mypageService.getAcctDetailWithHistory(acctNo);
+
+            CustAcctDTO account = (CustAcctDTO) data.get("account");
+            List<CustTranHistDTO> histList = (List<CustTranHistDTO>) data.get("history");
+
+            //  JSON 직렬화용 리스트
+            List<Map<String, Object>> convertedList = new ArrayList<>();
+
+            for (CustTranHistDTO h : histList) {
+                Map<String, Object> row = new HashMap<>();
+
+                row.put("tranDt", h.getTranDt());
+                row.put("tranType", h.getTranType());
+                row.put("tranMemo", h.getTranMemo());
+                row.put("tranRecName", h.getTranRecName());
+                row.put("tranRecAcctNo", h.getTranRecAcctNo());
+                row.put("tranBalance", h.getTranBalance());
+
+                // BigDecimal → Integer 변환 (핵심)
+                BigDecimal amt = h.getTranAmount();
+                int amount = (amt != null) ? amt.intValue() : 0;
+                row.put("tranAmount", amount);
+
+                convertedList.add(row);
+            }
+
+            Map<String, Object> sendData = new HashMap<>();
+            sendData.put("account", account);
+            sendData.put("history", convertedList);
+
             response.put("status", "success");
-            response.put("data", data);
+            response.put("data", sendData);
 
         } catch (Exception e) {
+            e.printStackTrace();
             response.put("status", "error");
             response.put("message", "서버 오류가 발생했습니다.");
         }
@@ -533,9 +563,82 @@ public class MypageController {
     }
 
 
+    // UI 나누기 위해!! dpst_transfer_1 매핑 새로 한다!!!!!
+    private final DepositService depositService;
+
+    @GetMapping("/dpst_addpay_1")
+    public String dpstAddPayStep1(
+            @RequestParam String dpstHdrAcctNo,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            Model model
+    ) {
+        DpstAcctHdrDTO dpst = mypageService.getDpstAcctHdr(dpstHdrAcctNo);
+        String cur;
+        if (dpst.getDpstHdrLinkedAcctType()==1){
+            cur = "KRW";
+        }else {
+            cur = dpst.getDpstHdrCurrency();
+        }
+        DpstAcctHdrDTO dpstAcctDTO = mypageService.getDpstAcctHdrAndBal(dpstHdrAcctNo, cur);
+        ProductDTO product = depositService.selectDpstProduct(dpstAcctDTO.getDpstHdrDpstId());
+
+        CustTranHistDTO dto = new CustTranHistDTO();
+
+        dto.setTranRecAcctNo(dpstHdrAcctNo);
+        dto.setTranRecBkCode("888");
+        dto.setTranType(2);
+        dto.setTranAcctNo(dpstAcctDTO.getDpstHdrLinkedAcctNo());
+        if (dpstAcctDTO.getDpstHdrLinkedAcctType()==1){
+            dto.setTranCurrency("KRW");
+            dto.setTranExpAcctNo(dto.getTranAcctNo());
+        }else {
+            dto.setTranCurrency(dpstAcctDTO.getDpstHdrCurrency());
+            dto.setTranExpAcctNo(mypageService.getFrgnAcctBal(dpstAcctDTO.getDpstHdrLinkedAcctNo()).getBalFrgnAcctNo());
+        }
+        dto.setTranCustName(userDetails.getCustName());
+        dto.setTranRecName(userDetails.getCustName());
+
+        model.addAttribute("dpstAcctDTO", dpstAcctDTO);
+        model.addAttribute("product", product);
+        model.addAttribute("custTranHistDTO", dto);
+
+        // 만기시점환율은 transfer1_C
+        // 원화계좌 연결돼서 환율 계산 로직 필요한 2가지 경우는 transfer1_A
+        // 외화계좌 연결돼서 환율 계산 필요없으면 transfer1_B
+        if (product.getDpstRateType() == 2) {
+            return "mypage/dpst_transfer1_C";
+        }
+        if (dpstAcctDTO.getDpstHdrLinkedAcctType() == 1) {
+            return "mypage/dpst_transfer1_A";
+        }
+        return "mypage/dpst_transfer1_B";
+    }
+
+    @PostMapping("/calcRate")
+    @ResponseBody
+    public DepositExchangeDTO calc(@RequestBody Map<String, String> req) {
+        System.out.println("⚡ POST /mypage/calcRate 호출됨!");
+
+        String currency = req.get("currency");
+        DepositExchangeDTO exDTO = new DepositExchangeDTO();
+
+        BigDecimal bdAmt = new BigDecimal(req.get("amount"));
+        String dpstAcctNo = req.get("dpstAcctNo");
+        DpstAcctHdrDTO dpstAcctDTO = mypageService.getDpstAcctHdr(dpstAcctNo);
+
+        exDTO.setAppliedRate(dpstAcctDTO.getDpstHdrRate());
 
 
+        BigDecimal krwAmt = bdAmt.multiply(exDTO.getAppliedRate())
+                .setScale(0, RoundingMode.FLOOR);
 
+        exDTO.setKrwAmount(krwAmt);
+
+
+        return exDTO;
+    }
+
+    // //////////////////////////////////////////////////////////
 
 
     //하나부터 열까지 다 수정해야 함
@@ -545,14 +648,20 @@ public class MypageController {
 
         // 계좌 정보 보내기
         DpstAcctHdrDTO dpstAcctDTO = mypageService.getDpstAcctHdr(dpstHdrAcctNo);
+
+        // 이체 정보 받을 객체 보내기
+        CustTranHistDTO custTranHistDTO = new CustTranHistDTO();
         double balance;
+
         if (dpstAcctDTO.getDpstHdrLinkedAcctType()==1){
             // 원화계좌 잔액 불러오기
             balance = mypageService.getKrwAcctBal(dpstAcctDTO.getDpstHdrLinkedAcctNo());
+            custTranHistDTO.setTranExpAcctNo(dpstAcctDTO.getDpstHdrLinkedAcctNo());
         } else {
             // 외화자식계좌 잔액, 부모계좌번호 불러오기
             FrgnAcctBalanceDTO dto = mypageService.getFrgnAcctBal(dpstAcctDTO.getDpstHdrLinkedAcctNo());
             balance = dto.getBalBalance();
+            custTranHistDTO.setTranExpAcctNo(dto.getBalFrgnAcctNo());
         }
 
         dpstAcctDTO.setDpstHdrLinkedAcctBal(BigDecimal.valueOf(balance));
@@ -562,8 +671,6 @@ public class MypageController {
 
 
 
-        // 이체 정보 받을 객체 보내기
-        CustTranHistDTO custTranHistDTO = new CustTranHistDTO();
         // 미리 설정할 거
         custTranHistDTO.setTranType(2); // 출금 : 2
         custTranHistDTO.setTranRecAcctNo(dpstHdrAcctNo); // 수취계좌번호
@@ -572,6 +679,8 @@ public class MypageController {
         custTranHistDTO.setTranCustName(userDetails.getCustName());
         custTranHistDTO.setTranAcctNo(dpstAcctDTO.getDpstHdrLinkedAcctNo());
         custTranHistDTO.setTranRecName(userDetails.getCustName());
+
+
         model.addAttribute("custTranHistDTO", custTranHistDTO);
 
 
@@ -585,7 +694,10 @@ public class MypageController {
                                 @AuthenticationPrincipal CustomUserDetails userDetails) {
 
 
-
+        log.info("CustTranHistDTO:{}", custTranHistDTO.toString());
+        if (custTranHistDTO.getDpstDtlAmount()==null){
+            custTranHistDTO.setDpstDtlAmount(custTranHistDTO.getTranAmount());
+        }
 
         // 4. 나머지 데이터(메모 등) 처리
         // '내통장표시'가 비어있으면 -> 사용자 이름(보내는 사람) or 조회된 받는분 이름 등 정책에 따라 설정
@@ -595,6 +707,8 @@ public class MypageController {
             custTranHistDTO.setTranCustName(userDetails.getCustName());
         }
         model.addAttribute("dpstHdrAcctNo", dpstHdrAcctNo);
+        DpstAcctHdrDTO dpstAcctDTO = mypageService.getDpstAcctHdr(dpstHdrAcctNo);
+        model.addAttribute("dpstAcctDTO", dpstAcctDTO);
 
         model.addAttribute("custTranHistDTO", custTranHistDTO);
 
@@ -607,7 +721,22 @@ public class MypageController {
         // 전자서명 임시 승인 수정해야함
         custTranHistDTO.setTranEsignYn("Y");
 
+        log.info(custTranHistDTO.toString());
 
+        DpstAcctHdrDTO dpstAcctDTO = mypageService.getDpstAcctHdr(dpstHdrAcctNo);
+        DpstAcctDtlDTO dpstDtlDTO = new DpstAcctDtlDTO();
+        // 계좌 잔액 업데이트
+        CustAcctDTO custAcct;
+        FrgnAcctBalanceDTO balAcct;
+
+        if ("KRW".equals(custTranHistDTO.getTranCurrency())){
+            custAcct  = mypageService.findCustAcct(custTranHistDTO.getTranAcctNo());
+            mypageService.addPayKrwToFrgn(custAcct, dpstAcctDTO, custTranHistDTO, dpstDtlDTO);
+        }else {
+            balAcct = mypageService.getBalAcctByBalNo(custTranHistDTO.getTranAcctNo());
+            log.info("balAcct:{}", balAcct.toString());
+            mypageService.addPayFrgnToFrgn(balAcct,  dpstAcctDTO, custTranHistDTO, dpstDtlDTO);
+        }
 
         /*
         CustAcctDTO custAcctDTO = new CustAcctDTO();
@@ -626,6 +755,8 @@ public class MypageController {
             model.addAttribute("state", "실패");
         }
          */
+
+        model.addAttribute("dpstAcctDTO", dpstAcctDTO);
         model.addAttribute("custTranHistDTO", custTranHistDTO);
         model.addAttribute("state", "정상");
 

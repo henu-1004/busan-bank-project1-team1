@@ -1,18 +1,25 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>원화 계좌이체 1</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>원화 계좌이체 1</title>
     <link rel="stylesheet" th:href="@{/css/mypage.css}">
     <link rel="stylesheet" th:href="@{/css/header.css}">
     <link rel="stylesheet" th:href="@{/css/footer.css}">
 
     <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-    crossorigin="anonymous"
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+            crossorigin="anonymous"
     />
+
+    <!--
+
+     만기시점환율형 추가납입
+     잔액도 원화, 납입금액도 원화
+
+     -->
 
 </head>
 <body>
@@ -46,7 +53,7 @@
                     <label class="transfer1-label">출금계좌</label>
 
                     <input type="text" class="transfer1-input readonly"
-                           th:value="|플로은행 ${dpstAcctDTO.dpstHdrExpAcctNo} (잔액 ${custTranHistDTO.formattedCurrency}${#numbers.formatInteger(dpstAcctDTO.dpstHdrLinkedAcctBal, 0, 'COMMA')})|"
+                           th:value="|플로은행 ${dpstAcctDTO.dpstHdrLinkedAcctNo} (잔액 ${#numbers.formatInteger(dpstAcctDTO.dpstHdrLinkedAcctBal, 0, 'COMMA')}원)|"
                            readonly>
                 </div>
 
@@ -62,8 +69,8 @@
                                placeholder="금액 입력" onkeyup="inputNumberFormat(this)">
 
                         <!-- 실제 서버로 전송될 숫자 값 (Hidden) -->
-                        <!-- <input type="hidden" id="hiddenTranAmount" th:field="*{tranAmount}">
-                        -->
+                        <input type="hidden" id="hiddenTranAmount" th:field="*{tranAmount}">
+
 
                     </div>
                     <div id="tranAmountError" class="error-msg">이체 금액을 입력해주세요.</div>

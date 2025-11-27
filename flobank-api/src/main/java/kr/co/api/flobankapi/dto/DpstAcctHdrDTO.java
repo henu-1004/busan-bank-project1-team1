@@ -46,4 +46,16 @@ public class DpstAcctHdrDTO {
     private LocalDateTime dpstHdrContractDt;
 
     private BigDecimal dpstHdrLinkedAcctBal;
+
+    public String getFormattedCurrency() {
+        String symbol = switch (dpstHdrCurrencyExp) {
+            case "KRW" -> "₩";
+            case "USD", "AUD" -> "$";
+            case "CNH", "CNY", "JPY" -> "¥";
+            case "GBP" -> "£";
+            case "EUR" -> "€";
+            default -> "?";
+        };
+        return symbol;
+    }
 }

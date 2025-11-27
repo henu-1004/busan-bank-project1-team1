@@ -121,9 +121,9 @@
                     clearInterval(timerInterval);
                     alert("로그인 세션이 만료되었습니다.\n메인 페이지로 이동합니다.");
 
-                    fetch('/member/logout', { method: 'POST' })
-                        .then(() => { window.location.href = "/"; })
-                        .catch(() => { window.location.href = "/"; });
+                    fetch('/flobank/member/logout', { method: 'POST' })
+                        .then(() => { window.location.href = "/flobank/"; })
+                        .catch(() => { window.location.href = "/flobank/"; });
                 }
             }, 1000);
         }
@@ -142,7 +142,7 @@
         }
 
         function extendSession(isAuto = false) {
-            fetch('/member/extend', {
+            fetch('/flobank/member/extend', {
                 method: 'POST'
             })
                 .then(response => {

@@ -15,6 +15,7 @@ import jakarta.servlet.http.HttpSession;
 import kr.co.api.flobankapi.dto.ApResponseDTO;
 import kr.co.api.flobankapi.dto.CustInfoDTO;
 import kr.co.api.flobankapi.dto.MemberDTO;
+import kr.co.api.flobankapi.jwt.CustomUserDetails;
 import kr.co.api.flobankapi.jwt.JwtTokenProvider;
 import kr.co.api.flobankapi.service.CustInfoService;
 import kr.co.api.flobankapi.service.EmailService;
@@ -144,43 +145,34 @@ public class MemberController {
         }
     }
 
-    // [추가] 세션 연장 API (AJAX 요청용)
+    // 세션 연장 API (AJAX 요청용)
     @PostMapping("/extend")
     @ResponseBody
-    public ResponseEntity<?> extendSession(@AuthenticationPrincipal User user, HttpServletResponse response) {
-        // user는 SecurityConfig에서 설정한 UserDetails 객체입니다.
-        // 현재 SecurityContext에 인증된 사용자 정보가 있다면 토큰을 재발급합니다.
+    public ResponseEntity<?> extendSession(@AuthenticationPrincipal CustomUserDetails user,
+                                           HttpServletResponse response) {
 
-        if (user != null) {
-            // 편의상 custCode를 username으로 간주하고 토큰 생성 (실제 로직에 맞게 조정 필요)
-            // JWT 토큰 내의 정보를 꺼내서 다시 만드는 것이 가장 정확합니다.
-            // 여기서는 예시로 user.getUsername()을 사용합니다.
-
-            // ★ 중요: 실제로는 custInfoService를 통해 DB에서 최신 정보를 가져오거나
-            // 현재 토큰의 Claims를 복호화해서 정보를 그대로 사용하는 것이 좋습니다.
-            // 여기서는 흐름만 보여드립니다.
-
-            String newToken = jwtTokenProvider.createToken(user.getUsername(), "USER", user.getUsername());
-
-            // 1. 액세스 토큰 쿠키 재발급
-            Cookie cookie = new Cookie("accessToken", newToken);
-            cookie.setHttpOnly(true);
-            cookie.setSecure(false);
-            cookie.setPath("/");
-            cookie.setMaxAge(1200); // 20분 리셋
-            response.addCookie(cookie);
-
-            // 2. 로그인 플래그 쿠키 재발급
-            Cookie loginFlag = new Cookie("loginYn", "Y");
-            loginFlag.setHttpOnly(false);
-            loginFlag.setPath("/");
-            loginFlag.setMaxAge(1200); // 20분 리셋
-            response.addCookie(loginFlag);
-
-            return ResponseEntity.ok().body("extended");
+        // 1. 로그인 안 된 사용자(user가 null) 방어 로직
+        if (user == null) {
+            return ResponseEntity.status(401).body("Unauthorized");
         }
 
-        return ResponseEntity.status(401).body("Unauthorized");
+        // 2. 토큰 재발급 로직 (기존과 동일)
+        String newToken = jwtTokenProvider.createToken(user.getUsername(), "USER", user.getCustName());
+
+        Cookie cookie = new Cookie("accessToken", newToken);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(false);
+        cookie.setPath("/");
+        cookie.setMaxAge(1200);
+        response.addCookie(cookie);
+
+        Cookie loginFlag = new Cookie("loginYn", "Y");
+        loginFlag.setHttpOnly(false);
+        loginFlag.setPath("/");
+        loginFlag.setMaxAge(1200);
+        response.addCookie(loginFlag);
+
+        return ResponseEntity.ok().body("extended");
     }
 
     @PostMapping("/logout")

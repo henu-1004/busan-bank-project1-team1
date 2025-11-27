@@ -1671,6 +1671,18 @@ input[type="file"] {
   border-bottom: 1px solid #e5e7eb;
   font-weight: 600;
   color: #1f2937;
+  cursor: pointer;
+}
+
+.pdf-list-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pdf-list-arrow {
+  font-size: 14px;
+  color: #4b5563;
 }
 
 .status-legend {
@@ -1694,6 +1706,12 @@ input[type="file"] {
   border-radius: 8px;
   padding: 12px 14px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.pdf-status-cluster {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .pdf-meta {
@@ -1732,6 +1750,21 @@ input[type="file"] {
   border: 1px solid #e5e7eb;
 }
 
+.pdf-delete-btn {
+  background: transparent;
+  border: none;
+  color: #9ca3af;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+  transition: color 0.2s ease;
+}
+
+.pdf-delete-btn:hover {
+  color: #ef4444;
+}
+
 .pdf-select {
   max-width: 360px;
 }
@@ -1744,11 +1777,22 @@ input[type="file"] {
   margin-top: 12px;
 }
 
+.risk-block-message {
+  margin-top: 10px;
+  padding: 10px 12px;
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecdd3;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
 .ai-comment-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 8px;
+  margin-top: 8px;
 }
 
 .ai-comment-header h4 {
@@ -1770,6 +1814,102 @@ input[type="file"] {
   margin: 0;
   font-size: 13px;
   color: #6b7280;
+}
+
+.ai-comment-content {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ai-comment-item {
+  padding: 10px 12px;
+  background: #ffffff;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.ai-comment-row {
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  align-items: start;
+  gap: 6px;
+  margin: 4px 0;
+}
+
+.ai-comment-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #374151;
+  padding-top: 2px;
+}
+
+.ai-comment-phrase {
+  font-weight: 700;
+  color: #111827;
+}
+
+.ai-comment-reason,
+.ai-comment-suggestion,
+.ai-comment-text {
+  margin: 2px 0;
+  font-size: 13px;
+  color: #374151;
+}
+
+.ai-comment-suggestion {
+  color: #2563eb;
+}
+
+.selected-pdf-notice {
+  margin-top: 8px;
+  padding: 10px 12px;
+  background: #eef2ff;
+  color: #4338ca;
+  border: 1px solid #c7d2fe;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.ai-risk-danger {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecdd3;
+}
+
+.ai-risk-safe {
+  background: #ecfdf3;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+
+.btn-submit:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+  color: #f3f4f6;
+  box-shadow: none;
+  transform: none;
+}
+
+.ai-risk-분석대기,
+.ai-risk-wait {
+  background: #f8fafc;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+}
+
+.pdf-status-cluster {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ai-risk-chip {
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
 }
 
 .status-sale {

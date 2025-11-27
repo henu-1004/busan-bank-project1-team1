@@ -1,5 +1,6 @@
 package kr.co.api.flobankapi.service;
 
+import kr.co.api.flobankapi.dto.CustAcctDTO;
 import kr.co.api.flobankapi.dto.CustFrgnAcctDTO;
 import kr.co.api.flobankapi.dto.FrgnAcctBalanceDTO;
 import kr.co.api.flobankapi.dto.FrgnRemtTranDTO;
@@ -65,11 +66,15 @@ public class RemitService {
     }
 
     // 계좌 비밀번호 비교
-    public boolean checkEnAcctPw(String acctNo, String acctPw) {
-        log.info("acctNo = {}, acctPw = {}", acctNo, acctPw);
-        CustFrgnAcctDTO custFrgnAcctDTO = frgnAcctService.getFrgnAcctByAcctNo(acctNo);
-        log.info("계좌 비밀번호 custFrgnAcctDTO = {}",  custFrgnAcctDTO);
-        return passwordEncoder.matches(acctPw, custFrgnAcctDTO.getFrgnAcctPw());
+    public boolean checkEnAcctPw(String acctNo, String acctPw, String acctType) {
+        if ("KRW".equals(acctType)) {
+            CustAcctDTO custAcctDTO = mypageMapper.selectCustAcct(acctNo);
+            return passwordEncoder.matches(acctPw, custAcctDTO.getAcctPw());
+        }else{
+            CustFrgnAcctDTO custFrgnAcctDTO = frgnAcctService.getFrgnAcctByAcctNo(acctNo);
+            log.info("계좌 비밀번호 custFrgnAcctDTO = {}",  custFrgnAcctDTO);
+            return passwordEncoder.matches(acctPw, custFrgnAcctDTO.getFrgnAcctPw());
+        }
     }
 
     // 모체 계좌번호 가져오기
