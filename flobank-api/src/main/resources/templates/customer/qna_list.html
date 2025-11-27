@@ -27,8 +27,8 @@
   <div class="qna-board">
     <!-- 🔹 상단 -->
     <div class="board-top">
-      <p class="board-count">총 <strong>12</strong>건의 문의가 있습니다.</p>
-      <a href="qnaWrite.html" class="btn-write">
+      <p class="board-count">총 <strong th:text="${totalCount}">0</strong>건의 문의가 있습니다.</p>
+      <a th:href="@{/customer/qna_write}" class="btn-write">
         <i class="fa-solid fa-pen"></i> 문의 등록
       </a>
     </div>
@@ -39,25 +39,29 @@
         <tr>
           <th>번호</th>
           <th>제목</th>
+          <th>상태</th>
           <th>작성자</th>
           <th>등록일</th>
           <th>조회수</th>
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td>12</td>
-          <td><a href="qnaView.html">해외송금 수수료는 얼마인가요?</a></td>
-          <td>홍길동</td>
-          <td>2025-11-06</td>
-          <td>32</td>
+        <tr th:each="qna, qnaStat : ${qnaList}">
+          <td th:text="${totalCount - ((page - 1) * pageSize) - qnaStat.index}">1</td>
+          <td class="title">
+            <a th:href="@{/customer/qna_view/{no}(no=${qna.qnaNo})}"
+               th:text="${qna.qnaTitle}">질문 제목</a>
+          </td>
+          <td>
+            <span th:if="${qna.qnaReply != null and !#strings.isEmpty(qna.qnaReply)}" class="qna-status complete">답변 완료</span>
+            <span th:if="${qna.qnaReply == null or #strings.isEmpty(qna.qnaReply)}" class="qna-status pending">답변 대기중</span>
+          </td>
+          <td th:text="${qna.qnaCustName != null ? qna.qnaCustName : qna.qnaCustCode}">작성자</td>
+          <td th:text="${qna.qnaDt != null ? #temporals.format(qna.qnaDt, 'yyyy-MM-dd') : ''}">2024-01-01</td>
+          <td th:text="${qna.qnaViewCnt != null ? qna.qnaViewCnt : 0}">0</td>
         </tr>
-        <tr>
-          <td>11</td>
-          <td><a href="qnaView.html">외화예금 금리 문의</a></td>
-          <td>user01</td>
-          <td>2025-11-05</td>
-          <td>48</td>
+        <tr th:if="${#lists.isEmpty(qnaList)}">
+          <td colspan="6" class="empty">등록된 문의가 없습니다.</td>
         </tr>
       </tbody>
     </table>
@@ -65,18 +69,23 @@
     <!-- 🔹 페이징 -->
 
 <div class="pagination">
-  <a href="#" class="page-prev">〈 이전</a>
-  <a href="#" class="active">1</a>
-  <a href="#">2</a>
-  <a href="#">3</a>
-  <a href="#" class="page-next">다음 〉</a>
+  <a th:if="${page > 1}"
+     th:href="@{/customer/qna_list(page=${page-1})}"
+     class="page-prev">〈 이전</a>
+  <a th:each="p : ${#numbers.sequence(1, totalPage)}"
+     th:href="@{/customer/qna_list(page=${p})}"
+     th:text="${p}"
+     th:classappend="${p == page} ? 'active'">1</a>
+  <a th:if="${page < totalPage}"
+     th:href="@{/customer/qna_list(page=${page+1})}"
+     class="page-next">다음 〉</a>
 </div>
 
   </div>
 </section>
 
 
-   
+
 
 </main>
 
@@ -84,4 +93,3 @@
 
 </body>
 </html>
-

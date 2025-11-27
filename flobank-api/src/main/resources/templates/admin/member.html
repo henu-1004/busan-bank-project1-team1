@@ -341,19 +341,21 @@
 
 
         <!-- Q&A 관리 -->
-        <section class="qna-admin">
+        <section id="qna-list" class="qna-admin">
             <div class="qna-header">
                 <h2>Q&A 목록</h2>
 
-                <div class="qna-filter">
+                <form id="qnaFilterForm" th:action="@{/admin/member}" method="get" class="qna-filter">
+                    <input type="hidden" name="page" th:value="${page}">
+                    <input type="hidden" name="faqPage" th:value="${faqPage}">
+                    <input type="hidden" name="qnaPage" value="1">
                     <label for="qna-status-filter">상태</label>
-                    <select id="qna-status-filter">
-                        <option value="all">전체</option>
-                        <option value="pending">답변 대기중</option>
-                        <option value="ai-draft">AI 초안 완료</option>
-                        <option value="complete">답변 완료</option>
+                    <select id="qna-status-filter" name="qnaStatus">
+                        <option value="all" th:selected="${qnaStatus == 'all'}">전체</option>
+                        <option value="pending" th:selected="${qnaStatus == 'pending'}">답변 대기중</option>
+                        <option value="complete" th:selected="${qnaStatus == 'complete'}">답변 완료</option>
                     </select>
-                </div>
+                </form>
             </div>
 
             <div class="qna-table-wrapper">
@@ -370,61 +372,59 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr data-status="pending">
-                        <td>1</td>
-                        <td>외화송금</td>
-                        <td>해외송금 수수료는 얼마인가요?</td>
-                        <td>김현아</td>
-                        <td>2025-11-10</td>
-                        <td><span class="qna-status pending">답변 대기중</span></td>
-                        <td><button class="qna-btn-ai">AI 초안 생성</button></td>
+                    <tr th:each="item, stat : ${qnaList}">
+                        <td th:text="${totalQnaCount - ((qnaPage - 1) * qnaPageSize) - stat.index}">1</td>
+                        <td>-</td>
+                        <td class="title" th:text="${item.qnaTitle}"></td>
+                        <td th:text="${item.qnaCustName != null ? item.qnaCustName : item.qnaCustCode}"></td>
+                        <td th:text="${item.qnaDt != null ? #temporals.format(item.qnaDt, 'yyyy-MM-dd HH:mm') : ''}"></td>
+                        <td>
+                            <span th:if="${item.qnaReply != null and !#strings.isEmpty(item.qnaReply)}" class="qna-status complete">답변 완료</span>
+                            <span th:if="${item.qnaReply == null or #strings.isEmpty(item.qnaReply)}" class="qna-status pending">답변 대기중</span>
+                        </td>
+                        <td>
+                            <a class="qna-btn-view"
+                               th:href="@{|/admin/qna/${item.qnaNo}?qnaPage=${qnaPage}&qnaStatus=${qnaStatus}|}">보기</a>
+                        </td>
                     </tr>
-
-                    <tr data-status="ai-draft">
-                        <td>2</td>
-                        <td>환전</td>
-                        <td>환전 가능한 통화는 어떤 것이 있나요?</td>
-                        <td>이수진</td>
-                        <td>2025-11-09</td>
-                        <td><span class="qna-status ai-draft">AI 초안 완료</span></td>
-                        <td><button class="qna-btn-approve">검토</button></td>
-                    </tr>
-
-                    <tr data-status="complete">
-                        <td>3</td>
-                        <td>외화예금</td>
-                        <td>외화예금 금리는 어떻게 되나요?</td>
-                        <td>박지민</td>
-                        <td>2025-11-08</td>
-                        <td><span class="qna-status complete">답변 완료</span></td>
-                        <td><button class="qna-btn-view">보기</button></td>
+                    <tr th:if="${#lists.isEmpty(qnaList)}">
+                        <td colspan="7" class="empty">등록된 문의가 없습니다.</td>
                     </tr>
                     </tbody>
                 </table>
             </div>
-        </section>
 
-        <!-- Q&A 모달 -->
-        <div class="qna-modal" id="qnaModal">
-            <div class="qna-modal-content">
-                <span class="qna-modal-close">&times;</span>
-                <h2 class="qna-modal-title">AI 초안 검토 및 승인</h2>
-                <div class="qna-modal-body">
-                    <div class="qna-modal-question">
-                        <h3>질문</h3>
-                        <p id="modal-question-text"></p>
-                        <div class="qna-modal-line"></div>
-                        <h3>AI 초안 답변</h3>
-                        <textarea id="modal-ai-answer" class="qna-ai-draft-box" rows="6"></textarea>
-                    </div>
-                </div>
-                <div class="qna-modal-footer">
-                    <button class="qna-btn-cancel">취소</button>
-                    <button class="qna-btn-primary" id="approveBtn">승인</button>
-                </div>
+            <div class="pagination" th:if="${totalQnaPage > 1}">
+                <a th:if="${qnaPage > 1}"
+                   th:href="@{|/admin/member?page=${page}&faqPage=${faqPage}&qnaPage=${qnaPage-1}&qnaStatus=${qnaStatus}#qna-list|}"
+                   class="page-btn prev">〈</a>
 
+                <a th:href="@{|/admin/member?page=${page}&faqPage=${faqPage}&qnaPage=1&qnaStatus=${qnaStatus}#qna-list|}"
+                   th:classappend="${qnaPage == 1} ? 'active'"
+                   class="page-btn">1</a>
+
+                <span class="ellipsis" th:if="${qnaPage > 4}">...</span>
+
+                <a th:each="p : ${#numbers.sequence(qnaPage-2, qnaPage+2)}"
+                   th:if="${p > 1 and p < totalQnaPage}"
+                   th:href="@{|/admin/member?page=${page}&faqPage=${faqPage}&qnaPage=${p}&qnaStatus=${qnaStatus}#qna-list|}"
+                   th:text="${p}"
+                   th:classappend="${p == qnaPage} ? 'active'"
+                   class="page-btn"></a>
+
+                <span class="ellipsis" th:if="${qnaPage < totalQnaPage-3}">...</span>
+
+                <a th:if="${totalQnaPage > 1}"
+                   th:href="@{|/admin/member?page=${page}&faqPage=${faqPage}&qnaPage=${totalQnaPage}&qnaStatus=${qnaStatus}#qna-list|}"
+                   th:text="${totalQnaPage}"
+                   th:classappend="${qnaPage == totalQnaPage} ? 'active'"
+                   class="page-btn"></a>
+
+                <a th:if="${qnaPage < totalQnaPage}"
+                   th:href="@{|/admin/member?page=${page}&faqPage=${faqPage}&qnaPage=${qnaPage+1}&qnaStatus=${qnaStatus}#qna-list|}"
+                   class="page-btn next">〉</a>
             </div>
-    </section>
+        </section>
     <!-- admin-content 끝 -->
 </th:block>
 

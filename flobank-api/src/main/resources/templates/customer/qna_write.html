@@ -25,21 +25,21 @@
 <section class="customer-content">
   <h2>질문 등록</h2>
 
-  <form class="qna-form">
+  <form class="qna-form" th:action="@{/customer/qna_write}" method="post">
     <label for="title">제목</label>
-    <input id="title" type="text" placeholder="질문 제목을 입력하세요.">
+    <input id="title" name="title" type="text" placeholder="질문 제목을 입력하세요." required>
 
     <label for="writer">작성자</label>
-    <input id="writer" type="text" placeholder="이름을 입력하세요.">
+    <input id="writer" type="text" th:value="${writerName}" readonly>
 
     <label for="content">내용</label>
-    <textarea id="content" rows="8" placeholder="질문 내용을 입력하세요."></textarea>
+    <textarea id="content" name="content" rows="8" placeholder="질문 내용을 입력하세요." required></textarea>
 
     <div class="form-buttons">
       <button type="submit" class="btn-submit">
         <i class="fa-solid fa-paper-plane"></i> 등록
       </button>
-      <a href="qnaList.html" class="btn-cancel">
+      <a th:href="@{/customer/qna_list}" class="btn-cancel">
         <i class="fa-solid fa-rotate-left"></i> 취소
       </a>
     </div>
@@ -47,7 +47,7 @@
 </section>
 
 
-   
+
 
 </main>
 
@@ -55,4 +55,3 @@
 <div th:replace="~{_template/_footer.html}"></div>
 </body>
 </html>
-
