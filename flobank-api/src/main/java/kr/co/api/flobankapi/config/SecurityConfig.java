@@ -44,8 +44,8 @@ public class SecurityConfig {
                                         "/remit/info",
                                         "/admin/login"
                         ).permitAll()
-                        .requestMatchers("/admin/**").hasRole("ADMIN")  //이게 걸린거
-                        //.requestMatchers("/admin/**").permitAll()   //이게 안걸린거 (개발용)
+                        //.requestMatchers("/admin/**").hasRole("ADMIN")  //이게 걸린거
+                        .requestMatchers("/admin/**").permitAll()   //이게 안걸린거 (개발용)
                         .requestMatchers("/mypage/**").authenticated() // 마이페이지는 로그인 필요
                         .requestMatchers("/remit/**").authenticated()
                         .requestMatchers("/exchange/step1").authenticated()
