@@ -3650,3 +3650,114 @@ body.event-page {
 .terminate-btn-sub:hover {
     background: #e5e5e5;
 }
+
+
+#terminateInfoModal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.45);
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+#terminateInfoModal .modal-content {
+    background: #fff;
+    border-radius: 14px;
+    padding: 32px 40px;
+    width: 700px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    position: relative;
+    animation: fadeIn 0.25s ease-in-out;
+}
+
+/* 제목 */
+#terminateInfoModal .modal-content h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--main-color);
+    text-align: center;
+    margin-bottom: 18px;
+    border-bottom: 1.5px solid #eee;
+    padding-bottom: 12px;
+}
+
+#terminateInfoModal .modal-content h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--main-color);
+    margin: 28px 0 10px;
+    border-left: 4px solid var(--main-color);
+    padding-left: 8px;
+}
+
+/* 닫기 버튼 */
+#terminateInfoModal .close-btn {
+    position: absolute;
+    top: 14px;
+    right: 18px;
+    font-size: 22px;
+    color: #888;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+#terminateInfoModal .close-btn:hover {
+    color: var(--main-color);
+}
+
+/* 표 스타일 (환전/계좌와 동일) */
+#terminateInfoModal .detail-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+#terminateInfoModal .detail-table th,
+#terminateInfoModal .detail-table td {
+    border: 1px solid #ddd;
+    padding: 10px 14px;
+    text-align: left;
+    line-height: 1.6;
+}
+
+#terminateInfoModal .detail-table th {
+    background: #f5f8fa;
+    color: #333;
+    font-weight: 600;
+    width: 24%;
+}
+
+#terminateInfoModal .detail-table td {
+    color: #444;
+}
+
+/* 스크롤바 */
+#terminateInfoModal .modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+#terminateInfoModal .modal-content::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 4px;
+}
+#terminateInfoModal .modal-content::-webkit-scrollbar-thumb:hover {
+    background: #999;
+}
+
+#terminateInfoModal .cancel-link {
+    width: 90px;
+    display: block;
+    float: right;
+    padding: 5px 7px;
+    font-weight: bold;
+    text-align: center;
+    text-decoration: none;
+    color: #dadada;
+    font-size: 15px;
+    background-color: #1a253a;
+    border-radius: 3px;
+}

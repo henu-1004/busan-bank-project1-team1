@@ -265,6 +265,40 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    const dpstCancelForm = document.getElementById("dpstCancelForm");
+    if (dpstCancelForm){
+        dpstCancelForm.addEventListener("submit", function(e) {
+            const agree = document.querySelector('input[name="agree"]:checked');
+            if (!agree || agree.value !== 'y') {
+                e.preventDefault();
+                alert("동의해야 다음 단계로 진행할 수 있습니다.");
+            }
+        });
+    }
+
+    const nextBtn = document.getElementById("openTerminateModal");
+    const modal = document.getElementById("terminateInfoModal");
+    const closeBtn = modal.querySelector(".close-btn");
+
+    if (nextBtn) {
+        nextBtn.addEventListener("click", function () {
+            modal.style.display = "flex";   // 모달 열기
+        });
+    }
+
+    if (closeBtn) {
+        closeBtn.addEventListener("click", function () {
+            modal.style.display = "none";    // 닫기 버튼
+        });
+    }
+
+    // 모달 바깥 클릭 시 닫기
+    window.addEventListener("click", function (e) {
+        if (e.target === modal) {
+            modal.style.display = "none";
+        }
+    });
+
 
 });
 

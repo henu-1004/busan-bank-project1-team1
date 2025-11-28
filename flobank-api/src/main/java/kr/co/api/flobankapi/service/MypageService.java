@@ -522,6 +522,10 @@ public class MypageService {
         return mypageMapper.selectDpstAcctDtlHist(dpstDtlHdrNo);
     }
 
+    public CustInfoDTO getRawCustInfo(String custCode){
+        return mypageMapper.getRawCustInfo(custCode);
+    }
+
 }
 
 

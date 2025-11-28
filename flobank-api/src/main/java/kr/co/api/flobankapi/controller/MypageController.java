@@ -6,6 +6,7 @@ import kr.co.api.flobankapi.dto.*;
 import kr.co.api.flobankapi.dto.SearchResDTO;
 import kr.co.api.flobankapi.dto.TermsHistDTO;
 import kr.co.api.flobankapi.service.*;
+import kr.co.api.flobankapi.util.AesUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -787,6 +788,7 @@ public class MypageController {
     public String dpst_cancel_1_post(@RequestParam String dpstHdrAcctNo,
                                 @ModelAttribute DpstAcctHdrDTO dpstAcct,
                                 DpstAcctDtlDTO dpstDtl,
+                                     @AuthenticationPrincipal CustomUserDetails userDetails,
                                      Model model) {
 
 
@@ -794,12 +796,45 @@ public class MypageController {
         model.addAttribute("dpstDtl", dpstDtl);
         model.addAttribute("dpstHdrAcctNo", dpstHdrAcctNo);
 
+        CustInfoDTO custInfo = mypageService.getRawCustInfo(userDetails.getUsername());
+        String aesJumin = AesUtil.decrypt(custInfo.getCustJumin()).substring(0, 6) + "-*******";
+        String aesHp = AesUtil.decrypt(custInfo.getCustHp());
+        String aesSecHp = aesHp.substring(0, 3) + "-****-" + aesHp.substring(7, 11);
+        custInfo.setCustJumin(aesJumin);
+        custInfo.setCustHp(aesSecHp);
+
+        model.addAttribute("custInfo", custInfo);
+
+
         return "mypage/dpst_cancel_2";
     }
 
     @GetMapping("/dpst_cancel_2")
     public String dpst_cancel_2(@RequestParam String dpstHdrAcctNo, Model model) {
         return "mypage/dpst_cancel_2";
+    }
+
+    @PostMapping("/dpst_cancel_3")
+    public String dpst_cancel_3(
+            Model model,
+            @RequestParam String dpstHdrAcctNo,
+            @ModelAttribute DpstAcctHdrDTO dpstAcct,
+            DpstAcctDtlDTO dpstDtl
+    ) {
+        // DTO로 다시 묶을 수도 있음
+
+
+
+
+        model.addAttribute("dpstHdrAcctNo", dpstHdrAcctNo);
+        model.addAttribute("dpstAcct", dpstAcct);
+        model.addAttribute("dpstDtl", dpstDtl);
+
+        dpstAcct.setDpstHdrStatus(2);
+
+
+
+        return "mypage/dpst_cancel_3";
     }
 
     @GetMapping("/dpst_cancel_3")
