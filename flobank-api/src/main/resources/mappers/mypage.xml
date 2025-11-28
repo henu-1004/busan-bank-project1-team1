@@ -211,7 +211,7 @@
         ) dt
         ON dt.DPST_DTL_HDR_NO = th.DPST_HDR_ACCT_NO
 
-        WHERE dpst_hdr_cust_code=#{dpstHdrCustCode}
+        WHERE dpst_hdr_cust_code=#{dpstHdrCustCode} AND dpst_hdr_status=1
     </select>
 
     <select id="selectDpstAcctDtls" resultType="kr.co.api.flobankapi.dto.DpstAcctDtlDTO">
@@ -332,5 +332,13 @@
         set bal_balance=#{balBalance}
         where bal_no=#{balNo}
     </update>
+
+    <select id="selectDpstAcctDtlHist" resultType="kr.co.api.flobankapi.dto.DpstAcctDtlDTO">
+        SELECT
+        *
+        FROM TB_DPST_ACCT_DTL
+        WHERE DPST_DTL_HDR_NO = #{dpstDtlHdrNo}
+        ORDER BY DPST_TRAN_DT ASC
+    </select>
 
 </mapper>
