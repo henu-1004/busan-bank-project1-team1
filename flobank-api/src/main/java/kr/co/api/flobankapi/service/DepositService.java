@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.api.flobankapi.dto.*;
 import kr.co.api.flobankapi.mapper.DepositMapper;
+import kr.co.api.flobankapi.mapper.EventMapper;
 import kr.co.api.flobankapi.mapper.admin.ProductMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +27,9 @@ public class DepositService {
     private final DepositMapper depositMapper;
     private final RateService rateService;
     private final ObjectMapper objectMapper;
+
+    // 이벤트 기간 확인을 위해 Mapper 추가
+    private final EventMapper eventMapper;
 
     public List<ProductDTO> getActiveProducts() {
         return depositMapper.findActiveProducts();
@@ -85,20 +89,16 @@ public class DepositService {
 
         for (int i = 0; i < 7; i++) {
             String response = rateService.getRate(date.toString());
-            log.warn("📌 [{}] raw response = {}", date, response);
 
             // JSON 배열 여부 검증
             try {
                 List<?> testList = objectMapper.readValue(response, new TypeReference<List<Object>>() {});
                 if (testList != null && !testList.isEmpty()) {
-                    log.warn("📌 사용된 영업일 환율 날짜 = {}", date);
                     return response;
                 }
             } catch (Exception e) {
-                log.error("🚨 JSON 파싱 실패 ({}): {}", date, response);
             }
 
-            log.warn("⚠ {} 날짜 환율 미존재 → 하루 더 이전으로 이동", date);
             date = date.minusDays(1);
         }
 
@@ -109,16 +109,9 @@ public class DepositService {
 
         try {
             String jsonResponse =  getValidRateJson();
-            System.err.println("📌 Raw API Date: " + LocalDate.now().minusDays(2).toString());
-            log.error("📌 Raw API response: {}", jsonResponse);
-
-
 
             // 2. JSON 문자열을 DTO 리스트로 변환
             List<RateInfoDTO> rateList = objectMapper.readValue(jsonResponse, new TypeReference<List<RateInfoDTO>>() {});
-
-            log.error("📌 Parsed rateList Size: {}", rateList.size());
-            log.error("📌 Parsed rateList Value: {}", rateList);
 
             boolean exists = rateList.stream()
                     .anyMatch(rate -> {
@@ -128,7 +121,6 @@ public class DepositService {
                     });
 
             if (!exists) {
-                log.error("🚨 '{}' 통화 없음. 전체 리스트 {}", currency, rateList);
                 throw new IllegalArgumentException("해당 통화의 환율 정보를 찾을 수 없습니다: " + currency);
             }
 
