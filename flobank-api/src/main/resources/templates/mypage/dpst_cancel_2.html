@@ -122,7 +122,7 @@
                     </colgroup>
                     <tr>
                         <th>입금계좌번호</th>
-                        <td colspan="3">112-2333-3333-33</td>
+                        <td colspan="3">[[${dpstAcct.dpstHdrLinkedAcctNo}]]</td>
                     </tr>
 
                 </table>
@@ -143,7 +143,7 @@
                     <tr>
                         <th>고객 구분</th>
                         <td colspan="3">
-                            <input type="radio" value="dom" name="sel"> 국내고객
+                            <input type="radio" value="dom" name="sel" checked> 국내고객
                             <input type="radio" value="frgn" name="sel"> 해외거주고객
                         </td>
                     </tr>
@@ -152,12 +152,7 @@
             </section>
 
             <div class="terminate-actions">
-                <button type="button" class="terminate-btn-sub">취소</button>
-                <form method="post" style="display:inline;">
-                    <input type="hidden" name="acctNo" >
-                    <button type="submit" class="terminate-btn-sub" style="background-color: #1a253a; color: white">다음</button>
-                </form>
-
+                    <button type="button" id="openTerminateModal" class="terminate-btn-sub" style="background-color: #1a253a; color: white">다음</button>
             </div>
 
 
@@ -172,40 +167,58 @@
         <span class="close-btn">&times;</span>
         <h2>추가본인인증</h2>
 
-        <div>* 등록된 전화번호가 없을 경우 고객정보 변경 후 진행하여 주시기 바랍니다.</div>
+        <form th:action="@{/mypage/dpst_cancel_3(dpstHdrAcctNo=${dpstHdrAcctNo})}" th:object="${dpstAcct}" method="post">
 
-        <h3>본인확인</h3>
-        <table class="detail-table">
-            <tr>
-                <th>이름(실명)</th>
-                <td colspan="3">i<input type="text" value="이다은"></td>
-            </tr>
+            <!-- hidden 전달값 추가 -->
+            <input type="hidden" name="dpstDtlAmount" th:value="${dpstDtl.totalInterest + dpstAcct.dpstHdrBalance - dpstDtl.incomeTax - dpstDtl.localTax}">
+            <input type="hidden" name="dpstDtlHdrNo" th:value="${dpstAcct.dpstHdrAcctNo}">
+            <input type="hidden" name="dpstDtlAppliedRate" value=0>
+            <input type="hidden" name="incomeTax" th:value="${dpstDtl.incomeTax}">
+            <input type="hidden" name="localTax" th:value="${dpstDtl.localTax}">
+            <input type="hidden" name="totalInterest" th:value="${dpstDtl.totalInterest}">
 
-            <tr>
-                <th>주민등록번호</th>
-                <td colspan="3">041125-*******</td>
-            </tr>
-        </table>
+            <input type="hidden" th:field="*{dpstHdrCurrencyExp}">
+            <input type="hidden" th:field="*{dpstHdrBalance}">
+            <input type="hidden" th:field="*{dpstHdrInterest}">
+            <input type="hidden" th:field="*{dpstHdrLinkedAcctNo}">
+            <input type="hidden" th:field="*{dpstHdrExpAcctNo}">
+            <input type="hidden" th:field="*{dpstHdrStartDy}">
+            <input type="hidden" th:field="*{dpstHdrFinDy}">
+            <!-- 필요한 값 계속 추가 -->
 
+            <div>* 등록된 전화번호가 없을 경우 고객정보 변경 후 진행하여 주시기 바랍니다.</div>
 
-        <h3>인증수단선택</h3>
-        <table class="detail-table detail-info">
-            <tbody>
-            <tr>
-                <th>추가인증수단</th>
-                <td colspan="3"><input type="radio" checked> 2채널인증(전화인증) [무료]</td>
-            </tr>
-            <tr>
-                <th>인증전화번호</th>
-                <td colspan="3">010-334*-444*</td>
-            </tr>
-            </tbody>
+            <h3>본인확인</h3>
+            <table class="detail-table">
+                <tr>
+                    <th>이름(실명)</th>
+                    <td colspan="3"><input class="open2-form-input" type="text" th:value="${custInfo.custName}" readonly></td>
+                </tr>
+                <tr>
+                    <th>주민등록번호</th>
+                    <td colspan="3">[[${custInfo.custJumin}]]</td>
+                </tr>
+            </table>
 
-        </table>
+            <h3>인증수단선택</h3>
+            <table class="detail-table detail-info">
+                <tbody>
+                <tr>
+                    <th>추가인증수단</th>
+                    <td colspan="3"><input type="radio" checked> 2채널인증(전화인증) [무료]</td>
+                </tr>
+                <tr>
+                    <th>인증전화번호</th>
+                    <td colspan="3">[[${custInfo.custHp}]]</td>
+                </tr>
+                </tbody>
+            </table>
 
-        <div>* 2채널인증(전화인증)은 ARS 안내에 따라 인증을 수행하시면 인증이 완료됩니다.</div>
+            <div>* 2채널인증(전화인증)은 ARS 안내에 따라 인증을 수행하시면 인증이 완료됩니다.</div>
+            <br>
+            <button type="submit" class="cancel-link">해지하기</button>
+        </form>
 
-        <a th:href="@{/mypage/dpst_cancel_3}" class="cancel-link">해지하기</a>
     </div>
 </div>
 

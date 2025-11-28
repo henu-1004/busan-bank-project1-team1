@@ -341,4 +341,9 @@
         ORDER BY DPST_TRAN_DT ASC
     </select>
 
+    <select id="getRawCustInfo" resultType="kr.co.api.flobankapi.dto.CustInfoDTO">
+        select * from TB_CUST_INFO
+        where cust_code=#{custCode}
+    </select>
+
 </mapper>
