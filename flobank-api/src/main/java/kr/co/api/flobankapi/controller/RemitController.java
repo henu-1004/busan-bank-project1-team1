@@ -41,6 +41,11 @@ public class RemitController {
 
     private final RemitService remitService;
 
+    @GetMapping("/info")
+    public String info(){
+        return "remit/info";
+    }
+
     @GetMapping("/en_transfer_1")
     public String en_transfer_1(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
 
