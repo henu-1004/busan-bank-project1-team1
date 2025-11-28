@@ -45,6 +45,13 @@
                 </a>
             </li>
 
+            <li>
+                <a th:href="@{/admin/chatbot}"  style="padding-left: 13px"
+                   th:classappend="${menu} == 'terms' ? ' active' : ''">
+                    <i class="fa-solid fa-robot"></i>챗봇
+                </a>
+            </li>
+
             <!--  adminType=1 (ROLE_ADMIN) 사용자만 보임 -->
             <li sec:authorize="hasRole('ADMIN')">
                 <a href="http://34.64.124.33:5601/" target="_blank">

@@ -1948,8 +1948,15 @@ body {
 .message {
   display: flex;
   gap: 14px;
-  align-items: flex-start;
+    align-items: flex-start;
+    width: 100%;
 }
+
+.message.user {
+    flex-direction: row-reverse;
+    justify-content: flex-start;
+}
+
 
 .message .avatar {
   width: 40px;
@@ -1998,6 +2005,7 @@ body {
   gap: 10px;
   flex-wrap: wrap;
 }
+
 
 .suggested-actions button {
   padding: 8px 14px;
@@ -3097,16 +3105,31 @@ body.event-page {
 }
 
 #depositInfoModal .cancel-link {
-    width: 90px;
+    width: 100px;
     display: block;
     float: right;
-    padding: 5px 7px;
+    padding: 7px 7px;
     font-weight: bold;
     text-align: center;
     text-decoration: none;
     color: #dadada;
     font-size: 15px;
     background-color: #1a253a;
+    border-radius: 3px;
+}
+
+#depositInfoModal .withdraw-link {
+    width: 100px;
+    display: block;
+    float: right;
+    padding: 7px 7px;
+    margin-right: 7px;
+    font-weight: bold;
+    text-align: center;
+    text-decoration: none;
+    color: #000000;
+    font-size: 15px;
+    background-color: #e1e1e1;
     border-radius: 3px;
 }
 

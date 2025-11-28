@@ -302,6 +302,11 @@ public class AdminController {
 
     }
 
+    @GetMapping("/chatbot")
+    public String adminChatbotForm() {
+        return "admin/chatbot";
+    }
+
 
 
 

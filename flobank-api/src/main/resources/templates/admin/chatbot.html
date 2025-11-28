@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko"
+      th:replace="~{admin/admin_template :: admin_template('고객센터 관리','환경설정',~{::content},~{::script})}">
+
+
+
+<!--지금 부터 수정 -->
+<th:block th:fragment="content">
+<!-- 본문 시작 -->
+<section class="admin-content">
+
+
+
+
+    <!-- 🔹 챗봇 채팅 로그 관리 -->
+    <section class="board-section chatbot-log-admin">
+
+        <div class="board-header">
+            <h2>챗봇 채팅 로그</h2>
+        </div>
+
+        <!-- 필터 영역 -->
+        <div class="board-row">
+            <div class="board-control">
+                <label for="searchKeyword">검색어</label>
+                <input id="searchKeyword" type="text" placeholder="사용자 메시지 검색" />
+            </div>
+            <div class="board-control">
+                <label for="errorFilter">유형 필터</label>
+                <select id="errorFilter">
+                    <option value="">전체</option>
+                    <option value="error">에러 발생</option>
+                    <option value="fallback">Fallback 응답</option>
+                    <option value="negative">부정 감정</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- 로그 테이블 -->
+        <div class="board-table-wrapper">
+            <table class="board-table">
+                <thead>
+                <tr>
+                    <th>번호</th>
+                    <th>채팅 시각</th>
+                    <th>사용자 메시지</th>
+                    <th>챗봇 응답</th>
+                    <th>태그</th>
+                    <th>관리</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr>
+                    <td>10</td>
+                    <td>2025-11-28 18:42</td>
+                    <td>환율 계산 오류났어 뭐야</td>
+                    <td>이해하지 못했습니다.<br/>다시 입력해 주세요.</td>
+                    <td><span class="tag tag-error">⚠️ 오류</span></td>
+                    <td>
+                        <button class="board-btn-edit">응답 수정</button>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>9</td>
+                    <td>2025-11-28 18:37</td>
+                    <td>지금 달러 환율 얼마?</td>
+                    <td>현재 USD 기준 환율은 1,472.80원입니다.</td>
+                    <td><span class="tag tag-normal">정상</span></td>
+                    <td></td>
+                </tr>
+
+                <tr>
+                    <td>8</td>
+                    <td>2025-11-28 18:33</td>
+                    <td>너 개바보냐</td>
+                    <td>고객님의 표현은 이해하였으나, 관련 내용은 도와드릴 수 없습니다.</td>
+                    <td><span class="tag tag-warning">🚫 금칙어</span></td>
+                    <td>
+                        <button class="board-btn-edit">응답 수정</button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </section>
+
+
+    <section id="board-register" class="board-section chatbot">
+
+        <div class="board-header">
+            <h2>금칙어 등록</h2>
+        </div>
+
+        <!-- 등록 폼 -->
+        <form th:action="@{/admin/chatbot/forbidden/register}" method="post">
+            <div class="board-row">
+                <div class="board-control">
+                    <label for="word">금칙어</label>
+                    <input id="word" name="keyword" type="text" placeholder="예: 욕설, 민감정보" required />
+                </div>
+
+                <div class="board-control">
+                    <label for="replaceWord">대체 응답</label>
+                    <input id="replaceWord" name="altReply" type="text" placeholder="예: 관련 내용 도와드릴 수 없습니다." />
+                </div>
+            </div>
+
+            <button type="submit" class="board-btn-primary">등록</button>
+        </form>
+    </section>
+
+
+    <!-- 🔹 금칙어 관리 -->
+    <section class="board-section forbidden-admin">
+        <div class="board-header">
+            <h2>금칙어 관리</h2>
+        </div>
+
+
+        <!-- 목록 -->
+        <div class="board-table-wrapper">
+            <table class="board-table">
+                <thead>
+                <tr>
+                    <th>번호</th>
+                    <th>금칙어</th>
+                    <th>대체 응답</th>
+                    <th>등록일</th>
+                    <th>관리</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr>
+                    <td>3</td>
+                    <td>XXX</td>
+                    <td>관련 내용은 안내드릴 수 없습니다.</td>
+                    <td>2025-11-28 17:10</td>
+                    <td>
+                        <button class="board-btn-delete">삭제</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>바보</td>
+                    <td>...</td>
+                    <td>2025-11-27 14:25</td>
+                    <td>
+                        <button class="board-btn-delete">삭제</button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </section>
+
+    <!-- 🔹 FAQ / 응답 Override 관리 -->
+    <section class="board-section chatbot-faq-admin">
+
+        <div class="board-header">
+            <h2>FAQ / 응답 Override</h2>
+        </div>
+
+
+        <!-- 등록 폼 -->
+        <form th:action="@{/admin/chatbot/faq/register}" method="post">
+            <div class="board-row">
+                <div class="board-control">
+                    <label for="faq-question">질문 (키워드 또는 정규식)</label>
+                    <input id="faq-question" name="faqQuestion" type="text" placeholder="예: 환율은 얼마?" required />
+                </div>
+
+                <div class="board-control">
+                    <label for="faq-active">사용 여부</label>
+                    <select id="faq-active" name="activeYn">
+                        <option value="Y">사용</option>
+                        <option value="N">미사용</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="board-control">
+                <label for="faq-answer">수동 지정 응답 내용</label>
+                <textarea id="faq-answer" name="faqAnswer" rows="4"
+                          placeholder="예: 현재 기준 환율은 1,472.80원입니다."></textarea>
+            </div>
+
+            <button type="submit" class="board-btn-primary">등록</button>
+        </form>
+    </section>
+
+
+    <!-- 🔹 FAQ / 응답 Override 관리 -->
+    <section class="board-section chatbot-faq-admin">
+
+        <div class="board-header">
+            <h2>FAQ / 응답 Override 확인</h2>
+        </div>
+
+        <!-- 목록 -->
+        <div class="board-table-wrapper">
+            <table class="board-table">
+                <thead>
+                <tr>
+                    <th>번호</th>
+                    <th>질문 패턴</th>
+                    <th>응답 내용 (요약)</th>
+                    <th>사용</th>
+                    <th>등록일</th>
+                    <th>관리</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr>
+                    <td>5</td>
+                    <td>만기 이자 얼마?</td>
+                    <td>만기 시 ~ 계산됩니다.</td>
+                    <td><span class="tag tag-normal">Y</span></td>
+                    <td>2025-11-27</td>
+                    <td>
+                        <button class="board-btn-edit">수정</button>
+                        <button class="board-btn-delete">삭제</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>/환율/</td>
+                    <td>현재 환율은 ...</td>
+                    <td><span class="tag tag-warning">N</span></td>
+                    <td>2025-11-26</td>
+                    <td>
+                        <button class="board-btn-edit">수정</button>
+                        <button class="board-btn-delete">삭제</button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+
+
+
+    <!-- 🔹 챗봇 테스트 창 -->
+    <section class="board-section chatbot-test-admin">
+
+        <div class="board-header">
+            <h2>챗봇 테스트</h2>
+        </div>
+
+        <form method="post">
+            <div class="board-row chatbot" style="padding-top: 5px; grid-template-columns: 8fr 1fr;">
+                <div class="board-control" style="gap: 0; width: 100%">
+                    <label for="faq-question" style="padding-bottom: 10px;">질문 (키워드 또는 정규식)</label>
+                    <input name="faqQuestion" type="text" placeholder="예: 환율은 얼마?" required />
+
+                </div>
+
+
+                <div class="board-control" style="justify-content: flex-end">
+                    <button class="board-btn-primary" style="margin-top: 15px; width: 100%; gap: 0">테스트 실행</button>
+                </div>
+
+            </div>
+
+            <div class="board-control">
+                <label for="faq-answer">테스트 결과</label>
+                <textarea name="faqAnswer" rows="4"
+                          placeholder="예: 현재 기준 환율은 1,472.80원입니다."></textarea>
+            </div>
+
+        </form>
+
+    </section>
+
+
+
+
+</section>
+
+</th:block>
+
+<th:block th:fragment="script">
+    <script th:src="@{/js/admin_setting.js}"></script>
+</th:block>
+
+
+
+</html>
