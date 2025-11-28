@@ -24,5 +24,12 @@ public class DpstAcctDtlDTO {
     private String dpstHdrCustCode;
     private String dpstHdrCurrencyExp;
     private String dpstHdrBalance;
+    
+    // 계좌해지 추가 필드
+    private BigDecimal incomeTax;
+    private BigDecimal localTax;
+    private BigDecimal totalInterest;
+
+
 
 }

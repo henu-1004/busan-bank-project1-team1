@@ -765,12 +765,40 @@ public class MypageController {
 
 
     @GetMapping("/dpst_cancel_1")
-    public String dpst_cancel_1() {
+    public String dpst_cancel_1(Model model, @RequestParam String dpstHdrAcctNo) {
+
+        DpstAcctHdrDTO dpstAcct = mypageService.getDpstAcctHdr(dpstHdrAcctNo);
+        model.addAttribute("dpstAcct", dpstAcct);
+        List<DpstAcctDtlDTO> dpstDtlList = mypageService.getDpstDtlHistList(dpstHdrAcctNo);
+        BigDecimal totalInterest = mypageService.calculateCompoundInterest(dpstAcct, dpstDtlList);
+        model.addAttribute("totalInterest", totalInterest);
+
+        BigDecimal incomeTax = totalInterest.multiply(new BigDecimal("0.14"))
+                .setScale(0, RoundingMode.DOWN);
+        BigDecimal localTax = incomeTax.multiply(new BigDecimal("0.10"))
+                .setScale(0, RoundingMode.DOWN);
+        model.addAttribute("incomeTax", incomeTax);         // 이자소득세
+        model.addAttribute("localTax", localTax);           // 지방소득세
+
         return "mypage/dpst_cancel_1";
     }
 
+    @PostMapping("/dpst_cancel_2")
+    public String dpst_cancel_1_post(@RequestParam String dpstHdrAcctNo,
+                                @ModelAttribute DpstAcctHdrDTO dpstAcct,
+                                DpstAcctDtlDTO dpstDtl,
+                                     Model model) {
+
+
+        model.addAttribute("dpstAcct", dpstAcct);
+        model.addAttribute("dpstDtl", dpstDtl);
+        model.addAttribute("dpstHdrAcctNo", dpstHdrAcctNo);
+
+        return "mypage/dpst_cancel_2";
+    }
+
     @GetMapping("/dpst_cancel_2")
-    public String dpst_cancel_2() {
+    public String dpst_cancel_2(@RequestParam String dpstHdrAcctNo, Model model) {
         return "mypage/dpst_cancel_2";
     }
 

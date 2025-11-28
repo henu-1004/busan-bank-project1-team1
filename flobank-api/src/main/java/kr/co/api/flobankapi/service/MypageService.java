@@ -13,7 +13,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -432,6 +434,94 @@ public class MypageService {
         mypageMapper.updateDpstAcctHdr(dpstAcctHdrDTO);
         mypageMapper.updateKrwAcctBal(custAcct);
     }
+
+    public BigDecimal calculateCompoundInterest(
+            DpstAcctHdrDTO dpstAcct, List<DpstAcctDtlDTO> histList) {
+
+        LocalDate startDate = LocalDate.parse(dpstAcct.getDpstHdrStartDy(), DateTimeFormatter.ofPattern("yyyyMMdd"));
+        LocalDate finDate = LocalDate.parse(dpstAcct.getDpstHdrFinDy(), DateTimeFormatter.ofPattern("yyyyMMdd"));
+        LocalDate cancelDate = LocalDate.now();
+
+        long contractDays = ChronoUnit.DAYS.between(startDate, finDate);
+        long passedDays = ChronoUnit.DAYS.between(startDate, cancelDate);
+
+        BigDecimal baseRate = dpstAcct.getDpstHdrInterest();
+        BigDecimal finalRate;
+
+        boolean isMaturity = !cancelDate.isBefore(finDate);
+
+        if (isMaturity) {
+            finalRate = baseRate; // 만기 → 기본금리
+        } else {
+            finalRate = calculateEarlyTerminationRate(baseRate, passedDays, contractDays); // 중도 → 감액금리
+        }
+
+        BigDecimal totalInterest = BigDecimal.ZERO;
+        BigDecimal hundred = new BigDecimal("100");
+
+        for (DpstAcctDtlDTO h : histList) {
+            LocalDate depositDate = LocalDate.from(h.getDpstTranDt());
+            long days = ChronoUnit.DAYS.between(depositDate, cancelDate);
+
+            if (days <= 0) continue; // 해지일 이후 입금제외
+
+            BigDecimal principal = new BigDecimal(String.valueOf(h.getDpstDtlAmount()));
+            log.info("principal: " + principal);
+            BigDecimal multiplier = BigDecimal.ONE
+                    .add(finalRate.divide(hundred, 10, RoundingMode.HALF_UP)
+                            .divide(BigDecimal.valueOf(365), 10, RoundingMode.HALF_UP))  // 하루 이율로 변환
+                    .pow((int) days)
+                    .subtract(BigDecimal.ONE);
+            log.info("multiplier: " + multiplier);
+
+            BigDecimal interest = principal.multiply(multiplier);
+            log.info("interest: " + interest);
+            totalInterest = totalInterest.add(interest);
+            log.info("totalInterest: " + totalInterest);
+        }
+
+        return totalInterest.setScale(2, RoundingMode.HALF_UP); // 재귀 호출 X
+    }
+
+
+    public BigDecimal calculateEarlyTerminationRate(BigDecimal baseRate, long passedDays, long contractDays) {
+        BigDecimal passedRatio = BigDecimal.valueOf(passedDays)
+                .divide(BigDecimal.valueOf(contractDays), 10, RoundingMode.HALF_UP); // 경과율
+
+        BigDecimal rateFactor;
+        BigDecimal minRate;
+
+        if (passedRatio.compareTo(new BigDecimal("0.10")) < 0) {
+            rateFactor = new BigDecimal("0.10");
+            minRate = new BigDecimal("0.0010"); // 연 0.10%
+        } else if (passedRatio.compareTo(new BigDecimal("0.30")) < 0) {
+            rateFactor = new BigDecimal("0.30");
+            minRate = new BigDecimal("0.0030");
+        } else if (passedRatio.compareTo(new BigDecimal("0.80")) < 0) {
+            rateFactor = new BigDecimal("0.50");
+            minRate = new BigDecimal("0.0050");
+        } else {
+            rateFactor = new BigDecimal("0.90");
+            minRate = new BigDecimal("0.0050");
+        }
+
+        BigDecimal midRate = baseRate
+                .divide(new BigDecimal("100"), 10, RoundingMode.HALF_UP) // % 변환
+                .multiply(rateFactor)
+                .multiply(passedRatio)                                   // 경과율 반영
+                .setScale(10, RoundingMode.HALF_UP);
+
+        if (midRate.compareTo(minRate) < 0) {
+            midRate = minRate;
+        }
+
+        return midRate; // 연이율 반환
+    }
+
+    public List<DpstAcctDtlDTO> getDpstDtlHistList(String dpstDtlHdrNo) {
+        return mypageMapper.selectDpstAcctDtlHist(dpstDtlHdrNo);
+    }
+
 }
 
 

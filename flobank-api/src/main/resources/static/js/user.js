@@ -466,6 +466,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 const tranCnt = link.dataset.trancnt;
                 const lastTranDt = link.dataset.lasttrandt || "-";
 
+                const cancelLink = depositInfoModal.querySelector("#cancelLink");
+                if (cancelLink) {
+                    cancelLink.href = `/flobank/mypage/dpst_cancel_1?dpstHdrAcctNo=${id}`;
+                }
+
                 depositDetailTable.innerHTML = `
                     <tr>
                 <th>계좌번호</th>
@@ -563,8 +568,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 `;
 
 
+
                 depositInfoModal.style.display = "flex";
             });
+
         });
 
         if (closeDepositBtn) {
@@ -575,6 +582,17 @@ document.addEventListener("DOMContentLoaded", function () {
         window.addEventListener("click", (e) => {
             if (e.target === depositInfoModal) {
                 depositInfoModal.style.display = "none";
+            }
+        });
+    }
+
+    const dpstCancelForm = document.getElementById("dpstCancelForm");
+    if (dpstCancelForm){
+        dpstCancelForm.addEventListener("submit", function(e) {
+            const agree = document.querySelector('input[name="agree"]:checked');
+            if (!agree || agree.value !== 'y') {
+                e.preventDefault();
+                alert("동의해야 다음 단계로 진행할 수 있습니다.");
             }
         });
     }

@@ -50,53 +50,60 @@
                     </colgroup>
                     <tr>
                         <th>해지구분</th>
-                        <td>만기해지</td>
+                        <td th:text="${
+    dpstAcct.dpstHdrFinDy != null and
+    dpstAcct.dpstHdrFinDy > #dates.format(#dates.createNow(), 'yyyyMMdd')
+        ? '중도해지'
+        : '만기해지'
+}"></td>
                         <th>해지예정일</th>
-                        <td>2024-11-11</td>
+                        <td th:text="${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}"></td>
                     </tr>
                     <tr>
                         <th>신규일자</th>
-                        <td>2024-11-24</td>
+                        <td th:text="|${#strings.substring(dpstAcct.dpstHdrStartDy,0,4)}-${#strings.substring(dpstAcct.dpstHdrStartDy,4,6)}-${#strings.substring(dpstAcct.dpstHdrStartDy,6,8)}|"></td>
                         <th>만기일자</th>
-                        <td>2025-11-24</td>
+                        <td th:text="|${#strings.substring(dpstAcct.dpstHdrFinDy,0,4)}-${#strings.substring(dpstAcct.dpstHdrFinDy,4,6)}-${#strings.substring(dpstAcct.dpstHdrFinDy,6,8)}|"></td>
                     </tr>
                     <tr>
                         <th>해지원금 ①</th>
-                        <td>2,560,000원</td>
+                        <td th:text="|${dpstAcct.formattedCurrency}${#numbers.formatDecimal(dpstAcct.dpstHdrBalance, 0, 'COMMA', 0, 'POINT')}|"></td>
                         <th>해지이자 ②</th>
-                        <td>88,320원</td>
+                        <td th:text="|${dpstAcct.formattedCurrency}${#numbers.formatDecimal(dpstDtl.totalInterest, 0, 'COMMA', 2, 'POINT')}|"></td>
                     </tr>
                     <tr>
                         <th>만기후이자 ③</th>
-                        <td>129원</td>
+                        <td th:text="|${dpstAcct.formattedCurrency}${#numbers.formatDecimal(0, 0, 'COMMA', 2, 'POINT')}|">0원</td>
                         <th>환입이자 ④</th>
-                        <td>0원</td>
+                        <td th:text="|${dpstAcct.formattedCurrency}${#numbers.formatDecimal(0, 0, 'COMMA', 2, 'POINT')}|">0원</td>
                     </tr>
                     <tr>
                         <th>정수세금 ⑤</th>
-                        <td>13,610원</td>
+                        <td th:text="|${dpstAcct.formattedCurrency}${#numbers.formatDecimal(dpstDtl.incomeTax + dpstDtl.localTax, 0, 'COMMA', 2, 'POINT')}|">13,610원</td>
                         <th>지방소득세</th>
-                        <td>1,230원</td>
+                        <td th:text="|${dpstAcct.formattedCurrency}${#numbers.formatDecimal(dpstDtl.localTax, 0, 'COMMA', 2, 'POINT')}|">1,230원</td>
                     </tr>
                     <tr>
                         <th>소득/법인세</th>
-                        <td>12,380원</td>
+                        <td th:text="|${dpstAcct.formattedCurrency}${#numbers.formatDecimal(dpstDtl.incomeTax, 0, 'COMMA', 2, 'POINT')}|">12,380원</td>
                         <th>농특세</th>
-                        <td>0원</td>
+                        <td th:text="|${dpstAcct.formattedCurrency}${#numbers.formatDecimal(0, 0, 'COMMA', 2, 'POINT')}|">0원</td>
                     </tr>
                     <tr>
                         <th>환출세액</th>
-                        <td>0원</td>
+                        <td th:text="|${dpstAcct.formattedCurrency}${#numbers.formatDecimal(0, 0, 'COMMA', 2, 'POINT')}|">0원</td>
                         <th>대출상환금액</th>
-                        <td>0원</td>
+                        <td th:text="|${dpstAcct.formattedCurrency}${#numbers.formatDecimal(0, 0, 'COMMA', 2, 'POINT')}|">0원</td>
                     </tr>
                     <tr>
                         <th>차감지급액<br>(①+②+③−④−⑤)</th>
-                        <td colspan="3">2,634,839원</td>
+                        <td colspan="3"
+                            th:text="|${dpstAcct.formattedCurrency}${#numbers.formatDecimal(dpstDtl.totalInterest - dpstDtl.incomeTax - dpstDtl.localTax, 0, 'COMMA', 2, 'POINT')}|">2,634,839원</td>
                     </tr>
                     <tr>
                         <th>실입금금액</th>
-                        <td colspan="3">43246823원</td>
+                        <td colspan="3"
+                            th:text="|${dpstAcct.formattedCurrency}${#numbers.formatDecimal(dpstDtl.totalInterest + dpstAcct.dpstHdrBalance - dpstDtl.incomeTax - dpstDtl.localTax, 0, 'COMMA', 2, 'POINT')}|">2,634,839원</td>
                     </tr>
                 </table>
             </section>
