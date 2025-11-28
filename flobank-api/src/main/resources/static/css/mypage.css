@@ -3195,6 +3195,8 @@ body.event-page {
 
 #depositInfoModal .detail-table td {
     color: #444;
+    width: 26%;
+    white-space: normal;
 }
 
 /* 스크롤바 */

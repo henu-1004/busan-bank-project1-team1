@@ -25,6 +25,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -821,6 +822,7 @@ public class MypageController {
             Model model,
             @RequestParam String dpstHdrAcctNo,
             @ModelAttribute DpstAcctHdrDTO dpstAcct,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             DpstAcctDtlDTO dpstDtl
     ) {
         // DTO로 다시 묶을 수도 있음
@@ -841,6 +843,21 @@ public class MypageController {
         dpstDtl.setDpstDtlEsignYn("y");
         dpstDtl.setDpstDtlEsignDt(LocalDateTime.now());
         depositService.insertDpstDtl(dpstDtl);
+
+        CustTranHistDTO histDTO = new CustTranHistDTO();
+        histDTO.setTranAcctNo(dpstHdrAcctNo);
+        histDTO.setTranCustName(userDetails.getCustName());
+        histDTO.setTranType(1);
+        histDTO.setTranAmount(dpstDtl.getDpstDtlAmount());
+        histDTO.setTranRecAcctNo(balDTO.getBalNo());
+        histDTO.setTranRecName(userDetails.getCustName());
+        histDTO.setTranRecBkCode("888");
+        histDTO.setTranEsignYn("Y");
+        DateTimeFormatter formatter =
+                DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
+        histDTO.setTranEsignDt(LocalDateTime.now().format(formatter));
+        histDTO.setTranCurrency(dpstDtl.getDpstHdrCurrencyExp());
+        depositService.insertCustTranHist(histDTO);
 
         return "mypage/dpst_cancel_3";
     }
