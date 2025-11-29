@@ -10,15 +10,15 @@
             <h2>오늘 주요 통계</h2>
         </div>
 
-        <div class="admin-stats-row">
+        <div class="admin-stats-row admin-stats-row--today">
             <!-- d원화 -->
-            <article class="admin-stat-card admin-graph-card">
+            <article class="admin-stat-card admin-stat-card--krw">
                 <h3> 원화 거래 수
                     <span th:text="|(${#temporals.format(baseTime,'yyyy.MM.dd HH:mm:ss')} 기준)|"></span>
                 </h3>
                 <div class="admin-graph-box admin-summary-cards">
-                    <div class="summary-card">
-                        <div class="summary-main">
+                    <div class="krw-summary-row">
+                        <div class="krw-summary-block krw-summary-block--count">
                             <h4>총 거래 건수</h4>
                             <p class="summary-value" id="totalTxCountText">0건</p>
                             <p class="summary-sub">
@@ -32,7 +32,7 @@
                     </div>
 
                     <div class="summary-card">
-                        <div class="summary-main">
+                        <div class="krw-summary-block krw-summary-block--amount">
                             <h4>총 거래 금액</h4>
                             <p class="summary-value" id="totalTxAmountText">0원</p>
                             <p class="summary-sub">
@@ -48,11 +48,11 @@
             </article>
 
             <!-- 외화 건수 -->
-            <article class="admin-stat-card admin-graph-card">
+            <article class="admin-stat-card admin-stat-card--fx">
                 <h3>외화 거래 수
-                    <span th:text="|(환전,외화송금) ${#temporals.format(baseTime, 'yyyy.MM.dd HH:mm:ss')} 기준)|"></span>
+                    <span th:text="|(${#temporals.format(baseTime, 'yyyy.MM.dd HH:mm:ss')} 기준)|"></span>
                 </h3>
-                <div class="admin-graph-box">
+                <div class="fx-chart-box">
                     <canvas id="fxChart"></canvas>
                 </div>
 

@@ -238,11 +238,11 @@ body {
 /*    height: 30px;*/
 /*}*/
 
-/*.summary-mini-chart canvas {*/
-/*    width: 100% !important;*/
-/*    height: 100% ;*/
-/*}*/
-
+.summary-mini-chart canvas{
+    width: 100% !important;
+    height: 100% !important;
+    display: block;
+}
 /*.summary-card{*/
 /*    width: 100%;*/
 /*    height: 300px;*/
@@ -3021,4 +3021,163 @@ input[type="file"] {
     grid-template-columns: 1fr 1fr;
     gap: 20px;
     margin-bottom: 20px;
+}
+
+.admin-stats-row--today .admin-stat-card:nth-child(1) {
+    flex: 0 0 70%;   /* 원화 카드 */
+}
+.admin-stats-row--today .admin-stat-card:nth-child(2) {
+    flex: 0 0 30%;   /* 외화 카드 */
+}
+
+.admin-stats-row--today{
+    justify-content: flex-start; /* 핵심: space-between 제거 */
+    flex-wrap: nowrap;
+    gap: 24px;
+}
+.admin-stats-row--today > .admin-stat-card{
+    min-width: 0;  /* 캔버스/텍스트가 flex 깨는 거 방지 */
+}
+
+/* 카드 비율 (클래스 붙였으면 이게 제일 안전) */
+.admin-stats-row--today > .admin-stat-card--krw{ flex: 7 1 0; }
+.admin-stats-row--today > .admin-stat-card--fx { flex: 3 1 0; }
+
+/* 클래스 안 붙였으면 임시로 nth-child 사용 */
+.admin-stats-row--today > .admin-stat-card:nth-child(1){ flex: 7 1 0; }
+.admin-stats-row--today > .admin-stat-card:nth-child(2){ flex: 3 1 0; }
+
+/* 화면 작아지면 다시 1열 */
+@media (max-width: 1100px){
+    .admin-stats-row--today{ flex-wrap: wrap; }
+    .admin-stats-row--today > .admin-stat-card{ flex: 0 0 100%; }
+}
+
+
+.krw-summary-block {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* 왼쪽(건수) 7, 오른쪽(금액) 3 비율 */
+.krw-summary-block--count {
+    flex: 7;
+}
+
+.krw-summary-block--amount {
+    flex: 3;
+}
+
+/* 안쪽 미니 차트 높이 조금 키우기 (필요하면 숫자 조절) */
+.krw-summary-block .summary-mini-chart {
+    height: 110px;  /* 원래 높이보다 살짝 키우거나 줄여보고 맞추면 됨 */
+}
+
+.admin-stat-card--fx {
+    padding: 20px 20px 16px;
+    display: flex;
+    flex-direction: column;
+}
+
+.fx-chart-box {
+    flex: 1 1 auto;
+    height: 320px;
+    display: flex;
+    align-items: flex-end;
+    padding-top: 10px;
+    padding-bottom: 18px;
+}
+
+.admin-stat-card--krw .krw-summary-row{
+    display: grid;
+    grid-template-columns: 7fr 3fr;
+    gap: 22px;
+    align-items: start;
+}
+
+.admin-stat-card--krw .krw-summary-block{
+    flex: 0 0 auto;
+    min-width: 0;
+}
+
+.admin-stat-card--krw .krw-summary-block h4{
+    font-size: 14px;
+    font-weight: 700;
+    color: #1f2937;
+}
+
+.admin-stat-card--krw .krw-summary-block .summary-value{
+    font-size: 16px;
+    font-weight: 800;
+    color: #111827;
+}
+.admin-stat-card--krw .krw-summary-block .summary-sub{
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
+    width: 100%;
+}
+
+
+.admin-stat-card--krw .summary-mini-chart{
+    flex: 0 0 auto;
+    height: 220px; /* 필요하면 조절 */
+
+}
+
+/* 오늘 주요 통계: 카드 사이 과한 공백 제거 */
+.admin-stats-row--today{
+    display: flex;
+    justify-content: flex-start; /* 핵심: space-between이면 가운데가 벌어짐 */
+    gap: 24px;
+    width: 100%;
+}
+
+.admin-stats-row--today > .admin-stat-card{
+    min-width: 0;
+}
+
+/* 7:3 비율 */
+.admin-stats-row--today > .admin-stat-card--krw{ flex: 7 1 0; }
+.admin-stats-row--today > .admin-stat-card--fx { flex: 3 1 0; }
+
+/* 원화 카드 내부: 건수/금액을 좌우로 (7:3) */
+.admin-stat-card--krw .admin-summary-cards{
+    display: grid;
+    grid-template-columns: 5fr 5fr;
+    gap: 22px;
+    align-items: stretch;
+}
+
+/* 각 요약 박스(왼쪽 .krw-summary-row, 오른쪽 .summary-card)를 "한 덩어리 카드"로 */
+.admin-stat-card--krw .krw-summary-row,
+.admin-stat-card--krw .summary-card{
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    min-width: 0;
+}
+
+/* 차트 캔버스가 flex/grid를 깨는 것 방지 (중요) */
+.admin-stat-card--krw .summary-mini-chart canvas{
+    width: 100% !important;
+    height: 100% !important;
+    display: block;
+}
+.admin-stat-card--fx .fx-chart-box canvas{
+    width: 100% !important;
+    height: auto !important;
+    display: block;
+}
+.admin-stat-card--krw h3 > span{
+    font-size: 13px;
+    font-weight: 500;
+    color: #6b7280;
+}
+.admin-stat-card--fx h3 > span{
+    font-size: 13px;
+    font-weight: 500;
+    color: #6b7280;
 }
