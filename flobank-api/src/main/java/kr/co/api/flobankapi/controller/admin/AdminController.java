@@ -1,14 +1,9 @@
 package kr.co.api.flobankapi.controller.admin;
 
 import jakarta.servlet.http.HttpServletResponse;
-import kr.co.api.flobankapi.dto.AdminInfoDTO;
-import kr.co.api.flobankapi.dto.BoardDTO;
-import kr.co.api.flobankapi.dto.FaqDTO;
-import kr.co.api.flobankapi.dto.QnaDTO;
+import kr.co.api.flobankapi.dto.*;
 import kr.co.api.flobankapi.dto.admin.dashboard.DashboardDTO;
-import kr.co.api.flobankapi.service.BoardService;
-import kr.co.api.flobankapi.service.FaqService;
-import kr.co.api.flobankapi.service.QnaService;
+import kr.co.api.flobankapi.service.*;
 import kr.co.api.flobankapi.service.admin.AdminAuthService;
 import kr.co.api.flobankapi.service.admin.DashboardService;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +14,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import org.springframework.http.HttpStatus;
@@ -302,14 +299,89 @@ public class AdminController {
 
     }
 
+    private final ChatbotRuleService chatbotRuleService;
+    private final ChatbotSessionService chatbotSessionService;
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
     @GetMapping("/chatbot")
-    public String adminChatbotForm() {
+    public String adminChatbotForm(Model model) {
+        ChatbotSessionDTO sessDTO = new ChatbotSessionDTO();
+        sessDTO.setSessCustCode("admin");
+        sessDTO.setSessStartDt(LocalDateTime.now().format(formatter));
+
+        sessDTO = chatbotSessionService.insertSess(sessDTO);
+        model.addAttribute("sessId", sessDTO.getSessId());
+
+
+        if (!model.containsAttribute("faHistDTO")) { // 처음 진입 여부 확인
+            ChatbotHistDTO emptyDTO = new ChatbotHistDTO();
+            emptyDTO.setBotContent(""); // 빈값
+            model.addAttribute("faHistDTO", emptyDTO);
+        }
+
+
+        List<ChatbotBadTypeDTO> badType = chatbotRuleService.selectBadTypeList();
+        List<ChatbotBadWordDTO> badWord = chatbotRuleService.selectBadWordList();
+        List<ChatbotRulesDTO> botRules = chatbotRuleService.selectRulesList();
+
+        model.addAttribute("badTypeList", badType);
+        model.addAttribute("badWordList", badWord);
+        model.addAttribute("botRulesList", botRules);
+
         return "admin/chatbot";
     }
 
+    @PostMapping("/chatbot")
+    public String chatbot(Model model, String q, String sessId) {
+
+        List<ChatbotBadTypeDTO> badType = chatbotRuleService.selectBadTypeList();
+        List<ChatbotBadWordDTO> badWord = chatbotRuleService.selectBadWordList();
+        List<ChatbotRulesDTO> botRules = chatbotRuleService.selectRulesList();
+
+        model.addAttribute("badTypeList", badType);
+        model.addAttribute("badWordList", badWord);
+        model.addAttribute("botRulesList", botRules);
+
+        String forbiddenResponse = chatbotRuleService.checkAllForbiddenWord(q);
+
+        model.addAttribute("sessId", sessId);
+
+        ChatbotHistDTO faHistDTO = new ChatbotHistDTO();
+        faHistDTO.setBotType(2);
+        faHistDTO.setBotSessId(sessId);
+
+        if (forbiddenResponse != null){
+
+            faHistDTO.setBotContent(forbiddenResponse);
+            model.addAttribute("faHistDTO", faHistDTO);
+
+            return "admin/chatbot";
+
+        }
+
+        faHistDTO.setBotContent("응답이 나오지 않습니다.");
+        model.addAttribute("faHistDTO", faHistDTO);
+
+        return "admin/chatbot";
+    }
+
+    @PostMapping("/forbidden")
+    public String forbidden(Model model, ChatbotBadWordDTO badWordDTO) {
 
 
+        badWordDTO.setBadUseYn("n");
+        chatbotRuleService.insertBadWords(badWordDTO);
 
+        List<ChatbotBadTypeDTO> badType = chatbotRuleService.selectBadTypeList();
+        List<ChatbotBadWordDTO> badWord = chatbotRuleService.selectBadWordList();
+        List<ChatbotRulesDTO> botRules = chatbotRuleService.selectRulesList();
+
+        model.addAttribute("badTypeList", badType);
+        model.addAttribute("badWordList", badWord);
+        model.addAttribute("botRulesList", botRules);
+
+        return "redirect:/admin/chatbot";
+    }
 
 
 

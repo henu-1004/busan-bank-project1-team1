@@ -3023,6 +3023,7 @@ input[type="file"] {
     margin-bottom: 20px;
 }
 
+<<<<<<< Updated upstream
 .admin-stats-row--today .admin-stat-card:nth-child(1) {
     flex: 0 0 70%;   /* 원화 카드 */
 }
@@ -3180,4 +3181,88 @@ input[type="file"] {
     font-size: 13px;
     font-weight: 500;
     color: #6b7280;
+=======
+
+
+/* 챗봇 테이블 css */
+.bot-table-wrapper {
+  overflow-x: auto;
+  width: 100%;
+}
+
+.bot-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+
+.bot-table thead th {
+  text-align: left;
+  font-size: 14px;
+  color: #4f5d73;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #d5dae2;
+}
+
+.bot-table tbody td {
+  padding: 14px 8px;
+  border-bottom: 1px solid rgba(227, 231, 236, 0.7);
+  vertical-align: middle;
+  color: #333;
+}
+
+.bot-table tbody tr:hover {
+  background-color: #f5f7fb;
+}
+
+/* 열 폭 */
+.bot-table td:first-child,
+.bot-table th:first-child {
+  width: 60px;
+  text-align: center;
+}
+
+.bot-table td:nth-child(1),
+.bot-table th:nth-child(1) {
+  width: 160px;
+  text-align: center;
+}
+
+.bot-table td:last-child,
+.bot-table th:last-child {
+  width: 160px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* 버튼 */
+.bot-btn-edit,
+.bot-btn-delete {
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.bot-btn-edit {
+  background-color: #4a6fa5;
+  color: #fff;
+}
+
+.bot-btn-delete {
+  background-color: #d9534f;
+  color: #fff;
+  margin-left: 6px;
+}
+
+.bot-btn-edit:hover {
+  background-color: #3b5c8a;
+}
+
+.bot-btn-delete:hover {
+  background-color: #c0392b;
+>>>>>>> Stashed changes
 }
