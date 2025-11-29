@@ -7,7 +7,10 @@
     <link rel="stylesheet" th:href="@{/css/deposit.css}">
     <link rel="stylesheet" th:href="@{/css/header.css}">
     <link rel="stylesheet" th:href="@{/css/footer.css}">
+    <link rel="stylesheet" th:href="@{/css/rate_modal.css}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous"/>
+
+
 </head>
 <body>
 <div th:replace="~{_template/_header.html}"></div>
@@ -223,45 +226,11 @@
 
         <div id="tab2" class="view-content">
 
-            <dl class="view-detail">
-                <dt>외화정기예금금리</dt>
-                <dd class="date-picker-area">
-                    <label for="searchDate">조회기준일</label>
-                    <input type="date" id="searchDate">
-                </dd>
-            </dl>
 
-            <div class="unit-text" style="text-align: right; font-size: 12px; color: #666; margin-bottom: 5px;">(세전, 연 %)</div>
+            <div class="rate-guide-action">
+                <button type="button" class="rate-modal-button" onclick="openRateModal()">금리안내</button>
 
-            <div class="table-wrap">
-                <table class="tbl-basic">
-                    <colgroup>
-                        <col style="width: 120px;">
-                        <col span="12" style="width: 80px;">
-                    </colgroup>
-                    <thead>
-                    <tr>
-                        <th scope="col">통화</th>
-                        <th scope="col">1개월이상</th>
-                        <th scope="col">2개월이상</th>
-                        <th scope="col">3개월이상</th>
-                        <th scope="col">4개월이상</th>
-                        <th scope="col">5개월이상</th>
-                        <th scope="col">6개월이상</th>
-                        <th scope="col">7개월이상</th>
-                        <th scope="col">8개월이상</th>
-                        <th scope="col">9개월이상</th>
-                        <th scope="col">10개월이상</th>
-                        <th scope="col">11개월이상</th>
-                        <th scope="col">12개월이상</th>
-                    </tr>
-                    </thead>
-                    <tbody id="rateTableBody">
-                    <tr>
-                        <td colspan="13" class="no-data" style="padding: 30px; text-align: center; color: #999;">조회할 날짜를 선택해주세요.</td>
-                    </tr>
-                    </tbody>
-                </table>
+
             </div>
 
             <dl class="view-detail" style="margin-top: 30px;">
@@ -327,6 +296,145 @@
             </table>
         </div>
 
+<!-- ///////////////////////////////////////////////////////////////////// -->
+        <!-- ///////////////////////////////////////////////////////////////////// -->
+
+
+
+        <div id="rateModal" class="rate-modal-overlay" style="display:none;">
+
+            <div class="rate-modal-content">
+                <button type="button" class="rate-modal-close" onclick="closeRateModal()" aria-label="닫기">&times;</button>
+
+                <!-- 제목 -->
+                <h3 class="rate-modal-title">외화예금상세조회</h3>
+
+                <!-- 조회 폼 -->
+                <div class="rate-modal-summary">
+                    <h4>조회 조건</h4>
+                    <p class="rate-modal-guide">조회일자와 통화를 선택 후 조회 버튼을 누르면 해당 기준일의 금리를 표시합니다.</p>
+
+                    <div class="rate-modal-form">
+
+                        <!-- 조회일자 -->
+                        <div class="rate-modal-field">
+                            <span class="rate-modal-label">조회일자</span>
+                            <div class="rate-modal-input-row">
+                                <input type="text" id="staticDate" value="2025-12-03" readonly>
+                                <button type="button" class="calendar-button">
+                                    <i class="fa-solid fa-calendar-days"></i>
+                                    
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 통화 -->
+                        <div class="rate-modal-field">
+                            <span class="rate-modal-label">통화</span>
+                            <select class="rate-modal-select" style="
+                        padding:10px;
+                        border:1px solid #cbd5e0;
+                        border-radius:8px;
+                        font-size:14px;">
+                                <option>USD : 미국달러</option>
+                            </select>
+                        </div>
+
+
+
+
+                    </div>
+
+                    <div style="
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        margin-top: 25px;
+    ">
+                        <button type="button" class="rate-modal-button"
+                                style="width:160px; padding:12px 0; font-size:16px; border-radius:10px;">
+                            조회
+                        </button>
+                    </div>
+
+
+                </div>
+
+                <!-- 조회기준일시 -->
+                <p class="rate-modal-date" style="margin:4px 0 16px; font-size:15px; color:#444;">
+                    조회기준일시 : <strong>2025-12-03 16:13:27</strong>  |  통화 : USD(미국)
+                </p>
+
+
+                <!-- 금리 카테고리 탭 -->
+                <div class="rate-modal-tab-wrapper">
+                    <button class="rate-modal-tab active">일반외화예수금이율</button>
+                    <button class="rate-modal-tab">외화 거치식 정기예금</button>
+                    <button class="rate-modal-tab">더 와이드 외화적금</button>
+                    <button class="rate-modal-tab">외화수퍼플러스 예금</button>
+                    <button class="rate-modal-tab">외화 고단위 플러스 정기예금</button>
+                </div>
+
+
+                <!-- 금리표 -->
+                <div class="table-wrap">
+                    <table class="tbl-basic rate-modal-table" style="width:100%; border-collapse:collapse;">
+                        <colgroup>
+                            <col style="width:180px;">
+                            <col style="width:120px;">
+                            <col style="width:120px;">
+                        </colgroup>
+
+                        <thead>
+                        <tr style="background:#f1f4f9;">
+                            <th>구분</th>
+                            <th>거주자</th>
+                            <th>비거주자</th>
+                        </tr>
+                        </thead>
+
+                        <tbody>
+
+                        <tr>
+                            <td style="background:#fafafa; font-weight:600;">외화보통예금</td>
+                            <td>3.27520</td>
+                            <td>3.30860</td>
+                        </tr>
+
+                        <tr>
+                            <td style="background:#fafafa; font-weight:600;">외화통지예금</td>
+                            <td>0.01000</td>
+                            <td>0.01000</td>
+                        </tr>
+
+                        <tr>
+                            <td colspan="3"
+                                style="background:#f0f4ff; font-weight:700; text-align:center;">
+                                외화정기예금 (USD)
+                            </td>
+                        </tr>
+
+                        <tr><td>1개월</td><td>3.272520</td><td>3.30860</td></tr>
+                        <tr><td>2개월</td><td>3.28870</td><td>3.32220</td></tr>
+                        <tr><td>3개월</td><td>3.30220</td><td>3.33590</td></tr>
+                        <tr><td>4개월</td><td>3.33550</td><td>3.36950</td></tr>
+                        <tr><td>5개월</td><td>3.36880</td><td>3.40320</td></tr>
+                        <tr><td>6개월</td><td>3.40220</td><td>3.43690</td></tr>
+                        <tr><td>7개월</td><td>3.40510</td><td>3.43980</td></tr>
+                        <tr><td>8개월</td><td>3.40810</td><td>3.44280</td></tr>
+                        <tr><td>9개월</td><td>3.41100</td><td>3.44580</td></tr>
+                        <tr><td>10개월</td><td>3.41400</td><td>3.44880</td></tr>
+
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+
+
+        <!-- ///////////////////////////////////////////////////////////////////// -->
+        <!-- ///////////////////////////////////////////////////////////////////// -->
 
         <div id="tab3" class="view-content">
             <ul class="view-terms-list">
@@ -392,5 +500,32 @@
 
 <div th:replace="~{_template/_footer.html}"></div>
 <script th:src="@{/js/deposit.js}"></script>
+
+<!--//////////////////////추가////////////////////// -->
+<script>
+    function openRateModal() {
+        const modal = document.getElementById('rateModal');
+        if (modal) {
+            modal.style.display = 'flex';
+        }
+    }
+
+    function closeRateModal() {
+        const modal = document.getElementById('rateModal');
+        if (modal) {
+            modal.style.display = 'none';
+        }
+    }
+
+    window.addEventListener('click', function (event) {
+        const modal = document.getElementById('rateModal');
+        if (modal && event.target === modal) {
+            closeRateModal();
+        }
+    });
+</script>
+
+<!--//////////////////////////////////////////// -->
+
 </body>
 </html>
