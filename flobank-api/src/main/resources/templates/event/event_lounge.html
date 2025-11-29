@@ -8,6 +8,129 @@
     <link rel="stylesheet" th:href="@{/css/header.css}">
     <link rel="stylesheet" th:href="@{/css/footer.css}">
     <link rel="stylesheet" th:href="@{/css/test/benefit.css}">
+
+    <style>
+        /* AI 요약 섹션 레이아웃 */
+        .ai-section {
+            background-color: #f4f6f9;
+            padding: 60px 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        /* 카드 디자인 (이미지처럼 보이는 핵심) */
+        .ai-card {
+            background: white;
+            width: 100%;
+            max-width: 700px; /* 가로로 넓게 잡아서 가독성 확보 */
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            overflow: hidden;
+            border: 1px solid #e1e4e8;
+            position: relative;
+        }
+
+        /* 1. 헤더 (그라데이션) */
+        .ai-card-header {
+            padding: 25px 30px;
+            background: linear-gradient(135deg, #004494 0%, #003366 100%);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .ai-header-title h2 { font-size: 22px; margin: 0 0 5px 0; font-weight: 700; color: white;}
+        .ai-header-title p { font-size: 14px; opacity: 0.85; margin: 0; color: #e0e7ff; }
+        .ai-flag { font-size: 40px; line-height: 1; }
+
+        /* 2. 본문 (요약 내용 + 데이터) */
+        .ai-card-body {
+            padding: 30px;
+            display: flex;
+            gap: 30px; /* 좌우 패널 간격 */
+        }
+
+        /* 왼쪽: 텍스트 요약 */
+        .ai-summary-text {
+            flex: 1.5;
+        }
+
+        .ai-badge {
+            display: inline-flex;
+            align-items: center;
+            background: linear-gradient(90deg, #6366f1, #8b5cf6); /* Gemini 컬러 */
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(99, 102, 241, 0.3);
+        }
+
+        .ai-desc {
+            font-size: 16px;
+            line-height: 1.7;
+            color: #333;
+            word-break: keep-all;
+        }
+        .ai-desc strong { color: #004494; font-weight: 700; background: #eef2ff; padding: 2px 5px; border-radius: 4px; }
+
+        /* 오른쪽: 데이터 시각화 */
+        .ai-visual-data {
+            flex: 1;
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #eee;
+        }
+
+        /* 원형 게이지 */
+        .circle-graph {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            /* 5.2%를 대략 시각화 (CSS conic-gradient 활용) */
+            background: conic-gradient(#004494 0% 85%, #d1d5db 85% 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .circle-inner {
+            width: 74px;
+            height: 74px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #004494;
+        }
+
+        .circle-inner .val { font-size: 20px; font-weight: 800; line-height: 1; }
+        .circle-inner .unit { font-size: 12px; font-weight: 500; color: #666; margin-top: 2px; }
+
+        .visual-label { font-size: 14px; color: #555; font-weight: 600; }
+
+        /* 모바일 대응 (반응형) */
+        @media (max-width: 768px) {
+            .ai-card-body { flex-direction: column; }
+            .ai-summary-text { margin-bottom: 20px; }
+            .ai-visual-data { flex-direction: row; gap: 20px; justify-content: space-around; }
+            .circle-graph { width: 70px; height: 70px; }
+            .circle-inner { width: 58px; height: 58px; }
+            .circle-inner .val { font-size: 16px; }
+        }
+    </style>
 </head>
 
 <body>
@@ -18,37 +141,65 @@
 
     <section class="hero">
         <div class="hero-inner">
-
-            <!-- LEFT: 캐릭터 -->
             <div class="hero-left">
                 <img th:src="@{/images/character12.png}" class="hero-img" alt="슈카월드 이미지">
             </div>
-
-            <!-- RIGHT: 영상 -->
             <div class="hero-right">
                 <iframe class="hero-video" width="560" height="315"
                         src="https://www.youtube.com/embed/X1L5w_pBRhY?si=o7XWWjc_ou_DYKGY"
                         frameborder="0" allowfullscreen></iframe>
             </div>
-
         </div>
 
         <div class="hero-bottom-text">
             <p class="hero-subtitle"><strong>슈카월드 X 플로뱅크</strong></p>
-
             <h1 class="hero-title">슈카 달러 풀링 예금</h1>
-
             <p class="hero-shuka-info">
                 경제·금융 콘텐츠 1위, 구독자 <strong>361만</strong> 슈카월드와 함께하는 특별 예금.
             </p>
-
             <p class="hero-desc">
                 인원이 모일수록 금리와 경품 혜택이 올라간다!
             </p>
         </div>
-
     </section>
-    <!-- RATE + STEP -->
+
+    <section class="ai-section">
+        <div class="ai-card">
+            <div class="ai-card-header">
+                <div class="ai-header-title">
+                    <h2>달러 풀링 예금 핵심 정보</h2>
+                    <p>복잡한 상품 설명, AI가 3줄로 정리했어요!</p>
+                </div>
+                <div class="ai-flag">🇺🇸</div>
+            </div>
+
+            <div class="ai-card-body">
+                <div class="ai-summary-text">
+                    <div class="ai-badge">✨ AI 핵심 요약</div>
+                    <p class="ai-desc">
+                        구독자 361만 유튜버 슈카월드와 함께하는 <strong>공동구매형 외화 예금</strong>입니다.<br><br>
+                        가입자가 늘어날수록 금리가 올라가 <strong>최대 연 5.2%</strong>의 혜택을 받을 수 있으며,
+                        참여자 중 추첨을 통해 <strong>하와이 왕복 항공권</strong> 등 특별한 경품을 제공합니다.
+                    </p>
+                </div>
+
+                <div class="ai-visual-data">
+                    <div class="circle-graph">
+                        <div class="circle-inner">
+                            <span class="val">5.2%</span>
+                        </div>
+                    </div>
+                    <div class="visual-label">최대 예상 금리</div>
+
+                    <div style="margin-top: 15px; text-align: center;">
+                        <span style="font-size: 24px;">🎁</span>
+                        <div class="visual-label" style="margin-top:5px;">경품 혜택 포함</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <section class="rate-section">
         <div class="rate-inner">
 
@@ -64,63 +215,47 @@
                 <p class="rate-basic">기본 연 <strong>3.0%</strong></p>
 
                 <div class="steps-cards">
-
-                    <!-- STEP 1 -->
                     <div class="step-card">
                         <div class="step-header">
                             <span class="step-badge">STEP 1</span>
                             <span class="step-people strong">1000명 가입</span>
                         </div>
                         <div class="step-rate">3.5%</div>
-
                         <div class="rate-detail-box">
                             <p><span class="label">기본금리</span> <strong>3.0%</strong></p>
                             <p><span class="label">우대금리</span> <strong>+0.5%</strong></p>
                         </div>
-
                         <p class="step-benefit highlight">스타벅스 추첨</p>
                     </div>
 
-                    <!-- STEP 2 -->
                     <div class="step-card">
                         <div class="step-header">
                             <span class="step-badge">STEP 2</span>
                             <span class="step-people strong">3000명 가입</span>
                         </div>
                         <div class="step-rate">4.5%</div>
-
                         <div class="rate-detail-box">
                             <p><span class="label">기본금리</span> <strong>3.5%</strong></p>
                             <p><span class="label">우대금리</span> <strong>+1.0%</strong></p>
                         </div>
-
                         <p class="step-benefit highlight">상품권 100만원</p>
                     </div>
 
-                    <!-- STEP 3 -->
                     <div class="step-card">
                         <div class="step-header">
                             <span class="step-badge">STEP 3</span>
                             <span class="step-people strong">6000명 가입</span>
                         </div>
                         <div class="step-rate">5.2%</div>
-
                         <div class="rate-detail-box">
                             <p><span class="label">기본금리</span> <strong>4.5%</strong></p>
                             <p><span class="label">우대금리</span> <strong>+0.7%</strong></p>
                         </div>
-
                         <p class="step-benefit highlight">하와이 왕복 비행기 티켓</p>
                     </div>
 
-                </div><!-- steps-cards -->
+                </div></div></div></section>
 
-            </div><!-- rate-text -->
-        </div><!-- rate-inner -->
-    </section>
-
-
-    <!-- CTA SECTION -->
     <section class="cta-section">
         <h3>5.2% 최대 금리와 경품 혜택을 지금 바로 만나보세요</h3>
         <p class="cta-sub">사전 신청 고객에게만 제공되는 특별 우대금리와 경품 혜택을 놓치지 마세요.</p>
@@ -130,7 +265,6 @@
             5.2% 받고 사전 신청하기
         </a>
     </section>
-
 
 </main>
 
