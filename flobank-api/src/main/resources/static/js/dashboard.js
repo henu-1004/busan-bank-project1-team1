@@ -108,6 +108,7 @@ document.addEventListener('DOMContentLoaded', function () {
         countTrendData = [totalTxCount];
         amountTrendData = [totalTxAmount];
     }
+    trendLabels = trendLabels.map(v => String(v ?? '').replace(/^"+|"+$/g, '').replace(/"/g, ''));
 
     // (1) 건수 미니차트
     const krwCountCanvas = document.getElementById('krwCountMiniChart');
@@ -121,7 +122,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 datasets: [
                     {
                         data: countTrendData,
-                        borderColor: '#1e1f22',
+                        borderColor: '#2196f3',
                         backgroundColor: 'rgba(244,244,244,0)',
                         tension: 0,
                         fill: true,
@@ -171,6 +172,34 @@ document.addEventListener('DOMContentLoaded', function () {
     const krwAmountCanvas = document.getElementById('krwAmountMiniChart');
     if (krwAmountCanvas) {
         const ctx = krwAmountCanvas.getContext('2d');
+        const maxAmount = Math.max(...amountTrendData.map(v => Number(v) || 0));
+        const amountUnit =
+            maxAmount >= 100000000 ? '억' :
+                maxAmount >= 10000000  ? '천만' :
+                    maxAmount >= 10000     ? '만' : '';
+
+        // ✅ 단위 포맷 함수
+        const formatAmount = (value) => {
+            const n = Number(value) || 0;
+            const abs = Math.abs(n);
+
+            if (amountUnit === '억') {
+                const x = n / 100000000;
+                return (Number.isInteger(x) ? x : x.toFixed(1)) + '억';
+            }
+            if (amountUnit === '천만') {
+                const x = n / 10000000;
+                return (Number.isInteger(x) ? x : x.toFixed(1)) + '천만';
+            }
+            if (amountUnit === '만') {
+                const x = n / 10000;
+                return (Number.isInteger(x) ? x : x.toFixed(1)) + '만';
+            }
+
+            // 1만 미만이면 그냥 콤마
+            return n.toLocaleString('ko-KR');
+        };
+
         new Chart(ctx, {
             type: 'line',
             data: {
@@ -178,11 +207,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 datasets: [
                     {
                         data: amountTrendData,
-                        borderColor: '#fcc1b0',
-                        backgroundColor: 'rgb(253,232,231)',
-                        tension: 0.4,
+                        borderColor: '#2196f3',
+                        backgroundColor: 'rgba(244,244,244, 0)',
+                        tension: 0,
                         fill: true,
-                        pointRadius: 0,
+                        pointRadius: 1,
                         hoverRadius: 0,
                         pointHitRadius: 15
                     }
@@ -210,11 +239,18 @@ document.addEventListener('DOMContentLoaded', function () {
                 },
                 scales: {
                     x: {
-                        display: false
+                        display: true
                     },
                     y: {
-                        display: false,
-                        beginAtZero: true
+                        display: true,
+                        beginAtZero: true,
+                        grace: '10%',
+                        ticks: {
+                            maxTicksLimit: 7,
+                            callback: function (value) {
+                                return formatAmount(value);
+                            }
+                        }
                     }
                 }
             }
@@ -250,6 +286,7 @@ document.addEventListener('DOMContentLoaded', function () {
             },
             options: {
                 responsive: true,
+                maintainAspectRatio: false,
                 animation: true,
                 plugins: {
                     legend: {
@@ -262,7 +299,26 @@ document.addEventListener('DOMContentLoaded', function () {
                         beginAtZero: true,
                         suggestedMax: maxValue + 1,
                         ticks: {
-                            precision: 0
+                            precision: 0,
+                            grid: {
+                                drawBorder: true
+                            },
+                            border: {
+                                display: true
+                            }
+                        },
+                        yR: {
+                            position: 'right',
+                            grid: {
+                                drawOnChartArea: false,  // 오른쪽 축이 그리드를 또 그리면 지저분해짐
+                                drawBorder: true
+                            },
+                            border: {
+                                display: true
+                            },
+                            ticks: {
+                                display: false
+                            }
                         }
                     }
                 },
