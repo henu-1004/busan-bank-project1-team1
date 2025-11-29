@@ -48,6 +48,7 @@ public class ChatbotController {
         return "mypage/chatbot";
     }
 
+    private final ChatbotRuleService chatbotRuleService;
     @PostMapping("/mypage/chatbot")
     public String chatbot(Model model, String q, String sessId) {
         System.out.println("GPT API 호출 들어옴 = " + System.currentTimeMillis());
@@ -62,6 +63,23 @@ public class ChatbotController {
 
 
         try {
+            String forbiddenResponse = chatbotRuleService.checkForbiddenWord(q);
+            if (forbiddenResponse != null){
+                ChatbotHistDTO faHistDTO = new ChatbotHistDTO();
+                faHistDTO.setBotType(2);
+                faHistDTO.setBotContent(forbiddenResponse);
+                faHistDTO.setBotSessId(sessId);
+                chatbotHistService.insertHist(faHistDTO);
+
+                List<ChatbotHistDTO> dtoList = chatbotHistService.selectHist(sessId);
+                model.addAttribute("dtoList", dtoList);
+                model.addAttribute("sessId", sessId);
+
+                return "mypage/chatbot"; // 금칙어 매칭 -> GPT 호출 전에 차단함
+
+            }
+
+
             // 문서 타입 자동 분류
             String type = typeClassifier.detectTypeByGPT(q);
             System.out.println("=== 자동 분류된 TYPE = " + type);
@@ -124,6 +142,7 @@ public class ChatbotController {
             model.addAttribute("sessId", sessId);
 
             return "mypage/chatbot";
+
 
         } catch (Exception e) {
             e.printStackTrace();
