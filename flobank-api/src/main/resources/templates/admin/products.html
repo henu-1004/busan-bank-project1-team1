@@ -3,7 +3,120 @@
       th:replace="~{admin/admin_template :: admin_template('외화예금 관리','외화예금 관리',~{::content},~{::script})}">
 
 <th:block th:fragment="content">
+    <style>
+        /* 카드 전체 컨테이너 */
+        .ai-card-preview {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            overflow: hidden;
+            margin-bottom: 20px;
+            border: 1px solid #e1e4e8;
+            font-family: 'Pretendard', sans-serif;
+        }
 
+        /* 1. 헤더 (파란색) */
+        .preview-header {
+            background-color: #1e3a8a; /* 짙은 파란색 */
+            color: white;
+            padding: 24px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .preview-header h3 { margin: 0 0 6px 0; font-size: 20px; font-weight: 700; color: white;}
+        .preview-header p { margin: 0; font-size: 13px; opacity: 0.8; font-weight: 400; color: #dbeafe;}
+        .preview-flag { font-size: 32px; font-weight: 700; letter-spacing: -1px; }
+
+        /* 2. 바디 (내용) */
+        .preview-body {
+            padding: 30px;
+            display: flex;
+            gap: 30px;
+        }
+
+        /* 왼쪽: 텍스트 영역 */
+        .preview-text-area { flex: 1.5; }
+
+        .ai-badge {
+            display: inline-block;
+            background: linear-gradient(90deg, #8b5cf6, #6366f1); /* 보라색 그라데이션 */
+            color: white;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 6px 14px;
+            border-radius: 20px;
+            margin-bottom: 16px;
+        }
+
+        .preview-desc {
+            font-size: 15px;
+            line-height: 1.6;
+            color: #333;
+            white-space: pre-wrap; /* 줄바꿈 허용 */
+        }
+        .preview-desc strong { color: #1e3a8a; font-weight: 700; background: #eff6ff; padding: 2px 4px; border-radius: 4px; }
+
+        /* 오른쪽: 원형 그래프 영역 */
+        .preview-visual-area {
+            flex: 1;
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #f1f5f9;
+        }
+
+        /* 원형 차트 (CSS conic-gradient) */
+        .circle-chart {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+            /* 기본 배경 (회색) */
+            background: #e2e8f0;
+        }
+
+        .circle-chart::before {
+            content: "";
+            position: absolute;
+            width: 84px; /* 두께 조절: 100 - 84 = 16px */
+            height: 84px;
+            background: #f8fafc; /* 배경색과 동일하게 */
+            border-radius: 50%;
+        }
+
+        .chart-text {
+            position: relative;
+            z-index: 2;
+            font-size: 22px;
+            font-weight: 800;
+            color: #1e3a8a;
+        }
+
+        .visual-label { font-size: 13px; color: #64748b; margin-top: 4px; font-weight: 500;}
+        .visual-icon { font-size: 24px; margin-top: 16px; }
+
+        /* 입력 필드 숨기기 (필요시 보이게 해도 됨) */
+        .edit-controls {
+            background: #f1f5f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            border: 1px dashed #cbd5e1;
+        }
+        .edit-controls label { font-size: 12px; font-weight: bold; color: #475569; display: block; margin-bottom: 4px;}
+        .edit-controls input, .edit-controls textarea {
+            width: 100%; border: 1px solid #cbd5e1; padding: 8px; border-radius: 4px; font-size: 13px; margin-bottom: 10px;
+        }
+    </style>
     <div class="product-container">
 
         <!-- =======================
@@ -79,7 +192,72 @@
                         </div>
                     </div>
                 </div>
+                <div class="form-section">
+                    <h3>AI 요약 카드 설정</h3>
 
+                    <div class="ai-card-preview">
+                        <div class="preview-header">
+                            <div>
+                                <h3 id="previewTitle">상품명 표시 영역</h3>
+                                <p>복잡한 상품 설명, AI가 3줄로 정리했어요!</p>
+                            </div>
+                            <div class="preview-flag" id="previewFlag">US</div>
+                        </div>
+
+                        <div class="preview-body">
+                            <div class="preview-body">
+                                <div class="preview-text-area">
+                                    <span class="ai-badge">✨ AI 핵심 요약</span>
+                                    <div class="preview-desc" id="previewDesc">아직 AI 분석 전입니다.</div>
+                                </div>
+
+                                <div class="preview-visual-area">
+                                    <div class="circle-chart" id="previewChart" style="background: conic-gradient(#1e3a8a 0% 0%, #e2e8f0 0% 100%);">
+                                        <span class="chart-text" id="previewRate">0%</span>
+                                    </div>
+                                    <div class="visual-label">최대 예상 금리</div>
+
+                                    <div id="benefitSection" style="text-align: center;">
+                                        <div class="visual-icon" id="previewIcon">🎁</div>
+                                        <div class="visual-label" id="previewBenefit">경품 혜택 포함</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="edit-controls">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <label>🤖 AI 생성 데이터 수정</label>
+                            <button type="button" id="btnGenSummary" class="btn-secondary" style="font-size: 11px; padding: 3px 8px;">✨ AI 내용 다시 생성</button>
+                        </div>
+
+                        <label>요약 텍스트</label>
+                        <textarea id="aiSummaryInput" name="aiSummary" rows="3" placeholder="AI 요약문"></textarea>
+
+                        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                            <div style="flex: 1;">
+                                <label>강조 금리 (%)</label>
+                                <input type="number" id="aiRateInput" name="aiRate" step="0.1" placeholder="5.2" />
+                            </div>
+                            <div style="flex: 1;">
+                                <label>대표 통화</label>
+                                <input type="text" id="aiCurrencyInput" name="aiCurrency" placeholder="US" />
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: 10px;">
+                            <div style="flex: 0.3;">
+                                <label>아이콘(이모지)</label>
+                                <input type="text" id="aiIconInput" name="aiIcon" placeholder="🎁" style="text-align: center;" />
+                            </div>
+                            <div style="flex: 1;">
+                                <label>추가 혜택 문구 (비워두면 숨김)</label>
+                                <input type="text" id="aiBenefitInput" name="aiBenefit" placeholder="예: 경품 혜택 포함, 비과세 적용 등" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div class="form-section">
                 <h3>기본정보</h3>
                 <div class="form-group">
@@ -352,8 +530,107 @@
            SSE 전역 변수
         ============================= */
         let currentEventSource = null;
+        let currentPdfData = null;
 
         const AI_PLACEHOLDER = "AI 분석이 완료되면 생성된 코멘트가 이 영역에 표시됩니다.";
+
+        /* ============================
+           🎨 1. AI 카드 미리보기 로직
+        ============================= */
+        // UI 요소 가져오기
+        const ui = {
+            summaryInput: document.getElementById('aiSummaryInput'),
+            rateInput: document.getElementById('aiRateInput'),
+            currencyInput: document.getElementById('aiCurrencyInput'),
+            // [추가] 혜택 관련 입력창
+            iconInput: document.getElementById('aiIconInput'),
+            benefitInput: document.getElementById('aiBenefitInput'),
+            nameInput: document.getElementById('dpstName'),
+
+            previewTitle: document.getElementById('previewTitle'),
+            previewDesc: document.getElementById('previewDesc'),
+            previewRate: document.getElementById('previewRate'),
+            previewChart: document.getElementById('previewChart'),
+            previewFlag: document.getElementById('previewFlag'),
+            // [추가] 미리보기 요소
+            previewIcon: document.getElementById('previewIcon'),
+            previewBenefit: document.getElementById('previewBenefit'),
+            benefitSection: document.getElementById('benefitSection')
+        };
+
+        // 미리보기 업데이트 함수
+        function updateCardPreview() {
+            // 텍스트 반영
+            if(ui.previewDesc) ui.previewDesc.innerHTML = (ui.summaryInput.value || "아직 AI 분석 전입니다.<br>PDF를 분석하면 요약 내용이 여기에 표시됩니다.").replace(/\n/g, "<br>");
+            if(ui.previewTitle) ui.previewTitle.textContent = ui.nameInput.value || "상품명 표시 영역";
+            if(ui.previewFlag) ui.previewFlag.textContent = ui.currencyInput.value || "US";
+
+            // 금리 차트 반영
+            const rate = parseFloat(ui.rateInput.value) || 0;
+            if(ui.previewRate) ui.previewRate.textContent = rate + "%";
+
+            // 도넛 차트 그라데이션 (최대 10% 기준 시각화)
+            const percentage = Math.min((rate / 6) * 100, 100);
+            if(ui.previewChart) {
+                ui.previewChart.style.background = `conic-gradient(#1e3a8a 0% ${percentage}%, #e2e8f0 ${percentage}% 100%)`;
+            }
+
+            // 2. 🔥 [핵심] 혜택 섹션 제어 로직
+            const iconVal = ui.iconInput.value;
+            const benefitVal = ui.benefitInput.value;
+
+            if (!benefitVal) {
+                // 텍스트가 없으면 아예 숨김
+                if(ui.benefitSection) ui.benefitSection.style.display = 'none';
+            } else {
+                // 텍스트가 있으면 보여줌
+                if(ui.benefitSection) ui.benefitSection.style.display = 'block';
+                if(ui.previewIcon) ui.previewIcon.textContent = iconVal || "🎁"; // 아이콘 없으면 기본값 선물상자
+                if(ui.previewBenefit) ui.previewBenefit.textContent = benefitVal;
+            }
+        }
+
+        // 이벤트 리스너 등록 (새로 추가된 input들도 포함)
+        [ui.summaryInput, ui.rateInput, ui.currencyInput, ui.iconInput, ui.benefitInput, ui.nameInput].forEach(input => {
+            if(input) input.addEventListener('input', updateCardPreview);
+        });
+
+        /* ============================
+           🤖 2. AI 내용 생성 버튼 동작
+        ============================= */
+        const btnGenSummary = document.getElementById("btnGenSummary");
+        if(btnGenSummary) {
+            btnGenSummary.addEventListener("click", () => {
+                if (!currentPdfData) {
+                    alert("먼저 'AI 분석 완료 PDF'를 선택해주세요.");
+                    return;
+                }
+
+                // 로딩 표시
+                ui.summaryInput.value = "AI가 내용을 생성하고 있습니다...";
+
+                setTimeout(() => {
+                    // 실제 데이터 매핑 (PDF 분석 결과가 있다고 가정)
+                    const summary = currentPdfData.productShortDesc || "PDF에서 요약 정보를 찾을 수 없습니다.";
+                    const maxRate = currentPdfData.maxRate || 0.0; // 데이터 없으면 0.0
+
+                    // 통화 코드 추출 (예: "USD, JPY" -> "US")
+                    let currency = "US";
+                    if(currentPdfData.currencies) {
+                        currency = currentPdfData.currencies.substring(0, 2).toUpperCase();
+                    }
+
+                    // 값 주입
+                    ui.summaryInput.value = summary;
+                    ui.rateInput.value = maxRate;
+                    ui.currencyInput.value = currency;
+
+                    // 미리보기 갱신
+                    updateCardPreview();
+                    alert("AI 요약 내용이 생성되었습니다.");
+                }, 500); // 0.5초 딜레이 연출
+            });
+        }
 
         /* ============================
            📡 SSE 연결 함수
@@ -589,6 +866,8 @@
         function applyPdfDataToForm(pdf) {
             if (!pdf) return;
 
+            currentPdfData = pdf; // [중요] 데이터 저장해두기 (버튼 클릭용)
+
             updateSelectedPdfInputs(pdf);
 
             const nameInput = document.getElementById("dpstName");
@@ -615,27 +894,16 @@
             /* 환율 정책 */
             const policy = (pdf.exchangeRatePolicy || "").replace(/\s/g, "").toLowerCase();
             let rateValue = null;
-
-            if (policy.includes("납입")) {
-                rateValue = "3";
-            } else if (policy.includes("만기")) {
-                rateValue = "2";
-            } else if (policy.includes("가입")) {
-                rateValue = "1";
-            }
-
+            if (policy.includes("납입")) rateValue = "3";
+            else if (policy.includes("만기")) rateValue = "2";
+            else if (policy.includes("가입")) rateValue = "1";
             setRadioValue("dpstRateType", rateValue);
 
             /* 가입 기간 */
             const termText = pdf.termType || "";
             let joinType = null;
-
-            if (pdf.minMonth != null || pdf.maxMonth != null || termText.includes("자유")) {
-                joinType = "1";
-            } else if (termText) {
-                joinType = "2";
-            }
-
+            if (pdf.minMonth != null || pdf.maxMonth != null || termText.includes("자유")) joinType = "1";
+            else if (termText) joinType = "2";
             setRadioValue("dpstPeriodType", joinType);
 
             const minMonths = document.querySelector('input[name="minMonths"]');
@@ -646,15 +914,12 @@
             const fixedMonthsInput = document.querySelector('input[name="fixedMonths"]');
             if (fixedMonthsInput && joinType === "2") {
                 const monthsFromText = termText.match(/\d+/g);
-                if (monthsFromText && monthsFromText.length > 0) {
-                    fixedMonthsInput.value = monthsFromText.join(",");
-                } else if (termText) {
-                    fixedMonthsInput.value = termText;
-                }
+                if (monthsFromText && monthsFromText.length > 0) fixedMonthsInput.value = monthsFromText.join(",");
+                else if (termText) fixedMonthsInput.value = termText;
                 fixedMonthsInput.dispatchEvent(new Event("change", { bubbles: true }));
             }
 
-            /* 추가 납입 / 자동 연장 / 분할 인출 */
+            /* 추가 기능 */
             const yesNo = (value) => {
                 if (!value) return null;
                 const cleaned = value.trim();
@@ -662,12 +927,14 @@
                 if (cleaned.includes("없음") || cleaned.includes("불가") || cleaned.includes("불가능")) return "N";
                 return null;
             };
-
             setRadioValue("dpstAddPayYn", yesNo(pdf.additionalDeposit));
             setRadioValue("dpstAutoRenewYn", yesNo(pdf.autoRenewal));
             setRadioValue("dpstPartWdrwYn", yesNo(pdf.partialWithdrawal));
 
             renderAiComments(pdf);
+
+            // PDF 선택 시 카드 미리보기도 한번 갱신 시도
+            if(ui.nameInput) ui.nameInput.dispatchEvent(new Event('input'));
         }
 
 
@@ -837,6 +1104,7 @@
             if (selector) {
                 selector.addEventListener("change", handlePdfSelection);
             }
+            if(typeof updateCardPreview === 'function') updateCardPreview();
         });
     </script>
 
