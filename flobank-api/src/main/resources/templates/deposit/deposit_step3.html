@@ -135,15 +135,18 @@
           <!--  버튼 -->
           <div class="step1-actions">
               <a th:href="@{/deposit/deposit_step2(dpstId=${product.dpstId})}" onclick="return confirmBeforeBack();" class="step1-btn-prev">이전</a>
-              <button type="submit" style="background-color: transparent; border: 0; height: 30px"><a class="step1-btn-next">완료</a></button>
+              <button type="button" id="btn-cert-complete" style="background-color: transparent; border: 0; height: 30px">
+                  <a class="step1-btn-next">완료</a>
+              </button>
           </div>
 
       </form>
   </div>
 </main>
-
-<script th:src ="@{/js/deposit.js}"></script>
 <div th:replace="~{_template/_footer.html}"></div>
+<script th:src="@{/js/common_cert.js}"></script>
+<script th:src ="@{/js/deposit.js}"></script>
+
 
 </body>
 </html>

@@ -268,8 +268,46 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    // --------------------------------------------------------
+    // [Step 3] 간편인증 연동 로직
+    // --------------------------------------------------------
+    const btnCertComplete = document.getElementById("btn-cert-complete");
 
-});
+    if (btnCertComplete) {
+        btnCertComplete.addEventListener("click", function() {
+
+            // 1. 폼 요소 가져오기
+            const finalForm = document.getElementById("depositFinalForm");
+
+            // 2. 인증창에 띄울 정보 수집 (Hidden Input 값 활용)
+            // 상품명 (HTML 테이블에서 텍스트를 가져오거나 하드코딩)
+            const productName = "BNK 모아드림 외화적금 가입";
+
+            // 출금 유형 (krw: 원화, fx: 외화)
+            const withdrawType = document.querySelector('input[name="withdrawType"]').value;
+
+            let authAmount = ""; // 인증창에 띄울 문자열 (예: "1,000,000 원")
+
+            if (withdrawType === 'krw') {
+                // 원화 출금 시: 원화 환산 금액 사용
+                const krwVal = document.querySelector('input[name="krwAmount"]').value;
+                authAmount = Number(krwVal).toLocaleString() + " 원";
+            } else {
+                // 외화 출금 시: 외화 금액 사용
+                const fxVal = document.querySelector('input[name="dpstAmount"]').value;
+                const currency = document.querySelector('input[name="dpstHdrCurrency"]').value;
+                authAmount = Number(fxVal).toLocaleString() + " " + currency;
+            }
+
+            // 3. CertManager 호출 (common_cert.js에 정의된 객체)
+            // 파라미터: (제목, 금액, 성공시콜백함수)
+            CertManager.request(productName, authAmount, function() {
+                // [콜백] 인증 성공 시 실행되는 부분
+                // 실제 폼을 서버로 제출
+                finalForm.submit();
+            });
+        });
+    }
 
 
     const calcBtn = document.getElementById("calcBtn");
@@ -453,10 +491,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             }
 
-
-
-
-
             const curSelect = document.getElementById("curSelect");
             if (!curSelect.value || curSelect.selectedIndex === 0) {
                 alert("신규 통화 종류를 선택해 주세요.");
@@ -517,7 +551,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-
             const autoRenewRadio = document.querySelector('input[name="autoRenewYn"][value="apply"]');
             if (autoRenewRadio && autoRenewRadio.checked) {
                 const autoRenewTerm = document.querySelector('select[name="autoRenewTerm"]');
@@ -527,7 +560,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     return;
                 }
             }
-
 
             const withdrawT = document.querySelector('input[name="withdrawType"]:checked').value;
             const foreignA = Number(document.getElementById("foreignAmount").value);
@@ -570,8 +602,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     return;
                 }
             }
-
-
         });
 
         const dpstPw = document.getElementById("dpstPw");
@@ -588,7 +618,7 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         }
     }
-
+});
 
 function confirmBeforeBack() {
     return confirm("이전 단계로 이동하면 현재 입력한 정보가 모두 사라집니다.\n계속하시겠습니까?");
