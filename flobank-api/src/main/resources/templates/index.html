@@ -48,30 +48,90 @@
     </div>
 </section>
 
-<section class="foreign-section">
-    <div class="foreign-container">
-        <div class="foreign-item">
-            <a href="javascript:void(0);" onclick="goKoAccountOpenMain();">
-                입출금계좌 개설
-            </a>
-            <p>언제 어디서나 간편하게</p>
+<section class="fx-wrapper">
+
+    <!-- 왼쪽: 환율 박스 -->
+    <div class="fx-left-box">
+        <div class="fx-title-row">
+            <h2>환율</h2>
+            <span class="fx-date" th:text="${fxDate}"></span>
         </div>
-        <div class="foreign-item">
-            <a th:href="@{/exchange/step1}">환전</a>
-            <p>다양한 통화, 실시간 환율</p>
+
+        <!-- 환율 테이블 -->
+        <table class="fx-table">
+            <thead>
+            <tr>
+                <th>통화</th>
+                <th>매매기준율</th>
+                <th>송금받을 때</th>
+                <th>송금보낼 때</th>
+            </tr>
+            </thead>
+
+            <tbody id="fx-list">
+            <tr>
+                <td><img th:src="@{/images/usd.png}"> USD</td>
+                <td id="usd-base"></td>
+                <td id="usd-ttb"></td>
+                <td id="usd-tts"></td>
+            </tr>
+
+            <tr>
+                <td><img th:src="@{/images/jpy.png}"> JPY</td>
+                <td id="jpy-base"></td>
+                <td id="jpy-ttb"></td>
+                <td id="jpy-tts"></td>
+            </tr>
+
+            <tr>
+                <td><img th:src="@{/images/eur.png}"> EUR</td>
+                <td id="eur-base"></td>
+                <td id="eur-ttb"></td>
+                <td id="eur-tts"></td>
+            </tr>
+
+            <tr>
+                <td><img th:src="@{/images/cnh.png}"> CNY</td>
+                <td id="cny-base"></td>
+                <td id="cny-ttb"></td>
+                <td id="cny-tts"></td>
+            </tr>
+            </tbody>
+        </table>
+
+        <!-- 하단 버튼 -->
+        <div class="fx-bottom-btns">
+            <a th:href="@{/rate/rate_calc}" class="fx-btn-link">환율계산기</a>
+            <a th:href="@{/rate/rate_info}" class="fx-btn-link">환율 전체 보기</a>
         </div>
-        <div class="foreign-item">
-            <a th:href="@{/remit/en_transfer_1}">외화송금</a>
-            <p>빠르고 안전한 해외송금</p>
-        </div>
-        <div class="foreign-item">
-            <a th:href="@{/rate/rate_calc}">환율계산기</a>
-            <p>실시간 환율 계산</p>
-        </div>
-        <div class="foreign-item">
-            <a th:href="@{/deposit/list}">외화예금</a>
-            <p>플로뱅크의 다양한 외화예금</p>
-        </div>
+    </div>
+
+    <!-- 오른쪽: 기능 박스 3개 -->
+    <div class="fx-right-box">
+
+        <a th:href="@{/exchange/step1}" class="fx-card purple">
+            <div class="fx-card-text">
+                <h3>환전</h3>
+                <p>다양한 통화 실시간 환전</p>
+            </div>
+            <img th:src="@{/images/main1.png}" class="fx-card-img">
+        </a>
+
+        <a th:href="@{/deposit/list}" class="fx-card blue">
+            <div class="fx-card-text">
+                <h3>외화예금</h3>
+                <p>FLOBANK의 다양한 외화예금 상품</p>
+            </div>
+            <img th:src="@{/images/main2.png}" class="fx-card-img">
+        </a>
+
+        <a th:href="@{/remit/en_transfer_1}" class="fx-card mint">
+            <div class="fx-card-text">
+                <h3>외화송금</h3>
+                <p>빠르고 안전한 해외송금</p>
+            </div>
+            <img th:src="@{/images/main3.png}" class="fx-card-img">
+        </a>
     </div>
 </section>
 
@@ -205,6 +265,65 @@
         });
     });
 </script>
+
+
+<script>
+    function getToday() {
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
+    function renderMainRate(data) {
+        const targets = {
+            "USD": { base: "#usd-base", ttb: "#usd-ttb", tts: "#usd-tts" },
+            "JPY(100)": { base: "#jpy-base", ttb: "#jpy-ttb", tts: "#jpy-tts" },
+            "EUR": { base: "#eur-base", ttb: "#eur-ttb", tts: "#eur-tts" },
+            "CNH": { base: "#cny-base", ttb: "#cny-ttb", tts: "#cny-tts" }
+        };
+
+        data.forEach(item => {
+            const cur = item.cur_unit;
+
+            if (targets[cur]) {
+                document.querySelector(targets[cur].base).textContent =
+                    item.kftc_deal_bas_r || item.deal_bas_r || "-";
+
+                document.querySelector(targets[cur].ttb).textContent =
+                    item.ttb || "-";
+
+                document.querySelector(targets[cur].tts).textContent =
+                    item.tts || "-";
+            }
+        });
+    }
+
+    async function loadMainRate() {
+        const today = getToday();
+
+        try {
+            const res = await fetch(`/flobank/rate/data?date=${today}`);
+            const data = await res.json();
+
+            if (!data || data.length === 0) {
+                console.warn("환율 없음");
+                return;
+            }
+
+            renderMainRate(data);
+
+        } catch (err) {
+            console.error("환율 로드 오류:", err);
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", loadMainRate);
+</script>
+
+
+
 
 </body>
 </html>

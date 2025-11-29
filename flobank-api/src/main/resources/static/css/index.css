@@ -27,30 +27,6 @@
 }
 
 
-/*=====================================*/
-/*=====================================*/
-
-.foreign-section {
-  background: #fafbfc; /* 회색 톤 배경 */
-  padding: 60px 0;     /* 위아래 여백 확장 */
-}
-
-
-.foreign-section h2 {
-  margin: 0 auto;
-  width: fit-content; /* 글자 길이에 맞춰 박스 크기 */
-}
-
-/* 제목(링크) */
-.foreign-item a {
-  display: inline-block;
-  font-size: 16px;
-  font-weight: 600;
-  color: #1f2a44;
-  text-decoration: none;
-  margin-bottom: 5px;
-  transition: color 0.2s ease;
-}
 
 
 
@@ -427,3 +403,174 @@
     color: #2C5DE5;
     font-weight: bold;
 }
+
+
+.fx-wrapper {
+    width: 1400px;          /* 전체 고정 폭 */
+    margin: 40px auto;      /* 중앙 정렬 */
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+}
+
+.fx-left-box {
+    width: 650px;
+    padding: 30px 30px 40px 30px; /* 패딩을 좀 더 넉넉하게 조정 */
+    border-radius: 20px;
+    background: #ffffff;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    position: relative;
+
+    /* [필수] 내부 요소를 세로 정렬하기 위한 Flex 설정 */
+    display: flex;
+    flex-direction: column;
+}
+
+.fx-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+}
+.fx-title-row h2 {
+    font-size: 26px;
+    font-weight: 700;
+}
+
+.fx-date {
+    color: #777;
+    font-size: 14px;
+}
+
+/* 탭 */
+.fx-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.fx-tabs button {
+    padding: 7px 20px;
+    border-radius: 50px;
+    border: 1px solid #ddd;
+    background: #f5f5f5;
+}
+
+.fx-tabs .active {
+    background: #2C5DE5;
+    color: white;
+}
+/* 표 — 아래 여백 강제로 없애기 */
+.fx-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: auto;
+
+    margin-bottom: 30px;
+}
+
+.fx-table th {
+    text-align: center;
+    padding-bottom: 15px; /* 헤더 간격 살짝 넒힘 */
+    color: #555;
+    font-weight: 600;
+}
+
+.fx-table td {
+    padding: 12px 0; /* 행 간격도 살짝 시원하게 */
+    text-align: center;
+    font-size: 16px; /* 글자 크기 살짝 키움 */
+}
+
+.fx-table td img {
+    width: 24px;
+    margin-right: 6px;
+}
+
+/* 하단 버튼 */
+.fx-bottom-btns {
+    display: flex;
+    gap: 15px;
+}
+
+
+
+.fx-btn-link {
+    flex: 1;
+    padding: 12px 0;
+    border-radius: 50px;
+    border: 1px solid #ddd;
+    background: white;
+    text-align: center;
+    text-decoration: none;
+    color: #333;
+    font-size: 15px;
+    transition: background 0.2s, color 0.2s;
+}
+
+.fx-btn-link:hover {
+    background: #f2f4ff;
+    color: #2C5DE5;
+}
+
+.fx-bottom-btns button {
+    flex: 1;
+    padding: 12px 0;
+    border-radius: 50px;
+    border: 1px solid #ddd;
+    background: white;
+}
+
+/* 오른쪽 3개 카드 — 고정 크기 */
+.fx-right-box {
+    width: 420px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.fx-card {
+    display: flex;                 /* 가로 정렬 */
+    justify-content: space-between;/* 텍스트 왼쪽 / 이미지 오른쪽 */
+    align-items: center;           /* 세로 가운데 */
+    padding: 25px 30px;
+    border-radius: 20px;
+    min-height: 130px;
+    text-decoration: none;
+    color: inherit;
+}
+
+.fx-card-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;      /* 세로 정렬 더 자연스럽게 */
+}
+
+/* 제목 */
+.fx-card-content h3 {
+    font-size: 21px;
+    font-weight: 700;
+    margin-bottom: 30px;
+}
+
+/* 설명 */
+.fx-card-content p {
+    font-size: 15px;
+    opacity: 0.9;
+    line-height: 1.4;
+    margin-top: 6px;
+}
+
+
+
+
+/* 이미지 크기 키우기 */
+.fx-card-img {
+    width: 80px;
+    height: auto;
+    flex-shrink: 0;               /* 텍스트가 커져도 이미지 줄어들지 않음 */
+}
+
+.purple { background: #e5ddff; }
+.blue   { background: #d8ebff; }
+.mint   { background: #dff7ed; }

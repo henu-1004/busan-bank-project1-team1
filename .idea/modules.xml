@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/flobank-ap.main.iml" filepath="$PROJECT_DIR$/.idea/modules/flobank-ap.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/flobank-api.main.iml" filepath="$PROJECT_DIR$/.idea/modules/flobank-api.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/project1.iml" filepath="$PROJECT_DIR$/.idea/project1.iml" />
     </modules>
   </component>

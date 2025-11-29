@@ -1,6 +1,5 @@
 package kr.co.api.flobankapi.service;
 
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -14,8 +13,6 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-
-import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,7 +22,7 @@ import java.util.Map;
 public class RateService {
 
     private final RedisTemplate<String, String> redisTemplate;
-    private final ObjectMapper objectMapper; // JSON 파싱용 (Spring Boot 기본 제공)
+    private final ObjectMapper objectMapper;
 
     @Value("${eximbank.api.base-url}")
     private String baseUrl;
@@ -33,65 +30,45 @@ public class RateService {
     @Value("${eximbank.api.auth-key}")
     private String authKey;
 
+    // =================================================================
+    // 1. 조회 페이지용: 입력한 날짜 그대로 조회 (데이터 없으면 빈값 리턴)
+    // =================================================================
     public String getRate(String date) {
-
         String searchDate = date.replace("-", "");
-        String redisKey = "fx:" + searchDate;
-
-        // Redis에서 먼저 조회
-        String cached = redisTemplate.opsForValue().get(redisKey);
-        if (cached != null) {
-//            System.out.println("Redis HIT → " + redisKey);
-            return cached;
-        }
-
-//        System.out.println("Redis MISS → Exim API 요청");
-
-        // API 호출
-        String url = baseUrl +
-                "?authkey=" + authKey +
-                "&searchdate=" + searchDate +
-                "&data=AP01";
-
-        RestTemplate rest = new RestTemplate();
-        String response = rest.getForObject(url, String.class);
-
-        // 영구 저장
-        if (response != null) {
-            redisTemplate.opsForValue().set(redisKey, response);  // TTL 없음
-        }
-
-        return response;
+        return fetchRawData(searchDate); // 아래 공통 메서드 사용
     }
 
-    // 특정 통화의 환율만 추출
-    public Map<String, Double> getCurrencyRate(String currency) {
-        // 1. 조회 시작 날짜 계산 (토/일/월 오전 -> 금요일 등)
-        LocalDate targetDate = getTargetDate();
-        String formattedDate = targetDate.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+    // =================================================================
+    // 2. 메인 페이지용: 오늘이 비영업일이면 자동으로 최근 영업일 데이터 조회
+    // =================================================================
+    public String getMainPageRate() {
+        LocalDate targetDate = getTargetDate(); // 영업일 계산
 
-        String jsonResponse = null;
-
-        // 2. 데이터가 없으면(공휴일 등) 최대 5일 전까지 과거로 가며 데이터를 찾음 (안전장치)
+        // 최대 5일 전까지 뒤져서 데이터가 있는 날짜를 찾음
         for (int i = 0; i < 5; i++) {
-            jsonResponse = getRate(formattedDate);
+            String searchDate = targetDate.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+            String response = fetchRawData(searchDate);
 
-            // 데이터가 유효하면 반복 종료
-            if (jsonResponse != null && !jsonResponse.isEmpty() && !jsonResponse.equals("[]")) {
-                break;
+            if (isValidResponse(response)) {
+                return response;
             }
-
-            // 데이터가 없으면 하루 전으로 이동하여 재시도
             targetDate = targetDate.minusDays(1);
-            formattedDate = targetDate.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
         }
+        return "[]";
+    }
 
-        // 5일간 뒤져도 없으면 null 반환
-        if (jsonResponse == null || jsonResponse.isEmpty() || jsonResponse.equals("[]")) {
+    // =================================================================
+    // ★ [복구됨] 3. 특정 통화(USD 등) 환율 하나만 가져오기 (계산기 등에서 사용)
+    // =================================================================
+    public Map<String, Double> getCurrencyRate(String currency) {
+        // 1. 최근 영업일 데이터 가져오기 (메인페이지 로직과 동일하게 최신 데이터 탐색)
+        String jsonResponse = getMainPageRate();
+
+        if (!isValidResponse(jsonResponse)) {
             return null;
         }
 
-        // 3. JSON 파싱
+        // 2. JSON 파싱해서 해당 통화 찾기
         try {
             JsonNode root = objectMapper.readTree(jsonResponse);
             if (root.isArray()) {
@@ -101,23 +78,20 @@ public class RateService {
                     // JPY(100), IDR(100) 등 괄호 처리 포함
                     if (curUnit.equals(currency) || curUnit.startsWith(currency + "(")) {
 
-                        // (1) 매매기준율 (deal_bas_r) 파싱
+                        // 매매기준율
                         String dealBasR = node.path("kftc_deal_bas_r").asText().replace(",", "");
                         if (dealBasR.isEmpty() || dealBasR.equals("0")) {
                             dealBasR = node.path("deal_bas_r").asText().replace(",", "");
                         }
 
-                        // (2) 전신환매도율 (tts) 파싱 (보내실 때 환율 - 고객 매수)
+                        // 송금 보낼때/받을때
                         String tts = node.path("tts").asText().replace(",", "");
-
-                        // (3) 전신환매입율 (ttb) 파싱 (받으실 때 환율 - 고객 매도)
                         String ttb = node.path("ttb").asText().replace(",", "");
 
-                        // Map에 담아서 반환
                         Map<String, Double> result = new HashMap<>();
                         result.put("rate", dealBasR.isEmpty() ? 0.0 : Double.parseDouble(dealBasR));
                         result.put("tts", tts.isEmpty() ? 0.0 : Double.parseDouble(tts));
-                        result.put("ttb", ttb.isEmpty() ? 0.0 : Double.parseDouble(ttb)); // ✅ TTB 추가
+                        result.put("ttb", ttb.isEmpty() ? 0.0 : Double.parseDouble(ttb));
 
                         return result;
                     }
@@ -126,35 +100,60 @@ public class RateService {
         } catch (Exception e) {
             log.error("JSON 파싱 에러", e);
         }
-
         return null;
     }
 
-    // 영업일 기준 날짜 계산 로직
-    private LocalDate getTargetDate() {
+
+    // -----------------------------------------------------------
+    // [내부 공통 메서드] API 호출 및 Redis 캐싱
+    // -----------------------------------------------------------
+    private String fetchRawData(String searchDate) {
+        String redisKey = "fx:" + searchDate;
+
+        // Redis 조회
+        String cached = redisTemplate.opsForValue().get(redisKey);
+        if (cached != null) {
+            return cached;
+        }
+
+        // API 호출
+        String url = baseUrl +
+                "?authkey=" + authKey +
+                "&searchdate=" + searchDate +
+                "&data=AP01";
+
+        try {
+            RestTemplate rest = new RestTemplate();
+            String response = rest.getForObject(url, String.class);
+
+            // 유효한 데이터면 Redis 저장
+            if (isValidResponse(response)) {
+                redisTemplate.opsForValue().set(redisKey, response);
+            }
+            return response;
+        } catch (Exception e) {
+            log.error("API 호출 실패: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    // 데이터 유효성 검사 (null 이거나 빈 배열이면 false)
+    private boolean isValidResponse(String response) {
+        return response != null && !response.equals("[]") && !response.isEmpty() && response.contains("cur_unit");
+    }
+
+    // 영업일 계산 로직
+    public LocalDate getTargetDate() {
         LocalDateTime now = LocalDateTime.now();
         LocalDate date = now.toLocalDate();
         DayOfWeek dayOfWeek = now.getDayOfWeek();
         int hour = now.getHour();
 
-        // 1. 토요일이면 -> 1일 전(금)
-        if (dayOfWeek == DayOfWeek.SATURDAY) {
-            return date.minusDays(1);
-        }
-        // 2. 일요일이면 -> 2일 전(금)
-        else if (dayOfWeek == DayOfWeek.SUNDAY) {
-            return date.minusDays(2);
-        }
-        // 3. 월요일이고 11시 이전이면 -> 3일 전(금)
-        else if (dayOfWeek == DayOfWeek.MONDAY && hour < 11) {
-            return date.minusDays(3);
-        }
-        // 4. 화~금 평일인데 11시 이전이면 -> 1일 전 (아직 오늘 고시 안됨)
-        else if (hour < 11) {
-            return date.minusDays(1);
-        }
+        if (dayOfWeek == DayOfWeek.SATURDAY) return date.minusDays(1);
+        else if (dayOfWeek == DayOfWeek.SUNDAY) return date.minusDays(2);
+        else if (dayOfWeek == DayOfWeek.MONDAY && hour < 11) return date.minusDays(3);
+        else if (hour < 11) return date.minusDays(1);
 
-        // 그 외(평일 11시 이후)는 오늘 날짜 반환
         return date;
     }
 }
