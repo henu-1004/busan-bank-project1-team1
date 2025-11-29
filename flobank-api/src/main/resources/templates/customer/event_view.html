@@ -32,7 +32,7 @@
       <div class="view-header">
           <h3 th:text="${event.boardTitle}"></h3>
           <p class="meta">
-              등록일 <strong th:text="${event.boardRegDt}"></strong> |
+              등록일 <strong th:text="${#temporals.format(event.boardRegDt, 'yyyy-MM-dd')}"></strong> |
               조회수 <span th:text="${event.boardHit}"></span>
           </p>
       </div>
