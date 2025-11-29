@@ -43,7 +43,7 @@
                 <a th:href="@{/customer/event_view/{no}(no=${event.boardNo})}"
                    th:text="${event.boardTitle}"></a>
             </td>
-            <td th:text="${event.boardRegDt}"></td>
+            <td th:text="${#temporals.format(event.boardRegDt, 'yyyy-MM-dd')}"></td>
             <td><span class="tag">진행중</span></td>
         </tr>
 

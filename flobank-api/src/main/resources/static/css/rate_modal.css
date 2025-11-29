@@ -3,13 +3,25 @@
 /* =============================== */
 
 .rate-guide-action {
-    display: flex;
+    display: grid;
+    grid-template-columns: 160px auto;   /* dt : dd 구조와 동일 */
     align-items: center;
-    gap: 12px;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    margin-bottom: 12px;
+    margin-bottom: 30px;
 }
+
+.rate-guide-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1C1E21;
+    padding-left: 8px; /* dt padding 동일 */
+    margin: 0;
+}
+
+.rate-modal-button {
+    justify-self: start;   /* dd가 왼쪽 정렬되는 컨벤션과 동일 */
+}
+
+
 
 .rate-modal-button {
     background: #22304E;      /* 이미지와 동일한 진한 네이비 */
@@ -234,13 +246,35 @@
     border-radius: 4px 4px 0 0;
 }
 
-/* 원래 기본 파란색 active 스타일 */
-.rate-modal-tab.active {
-    background: #2c5de5;
-    color: #fff;
-    border-bottom: 2px solid #2c5de5;
+
+/*==================================*/
+/*==================================*/
+/*==================================*/
+.rate-guide-action {
+    display: flex;
+    align-items: center;
+
+    padding: 18px 0;     /* dt/dd와 동일한 높이 */
+    border-bottom: 1px solid #eee;  /* ★ 회색 하단선 */
+    margin-bottom: 0;
 }
 
-.rate-modal-tab:not(.active):hover {
-    background: #f1f1f1;
+.rate-guide-title {
+    width: 180px;
+    flex-shrink: 0;
+    padding-left: 8px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #1C1E21;
+}
+
+.rate-modal-button {
+    background: #22304E;
+    color: #fff;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 15px;
+    cursor: pointer;
+    line-height: 1;
 }

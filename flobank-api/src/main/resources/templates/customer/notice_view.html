@@ -33,7 +33,7 @@
 
               <p class="meta">
                   작성자 <strong th:text="${notice.boardAdminId}"></strong> |
-                  등록일 <span th:text="${notice.boardRegDt}"></span> |
+                  등록일 <span th:text="${#temporals.format(notice.boardRegDt, 'yyyy-MM-dd')}"></span> |
                   조회수 <span th:text="${notice.boardHit}"></span>
               </p>
           </div>

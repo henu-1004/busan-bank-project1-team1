@@ -42,7 +42,7 @@
                 <a th:href="@{/customer/notice_view/{no}(no=${notice.boardNo})}"
                    th:text="${notice.boardTitle}"></a>
             </td>
-            <td th:text="${notice.boardRegDt}"></td>
+            <td th:text="${#temporals.format(notice.boardRegDt, 'yyyy-MM-dd')}"></td>
             <td th:text="${notice.boardHit}"></td>
         </tr>
 
