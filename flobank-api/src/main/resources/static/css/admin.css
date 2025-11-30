@@ -3181,7 +3181,7 @@ input[type="file"] {
     font-size: 13px;
     font-weight: 500;
     color: #6b7280;
-=======
+}
 
 
 /* 챗봇 테이블 css */
@@ -3264,5 +3264,5 @@ input[type="file"] {
 
 .bot-btn-delete:hover {
   background-color: #c0392b;
->>>>>>> Stashed changes
+
 }
