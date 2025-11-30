@@ -3209,6 +3209,7 @@ input[type="file"] {
   border-bottom: 1px solid rgba(227, 231, 236, 0.7);
   vertical-align: middle;
   color: #333;
+
 }
 
 .bot-table tbody tr:hover {
@@ -3265,4 +3266,8 @@ input[type="file"] {
 .bot-btn-delete:hover {
   background-color: #c0392b;
 
+}
+#botHistTable tbody td {
+    white-space: normal;
+      word-break: break-word;
 }
