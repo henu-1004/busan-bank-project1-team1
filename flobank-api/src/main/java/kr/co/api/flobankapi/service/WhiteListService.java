@@ -42,6 +42,32 @@ public class WhiteListService {
                 List<InterestInfoDTO> dtoList = whiteListMapper.interestInfo();
                 yield flobankInterest(dtoList);
             }
+            case "registerTerms" -> {
+                List<TermsHistDTO> terms = whiteListMapper.selectLatestTermsByCate(1);
+                yield flobankTerms(terms);
+            }
+            case "fxTerms" -> {
+                List<TermsHistDTO> terms = whiteListMapper.selectLatestTermsByCate(2);
+                yield flobankTerms(terms);
+            }
+            case "remitTerms" -> {
+                List<TermsHistDTO> terms = whiteListMapper.selectLatestTermsByCate(3);
+                yield flobankTerms(terms);
+            }
+            case "depositTerms" -> {
+                List<TermsHistDTO> terms = whiteListMapper.selectLatestTermsByCate(4);
+                yield flobankTerms(terms);
+            }
+            case "krwAcctTerms" -> {
+                List<TermsHistDTO> terms = whiteListMapper.selectLatestTermsByCate(5);
+                yield flobankTerms(terms);
+            }
+            case "fxAcctTerms" -> {
+                List<TermsHistDTO> terms = whiteListMapper.selectLatestTermsByCate(6);
+                yield flobankTerms(terms);
+            }
+
+
 
             default -> "";
         };
@@ -216,9 +242,17 @@ public class WhiteListService {
         );
     }
 
-    public String flobankRegisterTerms() {
-        List<TermsHistDTO> reg = whiteListMapper.selectLatestTermsByCate(1);
-        return "terms";
+    public String flobankTerms(List<TermsHistDTO> terms) {
+        StringBuilder sb = new StringBuilder();
+        String a = "";
+        int i=1;
+
+        for (TermsHistDTO t : terms) {
+            a = (i++) + ". " + t.getTermTitle() + "\n" + t.getThistContent() +"\n\n";
+            sb.append(a);
+        }
+
+        return sb.toString();
     }
 
     public String flobankExchTerms() {
@@ -231,13 +265,18 @@ public class WhiteListService {
         return "terms";
     }
 
-    public String flobankFrgnProductTerms() {
-        List<TermsHistDTO> reg = whiteListMapper.selectLatestTermsByCate(3);
+    public String flobankDepositTerms() {
+        List<TermsHistDTO> reg = whiteListMapper.selectLatestTermsByCate(4);
         return "terms";
     }
 
-    public String flobankFrgnKrwTerms() {
-        List<TermsHistDTO> reg = whiteListMapper.selectLatestTermsByCate(3);
+    public String flobankBasicAcctOpenTerms() {
+        List<TermsHistDTO> reg = whiteListMapper.selectLatestTermsByCate(5);
+        return "terms";
+    }
+
+    public String flobankFrgnAcctOpenTerms() {
+        List<TermsHistDTO> reg = whiteListMapper.selectLatestTermsByCate(6);
         return "terms";
     }
 
