@@ -2,6 +2,7 @@ package kr.co.api.flobankapi.service;
 
 import kr.co.api.flobankapi.dto.InterestInfoDTO;
 import kr.co.api.flobankapi.dto.ProductDTO;
+import kr.co.api.flobankapi.dto.TermsHistDTO;
 import kr.co.api.flobankapi.mapper.WhiteListMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -191,7 +192,7 @@ public class WhiteListService {
         예금 개요 : %s
         예금 타입 : %s
         적용 통화 : %s
-        환율 적용 타입 : %s
+        환율 적용 : %s
         최소/최대 금액 제한 : %s
         가입 기간 : %s
         상품 설명 : %s
@@ -199,7 +200,6 @@ public class WhiteListService {
         나이 제한 : %s
         자동 갱신 : %s
         추가 납입 : %s
-        상품 개시일자 : %s
         """.formatted(
                 dpstName,
                 dpstInfo,
@@ -212,9 +212,33 @@ public class WhiteListService {
                 dpstPartWdrw,
                 dpstAge,
                 dpstAutoRenewYn,
-                dpstAddPay,
-                dpstRegDt
+                dpstAddPay
         );
+    }
+
+    public String flobankRegisterTerms() {
+        List<TermsHistDTO> reg = whiteListMapper.selectLatestTermsByCate(1);
+        return "terms";
+    }
+
+    public String flobankExchTerms() {
+        List<TermsHistDTO> reg = whiteListMapper.selectLatestTermsByCate(2);
+        return "terms";
+    }
+
+    public String flobankFrgnRemitTerms() {
+        List<TermsHistDTO> reg = whiteListMapper.selectLatestTermsByCate(3);
+        return "terms";
+    }
+
+    public String flobankFrgnProductTerms() {
+        List<TermsHistDTO> reg = whiteListMapper.selectLatestTermsByCate(3);
+        return "terms";
+    }
+
+    public String flobankFrgnKrwTerms() {
+        List<TermsHistDTO> reg = whiteListMapper.selectLatestTermsByCate(3);
+        return "terms";
     }
 
 

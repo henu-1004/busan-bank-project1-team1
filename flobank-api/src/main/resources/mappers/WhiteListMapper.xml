@@ -99,6 +99,24 @@
     </select>
 
 
+    <select id="selectLatestTermsByCate" resultType="kr.co.api.flobankapi.dto.TermsHistDTO">
+        SELECT
+        m.TERM_TITLE,
+        h.THIST_CONTENT
+        FROM TB_TERMS_MASTER m
+        JOIN TB_TERMS_HIST h
+        ON m.TERM_CATE = h.THIST_TERM_CATE
+        AND m.TERM_ORDER = h.THIST_TERM_ORDER
+        WHERE m.TERM_CATE = #{termCate}
+        AND h.THIST_VERSION = (
+        SELECT MAX(h2.THIST_VERSION)
+        FROM TB_TERMS_HIST h2
+        WHERE h2.THIST_TERM_CATE = h.THIST_TERM_CATE
+        AND h2.THIST_TERM_ORDER = h.THIST_TERM_ORDER
+        )
+    </select>
+
+
 
 
 </mapper>
