@@ -283,6 +283,11 @@ document.addEventListener('DOMContentLoaded', function() {
     if (nextBtn) {
         nextBtn.addEventListener("click", function () {
             modal.style.display = "flex";   // 모달 열기
+
+            const form= modal.querySelector('form');
+            if (form){
+                cert(form);
+            }
         });
     }
 
@@ -373,4 +378,34 @@ function showError(inputElement, errorElement, message) {
 function resetError(inputElement, errorElement) {
     inputElement.classList.remove('input-error');
     errorElement.style.display = 'none';
+}
+
+
+function cert(form) {
+    const hiddenTranAmount = document.getElementById('terminateAction');
+
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        let displayAmount = '0';
+        if (hiddenTranAmount) {
+            displayAmount = Number(hiddenTranAmount.value).toLocaleString();
+        }
+
+        const currentModal = document.getElementById("terminateInfoModal");
+        if (currentModal) currentModal.style.display = "none";
+
+        // 전자서명 호출
+        if (typeof CertManager !== 'undefined') {
+            CertManager.request(
+                "계좌해지",
+                displayAmount, // 금액
+                function() {
+                    form.submit();
+                }
+            );
+        } else {
+            alert("인증 모듈(CertManager)을 찾을 수 없습니다.");
+        }
+    });
 }
