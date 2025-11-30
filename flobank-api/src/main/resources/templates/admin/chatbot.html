@@ -225,7 +225,7 @@
 
         <!-- 로그 테이블 -->
         <div class="board-table-wrapper">
-            <table class="board-table">
+            <table class="board-table" id="botHistTable">
                 <thead>
                 <tr>
                     <th>번호</th>
@@ -236,26 +236,13 @@
                 </thead>
 
                 <tbody>
-                <tr>
-                    <td>10</td>
-                    <td style="width:100px">2025-11-28 18:42</td>
-                    <td style="width:160px">환율 계산 오류났어 뭐야</td>
-                    <td style="width:160px">이해하지 못했습니다.<br/>다시 입력해 주세요.</td>
+                <tr th:each="hist : ${histList}">
+                    <td>[[${hist.botNo}]]</td>
+                    <td style="width:100px">[[${hist.botDt}]]</td>
+                    <td style="width:160px">[[${hist.userQuestion}]]</td>
+                    <td style="width:160px">[[${hist.botAnswer}]]</td>
                 </tr>
 
-                <tr>
-                    <td>9</td>
-                    <td style="width:100px">2025-11-28 18:37</td>
-                    <td style="width:160px">지금 달러 환율 얼마?</td>
-                    <td style="width:160px">현재 USD 기준 환율은 1,472.80원입니다.</td>
-                </tr>
-
-                <tr>
-                    <td>8</td>
-                    <td style="width:100px">2025-11-28 18:33</td>
-                    <td style="width:160px">너 개바보냐</td>
-                    <td style="width:160px">고객님의 표현은 이해하였으나, 관련 내용은 도와드릴 수 없습니다.</td>
-                </tr>
                 </tbody>
             </table>
         </div>

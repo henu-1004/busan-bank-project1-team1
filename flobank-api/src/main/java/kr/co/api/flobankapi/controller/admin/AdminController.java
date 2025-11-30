@@ -301,6 +301,7 @@ public class AdminController {
 
     private final ChatbotRuleService chatbotRuleService;
     private final ChatbotSessionService chatbotSessionService;
+    private final ChatbotHistService chatbotHistService;
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @GetMapping("/chatbot")
@@ -323,10 +324,12 @@ public class AdminController {
         List<ChatbotBadTypeDTO> badType = chatbotRuleService.selectBadTypeList();
         List<ChatbotBadWordDTO> badWord = chatbotRuleService.selectBadWordList();
         List<ChatbotRulesDTO> botRules = chatbotRuleService.selectRulesList();
+        List<ChatbotAdminDTO> histList = chatbotHistService.selectRecentHist();
 
         model.addAttribute("badTypeList", badType);
         model.addAttribute("badWordList", badWord);
         model.addAttribute("botRulesList", botRules);
+        model.addAttribute("histList", histList);
 
         return "admin/chatbot";
     }
@@ -337,10 +340,12 @@ public class AdminController {
         List<ChatbotBadTypeDTO> badType = chatbotRuleService.selectBadTypeList();
         List<ChatbotBadWordDTO> badWord = chatbotRuleService.selectBadWordList();
         List<ChatbotRulesDTO> botRules = chatbotRuleService.selectRulesList();
+        List<ChatbotAdminDTO> histList = chatbotHistService.selectRecentHist();
 
         model.addAttribute("badTypeList", badType);
         model.addAttribute("badWordList", badWord);
         model.addAttribute("botRulesList", botRules);
+        model.addAttribute("histList", histList);
 
         String forbiddenResponse = chatbotRuleService.checkAllForbiddenWord(q);
 
@@ -375,10 +380,12 @@ public class AdminController {
         List<ChatbotBadTypeDTO> badType = chatbotRuleService.selectBadTypeList();
         List<ChatbotBadWordDTO> badWord = chatbotRuleService.selectBadWordList();
         List<ChatbotRulesDTO> botRules = chatbotRuleService.selectRulesList();
+        List<ChatbotAdminDTO> histList = chatbotHistService.selectRecentHist();
 
         model.addAttribute("badTypeList", badType);
         model.addAttribute("badWordList", badWord);
         model.addAttribute("botRulesList", botRules);
+        model.addAttribute("histList", histList);
 
         return "redirect:/admin/chatbot";
     }

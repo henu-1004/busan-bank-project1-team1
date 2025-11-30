@@ -9,4 +9,5 @@ import java.util.List;
 public interface ChatbotHistMapper {
     public void insertHist(ChatbotHistDTO chatbotHistDTO);
     public List<ChatbotHistDTO> selectHist(String sessId);
+    public List<ChatbotHistDTO> selectRecentHist();
 }

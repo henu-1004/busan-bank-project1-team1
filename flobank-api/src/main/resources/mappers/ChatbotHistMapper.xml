@@ -21,4 +21,14 @@
         ORDER BY bot_no ASC
     </select>
 
+    <select id="selectRecentHist" resultType="kr.co.api.flobankapi.dto.ChatbotHistDTO">
+        SELECT
+        bot_no,
+        bot_content,
+        bot_type,
+        bot_dt
+        FROM TB_CHATBOT_HIST
+        ORDER BY bot_no DESC
+        fetch first 30 rows ONLY
+    </select>
 </mapper>
