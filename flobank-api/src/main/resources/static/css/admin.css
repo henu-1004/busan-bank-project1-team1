@@ -1079,29 +1079,17 @@ h4{
   font-weight: 600;
 }
 
-.qna-status.wait {
-  background-color: #e3e7ec;
-  color: #555;
-}
-
-.qna-status.safe {
-  background-color: #d6f5da;
-  color: #198754;
-}
-
-.qna-status.mid {
-  background-color: #fff3cd;
-  color: #b58105;
-}
-
+.qna-status.wait,
+.qna-status.mid,
 .qna-status.high {
-  background-color: #fde2e1;
-  color: #c2403d;
+  background-color: #fff4e5;
+  color: #b65b00;
 }
 
+.qna-status.safe,
 .qna-status.answered {
-  background-color: #dbeafe;
-  color: #1d4ed8;
+  background-color: #e7f5ec;
+  color: #16794c;
 }
 
 .qna-hint {
@@ -1185,6 +1173,20 @@ h4{
   margin-bottom: 20px;
 }
 
+.qna-modal-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+  color: #6b7280;
+}
+
+.qna-modal-meta .qna-meta {
+  margin: 0;
+  font-size: 13px;
+  color: #6b7280;
+}
+
 .qna-modal-question h3 {
   font-size: 15px;
   font-weight: 600;
@@ -1199,6 +1201,7 @@ h4{
   background: #f8f9fb;
   border-radius: 10px;
   padding: 10px 12px;
+  word-break: break-word;
 }
 
 .qna-modal-line {
@@ -1334,29 +1337,17 @@ h4{
   min-width: 90px;
 }
 
-.qna-status.wait {
-  background-color: #e3e7ec;
-  color: #555;
-}
-
-.qna-status.safe {
-  background-color: #d6f5da;
-  color: #198754;
-}
-
-.qna-status.mid {
-  background-color: #fff3cd;
-  color: #b58105;
-}
-
+.qna-status.wait,
+.qna-status.mid,
 .qna-status.high {
-  background-color: #fde2e1;
-  color: #c2403d;
+  background-color: #fff4e5;
+  color: #b65b00;
 }
 
+.qna-status.safe,
 .qna-status.answered {
-  background-color: #dbeafe;
-  color: #1d4ed8;
+  background-color: #e7f5ec;
+  color: #16794c;
 }
 
 /* 관리 버튼 스타일 */
