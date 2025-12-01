@@ -120,20 +120,25 @@
     <update id="updateQna">
         UPDATE TB_QNA_HDR
         SET
-            QNA_TITLE = #{qnaTitle},
-            QNA_CONTENT = #{qnaContent},
-            QNA_DT = SYSDATE
+        QNA_TITLE   = #{qnaTitle,   jdbcType=VARCHAR},
+        QNA_CONTENT = #{qnaContent, jdbcType=VARCHAR},
+        QNA_DRAFT   = #{qnaDraft,   jdbcType=VARCHAR},
+        QNA_REPLY   = #{qnaReply,   jdbcType=VARCHAR},
+        QNA_STATUS  = #{qnaStatus,  jdbcType=VARCHAR},
+        QNA_DT      = SYSDATE
         WHERE QNA_NO = #{qnaNo}
     </update>
+
 
     <update id="updateQnaReply">
         UPDATE TB_QNA_HDR
         SET
-            QNA_REPLY = #{reply},
-            QNA_STATUS = NVL(#{status}, QNA_STATUS),
-            QNA_DT = SYSDATE
+        QNA_REPLY  = #{reply,  jdbcType=VARCHAR},
+        QNA_STATUS = NVL(#{status, jdbcType=VARCHAR}, QNA_STATUS),
+        QNA_DT     = SYSDATE
         WHERE QNA_NO = #{qnaNo}
     </update>
+
 
     <delete id="deleteQna">
         DELETE FROM TB_QNA_HDR
