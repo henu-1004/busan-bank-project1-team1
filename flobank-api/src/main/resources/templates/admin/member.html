@@ -352,8 +352,11 @@
                     <label for="qna-status-filter">상태</label>
                     <select id="qna-status-filter" name="qnaStatus">
                         <option value="all" th:selected="${qnaStatus == 'all'}">전체</option>
-                        <option value="pending" th:selected="${qnaStatus == 'pending'}">답변 대기중</option>
-                        <option value="complete" th:selected="${qnaStatus == 'complete'}">답변 완료</option>
+                        <option value="WAIT" th:selected="${qnaStatus == 'WAIT'}">대기</option>
+                        <option value="SAFE" th:selected="${qnaStatus == 'SAFE'}">AI SAFE</option>
+                        <option value="MID" th:selected="${qnaStatus == 'MID'}">AI 중간 위험</option>
+                        <option value="HIGH" th:selected="${qnaStatus == 'HIGH'}">AI 높은 위험</option>
+                        <option value="ANSWERED" th:selected="${qnaStatus == 'ANSWERED'}">최종 답변 완료</option>
                     </select>
                 </form>
             </div>
@@ -363,7 +366,6 @@
                     <thead>
                     <tr>
                         <th>번호</th>
-                        <th>카테고리</th>
                         <th>질문</th>
                         <th>작성자</th>
                         <th>등록일</th>
@@ -374,13 +376,12 @@
                     <tbody>
                     <tr th:each="item, stat : ${qnaList}">
                         <td th:text="${totalQnaCount - ((qnaPage - 1) * qnaPageSize) - stat.index}">1</td>
-                        <td>-</td>
                         <td class="title" th:text="${item.qnaTitle}"></td>
                         <td th:text="${item.qnaCustName != null ? item.qnaCustName : item.qnaCustCode}"></td>
                         <td th:text="${item.qnaDt != null ? #temporals.format(item.qnaDt, 'yyyy-MM-dd HH:mm') : ''}"></td>
                         <td>
-                            <span th:if="${item.qnaReply != null and !#strings.isEmpty(item.qnaReply)}" class="qna-status complete">답변 완료</span>
-                            <span th:if="${item.qnaReply == null or #strings.isEmpty(item.qnaReply)}" class="qna-status pending">답변 대기중</span>
+                            <span th:class="${'qna-status ' + (item.qnaStatus != null ? item.qnaStatus.toLowerCase() : 'wait')}"
+                                  th:text="${item.qnaStatus == 'SAFE' ? 'AI SAFE 자동답변' : (item.qnaStatus == 'MID' or item.qnaStatus == 'HIGH') ? 'AI 초안 검토 필요' : item.qnaStatus == 'ANSWERED' ? '최종 답변 완료' : '대기'}"></span>
                         </td>
                         <td>
                             <a class="qna-btn-view"
@@ -388,7 +389,7 @@
                         </td>
                     </tr>
                     <tr th:if="${#lists.isEmpty(qnaList)}">
-                        <td colspan="7" class="empty">등록된 문의가 없습니다.</td>
+                        <td colspan="6" class="empty">등록된 문의가 없습니다.</td>
                     </tr>
                     </tbody>
                 </table>

@@ -13,9 +13,11 @@ import kr.co.api.flobankapi.dto.TermsHistDTO;
 import kr.co.api.flobankapi.jwt.CustomUserDetails;
 import kr.co.api.flobankapi.service.BoardService;
 import kr.co.api.flobankapi.service.FaqService;
+import kr.co.api.flobankapi.service.QnaAiService;
 import kr.co.api.flobankapi.service.QnaService;
 import kr.co.api.flobankapi.service.TermsDbService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -35,12 +37,14 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @Controller
 @RequestMapping("/customer")
 @RequiredArgsConstructor
+@Slf4j
 public class CustomerController {
 
     private final BoardService boardService;
     private final FaqService faqService;
     private final QnaService qnaService;
     private final TermsDbService termsDbService;
+    private final QnaAiService qnaAiService;
 
 
 
@@ -218,10 +222,12 @@ public class CustomerController {
         }
 
         boolean isOwner = userDetails != null && userDetails.getUsername().equals(qna.getQnaCustCode());
+        boolean canViewAnswer = "SAFE".equalsIgnoreCase(qna.getQnaStatus()) || "ANSWERED".equalsIgnoreCase(qna.getQnaStatus());
 
         model.addAttribute("activeItem", "qna");
         model.addAttribute("qna", qna);
         model.addAttribute("isOwner", isOwner);
+        model.addAttribute("canViewAnswer", canViewAnswer);
 
         return "customer/qna_view";
     }
@@ -250,8 +256,14 @@ public class CustomerController {
         qna.setQnaTitle(title);
         qna.setQnaContent(content);
         qna.setQnaCustCode(userDetails.getUsername());
+        qna.setQnaStatus("WAIT");
 
         qnaService.createQna(qna);
+        try {
+            qnaAiService.sendToAi(qna.getQnaNo(), content, title);
+        } catch (Exception e) {
+            log.error("[QNA-AI] 고객 문의 AI 호출 실패 qnaNo={} reason={}", qna.getQnaNo(), e.getMessage());
+        }
         redirectAttributes.addFlashAttribute("message", "문의가 등록되었습니다.");
 
         return "redirect:/customer/qna_list";

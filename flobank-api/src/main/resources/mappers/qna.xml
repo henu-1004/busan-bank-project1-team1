@@ -12,6 +12,7 @@
         <result property="qnaContent" column="QNA_CONTENT"/>
         <result property="qnaDraft" column="QNA_DRAFT"/>
         <result property="qnaReply" column="QNA_REPLY"/>
+        <result property="qnaStatus" column="QNA_STATUS"/>
         <result property="qnaDt" column="QNA_DT" jdbcType="TIMESTAMP"/>
         <result property="qnaViewCnt" column="QNA_VIEW_CNT"/>
         <result property="qnaCustName" column="CUST_NAME"/>
@@ -21,11 +22,8 @@
         SELECT COUNT(*)
         FROM TB_QNA_HDR
         <where>
-            <if test="status == 'pending'">
-                (QNA_REPLY IS NULL OR QNA_REPLY = '')
-            </if>
-            <if test="status == 'complete'">
-                QNA_REPLY IS NOT NULL AND QNA_REPLY &lt;&gt; ''
+            <if test="status != null">
+                QNA_STATUS = #{status}
             </if>
         </where>
     </select>
@@ -41,17 +39,15 @@
                 Q.QNA_CONTENT,
                 Q.QNA_DRAFT,
                 Q.QNA_REPLY,
+                Q.QNA_STATUS,
                 Q.QNA_DT,
                 Q.QNA_VIEW_CNT,
                 C.CUST_NAME
             FROM TB_QNA_HDR Q
             LEFT JOIN TB_CUST_INFO C ON Q.QNA_CUST_CODE = C.CUST_CODE
             <where>
-                <if test="status == 'pending'">
-                    (Q.QNA_REPLY IS NULL OR Q.QNA_REPLY = '')
-                </if>
-                <if test="status == 'complete'">
-                    Q.QNA_REPLY IS NOT NULL AND Q.QNA_REPLY &lt;&gt; ''
+                <if test="status != null">
+                    Q.QNA_STATUS = #{status}
                 </if>
             </where>
         ) A
@@ -67,6 +63,7 @@
             Q.QNA_CONTENT,
             Q.QNA_DRAFT,
             Q.QNA_REPLY,
+            Q.QNA_STATUS,
             Q.QNA_DT,
             Q.QNA_VIEW_CNT,
             C.CUST_NAME
@@ -81,15 +78,21 @@
         WHERE QNA_NO = #{qnaNo}
     </update>
 
-    <insert id="insertQna">
+    <insert id="insertQna" parameterType="kr.co.api.flobankapi.dto.QnaDTO">
+        <selectKey keyProperty="qnaNo" resultType="long" order="BEFORE">
+            SELECT FLOBANK.ISEQ$$_75959.NEXTVAL FROM dual
+        </selectKey>
+
         INSERT INTO TB_QNA_HDR
-        (QNA_CUST_CODE, QNA_TITLE, QNA_CONTENT, QNA_DRAFT, QNA_REPLY, QNA_DT, QNA_VIEW_CNT)
+        (QNA_NO, QNA_CUST_CODE, QNA_TITLE, QNA_CONTENT, QNA_DRAFT, QNA_REPLY, QNA_STATUS, QNA_DT, QNA_VIEW_CNT)
         VALUES
-        (#{qnaCustCode, jdbcType=VARCHAR},
+        (#{qnaNo, jdbcType=NUMERIC},
+        #{qnaCustCode, jdbcType=VARCHAR},
         #{qnaTitle, jdbcType=VARCHAR},
         #{qnaContent, jdbcType=VARCHAR},
         #{qnaDraft, jdbcType=VARCHAR},
         #{qnaReply, jdbcType=VARCHAR},
+        #{qnaStatus, jdbcType=VARCHAR},
         SYSDATE,
         0)
     </insert>
@@ -107,6 +110,7 @@
         UPDATE TB_QNA_HDR
         SET
             QNA_REPLY = #{reply},
+            QNA_STATUS = NVL(#{status}, QNA_STATUS),
             QNA_DT = SYSDATE
         WHERE QNA_NO = #{qnaNo}
     </update>

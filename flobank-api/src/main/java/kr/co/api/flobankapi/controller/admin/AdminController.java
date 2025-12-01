@@ -260,7 +260,25 @@ public class AdminController {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
 
-        qnaService.updateQnaReply(qnaNo, reply);
+        String normalizedReply = reply != null ? reply.trim() : null;
+        boolean containsAiNotice = normalizedReply != null && normalizedReply.contains("AI 생성 초안입니다. 검토가 필요합니다.");
+
+        String currentStatus = qna.getQnaStatus();
+        String nextStatus = null;
+
+        if (normalizedReply != null) {
+            if ("MID".equalsIgnoreCase(currentStatus) || "HIGH".equalsIgnoreCase(currentStatus)) {
+                if (containsAiNotice) {
+                    redirectAttributes.addFlashAttribute("msg", "AI 안내 문구를 삭제한 뒤 승인해주세요.");
+                    return "redirect:/admin/qna/" + qnaNo + "?qnaPage=" + qnaPage + "&qnaStatus=" + normalizeStatus(qnaStatus);
+                }
+                nextStatus = "ANSWERED";
+            } else if ("SAFE".equalsIgnoreCase(currentStatus) || "WAIT".equalsIgnoreCase(currentStatus)) {
+                nextStatus = "ANSWERED";
+            }
+        }
+
+        qnaService.updateQnaReply(qnaNo, normalizedReply, nextStatus);
         redirectAttributes.addFlashAttribute("msg", "답변이 저장되었습니다.");
 
         return "redirect:/admin/qna/" + qnaNo + "?qnaPage=" + qnaPage + "&qnaStatus=" + normalizeStatus(qnaStatus);
@@ -394,13 +412,15 @@ public class AdminController {
 
 
     private String normalizeStatus(String status) {
-        if ("pending".equalsIgnoreCase(status)) {
-            return "pending";
+        if (status == null || status.isBlank()) {
+            return "all";
         }
-        if ("complete".equalsIgnoreCase(status)) {
-            return "complete";
-        }
-        return "all";
+        String upper = status.toUpperCase();
+        return switch (upper) {
+            case "WAIT", "SAFE", "MID", "HIGH", "ANSWERED" -> upper;
+            case "ALL" -> "all";
+            default -> "all";
+        };
     }
 
 
