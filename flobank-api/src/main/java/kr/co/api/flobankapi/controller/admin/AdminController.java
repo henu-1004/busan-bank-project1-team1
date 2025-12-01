@@ -16,9 +16,11 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.server.ResponseStatusException;
 
 @Slf4j
@@ -264,6 +266,41 @@ public class AdminController {
         redirectAttributes.addFlashAttribute("msg", "답변이 저장되었습니다.");
 
         return "redirect:/admin/qna/" + qnaNo + "?qnaPage=" + qnaPage + "&qnaStatus=" + normalizeStatus(qnaStatus);
+    }
+
+    @PostMapping("/api/qna/{qnaNo}/reply")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> updateQnaReplyInline(@PathVariable Long qnaNo,
+                                                                    @RequestParam(name = "reply", required = false) String reply) {
+        QnaDTO qna = qnaService.findQna(qnaNo);
+        if (qna == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        qnaService.updateQnaReply(qnaNo, reply);
+
+        String normalizedReply = reply;
+        if (normalizedReply != null && normalizedReply.isBlank()) {
+            normalizedReply = null;
+        }
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("reply", normalizedReply);
+        body.put("status", normalizedReply != null ? "answered" : "pending");
+
+        return ResponseEntity.ok(body);
+    }
+
+    @DeleteMapping("/api/qna/{qnaNo}")
+    @ResponseBody
+    public ResponseEntity<Void> deleteQnaInline(@PathVariable Long qnaNo) {
+        QnaDTO qna = qnaService.findQna(qnaNo);
+        if (qna == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        qnaService.deleteQna(qnaNo);
+        return ResponseEntity.noContent().build();
     }
 
 
