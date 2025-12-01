@@ -39,9 +39,8 @@
     <select id="selectTodayExChangeTxCount" resultType="int">
         SELECT COUNT(*)
         FROM TB_FRGN_EXCH_TRAN
-        WHERE exch_req_dt IS NOT NULL
-          AND exch_req_dt &gt;= TRUNC(SYSDATE)
-          AND exch_req_dt &lt;  TRUNC(SYSDATE) + 1
+        WHERE EXCH_REQ_DT &gt;= TRUNC(SYSDATE)
+        AND EXCH_REQ_DT &lt;  TRUNC(SYSDATE) + 1
     </select>
 
     <!-- 일별 가입 수 -->
