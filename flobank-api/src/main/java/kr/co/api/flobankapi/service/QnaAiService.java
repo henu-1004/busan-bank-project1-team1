@@ -36,11 +36,18 @@ public class QnaAiService {
                     .bodyValue(payload)
                     .retrieve()
                     .toBodilessEntity()
-                    .doOnSuccess(res -> log.info("[QNA-AI] Sent to AI server qnaNo={} status={}", qnaNo, res.getStatusCode()))
-                    .doOnError(err -> log.error("[QNA-AI] Failed to call AI server for qnaNo={} reason={} ", qnaNo, err.getMessage()))
-                    .block();
+                    .subscribe(
+                            res -> log.info("[QNA-AI] Sent to AI server qnaNo={} status={}",
+                                    qnaNo, res.getStatusCode()),
+                            err -> log.error("[QNA-AI] Failed to call AI server for qnaNo={} reason={}",
+                                    qnaNo, err.getMessage(), err)
+                    );
+            // ❗ 여기까지 오면 바로 리턴됨. 실제 호출은 비동기로 진행.
         } catch (Exception e) {
-            log.error("[QNA-AI] Exception while calling AI server for qnaNo={}: {}", qnaNo, e.getMessage());
+            // 파라미터 세팅/uri 문제 같은 "즉시 나는 에러"만 여기서 잡힘
+            log.error("[QNA-AI] Exception while preparing AI call qnaNo={}: {}",
+                    qnaNo, e.getMessage(), e);
         }
     }
 }
+

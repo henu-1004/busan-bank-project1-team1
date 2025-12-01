@@ -258,16 +258,18 @@ public class CustomerController {
         qna.setQnaCustCode(userDetails.getUsername());
         qna.setQnaStatus("WAIT");
 
+        // 1) QNA 먼저 저장
         qnaService.createQna(qna);
-        try {
-            qnaAiService.sendToAi(qna.getQnaNo(), content, title);
-        } catch (Exception e) {
-            log.error("[QNA-AI] 고객 문의 AI 호출 실패 qnaNo={} reason={}", qna.getQnaNo(), e.getMessage());
-        }
-        redirectAttributes.addFlashAttribute("message", "문의가 등록되었습니다.");
+
+        // 2) AI는 비동기로 처리 (예외는 서비스 내부에서 처리)
+        qnaAiService.sendToAi(qna.getQnaNo(), content, title);
+
+        // 3) 유저는 바로 리스트로 이동
+        redirectAttributes.addFlashAttribute("message", "문의가 등록되었습니다. AI가 답변 초안을 준비 중입니다.");
 
         return "redirect:/customer/qna_list";
     }
+
 
     @GetMapping("/qna_edit/{qnaNo}")
     public String qna_edit(@PathVariable Long qnaNo,
@@ -293,7 +295,8 @@ public class CustomerController {
     public String updateQna(@PathVariable Long qnaNo,
                             @RequestParam String title,
                             @RequestParam String content,
-                            @AuthenticationPrincipal CustomUserDetails userDetails) {
+                            @AuthenticationPrincipal CustomUserDetails userDetails,
+                            RedirectAttributes redirectAttributes) {
 
         QnaDTO qna = qnaService.findQna(qnaNo);
         if (qna == null) {
@@ -303,12 +306,28 @@ public class CustomerController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
 
+        // 1) 질문 내용 수정 + AI 관련 필드 리셋
         qna.setQnaTitle(title);
         qna.setQnaContent(content);
+        qna.setQnaDraft(null);          // 이전 AI 초안 제거
+        qna.setQnaReply(null);          // 이전 최종답변 제거
+        qna.setQnaStatus("WAIT");       // 다시 대기 상태로
+
         qnaService.updateQna(qna);
+
+        // 2) AI 서버에 재요청 (비동기)
+        qnaAiService.sendToAi(qna.getQnaNo(), content, title);
+
+        // 3) 메시지 + 리다이렉트
+        redirectAttributes.addFlashAttribute(
+                "message",
+                "문의가 수정되었습니다. 새로운 내용 기준으로 AI가 다시 초안을 준비 중입니다."
+        );
 
         return "redirect:/customer/qna_view/" + qnaNo;
     }
+
+
 
     @PostMapping("/qna_delete/{qnaNo}")
     public String deleteQna(@PathVariable Long qnaNo,
