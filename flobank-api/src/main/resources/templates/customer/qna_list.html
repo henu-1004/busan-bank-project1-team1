@@ -53,8 +53,8 @@
                th:text="${qna.qnaTitle}">질문 제목</a>
           </td>
           <td>
-            <span th:if="${qna.qnaReply != null and !#strings.isEmpty(qna.qnaReply)}" class="qna-status complete">답변 완료</span>
-            <span th:if="${qna.qnaReply == null or #strings.isEmpty(qna.qnaReply)}" class="qna-status pending">답변 대기중</span>
+            <span th:class="${'qna-status ' + (qna.qnaStatus != null ? qna.qnaStatus.toLowerCase() : 'wait')}"
+                  th:text="${qna.qnaStatus == 'SAFE' ? 'AI SAFE 자동답변' : (qna.qnaStatus == 'MID' or qna.qnaStatus == 'HIGH') ? 'AI 초안 검토 중' : qna.qnaStatus == 'ANSWERED' ? '최종 답변 완료' : '답변 준비 중'}"></span>
           </td>
           <td th:text="${qna.qnaCustName != null ? qna.qnaCustName : qna.qnaCustCode}">작성자</td>
           <td th:text="${qna.qnaDt != null ? #temporals.format(qna.qnaDt, 'yyyy-MM-dd') : ''}">2024-01-01</td>

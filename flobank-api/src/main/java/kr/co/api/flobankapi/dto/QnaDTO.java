@@ -12,6 +12,7 @@ public class QnaDTO {
     private String qnaContent;
     private String qnaDraft;
     private String qnaReply;
+    private String qnaStatus;
     private LocalDateTime qnaDt;
     private Integer qnaViewCnt;
 

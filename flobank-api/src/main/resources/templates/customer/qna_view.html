@@ -33,6 +33,8 @@
         작성자 <strong th:text="${qna.qnaCustName != null ? qna.qnaCustName : qna.qnaCustCode}">작성자</strong>
         | 등록일 <span th:text="${qna.qnaDt != null ? #temporals.format(qna.qnaDt, 'yyyy-MM-dd HH:mm') : ''}">0000-00-00</span>
         | 조회수 <span th:text="${qna.qnaViewCnt != null ? qna.qnaViewCnt : 0}">0</span>
+        | <span class="qna-status" th:classappend="${qna.qnaStatus != null ? ' ' + qna.qnaStatus.toLowerCase() : ' wait'}"
+                 th:text="${qna.qnaStatus == 'SAFE' ? 'AI SAFE 자동답변' : (qna.qnaStatus == 'MID' or qna.qnaStatus == 'HIGH') ? 'AI 초안 검토 중' : qna.qnaStatus == 'ANSWERED' ? '최종 답변 완료' : '답변 준비 중'}">상태</span>
       </p>
     </div>
 
@@ -56,10 +58,10 @@
     <!-- 🔹 답변 (선택) -->
     <div class="view-answer">
       <h4><i class="fa-solid fa-comment-dots"></i> 답변</h4>
-      <div class="answer-box" th:if="${qna.qnaReply != null and !#strings.isEmpty(qna.qnaReply)}">
+      <div class="answer-box" th:if="${canViewAnswer and qna.qnaReply != null and !#strings.isEmpty(qna.qnaReply)}">
         <p th:utext="${#strings.replace(#strings.escapeXml(qna.qnaReply), '\n', '<br/>')}">답변 내용</p>
       </div>
-      <div class="answer-box" th:if="${qna.qnaReply == null or #strings.isEmpty(qna.qnaReply)}">
+      <div class="answer-box" th:if="${!canViewAnswer or qna.qnaReply == null or #strings.isEmpty(qna.qnaReply)}">
         <p>답변 준비 중입니다. 빠르게 확인하여 안내드리겠습니다.</p>
       </div>
     </div>

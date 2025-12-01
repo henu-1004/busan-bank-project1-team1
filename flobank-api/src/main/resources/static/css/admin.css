@@ -1079,14 +1079,35 @@ h4{
   font-weight: 600;
 }
 
-.qna-status.pending {
+.qna-status.wait {
   background-color: #e3e7ec;
   color: #555;
 }
 
-.qna-status.complete {
+.qna-status.safe {
   background-color: #d6f5da;
   color: #198754;
+}
+
+.qna-status.mid {
+  background-color: #fff3cd;
+  color: #b58105;
+}
+
+.qna-status.high {
+  background-color: #fde2e1;
+  color: #c2403d;
+}
+
+.qna-status.answered {
+  background-color: #dbeafe;
+  color: #1d4ed8;
+}
+
+.qna-hint {
+  font-size: 13px;
+  color: #c2403d;
+  margin: 0 0 8px 0;
 }
 
 /* 버튼 */
@@ -1313,19 +1334,29 @@ h4{
   min-width: 90px;
 }
 
-.qna-status.pending {
+.qna-status.wait {
   background-color: #e3e7ec;
   color: #555;
 }
 
-.qna-status.ai-draft {
-  background-color: #ede4ff;
-  color: #7b61ff;
-}
-
-.qna-status.complete {
+.qna-status.safe {
   background-color: #d6f5da;
   color: #198754;
+}
+
+.qna-status.mid {
+  background-color: #fff3cd;
+  color: #b58105;
+}
+
+.qna-status.high {
+  background-color: #fde2e1;
+  color: #c2403d;
+}
+
+.qna-status.answered {
+  background-color: #dbeafe;
+  color: #1d4ed8;
 }
 
 /* 관리 버튼 스타일 */

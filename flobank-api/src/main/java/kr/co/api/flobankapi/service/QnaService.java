@@ -16,7 +16,7 @@ public class QnaService {
 
     private final QnaMapper qnaMapper;
     private static final int PAGE_SIZE = 6;
-    private static final int ADMIN_PAGE_SIZE = 10;
+    private static final int ADMIN_PAGE_SIZE = 5;
 
     public Map<String, Object> getQnaPage(int page) {
         return getQnaPage(page, null, PAGE_SIZE);
@@ -67,6 +67,9 @@ public class QnaService {
     }
 
     public void createQna(QnaDTO qna) {
+        if (qna.getQnaStatus() == null || qna.getQnaStatus().isBlank()) {
+            qna.setQnaStatus("WAIT");
+        }
         qnaMapper.insertQna(qna);
     }
 
@@ -78,21 +81,23 @@ public class QnaService {
         qnaMapper.deleteQna(qnaNo);
     }
 
-    public void updateQnaReply(Long qnaNo, String reply) {
+    public void updateQnaReply(Long qnaNo, String reply, String status) {
         String normalized = reply;
         if (normalized != null && normalized.isBlank()) {
             normalized = null;
         }
-        qnaMapper.updateQnaReply(qnaNo, normalized);
+        String normalizedStatus = normalizeStatus(status);
+        qnaMapper.updateQnaReply(qnaNo, normalized, normalizedStatus);
     }
 
     private String normalizeStatus(String status) {
-        if ("pending".equalsIgnoreCase(status)) {
-            return "pending";
+        if (status == null || status.isBlank()) {
+            return null;
         }
-        if ("complete".equalsIgnoreCase(status)) {
-            return "complete";
-        }
-        return null;
+        String upper = status.toUpperCase();
+        return switch (upper) {
+            case "WAIT", "SAFE", "MID", "HIGH", "ANSWERED" -> upper;
+            default -> null;
+        };
     }
 }

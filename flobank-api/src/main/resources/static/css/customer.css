@@ -403,6 +403,39 @@
   margin: 0;
 }
 
+.qna-status {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 14px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.qna-status.wait {
+  background: #f0f2f5;
+  color: #555;
+}
+
+.qna-status.safe {
+  background: #d6f5da;
+  color: #198754;
+}
+
+.qna-status.mid {
+  background: #fff3cd;
+  color: #b58105;
+}
+
+.qna-status.high {
+  background: #fde2e1;
+  color: #c2403d;
+}
+
+.qna-status.answered {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
 /* 버튼 영역 */
 .view-footer {
   text-align: right;

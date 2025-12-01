@@ -24,7 +24,8 @@ public interface QnaMapper {
     void updateQna(QnaDTO qna);
 
     void updateQnaReply(@Param("qnaNo") Long qnaNo,
-                        @Param("reply") String reply);
+                        @Param("reply") String reply,
+                        @Param("status") String status);
 
     void deleteQna(@Param("qnaNo") Long qnaNo);
 }
