@@ -411,29 +411,17 @@
   font-weight: 600;
 }
 
-.qna-status.wait {
-  background: #f0f2f5;
-  color: #555;
-}
-
-.qna-status.safe {
-  background: #d6f5da;
-  color: #198754;
-}
-
-.qna-status.mid {
-  background: #fff3cd;
-  color: #b58105;
-}
-
+.qna-status.wait,
+.qna-status.mid,
 .qna-status.high {
-  background: #fde2e1;
-  color: #c2403d;
+  background: #fff4e5;
+  color: #b65b00;
 }
 
+.qna-status.safe,
 .qna-status.answered {
-  background: #dbeafe;
-  color: #1d4ed8;
+  background: #e7f5ec;
+  color: #16794c;
 }
 
 /* 버튼 영역 */

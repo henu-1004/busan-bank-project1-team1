@@ -34,7 +34,7 @@
         | 등록일 <span th:text="${qna.qnaDt != null ? #temporals.format(qna.qnaDt, 'yyyy-MM-dd HH:mm') : ''}">0000-00-00</span>
         | 조회수 <span th:text="${qna.qnaViewCnt != null ? qna.qnaViewCnt : 0}">0</span>
         | <span class="qna-status" th:classappend="${qna.qnaStatus != null ? ' ' + qna.qnaStatus.toLowerCase() : ' wait'}"
-                 th:text="${qna.qnaStatus == 'SAFE' ? 'AI SAFE 자동답변' : (qna.qnaStatus == 'MID' or qna.qnaStatus == 'HIGH') ? 'AI 초안 검토 중' : qna.qnaStatus == 'ANSWERED' ? '최종 답변 완료' : '답변 준비 중'}">상태</span>
+                 th:text="${(qna.qnaStatus == 'SAFE' or qna.qnaStatus == 'ANSWERED') ? '답변완료' : '답변준비중'}">상태</span>
       </p>
     </div>
 

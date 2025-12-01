@@ -37,12 +37,12 @@
     <table class="board-table">
       <thead>
         <tr>
-          <th>번호</th>
-          <th>제목</th>
-          <th>상태</th>
-          <th>작성자</th>
-          <th>등록일</th>
-          <th>조회수</th>
+            <th>번호</th>
+            <th>제목</th>
+            <th>상태</th>
+            <th>작성자</th>
+            <th>등록일</th>
+            <th>조회수</th>
         </tr>
       </thead>
       <tbody>
@@ -54,7 +54,7 @@
           </td>
           <td>
             <span th:class="${'qna-status ' + (qna.qnaStatus != null ? qna.qnaStatus.toLowerCase() : 'wait')}"
-                  th:text="${qna.qnaStatus == 'SAFE' ? 'AI SAFE 자동답변' : (qna.qnaStatus == 'MID' or qna.qnaStatus == 'HIGH') ? 'AI 초안 검토 중' : qna.qnaStatus == 'ANSWERED' ? '최종 답변 완료' : '답변 준비 중'}"></span>
+                  th:text="${(qna.qnaStatus == 'SAFE' or qna.qnaStatus == 'ANSWERED') ? '답변완료' : '답변준비중'}"></span>
           </td>
           <td th:text="${qna.qnaCustName != null ? qna.qnaCustName : qna.qnaCustCode}">작성자</td>
           <td th:text="${qna.qnaDt != null ? #temporals.format(qna.qnaDt, 'yyyy-MM-dd') : ''}">2024-01-01</td>

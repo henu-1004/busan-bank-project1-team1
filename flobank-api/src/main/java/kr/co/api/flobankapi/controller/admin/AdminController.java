@@ -16,9 +16,11 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.server.ResponseStatusException;
 
 @Slf4j
@@ -32,6 +34,8 @@ public class AdminController {
     private final QnaService qnaService;
     private final AdminAuthService adminAuthService;
     private final DashboardService dashboardService;
+
+    private static final String AI_NOTICE_TEXT = "AI 생성 초안입니다. 검토가 필요합니다.";
 
 
     /** 목록 */
@@ -261,7 +265,7 @@ public class AdminController {
         }
 
         String normalizedReply = reply != null ? reply.trim() : null;
-        boolean containsAiNotice = normalizedReply != null && normalizedReply.contains("AI 생성 초안입니다. 검토가 필요합니다.");
+        boolean containsAiNotice = normalizedReply != null && normalizedReply.contains(AI_NOTICE_TEXT);
 
         String currentStatus = qna.getQnaStatus();
         String nextStatus = null;
@@ -282,6 +286,83 @@ public class AdminController {
         redirectAttributes.addFlashAttribute("msg", "답변이 저장되었습니다.");
 
         return "redirect:/admin/qna/" + qnaNo + "?qnaPage=" + qnaPage + "&qnaStatus=" + normalizeStatus(qnaStatus);
+    }
+
+    @GetMapping("/api/qna/{qnaNo}")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> getQnaDetail(@PathVariable Long qnaNo) {
+        QnaDTO qna = qnaService.findQna(qnaNo);
+        if (qna == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("qnaNo", qna.getQnaNo());
+        body.put("qnaTitle", qna.getQnaTitle());
+        body.put("qnaContent", qna.getQnaContent());
+        body.put("qnaDraft", qna.getQnaDraft());
+        body.put("qnaReply", qna.getQnaReply());
+        body.put("qnaStatus", qna.getQnaStatus());
+        body.put("qnaDt", qna.getQnaDt());
+        body.put("qnaCustName", qna.getQnaCustName());
+        body.put("qnaCustCode", qna.getQnaCustCode());
+
+        return ResponseEntity.ok(body);
+    }
+
+    @PostMapping("/api/qna/{qnaNo}/reply")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> updateQnaReplyApi(@PathVariable Long qnaNo,
+                                                                 @RequestParam(name = "reply", required = false) String reply) {
+
+        QnaDTO qna = qnaService.findQna(qnaNo);
+        if (qna == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        String normalizedReply = reply != null ? reply.trim() : null;
+        boolean containsAiNotice = normalizedReply != null && normalizedReply.contains(AI_NOTICE_TEXT);
+
+        String currentStatus = qna.getQnaStatus();
+        String nextStatus = null;
+
+        if (normalizedReply != null) {
+            if ("MID".equalsIgnoreCase(currentStatus) || "HIGH".equalsIgnoreCase(currentStatus)) {
+                if (containsAiNotice) {
+                    Map<String, Object> errorBody = new HashMap<>();
+                    errorBody.put("message", "AI 안내 문구를 삭제한 뒤 승인해주세요.");
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorBody);
+                }
+                nextStatus = "ANSWERED";
+            } else if ("SAFE".equalsIgnoreCase(currentStatus) || "WAIT".equalsIgnoreCase(currentStatus)) {
+                nextStatus = "ANSWERED";
+            }
+        }
+
+        qnaService.updateQnaReply(qnaNo, normalizedReply, nextStatus);
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("message", "답변이 저장되었습니다.");
+        body.put("status", nextStatus != null ? nextStatus : currentStatus);
+        body.put("reply", normalizedReply);
+
+        return ResponseEntity.ok(body);
+    }
+
+    @DeleteMapping("/api/qna/{qnaNo}")
+    @ResponseBody
+    public ResponseEntity<Map<String, String>> deleteQna(@PathVariable Long qnaNo) {
+        QnaDTO qna = qnaService.findQna(qnaNo);
+        if (qna == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        qnaService.deleteQna(qnaNo);
+
+        Map<String, String> body = new HashMap<>();
+        body.put("message", "Q&A가 삭제되었습니다.");
+
+        return ResponseEntity.ok(body);
     }
 
 
