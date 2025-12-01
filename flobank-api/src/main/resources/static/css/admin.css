@@ -160,7 +160,7 @@ body {
    🔹 공통 컨테이너 (.section)
 ================================ */
 .section {
-  background: #e6e6fb;
+  background: rgba(213, 228, 244, 0.6);
   border-radius: 16px;
   padding: 32px 36px;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
@@ -3023,7 +3023,8 @@ input[type="file"] {
     margin-bottom: 20px;
 }
 
-<<<<<<< Updated upstream
+
+
 .admin-stats-row--today .admin-stat-card:nth-child(1) {
     flex: 0 0 70%;   /* 원화 카드 */
 }

@@ -464,7 +464,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         backgroundColor: 'rgba(33,150,243,0.2)',
                         fill: true,
                         tension: 0.4,
-                        pointRadius: 3
+                        pointRadius: 1
                     }]
                 },
                 options: {
