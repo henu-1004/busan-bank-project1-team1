@@ -97,5 +97,5 @@ ai-server:
   url: http://34.64.84.82:8000
 
 ai-server-qna:
-  url: http://34.64.84.82:8001/api/qna/auto_process
+  url: http://34.64.84.82:8000/api/qna/auto_process
 
