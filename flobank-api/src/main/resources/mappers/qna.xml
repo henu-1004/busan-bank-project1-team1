@@ -78,24 +78,44 @@
         WHERE QNA_NO = #{qnaNo}
     </update>
 
-    <insert id="insertQna" parameterType="kr.co.api.flobankapi.dto.QnaDTO">
-        <selectKey keyProperty="qnaNo" resultType="long" order="BEFORE">
-            SELECT FLOBANK.ISEQ$$_75959.NEXTVAL FROM dual
-        </selectKey>
+    <insert id="insertQna"
+            parameterType="kr.co.api.flobankapi.dto.QnaDTO">
 
-        INSERT INTO TB_QNA_HDR
-        (QNA_NO, QNA_CUST_CODE, QNA_TITLE, QNA_CONTENT, QNA_DRAFT, QNA_REPLY, QNA_STATUS, QNA_DT, QNA_VIEW_CNT)
-        VALUES
-        (#{qnaNo, jdbcType=NUMERIC},
-        #{qnaCustCode, jdbcType=VARCHAR},
+        <!--
+          QNA_NO는 IDENTITY GENERATED ALWAYS 이므로
+          INSERT할 때 건드리지 않고,
+          INSERT 후에 ISEQ$$_75959.CURRVAL 로 방금 값만 가져온다.
+        -->
+        INSERT INTO TB_QNA_HDR (
+        QNA_CUST_CODE,
+        QNA_TITLE,
+        QNA_CONTENT,
+        QNA_DRAFT,
+        QNA_REPLY,
+        QNA_STATUS,
+        QNA_DT,
+        QNA_VIEW_CNT
+        )
+        VALUES (
+        #{qnaCustCode, jdbcType=CHAR},
         #{qnaTitle, jdbcType=VARCHAR},
         #{qnaContent, jdbcType=VARCHAR},
         #{qnaDraft, jdbcType=VARCHAR},
         #{qnaReply, jdbcType=VARCHAR},
         #{qnaStatus, jdbcType=VARCHAR},
         SYSDATE,
-        0)
+        0
+        )
+
+        <!-- INSERT 끝난 뒤, 방금 찍힌 IDENTITY 값 가져오기 -->
+        <selectKey keyProperty="qnaNo"
+                   resultType="long"
+                   order="AFTER">
+            SELECT FLOBANK.ISEQ$$_75959.CURRVAL FROM dual
+        </selectKey>
     </insert>
+
+
 
     <update id="updateQna">
         UPDATE TB_QNA_HDR
