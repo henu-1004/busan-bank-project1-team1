@@ -1164,6 +1164,19 @@ h4{
   margin-bottom: 20px;
 }
 
+.qna-modal-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  color: #667085;
+  font-size: 13px;
+}
+
+.qna-modal-info {
+  color: #667085;
+}
+
 .qna-modal-question h3 {
   font-size: 15px;
   font-weight: 600;
