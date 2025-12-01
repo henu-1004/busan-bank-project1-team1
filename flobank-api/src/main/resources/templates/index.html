@@ -179,35 +179,51 @@
 </section>
 
 
-<section class="board-section">
-    <div class="board-container">
+<section class="board-section news-event">
+    <h2 class="ne-title">News & Event</h2>
 
-        <div class="board-box">
-            <h3>공지사항</h3>
-            <ul>
-                <li th:each="n : ${noticeList}">
-                    <a th:href="@{/customer/notice_view/{id}(id=${n.boardNo})}"
-                       th:text="${n.boardTitle}"></a>
-                    <span th:text="${#temporals.format(n.boardRegDt, 'yyyy.MM.dd')}"></span>
-                </li>
-            </ul>
+    <div class="ne-wrapper">
 
-
-            <div class="more"><a th:href="@{/customer/notice_list}">+ 더보기</a></div>
+        <!-- 좌측 배너 영역 -->
+        <div class="ne-banner-box">
+            <a href="#">
+                <img th:src="@{/images/swim.gif}" alt="news-banner" class="ne-banner-img">
+            </a>
         </div>
 
-        <div class="board-box">
-            <h3>이벤트</h3>
-            <ul>
-                <li th:each="e : ${eventList}">
-                    <a th:href="@{/customer/event_view/{id}(id=${e.boardNo})}"
-                       th:text="${e.boardTitle}"></a>
-                    <span th:text="${#temporals.format(e.boardRegDt, 'yyyy.MM.dd')}"></span>
-                </li>
-            </ul>
+        <!-- 우측 공지 + 이벤트 -->
+        <div class="ne-right-box">
 
+            <!-- 공지사항 -->
+            <div class="ne-board">
+                <h3>공지사항</h3>
+                <ul>
+                    <li th:each="n, stat : ${noticeList}" th:if="${stat.index < 3}">
+                        <a th:href="@{/customer/notice_view/{id}(id=${n.boardNo})}"
+                           th:text="${n.boardTitle}"></a>
+                        <span th:text="${#temporals.format(n.boardRegDt, 'yyyy.MM.dd')}"></span>
+                    </li>
+                </ul>
+                <div class="ne-more">
+                    <a th:href="@{/customer/notice_list}">+ 더보기</a>
+                </div>
+            </div>
 
-            <div class="more"><a th:href="@{/customer/event_list}">+ 더보기</a></div>
+            <!-- 이벤트 -->
+            <div class="ne-board">
+                <h3>이벤트</h3>
+                <ul>
+                    <li th:each="e, stat : ${eventList}" th:if="${stat.index < 3}">
+                        <a th:href="@{/customer/event_view/{id}(id=${e.boardNo})}"
+                           th:text="${e.boardTitle}"></a>
+                        <span th:text="${#temporals.format(e.boardRegDt, 'yyyy.MM.dd')}"></span>
+                    </li>
+                </ul>
+                <div class="ne-more">
+                    <a th:href="@{/customer/event_list}">+ 더보기</a>
+                </div>
+            </div>
+
         </div>
 
     </div>
