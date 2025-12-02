@@ -79,8 +79,8 @@
       <aside class="chatbot-support">
         <div class="quick-links">
           <h3>바로가기</h3>
-          <button><i class="fa-solid fa-chart-line"></i> 실시간 환율</button>
-          <button><i class="fa-solid fa-plane-departure"></i>환전하기</button>
+            <button><a style="text-decoration: none; color: #1A2C3A" th:href="@{/rate/rate_info}"><i class="fa-solid fa-chart-line"></i> 실시간 환율</a></button>
+            <button th:href="@{/exchange/step1}" ><a style="text-decoration: none; color: #1A2C3A" th:href="@{/exchange/step1}"><i class="fa-solid fa-plane-departure"></i> 환전하기</a></button>
         </div>
 
         <div class="faq-card">

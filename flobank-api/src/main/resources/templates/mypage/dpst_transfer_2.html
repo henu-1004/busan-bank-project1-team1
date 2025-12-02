@@ -114,7 +114,7 @@
                 <button type="submit" class="transfer2-btn-sub">이전</button>
             </form>
 
-            <form th:action="@{/mypage/dpst_transfer_3(dpstHdrAcctNo=${dpstHdrAcctNo})}" th:object="${custTranHistDTO}" method="post" style="display:inline;">
+            <form id="plusTranForm" th:action="@{/mypage/dpst_transfer_3(dpstHdrAcctNo=${dpstHdrAcctNo})}" th:object="${custTranHistDTO}" method="post" style="display:inline;">
                 <input type="hidden" th:field="*{tranAcctNo}">
                 <input type="hidden" th:field="*{tranCustName}">
                 <input type="hidden" th:field="*{tranRecAcctNo}">
@@ -128,12 +128,13 @@
                 <input type="hidden" th:field="*{dpstDtlAmount}">
                 <input type="hidden" th:field="*{dpstDtlAppliedRate}">
 
-                <button type="submit" class="transfer2-btn-main">이체실행</button>
+                <button type="submit" id="openPlusEsign" class="transfer2-btn-main">이체실행</button>
             </form>
         </div>
 
     </div>
 </main>
+<script th:src="@{/js/common_cert.js}"></script>
 <script th:src ="@{/js/deptran.js}"></script>
 <div th:replace="~{_template/_footer.html}"></div>
 

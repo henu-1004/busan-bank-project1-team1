@@ -12,4 +12,5 @@ public interface ChatbotRuleMapper {
     public List<ChatbotRulesDTO> selectRulesList();
     public List<ChatbotBadWordDTO> getActiveWords();
     public void insertBadWords(ChatbotBadWordDTO badWordDTO);
+    public List<ChatbotRulesDTO> getActiveRules();
 }
