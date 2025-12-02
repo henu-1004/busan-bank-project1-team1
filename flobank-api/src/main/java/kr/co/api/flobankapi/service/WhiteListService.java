@@ -255,30 +255,5 @@ public class WhiteListService {
         return sb.toString();
     }
 
-    public String flobankExchTerms() {
-        List<TermsHistDTO> reg = whiteListMapper.selectLatestTermsByCate(2);
-        return "terms";
-    }
-
-    public String flobankFrgnRemitTerms() {
-        List<TermsHistDTO> reg = whiteListMapper.selectLatestTermsByCate(3);
-        return "terms";
-    }
-
-    public String flobankDepositTerms() {
-        List<TermsHistDTO> reg = whiteListMapper.selectLatestTermsByCate(4);
-        return "terms";
-    }
-
-    public String flobankBasicAcctOpenTerms() {
-        List<TermsHistDTO> reg = whiteListMapper.selectLatestTermsByCate(5);
-        return "terms";
-    }
-
-    public String flobankFrgnAcctOpenTerms() {
-        List<TermsHistDTO> reg = whiteListMapper.selectLatestTermsByCate(6);
-        return "terms";
-    }
-
 
 }

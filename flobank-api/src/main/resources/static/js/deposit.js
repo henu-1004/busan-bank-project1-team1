@@ -384,7 +384,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     송금보내실때환율
                 </td>
                 <td class="prod-amt-right">
-                    ${numberFormat(data.baseRate)} 원
+                    ${numberFormat(data.ttsRate)} 원
                 </td>
             </tr>
             <tr>

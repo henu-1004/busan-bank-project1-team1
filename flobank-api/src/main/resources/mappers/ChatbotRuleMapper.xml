@@ -32,4 +32,10 @@
         values (#{badWord}, #{badType}, #{badUseYn}, SYSDATE)
     </insert>
 
+    <select id="getActiveRules" resultType="kr.co.api.flobankapi.dto.ChatbotRulesDTO">
+        SELECT *
+        FROM TB_CHATBOT_RULES
+        where rule_use_yn='y'
+    </select>
+
 </mapper>

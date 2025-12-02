@@ -153,6 +153,21 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 
+    const esignBtn = document.getElementById("openPlusEsign");
+
+    if (esignBtn) {
+        esignBtn.addEventListener("click", function () {
+
+            const tform= document.getElementById('plusTranForm');
+            if (tform){
+                tcert(tform);
+            }
+        });
+    }
+
+
+
+
 
 
 
@@ -276,33 +291,36 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    const nextBtn = document.getElementById("openTerminateModal");
     const modal = document.getElementById("terminateInfoModal");
-    const closeBtn = modal.querySelector(".close-btn");
 
-    if (nextBtn) {
-        nextBtn.addEventListener("click", function () {
-            modal.style.display = "flex";   // 모달 열기
 
-            const form= modal.querySelector('form');
-            if (form){
-                cert(form);
+    if (modal) {
+        const nextBtn = document.getElementById("openTerminateModal");
+        const closeBtn = modal.querySelector(".close-btn");
+        if (nextBtn) {
+            nextBtn.addEventListener("click", function () {
+                modal.style.display = "flex";   // 모달 열기
+
+                const form= modal.querySelector('form');
+                if (form){
+                    cert(form);
+                }
+            });
+        }
+
+        if (closeBtn) {
+            closeBtn.addEventListener("click", function () {
+                modal.style.display = "none";    // 닫기 버튼
+            });
+        }
+
+        // 모달 바깥 클릭 시 닫기
+        window.addEventListener("click", function (e) {
+            if (e.target === modal) {
+                modal.style.display = "none";
             }
         });
     }
-
-    if (closeBtn) {
-        closeBtn.addEventListener("click", function () {
-            modal.style.display = "none";    // 닫기 버튼
-        });
-    }
-
-    // 모달 바깥 클릭 시 닫기
-    window.addEventListener("click", function (e) {
-        if (e.target === modal) {
-            modal.style.display = "none";
-        }
-    });
 
 
 });
@@ -402,6 +420,27 @@ function cert(form) {
                 displayAmount, // 금액
                 function() {
                     form.submit();
+                }
+            );
+        } else {
+            alert("인증 모듈(CertManager)을 찾을 수 없습니다.");
+        }
+    });
+}
+
+
+function tcert(tform) {
+
+    tform.addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        // 전자서명 호출
+        if (typeof CertManager !== 'undefined') {
+            CertManager.request(
+                "추가납입",
+                0, // 금액
+                function() {
+                    tform.submit();
                 }
             );
         } else {
