@@ -9,119 +9,27 @@
     <link rel="stylesheet" th:href="@{/css/footer.css}">
     <link rel="stylesheet" th:href="@{/css/test/benefit.css}">
 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
-        /* AI 요약 섹션 레이아웃 */
-        .ai-section {
-            background-color: #f4f6f9;
-            padding: 60px 0;
-            display: flex;
-            justify-content: center;
-        }
-
-        /* 카드 디자인 (이미지처럼 보이는 핵심) */
-        .ai-card {
-            background: white;
-            width: 100%;
-            max-width: 700px; /* 가로로 넓게 잡아서 가독성 확보 */
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-            overflow: hidden;
-            border: 1px solid #e1e4e8;
-            position: relative;
-        }
-
-        /* 1. 헤더 (그라데이션) */
-        .ai-card-header {
-            padding: 25px 30px;
-            background: linear-gradient(135deg, #004494 0%, #003366 100%);
-            color: white;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
+        /* [기존 레이아웃 스타일] */
+        .ai-section { background-color: #f4f6f9; padding: 60px 0; display: flex; justify-content: center; }
+        .ai-card { background: white; width: 100%; max-width: 700px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); overflow: hidden; border: 1px solid #e1e4e8; position: relative; }
+        .ai-card-header { padding: 25px 30px; background: linear-gradient(135deg, #004494 0%, #003366 100%); color: white; display: flex; justify-content: space-between; align-items: center; }
         .ai-header-title h2 { font-size: 22px; margin: 0 0 5px 0; font-weight: 700; color: white;}
         .ai-header-title p { font-size: 14px; opacity: 0.85; margin: 0; color: #e0e7ff; }
         .ai-flag { font-size: 40px; line-height: 1; }
-
-        /* 2. 본문 (요약 내용 + 데이터) */
-        .ai-card-body {
-            padding: 30px;
-            display: flex;
-            gap: 30px; /* 좌우 패널 간격 */
-        }
-
-        /* 왼쪽: 텍스트 요약 */
-        .ai-summary-text {
-            flex: 1.5;
-        }
-
-        .ai-badge {
-            display: inline-flex;
-            align-items: center;
-            background: linear-gradient(90deg, #6366f1, #8b5cf6); /* Gemini 컬러 */
-            color: white;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 700;
-            margin-bottom: 15px;
-            box-shadow: 0 2px 5px rgba(99, 102, 241, 0.3);
-        }
-
-        .ai-desc {
-            font-size: 16px;
-            line-height: 1.7;
-            color: #333;
-            word-break: keep-all;
-        }
+        .ai-card-body { padding: 30px; display: flex; gap: 30px; }
+        .ai-summary-text { flex: 1.5; }
+        .ai-badge { display: inline-flex; align-items: center; background: linear-gradient(90deg, #6366f1, #8b5cf6); color: white; padding: 5px 12px; border-radius: 20px; font-size: 13px; font-weight: 700; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(99, 102, 241, 0.3); }
+        .ai-desc { font-size: 16px; line-height: 1.7; color: #333; word-break: keep-all; }
         .ai-desc strong { color: #004494; font-weight: 700; background: #eef2ff; padding: 2px 5px; border-radius: 4px; }
-
-        /* 오른쪽: 데이터 시각화 */
-        .ai-visual-data {
-            flex: 1;
-            background: #f8f9fa;
-            border-radius: 15px;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid #eee;
-        }
-
-        /* 원형 게이지 */
-        .circle-graph {
-            width: 90px;
-            height: 90px;
-            border-radius: 50%;
-            /* 5.2%를 대략 시각화 (CSS conic-gradient 활용) */
-            background: conic-gradient(#004494 0% 85%, #d1d5db 85% 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 15px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-        }
-
-        .circle-inner {
-            width: 74px;
-            height: 74px;
-            background: white;
-            border-radius: 50%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: #004494;
-        }
-
+        .ai-visual-data { flex: 1; background: #f8f9fa; border-radius: 15px; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 1px solid #eee; }
+        .circle-graph { width: 90px; height: 90px; border-radius: 50%; background: conic-gradient(#004494 0% 85%, #d1d5db 85% 100%); display: flex; align-items: center; justify-content: center; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .circle-inner { width: 74px; height: 74px; background: white; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #004494; }
         .circle-inner .val { font-size: 20px; font-weight: 800; line-height: 1; }
         .circle-inner .unit { font-size: 12px; font-weight: 500; color: #666; margin-top: 2px; }
-
         .visual-label { font-size: 14px; color: #555; font-weight: 600; }
-
-        /* 모바일 대응 (반응형) */
         @media (max-width: 768px) {
             .ai-card-body { flex-direction: column; }
             .ai-summary-text { margin-bottom: 20px; }
@@ -130,6 +38,41 @@
             .circle-inner { width: 58px; height: 58px; }
             .circle-inner .val { font-size: 16px; }
         }
+
+        /* 경품 박스 스타일 */
+        .prize-box-empty{ display: flex; align-items: center; border-radius: 10px; padding: 12px; margin-top: 15px; margin-bottom: 10px; height: 62px; box-sizing: border-box; }
+        .prize-box { display: flex; align-items: center; background: #fff8e1; border: 1px solid #ffe082; border-radius: 10px; padding: 12px; margin-top: 15px; margin-bottom: 10px; height: 62px; box-sizing: border-box; }
+        .prize-icon { width: 36px; height: 36px; background: #ffecb3; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #ff6f00; font-size: 16px; margin-right: 10px; flex-shrink: 0; }
+        .prize-content { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+        .prize-label { display: block; font-size: 11px; color: #ff8f00; font-weight: 700; margin-bottom: 2px; }
+        .prize-name { display: block; font-size: 13px; color: #333; font-weight: 700; line-height: 1.2; word-break: keep-all; letter-spacing: -0.5px; }
+
+        /* 상세보기 버튼 */
+        .btn-step-detail { display: block; width: 100%; margin-top: 10px; padding: 8px 0; background-color: #fff; border: 1px solid #ddd; border-radius: 8px; color: #555; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .btn-step-detail:hover { background-color: #f0f4ff; color: #004494; border-color: #004494; }
+
+        /* 모달 스타일 */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 9999; justify-content: center; align-items: center; }
+        .modal-box { background: white; padding: 25px; width: 90%; max-width: 480px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); position: relative; animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .modal-header h3 { font-size: 18px; color: #333; margin: 0; }
+        .btn-close { background: none; border: none; font-size: 24px; cursor: pointer; color: #888; }
+
+        .rate-table { width: 100%; border-collapse: collapse; margin: 10px 0 20px; font-size: 14px; }
+        .rate-table th, .rate-table td { border: 1px solid #eee; padding: 10px; text-align: center; }
+        .rate-table th { background-color: #f9f9f9; color: #555; font-weight: 600; }
+        .rate-table td { color: #333; }
+        .text-blue { color: #004494; font-weight: 700; }
+        .text-red { color: #e11d48; font-weight: 700; }
+        .text-gray { color: #aaa; font-weight: 500; }
+        .modal-note { background-color: #f8f9fa; padding: 15px; border-radius: 8px; font-size: 12px; color: #666; margin-top: 15px; line-height: 1.6; border: 1px solid #eee; }
+        .modal-footer { text-align: center; margin-top: 20px; }
+        .btn-confirm { background-color: #004494; color: white; padding: 10px 30px; border: none; border-radius: 8px; font-size: 14px; cursor: pointer; transition: background-color 0.2s; }
+        .btn-confirm:hover { background-color: #003366; }
+
+        .rate-detail-box p .label.total { color: #333; font-weight: 700; }
+        .rate-detail-box p strong { color: #333; }
     </style>
 </head>
 
@@ -138,7 +81,6 @@
 <div th:replace="~{_template/_header.html}"></div>
 
 <main>
-
     <section class="hero">
         <div class="hero-inner">
             <div class="hero-left">
@@ -150,16 +92,11 @@
                         frameborder="0" allowfullscreen></iframe>
             </div>
         </div>
-
         <div class="hero-bottom-text">
             <p class="hero-subtitle"><strong>슈카월드 X 플로뱅크</strong></p>
             <h1 class="hero-title">슈카 달러 풀링 예금</h1>
-            <p class="hero-shuka-info">
-                경제·금융 콘텐츠 1위, 구독자 <strong>361만</strong> 슈카월드와 함께하는 특별 예금.
-            </p>
-            <p class="hero-desc">
-                인원이 모일수록 금리와 경품 혜택이 올라간다!
-            </p>
+            <p class="hero-shuka-info">경제·금융 콘텐츠 1위, 구독자 <strong>361만</strong> 슈카월드와 함께하는 특별 예금.</p>
+            <p class="hero-desc">인원이 모일수록 금리와 경품 혜택이 올라간다!</p>
         </div>
     </section>
 
@@ -172,7 +109,6 @@
                 </div>
                 <div class="ai-flag">🇺🇸</div>
             </div>
-
             <div class="ai-card-body">
                 <div class="ai-summary-text">
                     <div class="ai-badge">✨ AI 핵심 요약</div>
@@ -182,15 +118,11 @@
                         참여자 중 추첨을 통해 <strong>하와이 왕복 항공권</strong> 등 특별한 경품을 제공합니다.
                     </p>
                 </div>
-
                 <div class="ai-visual-data">
                     <div class="circle-graph">
-                        <div class="circle-inner">
-                            <span class="val">5.2%</span>
-                        </div>
+                        <div class="circle-inner"><span class="val">5.2%</span></div>
                     </div>
                     <div class="visual-label">최대 예상 금리</div>
-
                     <div style="margin-top: 15px; text-align: center;">
                         <span style="font-size: 24px;">🎁</span>
                         <div class="visual-label" style="margin-top:5px;">경품 혜택 포함</div>
@@ -207,14 +139,16 @@
 
             <div class="rate-text">
                 <p class="apply-status">
-                    현재 <strong>2,105명</strong> 신청 완료!
-                    <span class="remain">마감까지 <strong>895명</strong> 남았습니다.</span>
+                    현재 <strong>5,105명</strong> 신청 완료!
+                    <span class="remain">마감까지 <strong>2시간</strong> 남았습니다.</span>
                 </p>
 
                 <p class="rate-max">최대 연 <strong>5.2%</strong></p>
-                <!-- <p class="rate-basic">기본 연 <strong>3.0%</strong></p> -->
+
+                <p class="rate-basic"><i class="fa-solid fa-bullhorn" style="color:#666; margin-right:5px;"></i>적용 금리 연 <strong>3.0%</strong></p>
 
                 <div class="steps-cards">
+
                     <div class="step-card">
                         <div class="step-header">
                             <span class="step-badge" style="margin-bottom: 0px">STEP 1</span>
@@ -224,9 +158,20 @@
                         <div class="rate-detail-box">
                             <p><span class="label">적용금리</span> <strong>3.0%</strong></p>
                             <p><span class="label">달성금리</span> <strong>+0.5%</strong></p>
-                            <p><span class="label total">총 금리</span> <strong>3.5%</strong></p>
+                            <p><span class="label total">총 금리</span> <strong style="color:#004494">3.5%</strong></p>
                         </div>
-                        <p class="step-benefit highlight">스타벅스 추첨</p>
+
+                        <div class="prize-box">
+                            <div class="prize-icon"><i class="fa-solid fa-mug-hot"></i></div>
+                            <div class="prize-content">
+                                <span class="prize-label">참여자 추첨</span>
+                                <span class="prize-name">스타벅스 커피 쿠폰</span>
+                            </div>
+                        </div>
+
+                        <button type="button" class="btn-step-detail" onclick="openRateModal('STEP 1', 3.0, 0.5)">
+                            상세 금리 보기 <i class="fa-solid fa-chevron-right"></i>
+                        </button>
                     </div>
 
                     <div class="step-card">
@@ -234,13 +179,24 @@
                             <span class="step-badge" style="margin-bottom: 0px">STEP 2</span>
                             <span class="step-people strong">3000명 가입</span>
                         </div>
-                        <div class="step-rate" style="margin-top: 10px">+1.0%</div>
+                        <div class="step-rate" style="margin-top: 10px">+1.5%</div>
                         <div class="rate-detail-box">
-                            <p><span class="label">적용금리</span> <strong>3.5%</strong></p>
-                            <p><span class="label">달성금리</span> <strong>+1.0%</strong></p>
-                            <p><span class="label total">총 금리</span> <strong>4.5%</strong></p>
+                            <p><span class="label">적용금리</span> <strong>3.0%</strong></p>
+                            <p><span class="label">달성금리</span> <strong>+1.5%</strong></p>
+                            <p><span class="label total">총 금리</span> <strong style="color:#004494">4.5%</strong></p>
                         </div>
-                        <p class="step-benefit highlight">상품권 100만원</p>
+
+                        <div class="prize-box">
+                            <div class="prize-icon"><i class="fa-solid fa-gift"></i></div>
+                            <div class="prize-content">
+                                <span class="prize-label">달성 기념</span>
+                                <span class="prize-name">백화점 상품권 100만원</span>
+                            </div>
+                        </div>
+
+                        <button type="button" class="btn-step-detail" onclick="openRateModal('STEP 2', 3.0, 1.5)">
+                            상세 금리 보기 <i class="fa-solid fa-chevron-right"></i>
+                        </button>
                     </div>
 
                     <div class="step-card">
@@ -248,33 +204,137 @@
                             <span class="step-badge" style="margin-bottom: 0px">STEP 3</span>
                             <span class="step-people strong">6000명 가입</span>
                         </div>
-                        <div class="step-rate" style="margin-top: 10px">+0.7%</div>
+                        <div class="step-rate" style="margin-top: 10px">+2.2%</div>
                         <div class="rate-detail-box">
-                            <p><span class="label">적용금리</span> <strong>4.5%</strong></p>
-                            <p><span class="label">달성금리</span> <strong>+0.7%</strong></p>
-                            <p><span class="label total">총 금리</span> <strong>5.2%</strong></p>
+                            <p><span class="label">적용금리</span> <strong>3.0%</strong></p>
+                            <p><span class="label">달성금리</span> <strong>+2.2%</strong></p>
+                            <p><span class="label total">총 금리</span> <strong style="color:#004494">5.2%</strong></p>
                         </div>
-                        <p class="step-benefit highlight">하와이 왕복 비행기 티켓</p>
+
+                        <div class="prize-box" style="background-color: #fff3cd; border-color: #ffc107;">
+                            <div class="prize-icon" style="color: #007bff; background-color: #fff;">
+                                <i class="fa-solid fa-plane-departure"></i>
+                            </div>
+                            <div class="prize-content">
+                                <span class="prize-label" style="color: #007bff;">달성 기념</span>
+                                <span class="prize-name">하와이 왕복 항공권</span>
+                            </div>
+                        </div>
+
+                        <button type="button" class="btn-step-detail" onclick="openRateModal('STEP 3', 3.0, 2.2)">
+                            상세 금리 보기 <i class="fa-solid fa-chevron-right"></i>
+                        </button>
                     </div>
 
                 </div>
-                <div style="float: right; color: gray; margin-top: 3px; margin-right:3px; font-size: 13px">※ 달러 거주자 금리 기준</div>
-
-            </div></div></section>
-
+            </div>
+        </div>
+    </section>
 
     <section class="cta-section">
         <h3>5.2% 최대 금리와 경품 혜택을 지금 바로 만나보세요</h3>
         <p class="cta-sub">사전 신청 고객에게만 제공되는 특별 우대금리와 경품 혜택을 놓치지 마세요.</p>
 
-        <a class="cta-button"
-           th:href="@{/deposit/deposit_step1(dpstId='FXD079')}">
-            5.2% 받고 사전 신청하기
+        <a class="cta-button" th:href="@{/deposit/deposit_step1(dpstId='FXD079')}">
+            혜택 받고 사전 신청하기
         </a>
     </section>
 
 </main>
 
+<div id="stepRateModal" class="modal-overlay">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3 id="modalTitle">STEP 상세 금리</h3>
+            <button type="button" class="btn-close" onclick="closeRateModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p style="font-size: 14px; color: #333; margin-bottom: 15px; font-weight: 600;">
+                <i class="fa-solid fa-calculator"></i> 예상 만기 이율 (세전)
+            </p>
+
+            <table class="rate-table">
+                <colgroup>
+                    <col width="25%">
+                    <col width="25%">
+                    <col width="25%">
+                    <col width="25%">
+                </colgroup>
+                <thead>
+                <tr>
+                    <th>구분</th>
+                    <th>적용금리</th>
+                    <th>달성금리</th>
+                    <th>최종금리</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td style="font-weight:bold">거주자</td>
+                    <td id="resBase">0.0%</td>
+                    <td id="resPref" class="text-blue">0.0%</td>
+                    <td id="resTotal" class="text-red" style="font-size:1.1em">0.0%</td>
+                </tr>
+                <tr>
+                    <td>
+                        비거주자
+                        <i class="fa-regular fa-circle-question" style="color:#aaa; font-size:12px;" title="비거주자는 이벤트 대상에서 제외됩니다."></i>
+                    </td>
+                    <td id="nonResBase">0.0%</td>
+                    <td id="nonResPref" class="text-gray">-</td>
+                    <td id="nonResTotal" style="font-weight:bold; color:#555;">0.0%</td>
+                </tr>
+                </tbody>
+            </table>
+
+            <div class="modal-note">
+                <strong><i class="fa-solid fa-circle-info"></i> 유의사항</strong>
+                <ul style="margin: 5px 0 0 15px; padding: 0;">
+                    <li>적용금리는 <strong>연 3.0%</strong>로 모든 단계에서 동일하게 적용됩니다.</li>
+                    <li>목표 인원 달성 시 제공되는 추가 금리는 <strong>달성금리</strong> 항목에 반영됩니다.</li>
+                    <li>본 이벤트 달성금리는 <strong>대한민국 거주자</strong>에 한하여 제공됩니다.</li>
+                </ul>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn-confirm" onclick="closeRateModal()">확인</button>
+        </div>
+    </div>
+</div>
+
 <div th:replace="~{_template/_footer.html}"></div>
+
+<script>
+    function openRateModal(stepTitle, baseRate, prefRate) {
+        document.getElementById('modalTitle').innerText = stepTitle + " 상세 금리 조회";
+
+        const resTotal = (baseRate + prefRate).toFixed(2);
+        document.getElementById('resBase').innerText = baseRate.toFixed(1) + '%';
+        document.getElementById('resPref').innerText = '+' + prefRate.toFixed(1) + '%';
+        document.getElementById('resTotal').innerText = resTotal + '%';
+
+        const nonResBaseVal = baseRate;
+        const nonResTotal = nonResBaseVal.toFixed(2);
+
+        document.getElementById('nonResBase').innerText = nonResBaseVal.toFixed(1) + '%';
+        const nonResPrefEl = document.getElementById('nonResPref');
+        nonResPrefEl.innerText = '-';
+        document.getElementById('nonResTotal').innerText = nonResTotal + '%';
+
+        document.getElementById('stepRateModal').style.display = 'flex';
+    }
+
+    function closeRateModal() {
+        document.getElementById('stepRateModal').style.display = 'none';
+    }
+
+    window.onclick = function(event) {
+        const modal = document.getElementById('stepRateModal');
+        if (event.target == modal) {
+            closeRateModal();
+        }
+    }
+</script>
+
 </body>
 </html>
