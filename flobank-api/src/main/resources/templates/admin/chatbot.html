@@ -194,8 +194,8 @@
                 </thead>
 
                 <tbody>
-                <tr th:each="rule : ${botRulesList}">
-                    <td>[[${rule.ruleId}]]</td>
+                <tr th:each="rule, stat : ${botRulesList}">
+                    <td>[[${stat.count}]]</td>
                     <td>[[${rule.ruleTxt}]]</td>
                     <td><span class="tag tag-normal">[[${rule.ruleUseYn}]]</span></td>
                     <td th:text="${#temporals.format(rule.ruleRegDt, 'yyyy-MM-dd HH:mm:ss')}"></td>
