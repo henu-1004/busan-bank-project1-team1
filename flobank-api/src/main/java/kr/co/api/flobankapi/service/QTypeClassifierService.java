@@ -24,6 +24,9 @@ public class QTypeClassifierService {
                         "반드시 아래 중 하나만 출력한다:\n" +
                         "- Interest\n" +
                         "- ProductInfo\n" +
+                        "- FxRateGlossary\n" +
+                        "- DepositGlossary\n" +
+                        "- AccountTranGlossary\n" +
                         "- null\n" +
                         "설명 금지. 한 단어만 출력.";
 
