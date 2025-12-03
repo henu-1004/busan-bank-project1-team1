@@ -127,8 +127,8 @@
                 </thead>
 
                 <tbody>
-                <tr th:each="bw: ${badWordList}">
-                    <td>[[${bw.badId}]]</td>
+                <tr th:each="bw, stat: ${badWordList}">
+                    <td>[[${stat.count}]]</td>
                     <td>[[${bw.badWord}]]</td>
                     <td th:text="${bw.badType == 1 ? '욕설/비속어' : (bw.badType == 2 ? '개인정보' : '기타')}">욕설/비속어</td>
                     <td th:text="${#temporals.format(bw.badRegDt, 'yyyy-MM-dd HH:mm:ss')}"></td>
