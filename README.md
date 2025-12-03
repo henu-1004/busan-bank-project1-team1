@@ -1,6 +1,6 @@
 # busan-bank-project1-team1
 
-# 🏦 FloBank (Busan Bank Project 1 Team 1)
+# 🏦 FLOBANK (Busan Bank Project 1 Team 1)
 
 **FloBank**는 차세대 뱅킹 시스템을 모사한 핀테크 웹 애플리케이션 프로젝트입니다.
 채널계(API Server)와 계정계(Core Banking Server)를 분리하여 **TCP/IP 소켓 통신**으로 연동하는 실제 금융권 아키텍처를 기반으로 설계되었습니다. 수신, 여신, 외환 등 핵심 금융 업무와 함께 OpenAI, Elasticsearch, Vector DB를 활용한 AI 기반의 혁신적인 금융 서비스를 제공합니다.
@@ -57,7 +57,7 @@
 ### 3\. 🤖 AI & 스마트 서비스 (AI & Smart Features)
 
   * **AI 챗봇 (Flo-Bot)**:
-      * **RAG (Retrieval-Augmented Generation)**: Pinecone(Vector DB)에 저장된 금융 지식 데이터를 기반으로 정확한 답변 제공.
+      * **RAG (Retrieval-Augmented Generation)**: Pinecone(Vector DB)에 저장된 금융 지식 데이터와 DB 화이트리스트 조회를 기반으로 정확한 답변 제공.
       * 자연어 처리를 통한 메뉴 이동 및 상품 추천.
   * **PDF 문서 AI 분석**:
       * 복잡한 금융 상품 약관이나 설명서(PDF)를 업로드하면 AI가 핵심 내용을 요약 및 분석해 주는 서비스.
