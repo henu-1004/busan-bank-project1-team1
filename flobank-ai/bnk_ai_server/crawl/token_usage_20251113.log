@@ -1,0 +1,24 @@
+[2025-11-13 03:50:43.392216] model=gpt-4.1-mini
+prompt_tokens=1127, completion_tokens=300, total_tokens=1427
+prompt_cost=$0.000169, completion_cost=$0.000180, total_cost=$0.000349
+------------------------------------------------------
+[2025-11-13 03:50:48.878688] model=gpt-4.1-mini
+prompt_tokens=4522, completion_tokens=322, total_tokens=4844
+prompt_cost=$0.000678, completion_cost=$0.000193, total_cost=$0.000871
+------------------------------------------------------
+[2025-11-13 05:19:14.109998] model=gpt-4.1-mini
+prompt_tokens=1145, completion_tokens=104, total_tokens=1249
+prompt_cost=$0.000172, completion_cost=$0.000062, total_cost=$0.000234
+------------------------------------------------------
+[2025-11-13 05:19:17.426011] model=gpt-4.1-mini
+prompt_tokens=4540, completion_tokens=177, total_tokens=4717
+prompt_cost=$0.000681, completion_cost=$0.000106, total_cost=$0.000787
+------------------------------------------------------
+[2025-11-13 05:21:05.203469] model=gpt-4.1-mini
+prompt_tokens=1167, completion_tokens=127, total_tokens=1294
+prompt_cost=$0.000175, completion_cost=$0.000076, total_cost=$0.000251
+------------------------------------------------------
+[2025-11-13 05:21:08.971464] model=gpt-4.1-mini
+prompt_tokens=4562, completion_tokens=186, total_tokens=4748
+prompt_cost=$0.000684, completion_cost=$0.000112, total_cost=$0.000796
+------------------------------------------------------
