@@ -1,0 +1,4 @@
+python3: can't open file '/home/g5223sho/run_crawler.py': [Errno 2] No such file or directory
+
+🚀 실행중: python3 run_crawler.py
+❌ 에러 발생! 중단됨: python3 run_crawler.py
