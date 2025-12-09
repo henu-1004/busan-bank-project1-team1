@@ -1,5 +1,6 @@
 package kr.co.api.flobankapi.service;
 
+import kr.co.api.flobankapi.dto.DepositRateDTO;
 import kr.co.api.flobankapi.dto.InterestInfoDTO;
 import kr.co.api.flobankapi.dto.ProductDTO;
 import kr.co.api.flobankapi.dto.TermsHistDTO;
@@ -39,8 +40,8 @@ public class WhiteListService {
                 yield sb.toString();
             }
             case "flobankInterest" -> {
-                List<InterestInfoDTO> dtoList = whiteListMapper.interestInfo();
-                yield flobankInterest(dtoList);
+                List<DepositRateDTO> dtoList = whiteListMapper.interestsInfo();
+                yield flobankInterestInfo(dtoList);
             }
             case "registerTerms" -> {
                 List<TermsHistDTO> terms = whiteListMapper.selectLatestTermsByCate(1);
@@ -90,6 +91,32 @@ public class WhiteListService {
             }else {
                 a = "플로뱅크 " + interest.getInterestCurrency() +" " + interest.getInterestMonth() + "개월 이상 예치 금리 : 거주자 " + interest.getInterestRate() + "%\n";
             }
+            sb.append(a);
+        }
+
+        return sb.toString();
+
+    }
+
+    private String flobankInterestInfo(List<DepositRateDTO> dtoList) {
+        StringBuilder sb = new StringBuilder();
+        String a = "";
+
+        for (DepositRateDTO interest : dtoList) {
+
+            a = "플로뱅크 " + interest.getCurrency() + " 외화예금 금리\n";
+            a += "플로뱅크 " + interest.getCurrency() + " 1개월 금리 : " + interest.getRate1M() + "\n";
+            a += "플로뱅크 " + interest.getCurrency() + " 2개월 금리 : " + interest.getRate2M() + "\n";
+            a += "플로뱅크 " + interest.getCurrency() + " 3개월 금리 : " + interest.getRate3M() + "\n";
+            a += "플로뱅크 " + interest.getCurrency() + " 4개월 금리 : " + interest.getRate4M() + "\n";
+            a += "플로뱅크 " + interest.getCurrency() + " 5개월 금리 : " + interest.getRate5M() + "\n";
+            a += "플로뱅크 " + interest.getCurrency() + " 6개월 금리 : " + interest.getRate6M() + "\n";
+            a += "플로뱅크 " + interest.getCurrency() + " 7개월 금리 : " + interest.getRate7M() + "\n";
+            a += "플로뱅크 " + interest.getCurrency() + " 8개월 금리 : " + interest.getRate8M() + "\n";
+            a += "플로뱅크 " + interest.getCurrency() + " 9개월 금리 : " + interest.getRate9M() + "\n";
+            a += "플로뱅크 " + interest.getCurrency() + " 10개월 금리 : " + interest.getRate10M() + "\n";
+            a += "플로뱅크 " + interest.getCurrency() + " 11개월 금리 : " + interest.getRate11M() + "\n";
+            a += "플로뱅크 " + interest.getCurrency() + " 12개월 금리 : " + interest.getRate12M() + "\n";
             sb.append(a);
         }
 

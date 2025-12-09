@@ -79,29 +79,7 @@ public class ChatbotController {
             }
 
 
-            // 질문 타입 분류
-            String type = typeClassifier.detectTypeByGPT(q);
-
             StringBuilder contextBuilder = new StringBuilder();
-            if (type != null && !type.equals("null")) {
-                // 질문 임베딩
-                List<Double> qEmbedding = embeddingService.embedText(q);
-                // VectorDB 검색
-                var results = pineconeService.search(
-                        qEmbedding,
-                        10,          // topK
-                        "fx-interest",       // namespace 전체 검색
-                        type,       // GPT가 판별한 문서 타입 (null 가능)
-                        0
-                );
-                // 검색된 문서로 문맥 텍스트 구성
-                for (SearchResDTO r : results) {
-                    Map<String, Object> meta = r.getMetadata();
-                    if (meta != null && meta.containsKey("content")) {
-                        contextBuilder.append(meta.get("content")).append("\n\n");
-                    }
-                }
-            }
 
             String query = typeClassifier.detectQueryByGPT(q);
             System.out.println("=== 실행될 QUERY = " + query);
@@ -112,6 +90,34 @@ public class ChatbotController {
             }
             //System.out.println("=== 쿼리 실행 결과 = " + queryResult);
 
+
+
+
+            // 질문 타입 분류
+            String type = typeClassifier.detectTypeByGPT(q);
+
+
+
+            if (type != null && !type.equals("null")) {
+                // 질문 임베딩
+                List<Double> qEmbedding = embeddingService.embedText(q);
+                // VectorDB 검색
+                var results = pineconeService.search(
+                        qEmbedding,
+                        5,          // topK
+                        "fx-interest",       // namespace 전체 검색
+                        type,       // GPT가 판별한 문서 타입 (null 가능)
+                        0
+                );
+                contextBuilder.append("\n\n\n\n");
+                // 검색된 문서로 문맥 텍스트 구성
+                for (SearchResDTO r : results) {
+                    Map<String, Object> meta = r.getMetadata();
+                    if (meta != null && meta.containsKey("content")) {
+                        contextBuilder.append(meta.get("content")).append("\n\n");
+                    }
+                }
+            }
 
             String context = contextBuilder.toString();
             log.info("=== 최종 context ===\n" + context);

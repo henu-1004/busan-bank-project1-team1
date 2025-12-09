@@ -8,6 +8,7 @@
     <select id="selectBadTypeList" resultType="kr.co.api.flobankapi.dto.ChatbotBadTypeDTO">
         SELECT *
         FROM TB_CHATBOT_BAD_TYPE
+        order by bt_no asc
     </select>
 
     <select id="selectBadWordList" resultType="kr.co.api.flobankapi.dto.ChatbotBadWordDTO">
