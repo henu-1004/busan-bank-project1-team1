@@ -38,15 +38,21 @@ public class ChatbotRuleService {
 
         for (ChatbotBadWordDTO w : badWords) {
             if (w.getBadType() == 1) {
-                // 🔹 욕설/비속어 : 단순 포함 체크
+                // 욕설/비속어 : 단순 포함 체크
                 if (q.contains(w.getBadWord())) {
                     return badTypes.get(0).getBtAnswer();
                 }
             } else if (w.getBadType() == 2) {
-                // 🔹 개인정보 : 정규식 패턴 매칭
+                // 개인정보 : 정규식 패턴 매칭
                 if (Pattern.compile(w.getBadWord()).matcher(q).find()) {
 
                     return badTypes.get(1).getBtAnswer();
+                }
+            } else if (w.getBadType() == 3) {
+                //
+                if (q.contains(w.getBadWord())) {
+
+                    return badTypes.get(2).getBtAnswer();
                 }
             }
         }

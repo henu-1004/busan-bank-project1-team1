@@ -1,5 +1,6 @@
 package kr.co.api.flobankapi.mapper;
 
+import kr.co.api.flobankapi.dto.DepositRateDTO;
 import kr.co.api.flobankapi.dto.InterestInfoDTO;
 import kr.co.api.flobankapi.dto.ProductDTO;
 import kr.co.api.flobankapi.dto.TermsHistDTO;
@@ -12,5 +13,6 @@ public interface WhiteListMapper {
     public List<ProductDTO> dpstAllInfo(String dpstId);
     public List<String> dpstIdList();
     public List<InterestInfoDTO> interestInfo();
+    public List<DepositRateDTO> interestsInfo();
     public List<TermsHistDTO> selectLatestTermsByCate(int termCate);
 }

@@ -63,6 +63,7 @@
                     <select id="type" name="badType" required>
                         <option value="1">욕설</option>
                         <option value="2">개인정보</option>
+                        <option value="3">우회시도</option>
                     </select>
                 </div>
             </div>
@@ -102,6 +103,19 @@
                 </div>
             </div>
 
+            <div class="board-row chatbot" style="padding-top: 5px; grid-template-columns: 8fr 1fr;">
+                <div class="board-control">
+                    <label>우회·강요형 질문(BYPASS_ATTEMPT) 기본 응답</label>
+                    <input type="text" name="PERSONAL_INFO"
+                           th:value="${badTypeList[2].btAnswer}"
+                           placeholder="예: 개인정보 관련 문의는 도와드릴 수 없습니다." />
+                </div>
+
+                <div class="board-control" style="justify-content: flex-end">
+                    <button class="board-btn-primary" style="margin-top: 15px; width: 100%; gap: 0">변경 저장</button>
+                </div>
+            </div>
+
 
         </form>
     </section>
@@ -130,7 +144,7 @@
                 <tr th:each="bw, stat: ${badWordList}">
                     <td>[[${stat.count}]]</td>
                     <td>[[${bw.badWord}]]</td>
-                    <td th:text="${bw.badType == 1 ? '욕설/비속어' : (bw.badType == 2 ? '개인정보' : '기타')}">욕설/비속어</td>
+                    <td th:text="${bw.badType == 1 ? '욕설/비속어' : (bw.badType == 2 ? '개인정보' : (bw.badType == 3 ? '우회질문' : '기타'))}">욕설/비속어</td>
                     <td th:text="${#temporals.format(bw.badRegDt, 'yyyy-MM-dd HH:mm:ss')}"></td>
                     <td>
                         <button th:if="${bw.badUseYn=='y'}" class="bot-btn-edit" style="background-color:gray">미적용</button>
@@ -240,7 +254,7 @@
                     <td>[[${hist.botNo}]]</td>
                     <td style="width:100px">[[${hist.botDt}]]</td>
                     <td style="width:160px">[[${hist.userQuestion}]]</td>
-                    <td style="width:160px">[[${hist.botAnswer}]]</td>
+                    <td th:utext="${hist.getBotAnswer()}" style="width:160px"></td>
                 </tr>
 
                 </tbody>
