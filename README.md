@@ -5,6 +5,8 @@
 **FloBank**는 차세대 뱅킹 시스템을 모사한 핀테크 웹 애플리케이션 프로젝트입니다.
 채널계(API Server)와 계정계(Core Banking Server)를 분리하여 **TCP/IP 소켓 통신**으로 연동하는 실제 금융권 아키텍처를 기반으로 설계되었습니다. 수신, 여신, 외환 등 핵심 금융 업무와 함께 OpenAI, Elasticsearch, Vector DB를 활용한 AI 기반의 혁신적인 금융 서비스를 제공합니다.
 
+## 발표자료
+[1조 발표자료 최종본.pdf](https://github.com/user-attachments/files/24046389/1.pdf)
 -----
 
 ## 📅 프로젝트 개요
